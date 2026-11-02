@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-02T18:50:04.897Z",
+  "generatedAt": "2026-11-02T22:22:52.193Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -26,8 +26,8 @@
    "returns": {
     "US": 0.1199313269617508,
     "EXUS": 0.13648499877602638,
-    "TBILLS": 0.036633777980417115,
-    "BONDS": -0.0023146283941397616,
+    "TBILLS": 0.03663377798096157,
+    "BONDS": -0.002314628393878748,
     "DEVX": 0.13140577813463872,
     "EM": 0.11523848211777143
    },
@@ -40,7 +40,7 @@
      "US"
     ],
     "absAsset": "US",
-    "excess": 0.08329754898133368,
+    "excess": 0.08329754898078923,
     "relativeMargin": 0.016553671814275583,
     "safeMargin": null,
     "nearTie": false,
@@ -49,7 +49,33 @@
    "previous": "EXUS",
    "changed": false
   },
-  "preview": null,
+  "preview": {
+   "asOf": "2026-11-02",
+   "returns": {
+    "US": 0.11456670593332552,
+    "EXUS": 0.13911682618090193,
+    "TBILLS": 0.03684283434330404,
+    "BONDS": -0.0008404747457216866,
+    "DEVX": 0.1350176955844251,
+    "EM": 0.11719108821440849
+   },
+   "decision": {
+    "asset": "EXUS",
+    "riskOn": true,
+    "leader": "EXUS",
+    "ranked": [
+     "EXUS",
+     "US"
+    ],
+    "absAsset": "US",
+    "excess": 0.07772387159002148,
+    "relativeMargin": 0.024550120247576412,
+    "safeMargin": null,
+    "nearTie": false,
+    "bufferApplied": false
+   },
+   "differsFromOfficial": false
+  },
   "history": [
    {
     "month": "2023-11",
@@ -60,12 +86,12 @@
     "returns": {
      "US": 0.13730852033065877,
      "EXUS": 0.07608700811442715,
-     "TBILLS": 0.048759567962050054,
-     "BONDS": 0.010007864371924358,
+     "TBILLS": 0.04875956796304881,
+     "BONDS": 0.010007864371711417,
      "DEVX": 0.10327364515296966,
      "EM": 0.04684410996951294
     },
-    "excess": 0.08854895236860871,
+    "excess": 0.08854895236760996,
     "nearTie": false
    },
    {
@@ -77,12 +103,12 @@
     "returns": {
      "US": 0.2618955063469277,
      "EXUS": 0.15666667385722022,
-     "TBILLS": 0.04943668581773286,
-     "BONDS": 0.05652406640096408,
+     "TBILLS": 0.04943668581782279,
+     "BONDS": 0.05652406640130514,
      "DEVX": 0.183973921498634,
      "EM": 0.11569871936427978
     },
-    "excess": 0.21245882052919485,
+    "excess": 0.21245882052910492,
     "nearTie": false
    },
    {
@@ -94,12 +120,12 @@
     "returns": {
      "US": 0.20614197611807983,
      "EXUS": 0.04360267549314356,
-     "TBILLS": 0.05092785599684069,
-     "BONDS": 0.020927951227931896,
+     "TBILLS": 0.05092785599803906,
+     "BONDS": 0.020927951227782238,
      "DEVX": 0.08127703626124494,
      "EM": -0.01889150998226019
     },
-    "excess": 0.15521412012123914,
+    "excess": 0.15521412012004077,
     "nearTie": false
    },
    {
@@ -111,12 +137,12 @@
     "returns": {
      "US": 0.3018179646545178,
      "EXUS": 0.12612531847370767,
-     "TBILLS": 0.05196231126717965,
-     "BONDS": 0.03342097361070562,
+     "TBILLS": 0.051962311268116235,
+     "BONDS": 0.033420973610956306,
      "DEVX": 0.14889271340879384,
      "EM": 0.09516162628918878
     },
-    "excess": 0.24985565338733817,
+    "excess": 0.2498556533864016,
     "nearTie": false
    },
    {
@@ -128,12 +154,12 @@
     "returns": {
      "US": 0.29629368981599424,
      "EXUS": 0.12879770815714542,
-     "TBILLS": 0.052075476696061385,
-     "BONDS": 0.01589112615761401,
+     "TBILLS": 0.05207547669600032,
+     "BONDS": 0.015891126157680402,
      "DEVX": 0.15167317800728597,
      "EM": 0.08944139680015417
     },
-    "excess": 0.24421821311993286,
+    "excess": 0.24421821311999392,
     "nearTie": false
    },
    {
@@ -145,12 +171,12 @@
     "returns": {
      "US": 0.22446673980784015,
      "EXUS": 0.08113947302681823,
-     "TBILLS": 0.05279630195313789,
-     "BONDS": -0.014917269175692471,
+     "TBILLS": 0.052796301953474956,
+     "BONDS": -0.014917269176832781,
      "DEVX": 0.08253650761224551,
      "EM": 0.09521102129176207
     },
-    "excess": 0.17167043785470226,
+    "excess": 0.1716704378543652,
     "nearTie": false
    },
    {
@@ -162,12 +188,12 @@
     "returns": {
      "US": 0.2804889618346982,
      "EXUS": 0.16761009960455686,
-     "TBILLS": 0.053650219802489074,
-     "BONDS": 0.013079945632620715,
+     "TBILLS": 0.05365021980232054,
+     "BONDS": 0.013079945631855328,
      "DEVX": 0.1847900765633912,
      "EM": 0.1385804520124274
     },
-    "excess": 0.2268387420322091,
+    "excess": 0.22683874203237764,
     "nearTie": false
    },
    {
@@ -179,12 +205,12 @@
     "returns": {
      "US": 0.24497835701489445,
      "EXUS": 0.11116004998239859,
-     "TBILLS": 0.05301237681301907,
-     "BONDS": 0.025817338546021418,
+     "TBILLS": 0.053012376813332374,
+     "BONDS": 0.025817338546483493,
      "DEVX": 0.11341220282531106,
      "EM": 0.11852074746999919
     },
-    "excess": 0.19196598020187539,
+    "excess": 0.19196598020156208,
     "nearTie": false
    },
    {
@@ -196,12 +222,12 @@
     "returns": {
      "US": 0.22011553118294325,
      "EXUS": 0.09237716484357117,
-     "TBILLS": 0.05369631437667133,
-     "BONDS": 0.050810747479898666,
+     "TBILLS": 0.05369631437650679,
+     "BONDS": 0.05081074747934822,
      "DEVX": 0.1121996473054343,
      "EM": 0.0636445895317368
     },
-    "excess": 0.16641921680627192,
+    "excess": 0.16641921680643645,
     "nearTie": false
    },
    {
@@ -213,12 +239,12 @@
     "returns": {
      "US": 0.2692521260594485,
      "EXUS": 0.1779205652870237,
-     "TBILLS": 0.05333672769598374,
-     "BONDS": 0.07291000354438171,
+     "TBILLS": 0.053336727696948305,
+     "BONDS": 0.07291000354507693,
      "DEVX": 0.1955040790793905,
      "EM": 0.14328817640590663
     },
-    "excess": 0.21591539836346474,
+    "excess": 0.21591539836250018,
     "nearTie": false
    },
    {
@@ -230,12 +256,12 @@
     "returns": {
      "US": 0.3603915129324622,
      "EXUS": 0.25295656030024727,
-     "TBILLS": 0.05358259330372839,
-     "BONDS": 0.11607680093209316,
+     "TBILLS": 0.0535825933038685,
+     "BONDS": 0.11607680093220973,
      "DEVX": 0.25049708827992867,
      "EM": 0.2424458250971988
     },
-    "excess": 0.3068089196287338,
+    "excess": 0.3068089196285937,
     "nearTie": false
    },
    {
@@ -247,12 +273,12 @@
     "returns": {
      "US": 0.37817010268205054,
      "EXUS": 0.2332744875808106,
-     "TBILLS": 0.05320284498037853,
-     "BONDS": 0.10529641096956888,
+     "TBILLS": 0.05320284497958183,
+     "BONDS": 0.10529641097021014,
      "DEVX": 0.21995767220539064,
      "EM": 0.24694016078294534
     },
-    "excess": 0.324967257701672,
+    "excess": 0.3249672577024687,
     "nearTie": false
    },
    {
@@ -264,12 +290,12 @@
     "returns": {
      "US": 0.3381256688474743,
      "EXUS": 0.1358530158074014,
-     "TBILLS": 0.052178844668990365,
-     "BONDS": 0.06855694906986187,
+     "TBILLS": 0.052178844668831825,
+     "BONDS": 0.06855694907083132,
      "DEVX": 0.12374940387529376,
      "EM": 0.12659071858435555
     },
-    "excess": 0.28594682417848394,
+    "excess": 0.2859468241786425,
     "nearTie": false
    },
    {
@@ -281,12 +307,12 @@
     "returns": {
      "US": 0.24885149723068678,
      "EXUS": 0.05194715726039245,
-     "TBILLS": 0.05191018220048882,
-     "BONDS": 0.013076096147749183,
+     "TBILLS": 0.05191018220127597,
+     "BONDS": 0.013076096147608185,
      "DEVX": 0.035100803692886595,
      "EM": 0.06507545871485743
     },
-    "excess": 0.19694131503019796,
+    "excess": 0.1969413150294108,
     "nearTie": false
    },
    {
@@ -298,12 +324,12 @@
     "returns": {
      "US": 0.26228740025508634,
      "EXUS": 0.10775153301305185,
-     "TBILLS": 0.05110629270662681,
-     "BONDS": 0.019844854219215557,
+     "TBILLS": 0.05110629270624445,
+     "BONDS": 0.019844854219009056,
      "DEVX": 0.0897125830536114,
      "EM": 0.12829450618736238
     },
-    "excess": 0.21118110754845953,
+    "excess": 0.2111811075488419,
     "nearTie": false
    },
    {
@@ -315,12 +341,12 @@
     "returns": {
      "US": 0.18445012661469717,
      "EXUS": 0.10186065024589164,
-     "TBILLS": 0.04983980439641167,
-     "BONDS": 0.05828234233824725,
+     "TBILLS": 0.04983980439436597,
+     "BONDS": 0.05828234233852503,
      "DEVX": 0.08936113579636062,
      "EM": 0.09515495798622875
     },
-    "excess": 0.1346103222182855,
+    "excess": 0.1346103222203312,
     "nearTie": false
    },
    {
@@ -332,12 +358,12 @@
     "returns": {
      "US": 0.08301110428505543,
      "EXUS": 0.06907614006788632,
-     "TBILLS": 0.04897319908613795,
-     "BONDS": 0.0485488056384471,
+     "TBILLS": 0.048973199086311814,
+     "BONDS": 0.04854880563823194,
      "DEVX": 0.05569595480716116,
      "EM": 0.0790089619336094
     },
-    "excess": 0.03403790519891747,
+    "excess": 0.03403790519874361,
     "nearTie": false
    },
    {
@@ -349,12 +375,12 @@
     "returns": {
      "US": 0.11872794699318079,
      "EXUS": 0.12539862008994596,
-     "TBILLS": 0.04802058375763041,
-     "BONDS": 0.07979243072419262,
+     "TBILLS": 0.04802058375828899,
+     "BONDS": 0.07979243072594211,
      "DEVX": 0.13139813628806762,
      "EM": 0.08195910285580821
     },
-    "excess": 0.07070736323555038,
+    "excess": 0.0707073632348918,
     "nearTie": true
    },
    {
@@ -366,12 +392,12 @@
     "returns": {
      "US": 0.13178873161355642,
      "EXUS": 0.13067946884091008,
-     "TBILLS": 0.04703898199750345,
-     "BONDS": 0.055640740299828684,
+     "TBILLS": 0.047038981998327456,
+     "BONDS": 0.055640740299786495,
      "DEVX": 0.12849460570814575,
      "EM": 0.11205334701370795
     },
-    "excess": 0.08474974961605297,
+    "excess": 0.08474974961522896,
     "nearTie": true
    },
    {
@@ -383,12 +409,12 @@
     "returns": {
      "US": 0.14939940269218455,
      "EXUS": 0.17989611170830577,
-     "TBILLS": 0.04636990445483913,
-     "BONDS": 0.061634649008322606,
+     "TBILLS": 0.046369904454610866,
+     "BONDS": 0.061634649007614284,
      "DEVX": 0.17673849030299804,
      "EM": 0.15965285797053852
     },
-    "excess": 0.10302949823734542,
+    "excess": 0.10302949823757368,
     "nearTie": false
    },
    {
@@ -400,12 +426,12 @@
     "returns": {
      "US": 0.16180340928189807,
      "EXUS": 0.14201136076963516,
-     "TBILLS": 0.0453915973692669,
-     "BONDS": 0.033814388107705984,
+     "TBILLS": 0.04539159736940923,
+     "BONDS": 0.03381438810748727,
      "DEVX": 0.12301751397515037,
      "EM": 0.15658960811233968
     },
-    "excess": 0.11641181191263117,
+    "excess": 0.11641181191248884,
     "nearTie": false
    },
    {
@@ -417,12 +443,12 @@
     "returns": {
      "US": 0.15857237193450668,
      "EXUS": 0.157659336241035,
-     "TBILLS": 0.04444460200610911,
-     "BONDS": 0.03104054451083771,
+     "TBILLS": 0.044444602004659384,
+     "BONDS": 0.031040544510484436,
      "DEVX": 0.13676808940445206,
      "EM": 0.17896503571381994
     },
-    "excess": 0.11412776992839757,
+    "excess": 0.1141277699298473,
     "nearTie": true
    },
    {
@@ -434,12 +460,12 @@
     "returns": {
      "US": 0.17513639335577613,
      "EXUS": 0.1687279991388142,
-     "TBILLS": 0.043487915031366065,
-     "BONDS": 0.028965942239153053,
+     "TBILLS": 0.04348791503152083,
+     "BONDS": 0.028965942238197817,
      "DEVX": 0.15123612881705295,
      "EM": 0.1873713194929838
     },
-    "excess": 0.13164847832441007,
+    "excess": 0.1316484783242553,
     "nearTie": true
    },
    {
@@ -451,12 +477,12 @@
     "returns": {
      "US": 0.21398166794140905,
      "EXUS": 0.2509723236080468,
-     "TBILLS": 0.04302463139632429,
-     "BONDS": 0.06204783239485279,
+     "TBILLS": 0.04302463139635648,
+     "BONDS": 0.06204783239392375,
      "DEVX": 0.22990101337078128,
      "EM": 0.269275277212917
     },
-    "excess": 0.17095703654508476,
+    "excess": 0.17095703654505257,
     "nearTie": false
    },
    {
@@ -468,12 +494,12 @@
     "returns": {
      "US": 0.14789584199971206,
      "EXUS": 0.2570679186660578,
-     "TBILLS": 0.04217043680124677,
-     "BONDS": 0.0567280394168137,
+     "TBILLS": 0.04217043680102672,
+     "BONDS": 0.05672803941638116,
      "DEVX": 0.24293477011171394,
      "EM": 0.27761387623649614
     },
-    "excess": 0.1057254051984653,
+    "excess": 0.10572540519868534,
     "nearTie": false
    },
    {
@@ -485,12 +511,12 @@
     "returns": {
      "US": 0.17715053440669926,
      "EXUS": 0.32593236978064066,
-     "TBILLS": 0.041480480123327945,
-     "BONDS": 0.07193240688665781,
+     "TBILLS": 0.041480480123419206,
+     "BONDS": 0.07193240688748737,
      "DEVX": 0.3155084176812213,
      "EM": 0.32559487357648353
     },
-    "excess": 0.1356700542833713,
+    "excess": 0.13567005428328005,
     "nearTie": false
    },
    {
@@ -502,12 +528,12 @@
     "returns": {
      "US": 0.16325821253960404,
      "EXUS": 0.3508899997060635,
-     "TBILLS": 0.040914592807596684,
-     "BONDS": 0.06909895110989073,
+     "TBILLS": 0.04091459280662124,
+     "BONDS": 0.06909895111007858,
      "DEVX": 0.3168109226264748,
      "EM": 0.4101084976954237
     },
-    "excess": 0.12234361973200736,
+    "excess": 0.1223436197329828,
     "nearTie": false
    },
    {
@@ -519,12 +545,12 @@
     "returns": {
      "US": 0.1680333224702888,
      "EXUS": 0.3865158522324399,
-     "TBILLS": 0.04032769474050113,
-     "BONDS": 0.062414552858899075,
+     "TBILLS": 0.04032769474149678,
+     "BONDS": 0.06241455285867237,
      "DEVX": 0.33795169429545346,
      "EM": 0.4791686437583358
     },
-    "excess": 0.12770562772978766,
+    "excess": 0.12770562772879201,
     "nearTie": false
    },
    {
@@ -536,12 +562,12 @@
     "returns": {
      "US": 0.17592384751394818,
      "EXUS": 0.2721580957221208,
-     "TBILLS": 0.039918959096863604,
-     "BONDS": 0.043645128172404846,
+     "TBILLS": 0.039918959097697604,
+     "BONDS": 0.04364512817268951,
      "DEVX": 0.23094268096123427,
      "EM": 0.33088634478151224
     },
-    "excess": 0.13600488841708458,
+    "excess": 0.13600488841625058,
     "nearTie": false
    },
    {
@@ -553,12 +579,12 @@
     "returns": {
      "US": 0.3108229141757237,
      "EXUS": 0.33199741101627,
-     "TBILLS": 0.03937902175769992,
-     "BONDS": 0.040925021831745845,
+     "TBILLS": 0.03937902175713748,
+     "BONDS": 0.040925021831461184,
      "DEVX": 0.2505088372124069,
      "EM": 0.4921231510859563
     },
-    "excess": 0.2714438924180238,
+    "excess": 0.27144389241858624,
     "nearTie": false
    },
    {
@@ -570,12 +596,12 @@
     "returns": {
      "US": 0.29821946676884337,
      "EXUS": 0.32505157894890724,
-     "TBILLS": 0.03890835266977066,
-     "BONDS": 0.0503388558989577,
+     "TBILLS": 0.038908352668977964,
+     "BONDS": 0.050338855899325186,
      "DEVX": 0.22226493645580847,
      "EM": 0.5162580923958848
     },
-    "excess": 0.2593111140990727,
+    "excess": 0.2593111140998654,
     "nearTie": false
    },
    {
@@ -587,12 +613,12 @@
     "returns": {
      "US": 0.2220185208839145,
      "EXUS": 0.2828878225579943,
-     "TBILLS": 0.038261801821604546,
-     "BONDS": 0.037897029399454274,
+     "TBILLS": 0.038261801822022434,
+     "BONDS": 0.037897029399682536,
      "DEVX": 0.2018568103938423,
      "EM": 0.41505375583051696
     },
-    "excess": 0.18375671906230995,
+    "excess": 0.18375671906189206,
     "nearTie": false
    },
    {
@@ -604,12 +630,12 @@
     "returns": {
      "US": 0.19492313780052206,
      "EXUS": 0.28270499995858334,
-     "TBILLS": 0.03805078228631453,
-     "BONDS": 0.02714588723078415,
+     "TBILLS": 0.038050782287204266,
+     "BONDS": 0.027145887231554866,
      "DEVX": 0.24762501483562804,
      "EM": 0.3191237804699911
     },
-    "excess": 0.15687235551420753,
+    "excess": 0.1568723555133178,
     "nearTie": false
    },
    {
@@ -621,12 +647,12 @@
     "returns": {
      "US": 0.20227625847527864,
      "EXUS": 0.2672020213629587,
-     "TBILLS": 0.0370759608953839,
-     "BONDS": 0.01903159558976153,
+     "TBILLS": 0.037075960896477245,
+     "BONDS": 0.01903159558979839,
      "DEVX": 0.21475861846804545,
      "EM": 0.3497739139109408
     },
-    "excess": 0.16520029757989474,
+    "excess": 0.1652002975788014,
     "nearTie": false
    },
    {
@@ -638,12 +664,12 @@
     "returns": {
      "US": 0.1571118812575878,
      "EXUS": 0.19482944772810495,
-     "TBILLS": 0.036601427895317507,
-     "BONDS": -0.018612945587247243,
+     "TBILLS": 0.03660142789512344,
+     "BONDS": -0.018612945586113816,
      "DEVX": 0.1507370933361456,
      "EM": 0.26248443130717547
     },
-    "excess": 0.12051045336227029,
+    "excess": 0.12051045336246435,
     "nearTie": false
    },
    {
@@ -655,18 +681,18 @@
     "returns": {
      "US": 0.1199313269617508,
      "EXUS": 0.13648499877602638,
-     "TBILLS": 0.036633777980417115,
-     "BONDS": -0.0023146283941397616,
+     "TBILLS": 0.03663377798096157,
+     "BONDS": -0.002314628393878748,
      "DEVX": 0.13140577813463872,
      "EM": 0.11523848211777143
     },
-    "excess": 0.08329754898133368,
+    "excess": 0.08329754898078923,
     "nearTie": false
    }
   ],
   "switchesInHistory": 6,
   "nextDecisionDate": "2026-11-30",
-  "lastDataDate": "2026-10-30",
+  "lastDataDate": "2026-11-02",
   "warnings": []
  },
  "explanation": {
@@ -690,7 +716,7 @@
    "level": "słaby"
   },
   "stabilityText": "Stabilność sygnału: słaby (do zmiany sygnału brakuje 1,7 pp).",
-  "previewNote": null,
+  "previewNote": "Wstępny sygnał na dziś (dane do 2 listopada 2026) potwierdza EXUS.DE.",
   "currency": [
    {
     "key": "IKE",
@@ -751,8 +777,8 @@
    {
     "id": "T10Y3M",
     "name": "Krzywa rentowności USA (10L − 3M)",
-    "date": "2026-10-30",
-    "value": "0,78 pp",
+    "date": "2026-11-02",
+    "value": "0,70 pp",
     "tier": 0,
     "comment": "normalna"
    },
@@ -767,8 +793,8 @@
    {
     "id": "DTWEXBGS",
     "name": "Dolar amerykański (indeks szeroki), zmiana 3M",
-    "date": "2026-10-23",
-    "value": "+0,3%",
+    "date": "2026-10-30",
+    "value": "+1,7%",
     "tier": 0,
     "comment": "stabilny"
    },
@@ -791,10 +817,10 @@
   "errors": []
  },
  "news": {
-  "fetched": 295,
+  "fetched": 312,
   "items": [
    {
-    "title": "Polityczna wojna może sparaliżować NBP. Inwestorzy mają powody do obaw",
+    "title": "NBP na krawędzi paraliżu. Inwestorzy mogą stracić cierpliwość",
     "link": "https://www.bankier.pl/wiadomosc/Polityczna-wojna-moze-sparalizowac-NBP-Inwestorzy-maja-powody-do-obaw-9222321.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
     "date": "2026-11-02T15:25:00.000Z",
     "summary": "Narastający konflikt między premierem Donaldem Tuskiem, prezydentem Karolem Nawrockim i prezesem Narodowego Banku Polskiego Adamem Glapińskim może zagrozić sprawnemu funkcjonowaniu banku centralnego – ocenia Bloomberg. Zdaniem agencji polityczny impas wokół NBP budzi coraz większe obawy o niezależno",
@@ -809,6 +835,23 @@
     ],
     "relevant": true,
     "score": 10
+   },
+   {
+    "title": "US-Israeli war on Iran depleted global oil stocks: CEO of Abu Dhabi National Oil Company - نورنیوز",
+    "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQUGd0cHpuRW52UERJelJpQldZMVQ4OFRUbVQzN2JJaHdSc01TWE56dmlpTS1uQWx6WGhTVkNBeVBuTEtRSS1MTFdfeWJnMU5WTDdhTjZ1U3ZSc3NVVmxXejV5MFRVRUJrOFNyNjNRaHc0YmVzSEdTeU9qWDFzQ1dxVDBiWGRRaW1TVGZXaGR2ck9XVnBMTWFKMnBUZDNVT3RhMGxDemFlVGZWR09nZnM4S2ttZFNOcFJKZWdYZTlTdw?oc=5",
+    "date": "2026-11-02T15:32:00.000Z",
+    "summary": "US-Israeli war on Iran depleted global oil stocks: CEO of Abu Dhabi National Oil Company نورنیوز",
+    "source": "Google News",
+    "regions": [
+     "USA",
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 9
    },
    {
     "title": "Wyniki Apple, atak hakerski na Binance i wybory w USA. Co dziś wpływa na rynki? - Investing.com Polska: Kursy walut, kryptowalut, notowania akcji",
@@ -828,30 +871,13 @@
     "score": 9
    },
    {
-    "title": "How US oil firms profit $130bn from Iran war as household bills surge",
-    "link": "https://www.aljazeera.com/news/2026/11/2/how-us-oil-firms-profit-130bn-from-iran-war-as-household-bills-surge?traffic_source=rss",
-    "date": "2026-11-02T14:27:50.000Z",
-    "summary": "As energy from the Gulf and Russia take a hit, American oil and gas firms are the big gainers.",
-    "source": "Al Jazeera",
+    "title": "World drains nearly 1 billion barrels from oil stocks amid Iran war, says ADNOC chief - Telegraph India",
+    "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOaGhhaUZ2ZFVrR2dIcGQyZEw0U2hMTjY1emtTbEIza1htQ281MThRZWhrTmpoSkJnNFN0a1BRRU1Kdk10NWl4cDhRaE4tWVBGYmhHQ2QtUXhVbWpQZzgzTjdMX0tJYmJXakwwXzVhMC1UVm5BVndfN2p2YWI4NmJSUlN2X2RCbE5WeHVPcldfQXRmTFdmQlhKeWtPQ1dqR0YyZ2FwaVR5V05uSHBEQWhfZWxDX19oSVdNUVZkbHJhcWdjZ0lJaGxWS21ldFhJMl9XOFo40gHTAUFVX3lxTE5oaGFpRnZkVWtHZ0hwZDJkTDRTaExONjV6a1NsQjNrWG1DbzUxOFFlaGtOamhKQmc0U3RrUFFFTUp2TXQ1aXhwOFFoTi1ZUEZiaEdDZC1ReFVtalBnODNON0xfS0liYldqTDBfNWEwLVRWbkFWd183anZhYjg2YlJSU3ZfZEJsTlZ4dU9yV19BdGZMV2ZCWEp5a09DV2pHRjJnYXBpVHlXTm5IcERBaF9lbENfX2hJV01RVmRscmFxZ2NnSUlobFZLbWV0WEkyX1c4Wjg?oc=5",
+    "date": "2026-11-02T07:27:30.000Z",
+    "summary": "World drains nearly 1 billion barrels from oil stocks amid Iran war, says ADNOC chief Telegraph India",
+    "source": "Google News",
     "regions": [
-     "USA",
-     "Bliski Wschód",
-     "Rosja/Ukraina"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Analiza rynku ropy: OPEC+ utrzymuje wydobycie, wojna z Iranem zakłóca podaż - CMB News",
-    "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQWUVMYWc4VTlwYndoejdxUEtSTGtiaXFaRmJLNGxRZ1E2VlFaMjRpdDJrQ2NrSmhXdmZRM2lnZTczdDA3N0ZQWjZ0VWFtbFdrTlhFc2FnclhWdjhjc3g2SUY5UlI1elR4RlFrVnYtUDhNVHJhQ2VHRHJObHp2R21ab19ZX1JMTU1jS3hadkVlMVJ2SDUwOTFmT3VlRHZWTGJmaUd6bjlGUU9xTUE?oc=5",
-    "date": "2026-11-02T07:55:59.000Z",
-    "summary": "Analiza rynku ropy: OPEC+ utrzymuje wydobycie, wojna z Iranem zakłóca podaż CMB News",
-    "source": "Google News PL",
-    "regions": [
+     "Azja",
      "Bliski Wschód"
     ],
     "themes": [
@@ -859,21 +885,20 @@
      "Energia i surowce"
     ],
     "relevant": true,
-    "score": 8
+    "score": 9
    },
    {
-    "title": "Wybory i dane z rynku pracy w USA, decyzja RPP oraz wyniki PKO BP, Orlenu i Asbisu. Oto najważniejsze wydarzenia tego tygodnia - pb.pl",
-    "link": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxPdmFEdTFYWm1xOXVsZzFBRnVzNEF1dVJKOVlpbmNhcWYtY0FOY0Jndm9VU1VCRkk4V1oxd2dPaTdvcVI1VTE4OENQVElUUUl3cVptZ25UeE5DR212azZWbEpmei1sY3B2YktZUmdienFscDBhamRpbWxyWWNqSmswaGFNQmhVNGRIVFNWOFltN3laNGtRN2FiQm9hREpmY1MtVjloWXR2LVE0NzZLMmktYUdpUllUQ0RmYlpzY21MTExDZEVrU0N5X0Zfek94TjNPQ2h5aE9HdFZZd3NLajd3RkhBWQ?oc=5",
-    "date": "2026-11-02T07:33:00.000Z",
-    "summary": "Wybory i dane z rynku pracy w USA, decyzja RPP oraz wyniki PKO BP, Orlenu i Asbisu. Oto najważniejsze wydarzenia tego tygodnia pb.pl",
-    "source": "Google News PL",
+    "title": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso - EnergyNow.com",
+    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPaGRxVzJMUGFPeTZJb19RSzdxcEdiTjZPMGhleXFLZ3R6eTRzSkd4eTlvSVJ4NHhHTmhTX0tCR2ZDb1o5QUVnOHg2TG5vc0N0dUZTZ3ZzZ0Jvc2V6MFJUZFlpYUZyU051NUEtLW1LcG9mcXZvYUhBejBmbzJPMTZTWjRXUkkwZ2F2RDM2bG81SEdqMWljQjRDM3Q1Uy1jLVJraVo2QzZZR3pLT3BlOUk4YUFn?oc=5",
+    "date": "2026-11-02T15:27:22.000Z",
+    "summary": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso EnergyNow.com",
+    "source": "Google News",
     "regions": [
-     "USA",
-     "Polska"
+     "Bliski Wschód"
     ],
     "themes": [
-     "Banki centralne i stopy",
-     "Wybory i polityka"
+     "Konflikty i wojny",
+     "Energia i surowce"
     ],
     "relevant": true,
     "score": 8
@@ -895,10 +920,10 @@
     "score": 8
    },
    {
-    "title": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso - EnergyNow.com",
-    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPaGRxVzJMUGFPeTZJb19RSzdxcEdiTjZPMGhleXFLZ3R6eTRzSkd4eTlvSVJ4NHhHTmhTX0tCR2ZDb1o5QUVnOHg2TG5vc0N0dUZTZ3ZzZ0Jvc2V6MFJUZFlpYUZyU051NUEtLW1LcG9mcXZvYUhBejBmbzJPMTZTWjRXUkkwZ2F2RDM2bG81SEdqMWljQjRDM3Q1Uy1jLVJraVo2QzZZR3pLT3BlOUk4YUFn?oc=5",
-    "date": "2026-10-31T03:30:34.000Z",
-    "summary": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso EnergyNow.com",
+    "title": "Iran War Ceasefire Pushes Energy Markets Into Twilight Zone: Bousso - EnergyNow.com",
+    "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxPRklBQkZvb3NtU0FzeDJNcWs5MGUwNEZHek9vU253V0RKRjlkWVBqTFpRNjdlVEozUXB4TzlKTmJwMmFOZjA4bTJxOVRGQWhBMTRXMVlRS08xTWQwckdqUkI3b05CXzd5LVdPVlNQTEZWNl9waC1VelhNZU5HeWVLSTBaLWlrNklObE5yTGdrNUdzMHdzZTNqMTdITkFVQQ?oc=5",
+    "date": "2026-10-31T21:45:49.000Z",
+    "summary": "Iran War Ceasefire Pushes Energy Markets Into Twilight Zone: Bousso EnergyNow.com",
     "source": "Google News",
     "regions": [
      "Bliski Wschód"
@@ -909,6 +934,70 @@
     ],
     "relevant": true,
     "score": 8
+   },
+   {
+    "title": "World Absorbs Historic Iran War Oil Supply Loss, But Depleted Stocks Bring Risks - EnergyNow.com",
+    "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQbW5RLWt6Unk4SkNYOXIySEZqOF8tTUs3NWNZWTRWaUEzVW5MVmNqSTJqTnY5UTZZc09EY0RlLTc3UWcyTWlFcnlLdFdQSG9WSm1RcUFwNENpcGIxQkxmZU53VkFRM3o3aWtQZDRsQ0NHR0ZsejFVdHhyR09Jb1gweU1BLVFCSE1yVnBYQmV3VDRxcEJHVGMzNXh4QTlQbmQzaUJRaVBxM2FRQ3dCX0Rz?oc=5",
+    "date": "2026-10-31T21:45:23.000Z",
+    "summary": "World Absorbs Historic Iran War Oil Supply Loss, But Depleted Stocks Bring Risks EnergyNow.com",
+    "source": "Google News",
+    "regions": [
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Brent ends October up 13.6% as Iran war risks unsettle markets - Nation Thailand",
+    "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE9NbHdDWnoyUnRnZXJ5SE5saGxETWFwbjdoWlNyTUllRUJ1dUJNQkVyTmNFY2Z1OUtxdmtpcFRNX0pieFFXZWUzSVFEQ1ZROWREbzhrdFZ2RzBVOVRMU2xZ?oc=5",
+    "date": "2026-10-31T00:28:00.000Z",
+    "summary": "Brent ends October up 13.6% as Iran war risks unsettle markets Nation Thailand",
+    "source": "Google News",
+    "regions": [
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Druga czarna świeca na Nasdaqu. Wall Street w dół pomimo przeceny ropy naftowej",
+    "link": "https://www.bankier.pl/wiadomosc/Druga-czarna-swieca-na-Nasdaqu-Wall-Street-w-dol-pomimo-przeceny-ropy-naftowej-9222479.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-02T21:14:00.000Z",
+    "summary": "Poniedziałkowa, pierwsza w listopadzie, sesja na Wall Street przyniosła uspokojenie nastrojów po mocnej piątkowej wyprzedaży. Nasdaq spadł o 1 proc., gdyż inwestorzy przenoszą się z akcji spółek technologicznych na sektory defensywne. Rynek czeka na wyniki wyborów w USA.",
+    "source": "Bankier.pl",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Trump to remove Rwanda and South Africa from US trade deal",
+    "link": "https://www.bbc.co.uk/news/articles/c9j346xg0mkvo?at_medium=RSS&at_campaign=rss",
+    "date": "2026-11-02T19:33:10.000Z",
+    "summary": "The move comes barely a week after Rwanda's defence ministry was hit with sanctions by the US Treasury.",
+    "source": "BBC World",
+    "regions": [
+     "USA",
+     "Rynki wschodzące"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 7
    },
    {
     "title": "DZIEŃ NA GPW: GPW jednym z najsłabszych rynków w Europie; inwestorzy czekają na wybory w USA - wnp.pl",
@@ -960,100 +1049,36 @@
     "score": 7
    },
    {
-    "title": "Kurs euro i dolara a wybory w USA. Ważny tydzień dla złotego - Magazyn MANAGER+",
-    "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9EcWNZMjNHM1NJTEpmeEkwXzhDSVJhRjh3bzFCQjhPNzdfRGdBdFEzOUZoVkdqQzlBNkExQ2FUM3JjMmM2cWtER1hTb2NHY25pRnZTRURQdFFaUnB6U1R6NFNfZV8ydGF1ZGRVb2xPM3U?oc=5",
-    "date": "2026-11-02T16:14:24.000Z",
-    "summary": "Kurs euro i dolara a wybory w USA. Ważny tydzień dla złotego Magazyn MANAGER+",
-    "source": "Google News PL",
-    "regions": [
-     "USA",
-     "Polska"
-    ],
+    "title": "[New York Stock Market] Mixed Close a Day Before Election as Oil Plunges and Tech Stocks Sell Off - 아시아경제",
+    "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5TekFVYlhIdWRzNlBjUlhQbzBld2VIRWVpOThvZ3VHNUc0WXd5dFZNNk92d2g5cmJDMGN4TkdyNVY2YU8tRE1jSHRRZGNoa2ptWjItZG5wVG1SQTJJWDBzbmxFZGg?oc=5",
+    "date": "2026-11-02T21:49:41.000Z",
+    "summary": "[New York Stock Market] Mixed Close a Day Before Election as Oil Plunges and Tech Stocks Sell Off 아시아경제",
+    "source": "Google News",
+    "regions": [],
     "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Lobster industry caught in Maine’s political headwinds before US midterms",
-    "link": "https://www.aljazeera.com/economy/2026/11/2/lobster-industry-caught-in-maines-political-headwinds-before-midterms?traffic_source=rss",
-    "date": "2026-11-02T15:54:53.000Z",
-    "summary": "Senator Susan Collins and Democratic challenger Troy Jackson clash over tariffs and their impact on Maine's economy.",
-    "source": "Al Jazeera",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Sankcje i cła"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Lodówki w sklepach nagle zaczęły grzać. Cyberatak sparaliżował markety w Europie",
-    "link": "https://www.bankier.pl/wiadomosc/Lodowki-w-sklepach-nagle-zaczely-grzac-Cyberatak-sparalizowal-markety-9222050.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-02T09:35:00.000Z",
-    "summary": "Cyberataki na sieci supermarketów w Europie zakłócają działanie systemów chłodniczych, prowadząc do wzrostu temperatury w lodówkach i zamrażarkach nawet do 50 stopni Celsjusza. Po incydentach w Szwecji i Francji problemy dotknęły także sklepy Delhaize w Belgii i Luksemburgu. Skutki ataków mogą oznac",
-    "source": "Bankier.pl",
-    "regions": [
-     "Europa"
-    ],
-    "themes": [
-     "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Kontrakty terminowe na Wall Street odrabiają straty; wybory w centrum uwagi - Investing.com Polska: Kursy walut, kryptowalut, notowania akcji",
-    "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQeEVGVjFPOXJuRHpxVThTN0VQYXZjdXBEdlkycm5ubTFPYmNPbU0zbGJVQ3ZEZ0pFeXRZbW0xaXlxSGZXYTc5RlJRQzItbkJQT1ZoMTNlX2pYREVzWV9pZ3R4Zlh5Rk0yZno4ZGx3Y0dtQ2xyUW56Wk1aUmlnRm4teDY2emlmdGVoMkJJTExHZVpWdkhJdXNKM2lMYkdoSS1acjh2dzlvY3NuZlhjRWhVVVg2QzdJZ3VmUHhEZDVqNkEyNnZDVmxCeDNncEVPZHZNRk93?oc=5",
-    "date": "2026-11-02T00:31:00.000Z",
-    "summary": "Kontrakty terminowe na Wall Street odrabiają straty; wybory w centrum uwagi Investing.com Polska: Kursy walut, kryptowalut, notowania akcji",
-    "source": "Google News PL",
-    "regions": [
-     "USA",
-     "Polska"
-    ],
-    "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Bolsonaro uciekł do Trumpa, a giełda runęła. Co się dzieje w Brazylii po wyborach? - OKO.press",
-    "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNbE1GbmdRMHBvUVRkWVkwYllWWUpGXzJoSkVlY0hMczk2QmNieVJTN0R3VXhUM2dOeFAydWYxaGFKUzJpLWo2YVUwbHR3c3JWeXM5VlRxTExFZUllLWkzY09qVXBBVEl3RFhUMmlscWlScHBsdkc2aWtqc2ozTlpGdXN5cTVmdE1J?oc=5",
-    "date": "2026-11-01T16:24:53.000Z",
-    "summary": "Bolsonaro uciekł do Trumpa, a giełda runęła. Co się dzieje w Brazylii po wyborach? OKO.press",
-    "source": "Google News PL",
-    "regions": [
-     "USA",
-     "Rynki wschodzące"
-    ],
-    "themes": [
-     "Wybory i polityka"
+     "Wybory i polityka",
+     "Energia i surowce"
     ],
     "relevant": true,
     "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 12,
-   "Sankcje i cła": 1,
-   "Banki centralne i stopy": 3,
-   "Wybory i polityka": 41,
-   "Energia i surowce": 13,
+   "Konflikty i wojny": 20,
+   "Sankcje i cła": 3,
+   "Banki centralne i stopy": 1,
+   "Wybory i polityka": 60,
+   "Energia i surowce": 17,
    "Inflacja i recesja": 2
   },
   "regionCounts": {
-   "USA": 26,
+   "USA": 35,
    "Europa": 3,
-   "Azja": 0,
-   "Rynki wschodzące": 3,
-   "Polska": 10,
-   "Bliski Wschód": 7,
-   "Rosja/Ukraina": 1
+   "Azja": 1,
+   "Rynki wschodzące": 6,
+   "Polska": 6,
+   "Bliski Wschód": 12,
+   "Rosja/Ukraina": 0
   },
   "errors": []
  },
@@ -1128,6 +1153,19 @@
      "score": 8
     },
     {
+     "title": "Limity wpłat 2027 r. IKE, IKZE, OIPE, PPE - Stowarzyszenie Inwestorów Indywidualnych",
+     "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQMWdaM2NoZ1JVcEZpeEdLLV9hTXJuNjZWeHNJWTEwbnlSN1NNbzZZbC1QWmwxcGZMbzZlbVVQcjJHMEt5czFaVVdnSXF6REZLWVV1OUhTTGlPaUlTM0Nod0I0R3VKUjVHQm1xZERNcWstQU16eXk5aDV5WnBkNkY3TmdJLW04ODV3U0xEVElFM0dBQQ?oc=5",
+     "date": "2026-11-02T16:30:00.000Z",
+     "summary": "Limity wpłat 2027 r. IKE, IKZE, OIPE, PPE Stowarzyszenie Inwestorów Indywidualnych",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "PPK i emerytury"
+     ],
+     "important": true,
+     "score": 7
+    },
+    {
      "title": "Rewolucja w oszczędzaniu na emeryturę? Propozycje zmian w IKE, IKZE, PPE i PPK - RMF24",
      "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOa1lJQkNXV20zV3dtNFVIYVp5MEJxUGwxQ1psYkh5NjlRdzVfbmRqNTRyNUZydDluWlRtMlM1LXNsTG5fY2JBbUhLVTJEdjhsTmdRd0tvQzNRQ29ZX3VVVXI4MklieHhSbHhEcDNYMUJ6Tzd6TEo4ZEFtMzZ5NnIxRjVRQV82d0xXUUZrTG92MklZNm52Xy1SMHprazBZNGlkZ3dnNExkY00xRXlRZy13UEJiTk8?oc=5",
      "date": "2026-10-27T09:20:00.000Z",
@@ -1165,18 +1203,6 @@
      "score": 6
     },
     {
-     "title": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy - INFOR.PL",
-     "link": "https://news.google.com/rss/articles/CBMi1gJBVV95cUxQWUotM3BwWWJqY29Ga3VTVUtrS2sxVDRPUUVvd2JmTEh1dFNZSk9qbVg0Mzk3Y0lHUURjTHZkaTU5V1RUemxrWDliU1prWnJZUEljelRxbURjcVB1cl9oSDV1NnJyMUhPSVZBcjBNVmlZa0VyV0FFYnUzVDljaDlzVUxpdC1BOHNQbkQtTjNTRHdFVUpueTl3cjZGUllicV9IbS1FaVZaandNUTJkMXJLWTh3TXBBRVdOdDkyTVotdmlZeks2ekJ0UGM1VUdTMFRSRWNxLS1TVDdfdEN5YWl6VW1xUXdpbTFYS2VOZUhIVkxOOFQ1X05zTFZwdFRNMHdQS2JSMzh3cWJ2cDRBXzdpWEhoWGdReHRSR1ZNdkhKX216Z3ptb0dZd2dVVjNaVnFfZkVjRDdPRU5SaW04ZlVrSHlvakxnTFZoMU9XdHNQdXA0TkY5cXc?oc=5",
-     "date": "2026-11-02T14:37:01.000Z",
-     "summary": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy INFOR.PL",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "OKI"
-     ],
-     "important": true,
-     "score": 6
-    },
-    {
      "title": "Wyższy limit wpłat na IKZE w 2027 roku. Jest już obwieszczenie Ministra Rodziny, Pracy i Polityki Społecznej - Forsal.pl",
      "link": "https://news.google.com/rss/articles/CBMigAJBVV95cUxOaVFwREhLeEVKS2ZUR29OZkpCZ2JkeTZwT08yajFwVTBvajF1TUhkQXFGUDVUUFRwM1B6dkNDaHAwTFVBbmVMZlhsYmJ1U3dYMXE1THEzeUZlSU94U044V2tma3V5ZVliRWw2Z3ByQS16ZWlIdjlORExtYVNMbGV1S3NRUUJWMTNRRUd4ZTZXYlBYa3p2YXplWkhQUThta1VKSDI4aU9YT3F0bEt3YVd4dWJUdWhkemRfeXFpM21MbUZiUElTTWRkS1pZRU9kc3gybTJRTnczR29hZERYb1Y5dlNrVEUyYWpMeUJmeUoyOUZrY2tsbXhOY1JON1pGT3NZ?oc=5",
      "date": "2026-11-02T12:40:17.000Z",
@@ -1189,22 +1215,22 @@
      "score": 6
     },
     {
-     "title": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani - Bezprawnik",
-     "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9GUlNDR0RXV0ZZcmJXM2g4blRiZjA5TEsyalJBUDBac2JhRzhmT3dUNnFvTmlDOHdqcG1JVUE3aHlMUGxFaEFla1k4WmtKSHVuZEJVRFJ2Nm5PZWc?oc=5",
-     "date": "2026-11-02T09:21:42.000Z",
-     "summary": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani Bezprawnik",
+     "title": "Podatek na OKI – jak działa? Limity 100 tys. i 25 tys. zł, stawka i przykłady - Analizy.pl",
+     "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNa0ZiSkhhbGhnMF80QzAzVEdzSEdtV2VGUjUyUkpudEo4Rk9mSGxWT3dlOURCZHdZTVFvRnA1NjgwbDFoY3JyQnpYUl9RNFozdnVMbVM3OGIwZ05UV0pUR1FhbU5WOFdMVXAydXFqMUxCSWVyYWpzNDJMYzNFWWl3QWhHV3pQN1NaTE9jc0xR?oc=5",
+     "date": "2026-11-02T10:55:17.000Z",
+     "summary": "Podatek na OKI – jak działa? Limity 100 tys. i 25 tys. zł, stawka i przykłady Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
-      "IKE/IKZE"
+      "OKI"
      ],
      "important": true,
      "score": 6
     },
     {
-     "title": "Ważna informacja dla oszczędzających Polaków. Są nowe limity wpłat na IKZE - Parkiet",
-     "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9KMmhDXzhpYmh0UGhrZFN2WWdGX3NiZGsyY21QSS12X0tLVlZ4UTl4SkM0S3IzVFJvM0pKSEFtd01aX2JXT19FbGhWemF3ZXZWa3UxU3A5S09IMXZFNXF1LXVvNGp1Q1N0VDd2OXR3?oc=5",
-     "date": "2026-11-02T08:14:00.000Z",
-     "summary": "Ważna informacja dla oszczędzających Polaków. Są nowe limity wpłat na IKZE Parkiet",
+     "title": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani - Bezprawnik",
+     "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9GUlNDR0RXV0ZZcmJXM2g4blRiZjA5TEsyalJBUDBac2JhRzhmT3dUNnFvTmlDOHdqcG1JVUE3aHlMUGxFaEFla1k4WmtKSHVuZEJVRFJ2Nm5PZWc?oc=5",
+     "date": "2026-11-02T09:21:42.000Z",
+     "summary": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani Bezprawnik",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE"
@@ -1267,10 +1293,10 @@
      "score": 8
     },
     {
-     "title": "Rewolucja w oszczędzaniu na emeryturę? Propozycje zmian w IKE, IKZE, PPE i PPK - RMF24",
-     "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOa1lJQkNXV20zV3dtNFVIYVp5MEJxUGwxQ1psYkh5NjlRdzVfbmRqNTRyNUZydDluWlRtMlM1LXNsTG5fY2JBbUhLVTJEdjhsTmdRd0tvQzNRQ29ZX3VVVXI4MklieHhSbHhEcDNYMUJ6Tzd6TEo4ZEFtMzZ5NnIxRjVRQV82d0xXUUZrTG92MklZNm52Xy1SMHprazBZNGlkZ3dnNExkY00xRXlRZy13UEJiTk8?oc=5",
-     "date": "2026-10-27T09:20:00.000Z",
-     "summary": "Rewolucja w oszczędzaniu na emeryturę? Propozycje zmian w IKE, IKZE, PPE i PPK RMF24",
+     "title": "Limity wpłat 2027 r. IKE, IKZE, OIPE, PPE - Stowarzyszenie Inwestorów Indywidualnych",
+     "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQMWdaM2NoZ1JVcEZpeEdLLV9hTXJuNjZWeHNJWTEwbnlSN1NNbzZZbC1QWmwxcGZMbzZlbVVQcjJHMEt5czFaVVdnSXF6REZLWVV1OUhTTGlPaUlTM0Nod0I0R3VKUjVHQm1xZERNcWstQU16eXk5aDV5WnBkNkY3TmdJLW04ODV3U0xEVElFM0dBQQ?oc=5",
+     "date": "2026-11-02T16:30:00.000Z",
+     "summary": "Limity wpłat 2027 r. IKE, IKZE, OIPE, PPE Stowarzyszenie Inwestorów Indywidualnych",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE",
@@ -1316,7 +1342,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-02T18:50:04.897Z",
+  "generatedAt": "2026-11-02T22:22:52.193Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
