@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-02T18:40:39.854Z",
+  "generatedAt": "2026-11-02T18:50:04.897Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -791,7 +791,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 302,
+  "fetched": 295,
   "items": [
    {
     "title": "Polityczna wojna może sparaliżować NBP. Inwestorzy mają powody do obaw",
@@ -828,23 +828,6 @@
     "score": 9
    },
    {
-    "title": "World drains nearly 1 billion barrels from oil stocks amid Iran war, says ADNOC chief - Telegraph India",
-    "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOaGhhaUZ2ZFVrR2dIcGQyZEw0U2hMTjY1emtTbEIza1htQ281MThRZWhrTmpoSkJnNFN0a1BRRU1Kdk10NWl4cDhRaE4tWVBGYmhHQ2QtUXhVbWpQZzgzTjdMX0tJYmJXakwwXzVhMC1UVm5BVndfN2p2YWI4NmJSUlN2X2RCbE5WeHVPcldfQXRmTFdmQlhKeWtPQ1dqR0YyZ2FwaVR5V05uSHBEQWhfZWxDX19oSVdNUVZkbHJhcWdjZ0lJaGxWS21ldFhJMl9XOFo40gHTAUFVX3lxTE5oaGFpRnZkVWtHZ0hwZDJkTDRTaExONjV6a1NsQjNrWG1DbzUxOFFlaGtOamhKQmc0U3RrUFFFTUp2TXQ1aXhwOFFoTi1ZUEZiaEdDZC1ReFVtalBnODNON0xfS0liYldqTDBfNWEwLVRWbkFWd183anZhYjg2YlJSU3ZfZEJsTlZ4dU9yV19BdGZMV2ZCWEp5a09DV2pHRjJnYXBpVHlXTm5IcERBaF9lbENfX2hJV01RVmRscmFxZ2NnSUlobFZLbWV0WEkyX1c4Wjg?oc=5",
-    "date": "2026-11-02T07:27:30.000Z",
-    "summary": "World drains nearly 1 billion barrels from oil stocks amid Iran war, says ADNOC chief Telegraph India",
-    "source": "Google News",
-    "regions": [
-     "Azja",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
     "title": "How US oil firms profit $130bn from Iran war as household bills surge",
     "link": "https://www.aljazeera.com/news/2026/11/2/how-us-oil-firms-profit-130bn-from-iran-war-as-household-bills-surge?traffic_source=rss",
     "date": "2026-11-02T14:27:50.000Z",
@@ -858,6 +841,39 @@
     "themes": [
      "Konflikty i wojny",
      "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Analiza rynku ropy: OPEC+ utrzymuje wydobycie, wojna z Iranem zakłóca podaż - CMB News",
+    "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQWUVMYWc4VTlwYndoejdxUEtSTGtiaXFaRmJLNGxRZ1E2VlFaMjRpdDJrQ2NrSmhXdmZRM2lnZTczdDA3N0ZQWjZ0VWFtbFdrTlhFc2FnclhWdjhjc3g2SUY5UlI1elR4RlFrVnYtUDhNVHJhQ2VHRHJObHp2R21ab19ZX1JMTU1jS3hadkVlMVJ2SDUwOTFmT3VlRHZWTGJmaUd6bjlGUU9xTUE?oc=5",
+    "date": "2026-11-02T07:55:59.000Z",
+    "summary": "Analiza rynku ropy: OPEC+ utrzymuje wydobycie, wojna z Iranem zakłóca podaż CMB News",
+    "source": "Google News PL",
+    "regions": [
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Wybory i dane z rynku pracy w USA, decyzja RPP oraz wyniki PKO BP, Orlenu i Asbisu. Oto najważniejsze wydarzenia tego tygodnia - pb.pl",
+    "link": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxPdmFEdTFYWm1xOXVsZzFBRnVzNEF1dVJKOVlpbmNhcWYtY0FOY0Jndm9VU1VCRkk4V1oxd2dPaTdvcVI1VTE4OENQVElUUUl3cVptZ25UeE5DR212azZWbEpmei1sY3B2YktZUmdienFscDBhamRpbWxyWWNqSmswaGFNQmhVNGRIVFNWOFltN3laNGtRN2FiQm9hREpmY1MtVjloWXR2LVE0NzZLMmktYUdpUllUQ0RmYlpzY21MTExDZEVrU0N5X0Zfek94TjNPQ2h5aE9HdFZZd3NLajd3RkhBWQ?oc=5",
+    "date": "2026-11-02T07:33:00.000Z",
+    "summary": "Wybory i dane z rynku pracy w USA, decyzja RPP oraz wyniki PKO BP, Orlenu i Asbisu. Oto najważniejsze wydarzenia tego tygodnia pb.pl",
+    "source": "Google News PL",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
+     "Wybory i polityka"
     ],
     "relevant": true,
     "score": 8
@@ -879,58 +895,10 @@
     "score": 8
    },
    {
-    "title": "Iran War Ceasefire Pushes Energy Markets Into Twilight Zone: Bousso - EnergyNow.com",
-    "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxPRklBQkZvb3NtU0FzeDJNcWs5MGUwNEZHek9vU253V0RKRjlkWVBqTFpRNjdlVEozUXB4TzlKTmJwMmFOZjA4bTJxOVRGQWhBMTRXMVlRS08xTWQwckdqUkI3b05CXzd5LVdPVlNQTEZWNl9waC1VelhNZU5HeWVLSTBaLWlrNklObE5yTGdrNUdzMHdzZTNqMTdITkFVQQ?oc=5",
-    "date": "2026-10-31T21:45:49.000Z",
-    "summary": "Iran War Ceasefire Pushes Energy Markets Into Twilight Zone: Bousso EnergyNow.com",
-    "source": "Google News",
-    "regions": [
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "World Absorbs Historic Iran War Oil Supply Loss, But Depleted Stocks Bring Risks - EnergyNow.com",
-    "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQbW5RLWt6Unk4SkNYOXIySEZqOF8tTUs3NWNZWTRWaUEzVW5MVmNqSTJqTnY5UTZZc09EY0RlLTc3UWcyTWlFcnlLdFdQSG9WSm1RcUFwNENpcGIxQkxmZU53VkFRM3o3aWtQZDRsQ0NHR0ZsejFVdHhyR09Jb1gweU1BLVFCSE1yVnBYQmV3VDRxcEJHVGMzNXh4QTlQbmQzaUJRaVBxM2FRQ3dCX0Rz?oc=5",
-    "date": "2026-10-31T21:45:23.000Z",
-    "summary": "World Absorbs Historic Iran War Oil Supply Loss, But Depleted Stocks Bring Risks EnergyNow.com",
-    "source": "Google News",
-    "regions": [
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
     "title": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso - EnergyNow.com",
     "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPaGRxVzJMUGFPeTZJb19RSzdxcEdiTjZPMGhleXFLZ3R6eTRzSkd4eTlvSVJ4NHhHTmhTX0tCR2ZDb1o5QUVnOHg2TG5vc0N0dUZTZ3ZzZ0Jvc2V6MFJUZFlpYUZyU051NUEtLW1LcG9mcXZvYUhBejBmbzJPMTZTWjRXUkkwZ2F2RDM2bG81SEdqMWljQjRDM3Q1Uy1jLVJraVo2QzZZR3pLT3BlOUk4YUFn?oc=5",
     "date": "2026-10-31T03:30:34.000Z",
     "summary": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso EnergyNow.com",
-    "source": "Google News",
-    "regions": [
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Brent ends October up 13.6% as Iran war risks unsettle markets - Nation Thailand",
-    "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE9NbHdDWnoyUnRnZXJ5SE5saGxETWFwbjdoWlNyTUllRUJ1dUJNQkVyTmNFY2Z1OUtxdmtpcFRNX0pieFFXZWUzSVFEQ1ZROWREbzhrdFZ2RzBVOVRMU2xZ?oc=5",
-    "date": "2026-10-31T00:28:00.000Z",
-    "summary": "Brent ends October up 13.6% as Iran war risks unsettle markets Nation Thailand",
     "source": "Google News",
     "regions": [
      "Bliski Wschód"
@@ -1023,36 +991,68 @@
     "score": 6
    },
    {
-    "title": "3 U.S. Manufacturing Stocks That Could Gain From Tariffs On Vietnamese Imports - Simply Wall St",
-    "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPcDAxM0l2MFZCVG90ZElqMUtqSUtVUGdvQURMV1B3dzlJMEJMeFBqdnB1UFpFT1R4T2N5STlEdkdiWlRsdHlwYTRzczdPTDZKSlpBbzRsSUwtaDBtaXcwZHhzTWVINnExUFpXTl9MSWNWX2VOenB2a0RlVjM2dWRzQUVDb3NjTkNjNUhGbUlkbHc3Z1BpYXJlOW51alBXdDRDSC1URVJNOTFVSUcxeUQzOThzUW9vM3BvcXFDb0t5ZU3SAcYBQVVfeXFMTnk3cUpxX1NxLVJGdkxVcm0wbmhIWmJSMjh0YkFEVnl4eFhwTTFWTlBycXRpdGU0N20xNWh2UWFTUUxOdnhhT3puWGNBYXgyclJpMkVNRXlGdmdxTm8yNGR5Z25MeDJPTFc2M3FTcmRJakN0ZDZTbGhvQkFYZWxacWJaMHlkZ1U0WVFld3pvSXg4WGlUdmt0RC1ldTJaMmh5akFNNy1VNFdVRHhFZUNMVGNpcUtENzh0blVCbHRVN05rOXJrOE93?oc=5",
-    "date": "2026-11-02T09:59:40.000Z",
-    "summary": "3 U.S. Manufacturing Stocks That Could Gain From Tariffs On Vietnamese Imports Simply Wall St",
-    "source": "Google News",
+    "title": "Lodówki w sklepach nagle zaczęły grzać. Cyberatak sparaliżował markety w Europie",
+    "link": "https://www.bankier.pl/wiadomosc/Lodowki-w-sklepach-nagle-zaczely-grzac-Cyberatak-sparalizowal-markety-9222050.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-02T09:35:00.000Z",
+    "summary": "Cyberataki na sieci supermarketów w Europie zakłócają działanie systemów chłodniczych, prowadząc do wzrostu temperatury w lodówkach i zamrażarkach nawet do 50 stopni Celsjusza. Po incydentach w Szwecji i Francji problemy dotknęły także sklepy Delhaize w Belgii i Luksemburgu. Skutki ataków mogą oznac",
+    "source": "Bankier.pl",
     "regions": [
-     "USA"
+     "Europa"
     ],
     "themes": [
-     "Sankcje i cła"
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Kontrakty terminowe na Wall Street odrabiają straty; wybory w centrum uwagi - Investing.com Polska: Kursy walut, kryptowalut, notowania akcji",
+    "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQeEVGVjFPOXJuRHpxVThTN0VQYXZjdXBEdlkycm5ubTFPYmNPbU0zbGJVQ3ZEZ0pFeXRZbW0xaXlxSGZXYTc5RlJRQzItbkJQT1ZoMTNlX2pYREVzWV9pZ3R4Zlh5Rk0yZno4ZGx3Y0dtQ2xyUW56Wk1aUmlnRm4teDY2emlmdGVoMkJJTExHZVpWdkhJdXNKM2lMYkdoSS1acjh2dzlvY3NuZlhjRWhVVVg2QzdJZ3VmUHhEZDVqNkEyNnZDVmxCeDNncEVPZHZNRk93?oc=5",
+    "date": "2026-11-02T00:31:00.000Z",
+    "summary": "Kontrakty terminowe na Wall Street odrabiają straty; wybory w centrum uwagi Investing.com Polska: Kursy walut, kryptowalut, notowania akcji",
+    "source": "Google News PL",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Bolsonaro uciekł do Trumpa, a giełda runęła. Co się dzieje w Brazylii po wyborach? - OKO.press",
+    "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNbE1GbmdRMHBvUVRkWVkwYllWWUpGXzJoSkVlY0hMczk2QmNieVJTN0R3VXhUM2dOeFAydWYxaGFKUzJpLWo2YVUwbHR3c3JWeXM5VlRxTExFZUllLWkzY09qVXBBVEl3RFhUMmlscWlScHBsdkc2aWtqc2ozTlpGdXN5cTVmdE1J?oc=5",
+    "date": "2026-11-01T16:24:53.000Z",
+    "summary": "Bolsonaro uciekł do Trumpa, a giełda runęła. Co się dzieje w Brazylii po wyborach? OKO.press",
+    "source": "Google News PL",
+    "regions": [
+     "USA",
+     "Rynki wschodzące"
+    ],
+    "themes": [
+     "Wybory i polityka"
     ],
     "relevant": true,
     "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 20,
-   "Sankcje i cła": 4,
-   "Banki centralne i stopy": 2,
-   "Wybory i polityka": 52,
-   "Energia i surowce": 15,
-   "Inflacja i recesja": 3
+   "Konflikty i wojny": 12,
+   "Sankcje i cła": 1,
+   "Banki centralne i stopy": 3,
+   "Wybory i polityka": 41,
+   "Energia i surowce": 13,
+   "Inflacja i recesja": 2
   },
   "regionCounts": {
-   "USA": 32,
+   "USA": 26,
    "Europa": 3,
-   "Azja": 1,
-   "Rynki wschodzące": 4,
-   "Polska": 7,
-   "Bliski Wschód": 12,
+   "Azja": 0,
+   "Rynki wschodzące": 3,
+   "Polska": 10,
+   "Bliski Wschód": 7,
    "Rosja/Ukraina": 1
   },
   "errors": []
@@ -1093,7 +1093,7 @@
      "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQSldqcWpJeXlnUy05MUFTaEZmQmhMTThnMzV4RHRrN0lxY3RYVE43ZG9UZ0JKRGQ2RFg5Vk5QNVBSY014a25JMTdkbE50TEJPOUJDaWFINmdrQTFoZ3NObDFHTWRzZU5WaXhsUGl4ekg1MWRqMi1va25FRDhTeXNYX1pmNUdlRno5aGFSbg?oc=5",
      "date": "2026-11-02T09:18:57.000Z",
      "summary": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? Rankia Polska",
-     "source": "Google News – podatki inwestora",
+     "source": "Google News – brokerzy",
      "topics": [
       "IKE/IKZE",
       "PIT i rozliczenia"
@@ -1189,10 +1189,10 @@
      "score": 6
     },
     {
-     "title": "Limit IKZE na 2027 rok wyraźnie w górę. Tyle będzie można wpłacić - Radio ESKA",
-     "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOS2x2YlRuMHp6VDNlQWk3UWc2bmt6d3poY2J5cGJERmFhWENoSUt4RlJsdzFrT0xHeWNod1FwWFZWaHZaVzNoekpaTG15X3BwUFhZLTd3Q0RuZzZlTjJmZ01qNGlJcmpqcVc5eXFXVV9IdUtJdWtiT05zVXFCb3Bjcy1VRkZleUVSaHRhaWEyNjNmSGFJNERJYjMwRmpQUlJYNk56c1FOVm9xS0p0dGNBUU4yTkFoVkc0bHNF?oc=5",
-     "date": "2026-11-02T11:40:00.000Z",
-     "summary": "Limit IKZE na 2027 rok wyraźnie w górę. Tyle będzie można wpłacić Radio ESKA",
+     "title": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani - Bezprawnik",
+     "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9GUlNDR0RXV0ZZcmJXM2g4blRiZjA5TEsyalJBUDBac2JhRzhmT3dUNnFvTmlDOHdqcG1JVUE3aHlMUGxFaEFla1k4WmtKSHVuZEJVRFJ2Nm5PZWc?oc=5",
+     "date": "2026-11-02T09:21:42.000Z",
+     "summary": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani Bezprawnik",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE"
@@ -1201,10 +1201,10 @@
      "score": 6
     },
     {
-     "title": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani - Bezprawnik",
-     "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9GUlNDR0RXV0ZZcmJXM2g4blRiZjA5TEsyalJBUDBac2JhRzhmT3dUNnFvTmlDOHdqcG1JVUE3aHlMUGxFaEFla1k4WmtKSHVuZEJVRFJ2Nm5PZWc?oc=5",
-     "date": "2026-11-02T09:21:42.000Z",
-     "summary": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani Bezprawnik",
+     "title": "Ważna informacja dla oszczędzających Polaków. Są nowe limity wpłat na IKZE - Parkiet",
+     "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9KMmhDXzhpYmh0UGhrZFN2WWdGX3NiZGsyY21QSS12X0tLVlZ4UTl4SkM0S3IzVFJvM0pKSEFtd01aX2JXT19FbGhWemF3ZXZWa3UxU3A5S09IMXZFNXF1LXVvNGp1Q1N0VDd2OXR3?oc=5",
+     "date": "2026-11-02T08:14:00.000Z",
+     "summary": "Ważna informacja dla oszczędzających Polaków. Są nowe limity wpłat na IKZE Parkiet",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE"
@@ -1232,7 +1232,7 @@
      "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQSldqcWpJeXlnUy05MUFTaEZmQmhMTThnMzV4RHRrN0lxY3RYVE43ZG9UZ0JKRGQ2RFg5Vk5QNVBSY014a25JMTdkbE50TEJPOUJDaWFINmdrQTFoZ3NObDFHTWRzZU5WaXhsUGl4ekg1MWRqMi1va25FRDhTeXNYX1pmNUdlRno5aGFSbg?oc=5",
      "date": "2026-11-02T09:18:57.000Z",
      "summary": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? Rankia Polska",
-     "source": "Google News – podatki inwestora",
+     "source": "Google News – brokerzy",
      "topics": [
       "IKE/IKZE",
       "PIT i rozliczenia"
@@ -1316,7 +1316,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-02T18:40:39.854Z",
+  "generatedAt": "2026-11-02T18:50:04.897Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
