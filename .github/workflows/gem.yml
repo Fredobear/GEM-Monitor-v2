@@ -1,0 +1,67 @@
+name: GEM Monitor
+
+on:
+  schedule:
+    # Pon–pt o 06:15 UTC (7:15 zimą, 8:15 latem w Polsce): po zamknięciu sesji w USA, przed otwarciem giełd w Europie.
+    - cron: '15 6 * * 1-5'
+    # 5. dnia miesiąca: odświeżenie długiego backtestu (dane Kennetha Frencha publikowane z opóźnieniem).
+    - cron: '0 7 5 * *'
+  workflow_dispatch:
+    inputs:
+      ai:
+        description: 'Wymuś komentarz AI (wymaga ANTHROPIC_API_KEY)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gem-monitor
+  cancel-in-progress: false
+
+jobs:
+  gem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HAS_AI: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Instalacja pakietu AI (tylko gdy ustawiono ANTHROPIC_API_KEY)
+        if: env.HAS_AI == 'true'
+        run: npm install --no-audit --no-fund
+
+      - name: Backtest długoterminowy
+        if: github.event.schedule == '0 7 5 * *'
+        run: node src/cli.js research
+
+      - name: Sygnał GEM, panel i powiadomienia
+        if: github.event.schedule != '0 7 5 * *'
+        run: node src/cli.js run ${{ inputs.ai && '--ai' || '' }}
+        env:
+          TIINGO_API_KEY: ${{ secrets.TIINGO_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
+
+      - name: Zapis panelu i stanu do repozytorium
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs state research
+          if git diff --cached --quiet; then
+            echo "Brak zmian do zapisania."
+          else
+            git commit -m "GEM: aktualizacja $(date -u +%F)"
+            git push
+          fi

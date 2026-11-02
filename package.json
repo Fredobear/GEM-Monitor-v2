@@ -1,0 +1,20 @@
+{
+  "name": "gem-monitor-xtb",
+  "version": "1.0.0",
+  "description": "Monitor strategii Global Equity Momentum (GEM) z mapowaniem na ETF-y dostępne w XTB, powiadomieniami na telefon i panelem WWW.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/cli.js run",
+    "run:dry": "node src/cli.js run --dry",
+    "research": "node src/cli.js research",
+    "demo": "node src/cli.js demo",
+    "test": "node --test"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/sdk": "0.135.0"
+  }
+}
