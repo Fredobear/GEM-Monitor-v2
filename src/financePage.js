@@ -4,12 +4,65 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CSS, HEAD_COMMON, navHtml } from './dashboard.js';
-import { ACCOUNT_ICONS, ACCOUNT_TYPES, FREQS } from './client/finance-core.js';
+import { ACCOUNT_ICONS, ACCOUNT_TYPES, CURRENCIES, FREQS } from './client/finance-core.js';
+import { addDays } from './lib/dates.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
+// Kursy NBP i ceny instrumentów dla dziennika (z danych pobieranych przez GitHub Actions do zakładki Portfel):
+// ostatnie 100 dni dzień po dniu, wcześniej ostatni dzień każdego miesiąca. Trafiają do strony jako dane,
+// więc dziennik nie musi niczego pobierać z sieci.
+export function marketSnapshot(prices, config) {
+  const thin = (pairs = []) => {
+    if (!pairs.length) return [];
+    const cut = addDays(pairs[pairs.length - 1][0], -100);
+    return pairs.filter(([d], i) => d >= cut || i === pairs.length - 1 || pairs[i + 1][0].slice(0, 7) !== d.slice(0, 7));
+  };
+  const fx = Object.fromEntries(Object.entries(prices?.fx ?? {}).filter(([, p]) => p?.length).map(([c, p]) => [c, thin(p)]));
+  const assets = {};
+  for (const [ticker, inst] of Object.entries(prices?.instruments ?? {})) {
+    if (!inst.series?.length && !inst.quotes?.length) continue;
+    assets[ticker] = { name: inst.name ?? config?.portfolio?.instruments?.[ticker]?.name ?? ticker, currency: inst.currency, series: thin(inst.series), quotes: (inst.quotes ?? []).slice(-10) };
+  }
+  const latest = (list) => list.filter(Boolean).sort().at(-1) ?? null;
+  return { asOf: latest(Object.values(fx).map((p) => p.at(-1)[0])), pricesAsOf: latest(Object.values(assets).map((a) => a.series.at(-1)?.[0])), fx, assets };
+}
+
 const FIN_CSS = `
 .offline-badge{display:inline-block;background:var(--pos-soft);color:var(--pos);border-radius:999px;padding:3px 10px;font-weight:600;font-size:12px;white-space:nowrap}
+.toast{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.toast-btn{background:transparent;border:1px solid currentColor;color:inherit;border-radius:9px;padding:4px 12px;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn.danger-solid{background:var(--neg);border-color:var(--neg);color:var(--surface)}
+.btn.danger-solid:disabled{opacity:.45;cursor:default}
+.link.danger-text,.btn.danger-text{color:var(--neg)}
+label.check{display:flex}
+.check.opt{align-items:flex-start;margin:10px 0 4px}.check.opt>span{flex:1;min-width:0}.check.opt select{margin-top:6px;width:100%}.check.sub{margin-left:26px;align-items:flex-start}
+.seg.set-seg button{font-size:12.5px;padding:6px 1px;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:400px){.seg.set-seg button{font-size:11.5px}}
+.worth-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 0 6px}
+.worth-chart .wc-line{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.worth-chart .wc-area{fill:color-mix(in srgb,var(--accent) 14%,transparent)}
+.worth-chart .wc-dot{fill:var(--accent);stroke:var(--surface);stroke-width:2}
+.worth-chart .wc-inc{fill:var(--pos)}.worth-chart .wc-exp{fill:var(--neg)}
+.worth-chart .wc-axis{fill:var(--muted);font-size:10.5px}.worth-chart .wc-grid{stroke:var(--line)}
+.worth-stats{margin-top:12px}
+.inv-line{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:3px 0}.inv-line span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inv-line b{white-space:nowrap;font-variant-numeric:tabular-nums}
+.acc-sub{display:block;font-size:12px;color:var(--muted);font-weight:500;text-align:right}
+.map-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:4px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.map-row small{display:block;color:var(--muted);font-size:12px}.map-row .map-reason{grid-column:1/-1;margin-top:-2px}
+.map-row select{width:100%;min-width:0}.row-inline{display:flex;gap:6px;min-width:0}.row-inline select{flex:1}
+@media (max-width:520px){.map-row{grid-template-columns:1fr}}
+.map-rec{align-items:flex-start;padding:6px 0}
+.mm-h{font-size:15px;margin:18px 0 4px}
+.lot-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;border:1px solid var(--line);border-radius:14px;padding:10px;margin:8px 0;background:var(--surface-2)}
+.lot-row .full{grid-column:1/-1}.lot-foot{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.doc-row{display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.doc-ico{font-size:22px;line-height:1}.doc-main b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.doc-main small{color:var(--muted);font-size:12.5px}
+.doc-btns{grid-column:2;display:flex;flex-wrap:wrap;gap:6px}
+.doc-chip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:6px 10px;margin:6px 0;font-size:13.5px}
+.doc-chip span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.doc-chip select{min-height:32px;padding:4px 6px;font-size:14px}
+#dv-body img{display:block;max-width:100%;border-radius:12px;margin:0 auto}
 @media (max-width:760px){main{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}.card{padding:15px}}
 input,select,textarea{font-size:16px}
 button,label,summary{touch-action:manipulation}
@@ -26,7 +79,7 @@ dialog{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .hb-val{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
 .hb-chev{font-size:30px;line-height:1;color:var(--muted)}
 .period{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
-.period-seg,.set-seg{display:flex;width:100%}.period-seg button,.set-seg button{flex:1;padding:6px 2px;min-width:0}
+.period-seg,.set-seg{display:flex;width:100%}.seg.period-seg button,.seg.set-seg button{flex:1;padding:6px 2px;min-width:0}
 .pswitch{display:flex;align-items:center;gap:10px}
 .pswitch b{flex:1;text-align:center;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pswitch .icon-btn{font-size:22px}
@@ -121,7 +174,7 @@ dialog{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .legend-row{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:6px}
 .cat-edits{display:flex;flex-direction:column;gap:6px}
 .cat-edit{display:grid;grid-template-columns:52px 1fr 46px 110px auto;gap:6px;align-items:center}
-@media (max-width:560px){.cat-edit{grid-template-columns:48px 1fr 42px}.cat-edit input[name=budget]{grid-column:1/3}}
+@media (max-width:560px){.cat-edit{grid-template-columns:48px 1fr 42px}.cat-edit input[name=budget]{grid-column:1/-1}.cat-edit .row-inline{grid-column:1/-1;justify-content:flex-end;gap:18px}}
 .cat-edit input[type=color]{padding:2px;min-height:40px;width:100%}
 input.emoji{text-align:center;font-size:18px;padding:6px;width:52px}
 textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0}
@@ -155,27 +208,34 @@ const typeRadios = () => `<div class="type3" role="radiogroup" aria-label="Typ">
 const actions = (del = '', extra = '', submit = 'Zapisz') =>
   `<div class="dlg-actions">${del}${extra}<span style="flex:1"></span><button type="button" class="btn ghost" data-close>Anuluj</button><button type="submit" class="btn primary">${submit}</button></div>`;
 
+const currencyOptions = () => CURRENCIES.map((c) => `<option value="${c}">${c === 'PLN' ? 'PLN – złoty' : c}</option>`).join('');
+
 const TX_DIALOG = `<dialog id="fin-dialog"><form method="dialog" novalidate>
 <h3 id="fd-title">Nowa operacja</h3>
-${typeRadios()}
-<label class="field">Kwota (zł)<input name="amount" class="amount-input" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+<div id="fd-types">${typeRadios()}</div>
+<p class="dlg-hint" id="fd-korekta" hidden>⚖️ Korekta salda zmienia saldo konta (saldo początkowe, wycena konta inwestycyjnego, wyrównanie do banku), ale nie liczy się do wydatków ani przychodów. Gdy saldo maleje, wpisz kwotę z minusem.</p>
+<label class="field"><span id="fd-amount-label">Kwota (zł)</span><input name="amount" class="amount-input" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+<p class="small muted" id="fd-fx" hidden></p>
 <div id="fd-cats-wrap"><div class="small muted">Kategoria</div><div class="cat-grid" id="fd-cats"></div></div>
 <div class="two"><label class="field"><span id="fd-acc-label">Konto</span><select name="accountId"></select></label><label class="field">Data<input type="date" name="date"></label></div>
 <label class="field" id="fd-to" hidden>Na konto<select name="toAccountId"></select></label>
+<label class="field" id="fd-to-amount-wrap" hidden><span id="fd-to-amount-label">Na konto wpłynie</span><input name="toAmount" inputmode="decimal" placeholder="0,00" autocomplete="off"><small>Wpisz kwotę, która faktycznie wpłynęła (np. po kursie z XTB). Domyślnie liczę po kursie NBP.</small></label>
 <p class="dlg-hint" id="fd-hint" hidden></p>
 <label class="field">Opis / sprzedawca<input name="merchant" maxlength="80" placeholder="np. Biedronka"></label>
 <label class="field">Notatka<input name="note" maxlength="1000"></label>
 <label class="field" id="fd-repeat">Powtarzaj<select name="repeat"><option value="">Nie powtarzaj</option>${Object.entries(FREQS).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></label>
+<div id="fd-docs-wrap"><div class="small muted" id="fd-docs-title">Dokumenty</div><div id="fd-docs"></div><button type="button" class="btn small" id="fd-doc-add">📎 Dodaj dokument</button><input type="file" id="fd-doc-file" accept="application/pdf,image/*" hidden></div>
 <label class="check small" id="fd-remember"><input type="checkbox" name="remember"> Zapamiętaj kategorię dla tego sprzedawcy</label>
 <div class="errors" id="fd-errors" role="alert"></div>
-${actions('<button type="button" class="btn danger" id="fd-delete" hidden>Usuń</button>')}
+${actions('<button type="button" class="btn danger" id="fd-delete" hidden>Usuń…</button>')}
 </form></dialog>`;
 
 const ACC_DIALOG = `<dialog id="acc-dialog"><form method="dialog" novalidate>
 <h3 id="ad-title">Nowe konto</h3>
 <label class="field">Nazwa<input name="name" maxlength="60" placeholder="np. mBank – konto osobiste" autocomplete="off"></label>
 <div class="field"><span>Rodzaj</span><div class="typesel" role="radiogroup" aria-label="Rodzaj konta">${Object.entries(ACCOUNT_TYPES).map(([k, l]) => `<label><input type="radio" name="type" value="${k}"><span>${ACCOUNT_ICONS[k]} ${l}</span></label>`).join('')}</div></div>
-<label class="field" id="ad-plain">Saldo obecne (zł)<input name="balance" inputmode="decimal" placeholder="0,00" autocomplete="off"><small>Ile jest teraz na koncie. Każda zapisana operacja zmieni to saldo.</small></label>
+<label class="field">Waluta<select name="currency">${currencyOptions()}</select><small id="ad-currency-hint">Konto w innej walucie liczy się do majątku po bieżącym kursie średnim NBP.</small></label>
+<label class="field" id="ad-plain"><span id="ad-balance-label">Saldo obecne (zł)</span><input name="balance" inputmode="decimal" placeholder="0,00" autocomplete="off"><small id="ad-balance-hint">Ile jest teraz na koncie. Każda zapisana operacja zmieni to saldo.</small></label>
 <div id="ad-card" hidden>
 <label class="field">Zadłużenie na karcie (zł)<input name="debt" inputmode="decimal" placeholder="0,00" autocomplete="off"><small>Kwota do spłaty, np. 1250. Saldo karty będzie ujemne, a każdy wydatek tą kartą je powiększy.</small></label>
 <div class="two"><label class="field">Limit karty (zł)<input name="limit" inputmode="decimal" placeholder="np. 5000" autocomplete="off"></label><label class="field">Dzień spłaty<input name="dueDay" inputmode="numeric" placeholder="np. 25" maxlength="2" autocomplete="off"></label></div>
@@ -184,14 +244,14 @@ const ACC_DIALOG = `<dialog id="acc-dialog"><form method="dialog" novalidate>
 <label class="field">Karty w Apple Pay (nazwy z Portfela, po przecinku)<input name="cards" placeholder="np. mBank Visa"></label>
 <label class="check small"><input type="checkbox" name="excludeFromTotal"> Nie wliczaj do salda łącznego</label>
 <div class="errors" id="ad-errors" role="alert"></div>
-${actions('<button type="button" class="btn danger" id="ad-delete" hidden>Usuń</button>', '<button type="button" class="btn ghost" id="ad-archive" hidden>Ukryj</button>')}
+${actions('<button type="button" class="btn danger" id="ad-delete" hidden>Usuń…</button>', '<button type="button" class="btn ghost" id="ad-archive" hidden>Ukryj</button>')}
 </form></dialog>`;
 
 const REC_DIALOG = `<dialog id="rec-dialog"><form method="dialog" novalidate>
 <h3 id="rd-title">Nowa stała pozycja</h3>
 ${typeRadios()}
 <label class="field">Nazwa<input name="title" maxlength="60" placeholder="np. Czynsz, Wynagrodzenie, Netflix" autocomplete="off"></label>
-<label class="field">Kwota (zł)<input name="amount" class="amount-input" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+<label class="field"><span id="rd-amount-label">Kwota (zł)</span><input name="amount" class="amount-input" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
 <div id="rd-cats-wrap"><div class="small muted">Kategoria</div><div class="cat-grid" id="rd-cats"></div></div>
 <label class="field"><span id="rd-acc-label">Konto</span><select name="accountId"></select></label>
 <label class="field" id="rd-to" hidden>Na konto<select name="toAccountId"></select></label>
@@ -201,7 +261,7 @@ ${typeRadios()}
 <p class="dlg-hint" id="rd-hint"></p>
 <label class="check small" id="rd-paused-wrap"><input type="checkbox" name="paused"> Wstrzymaj (bez kolejnych terminów)</label>
 <div class="errors" id="rd-errors" role="alert"></div>
-${actions('<button type="button" class="btn danger" id="rd-delete" hidden>Usuń</button>')}
+${actions('<button type="button" class="btn danger" id="rd-delete" hidden>Usuń…</button>')}
 </form></dialog>`;
 
 const REPAY_DIALOG = `<dialog id="repay-dialog"><form method="dialog" novalidate>
@@ -215,9 +275,38 @@ const REPAY_DIALOG = `<dialog id="repay-dialog"><form method="dialog" novalidate
 ${actions('', '', 'Spłać kartę')}
 </form></dialog>`;
 
-export function renderFinancePage() {
+// Pozycje konta inwestycyjnego: ETF-y z listy (wycena co dzień roboczy) i aktywa z wyceną ręczną.
+const LOTS_DIALOG = `<dialog id="lots-dialog"><form method="dialog" novalidate>
+<h3 id="ld-title">Aktywa na koncie</h3>
+<p class="small muted" id="ld-info"></p>
+<div id="ld-rows"></div>
+<div class="row-btns"><button type="button" class="btn small" id="ld-add">+ ETF z listy</button><button type="button" class="btn small ghost" id="ld-add-manual">+ Inne aktywo (wycena ręczna)</button></div>
+<label class="check small"><input type="checkbox" name="settle"> <span>Rozlicz zmianę z wolną gotówką na koncie (kupno ją zmniejsza, sprzedaż zwiększa)</span></label>
+<p class="dlg-hint" id="ld-sum"></p>
+<div class="errors" id="ld-errors" role="alert"></div>
+${actions()}
+</form></dialog>`;
+
+// Potwierdzenie operacji, których nie da się łatwo odwrócić (usuwanie, nadpisanie danych).
+const CONFIRM_DIALOG = `<dialog id="confirm-dialog"><form method="dialog" novalidate>
+<h3 id="cf-title"></h3>
+<div id="cf-body" class="small"></div>
+<div id="cf-extra"></div>
+<label class="check small" id="cf-ack-wrap" hidden><input type="checkbox" id="cf-ack"> <span id="cf-ack-label"></span></label>
+<div class="dlg-actions"><span style="flex:1"></span><button type="button" class="btn ghost" data-close>Anuluj</button><button type="submit" class="btn danger-solid" id="cf-ok">Usuń</button></div>
+</form></dialog>`;
+
+const DOC_DIALOG = `<dialog id="doc-dialog"><form method="dialog" novalidate>
+<h3 id="dv-title"></h3>
+<div id="dv-body"></div>
+<div class="dlg-actions"><span style="flex:1"></span><button type="button" class="btn" id="dv-share">Udostępnij / zapisz</button><button type="button" class="btn primary" data-close>Zamknij</button></div>
+</form></dialog>`;
+
+export function renderFinancePage({ prices = null, config = null } = {}) {
   const read = (name) => readFileSync(path.join(HERE, 'client', name), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '');
-  const csp = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; worker-src 'self'; manifest-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'";
+  const market = JSON.stringify(marketSnapshot(prices, config)).replace(/</g, '\\u003c');
+  // blob: tylko do podglądu dokumentów zapisanych na urządzeniu; połączenia sieciowe nadal zablokowane.
+  const csp = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'self'; manifest-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'";
   return `<!doctype html><html lang="pl"><head>${HEAD_COMMON}
 <meta http-equiv="Content-Security-Policy" content="${csp}">
 <title>Finanse · GEM</title>
@@ -227,11 +316,12 @@ ${navHtml('finanse')}
 <main>
 <nav class="fin-tabs" id="fin-nav" aria-label="Dziennik">${TABS.map(([k, l]) => `<button data-view="${k}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg><span>${l}</span></button>`).join('')}</nav>
 <div id="fin-root"><p class="muted">Ładowanie…</p></div>
-<footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
+<footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów są dołączane do strony przy każdej aktualizacji aplikacji. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
-${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}
+${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}${LOTS_DIALOG}${CONFIRM_DIALOG}${DOC_DIALOG}
 <noscript><p>Dziennik wymaga włączonej obsługi JavaScript.</p></noscript>
+<script type="application/json" id="fin-market">${market}</script>
 <script type="module">${read('finance-core.js')}\n${read('mmbackup.js')}\n${read('finance-ui.js')}</script>
 </body></html>`;
 }

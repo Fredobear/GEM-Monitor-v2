@@ -4,18 +4,20 @@ Zakładka **Finanse** to osobna strona aplikacji (`finanse.html`) do śledzenia 
 
 | Zakładka | Co tam jest |
 |---|---|
-| **Przegląd** | saldo wszystkich kont, wydatki i przychody za dzień, tydzień, miesiąc, rok albo dowolny okres, wykres kategorii, duże przyciski **− Wydatek** i **+ Przychód**, raporty |
+| **Przegląd** | majątek, wydatki i przychody za dzień, tydzień, miesiąc, rok albo dowolny okres, wykres kategorii, duże przyciski **− Wydatek** i **+ Przychód**, raporty |
 | **Kalendarz** | miesiąc dzień po dniu: ile wydano każdego dnia; dotknięcie dnia pokazuje jego operacje |
 | **Operacje** | lista wszystkich operacji, wyszukiwanie i filtry, eksport do CSV |
-| **Konta** | konta, karty kredytowe z zadłużeniem i limitem, spłata karty, przelewy między kontami |
+| **Konta** | wykres majątku i dochodów, konta w złotych i innych walutach, karty kredytowe (zadłużenie, limit, spłata), konta inwestycyjne z aktywami |
 | **Stałe** | stałe dochody, płatności i przelewy (pensja, czynsz, rachunki, subskrypcje) |
-| **Więcej** | kategorie i reguły, import (Money Manager, wyciąg CSV), Apple Pay, kopia zapasowa |
+| **Więcej** | kategorie i reguły, import (Money Manager, wyciąg CSV), dokumenty (paski płacowe, paragony), Apple Pay, kopia zapasowa |
 
 ## Prywatność: dlaczego dane nie wychodzą do sieci
 
 - **Dane są tylko na Twoim urządzeniu**, w pamięci przeglądarki (localStorage). Nie trafiają na GitHub, do mnie ani do nikogo innego. Synchronizacja z zakładki Portfel ich nie obejmuje.
 - **Strona ma zablokowaną sieć.** W nagłówku ma politykę bezpieczeństwa `Content-Security-Policy: connect-src 'none'`. Przeglądarka odrzuci każdą próbę połączenia z tej strony, także wysłanie danych w tle. Sprawdziłem to: wszystkie próby połączeń zostały zablokowane.
 - **Import też działa bez sieci.** Pliki .mmbackup i CSV są odczytywane w telefonie, w przeglądarce.
+- **Dokumenty** (paski płacowe, paragony, umowy) są zapisywane w pamięci przeglądarki na urządzeniu (IndexedDB), tak samo bez sieci.
+- **Kursy walut i ceny ETF-ów** nie są pobierane przez dziennik. Automat na GitHubie (ten sam, który liczy sygnał GEM) w każdy dzień roboczy pobiera średnie kursy NBP i ceny, a potem dołącza je do strony dziennika. Telefon pobiera tylko nową wersję strony; nic nie wysyła.
 - **Działa bez internetu.** Service worker zapisuje aplikację w pamięci telefonu, więc dziennik otworzysz w trybie samolotowym.
 - **Kopia zapasowa jest ręczna**: *Finanse → Więcej → Kopia → Eksportuj kopię*. Plik zapisz w *Plikach* na iPhonie.
 
@@ -35,7 +37,7 @@ Masz dwie drogi.
 3. **Stałe → + Dodaj**: pensja, czynsz, rachunki, subskrypcje.
 4. Wydatki dodajesz przyciskiem **− Wydatek** w Przeglądzie: kwota, kategoria jednym dotknięciem, konto. Przelew między własnymi kontami nie jest wydatkiem.
 
-Saldo konta zmienia każda zapisana operacja, także dopisana z datą wsteczną. Jeśli saldo się rozjedzie z bankiem, wejdź w **Konta → Edytuj** i wpisz prawidłowe saldo obecne.
+Saldo konta zmienia każda zapisana operacja, także dopisana z datą wsteczną. Jeśli saldo się rozjedzie z bankiem, wejdź w **Konta → Edytuj** i wpisz prawidłowe saldo obecne – różnica zapisze się jako [korekta salda](#korekta-salda).
 
 ## Przegląd
 
@@ -70,9 +72,72 @@ Saldo konta zmienia każda zapisana operacja, także dopisana z datą wsteczną.
 4. **Spłać kartę**: zadłużenie karty spada, a z konta schodzi ta sama kwota. Spłata to przelew między Twoimi kontami, więc nie liczy się jako wydatek – wydatkami były zakupy kartą.
 
 Inne:
-- **Saldo łączne** sumuje wszystkie aktywne konta w złotych (zadłużenie kart odejmuje się samo). Konta w innych walutach i oznaczone „nie wliczaj do salda łącznego” są pomijane.
+- **Majątek** sumuje wszystkie aktywne konta w złotych: konta w innych walutach po bieżącym kursie NBP, konta inwestycyjne razem z aktywami, a zadłużenie kart odejmuje się samo. Pomijane są tylko konta oznaczone „Nie wliczaj do salda łącznego” (np. PPE, z którego nie możesz swobodnie korzystać).
 - **Historia** przy koncie pokazuje wszystkie jego operacje i saldo.
-- **Ukryj** chowa konto, którego już nie używasz, ale zostawia jego historię. Konto bez operacji można usunąć.
+- **Ukryj** chowa konto, którego już nie używasz, ale zostawia jego historię. **Usuń…** – patrz [Usuwanie i cofanie zmian](#usuwanie-i-cofanie-zmian).
+
+## Waluty
+
+- Przy zakładaniu konta (albo w *Edytuj*) wybierasz **walutę**: PLN, EUR, USD, GBP albo CHF. Walutę można zmienić, dopóki konto nie ma operacji.
+- Kwoty na koncie w euro wpisujesz w euro. Okno operacji pokazuje od razu przeliczenie, np. „≈ 44,19 zł · kurs średni NBP 4,4185 z 2 lis 2026”.
+- **W raportach** (wydatki, przychody, kategorie) operacja liczy się w złotych po kursie NBP z jej dnia. **W majątku** saldo konta walutowego liczy się po bieżącym kursie NBP.
+- **Przelew między walutami**, np. z konta w złotych na konto maklerskie w euro: wpisujesz kwotę w złotych, a pole **Na konto wpłynie (EUR)** wypełnia się po kursie NBP. Wpisz tam kwotę, która faktycznie wpłynęła (np. po kursie z XTB) – tę zapiszę.
+- Kursy pochodzą z tabeli A NBP i są odświeżane w dni robocze razem z aplikacją (data kursu jest widoczna w zakładce Konta).
+
+## Konto inwestycyjne
+
+Rodzaj konta **Konto inwestycyjne** (np. XTB, IKE, IKZE). Jego wartość to **wolna gotówka** (saldo konta) **+ aktywa** wyceniane po bieżących cenach.
+
+1. *Konta → przy koncie inwestycyjnym → **Aktywa***.
+2. **+ ETF z listy**: wybierz ETF (te same, które śledzi zakładka Portfel, np. SXR8.DE, CSPX.UK, EXUS.DE, IB01.UK), wpisz ilość, cenę zakupu za sztukę i datę zakupu. Każdy zakup dodawaj jako osobną pozycję.
+3. **+ Inne aktywo (wycena ręczna)**: np. obligacje skarbowe, lokata, złoto. Wpisujesz wartość, a gdy się zmieni – nową wartość (aplikacja zapamięta historię wycen do wykresu).
+4. Opcja **Rozlicz zmianę z wolną gotówką na koncie** (domyślnie włączona):
+   - nowa pozycja zmniejsza wolną gotówkę o swoją wartość – tak jest, gdy kupujesz ETF za pieniądze z rachunku albo gdy saldo konta (np. z Money Managera) obejmowało już wartość ETF-ów;
+   - usunięcie pozycji to sprzedaż: jej wartość wraca do gotówki, a w historii pozycja zostaje do dnia sprzedaży.
+
+   Wyłącz tę opcję, gdy saldo konta to tylko gotówka, a aktywa dopisujesz osobno.
+
+**Jak liczona jest cena ETF-u:** od ceny zakupu, którą wpisujesz, według zmiany indeksu, który ten ETF śledzi, przeliczonej na walutę ETF-u. To ten sam sposób co w zakładce Portfel. Ceny odświeżają się w każdy dzień roboczy. Wycena jest bardzo bliska notowaniu, ale może się nieznacznie różnić (np. o koszty funduszu) – dokładną cenę zawsze widzisz w XTB.
+
+## Wykres majątku i dochodów
+
+Na górze zakładki **Konta**:
+- **linia** – majątek na koniec każdego miesiąca (ostatni punkt to dziś);
+- **słupki** – przychody (zielone) i wydatki (czerwone) w każdym miesiącu;
+- zakres: 6 miesięcy, rok, 3 lata albo całość;
+- pod wykresem: zmiana majątku, suma przychodów i ile z nich udało się odłożyć (przychody − wydatki).
+
+Majątek rośnie nie tylko z oszczędności, ale też ze wzrostu wartości inwestycji i z korekt salda (np. aktualizacji wyceny PPE). Wykres zaczyna się od pierwszej operacji w dzienniku.
+
+## Korekta salda
+
+Korekta salda zmienia saldo konta, ale **nie jest wydatkiem ani przychodem**. Powstaje:
+- gdy w *Konta → Edytuj* wpiszesz inne saldo obecne – różnica zapisze się z dzisiejszą datą (ikona ⚖️);
+- przy imporcie z Money Managera – saldo początkowe i późniejsze zmiany salda kont;
+- przy rozliczeniu aktywów z gotówką na koncie inwestycyjnym.
+
+Korekty widać w historii konta i w Operacjach (filtr „Korekta salda”). Można je poprawić albo usunąć jak zwykłą operację.
+
+## Usuwanie i cofanie zmian
+
+Wszystko można zmienić albo usunąć, ale nie przez przypadek:
+- **Operacja**: dotknij jej, a potem **Usuń…** – pojawi się okno z podsumowaniem i przyciskiem *Usuń operację*. Dołączone dokumenty zostają w zakładce Dokumenty.
+- **Konto**: *Konta → Edytuj → Usuń…*. Wybierasz, co zrobić z operacjami:
+  - **przenieść je na inne konto** – np. gdy to samo konto jest wpisane dwa razy. Opcja „Zachowaj obecne saldo konta docelowego” zostawia saldo tego konta bez zmian;
+  - **usunąć razem z kontem** – przelewy z innymi kontami zostają, więc salda pozostałych kont się nie zmienią.
+
+  Trzeba jeszcze zaznaczyć „Tak, chcę usunąć to konto”.
+- **Kategoria**: *Więcej → Kategorie → Usuń…* – operacje przenosisz do innej kategorii albo do „Do przypisania”.
+- **Stała pozycja, dokument, dane z importu, cały dziennik** – też zawsze przez okno potwierdzenia.
+
+Po każdym usunięciu przez 10 sekund widać przycisk **Cofnij**, który przywraca wszystko, jak było.
+
+## Dokumenty: paski płacowe, paragony, umowy
+
+- **Przy operacji**: w oknie operacji przycisk **📎 Dodaj dokument** (PDF albo zdjęcie – na iPhonie możesz od razu zrobić zdjęcie). Przy wpisywaniu wypłaty okno samo podpowiada dołączenie paska płacowego.
+- **Osobno**: *Więcej → Dokumenty → Dodaj dokument* – np. PIT, umowa, wyciąg.
+- Lista w *Więcej → Dokumenty* jest pogrupowana według lat. Przy każdym dokumencie: **Otwórz**, **Udostępnij / zapisz** (np. do Plików) i **Usuń…**.
+- Dokumenty są zapisane tylko na tym urządzeniu. Kopia zapasowa (*Więcej → Kopia*) może je zawierać – wtedy plik kopii jest większy.
 
 ## Stałe przelewy i dochody
 
@@ -93,26 +158,33 @@ Przenosi dane z aplikacji *Money Manager: finanse, przychody i wydatki* (Orange 
 
 1. W Money Managerze utwórz kopię zapasową i zapisz plik `.mmbackup` w aplikacji *Pliki* na iPhonie (np. *Na moim iPhonie*).
 2. W dzienniku: *Finanse → Więcej → Import → Wybierz plik .mmbackup* i wskaż ten plik.
-3. Zobaczysz podsumowanie: zakres dat, liczbę kont, kategorii, wydatków, przychodów i przelewów oraz salda kont. Sprawdź je.
-4. **Importuj.**
+3. Pojawi się **kreator importu** w trzech krokach. Każdą propozycję możesz zmienić:
+   - **Konta** – dla każdego konta z Money Managera: *połącz z kontem z dziennika* (aplikacja sama proponuje konto o podobnej nazwie, nawet z literówką, np. „ERTSE DEBIT” → „Erste konto”), *nowe konto* albo *nie importuj*. Operacje, które już są na połączonym koncie (ta sama kwota, data ± 1 dzień), nie zostaną dodane drugi raz. Opcja „Ustaw salda połączonych kont tak jak w Money Managerze” ustawia saldo z kopii.
+   - **Kategorie** – dla każdej kategorii z Money Managera: odpowiednik w dzienniku (np. „Jedzenie na mieście” → „Restauracje i kawiarnie”, „Hobby” → „Rozrywka i hobby”), *nowa kategoria* albo *Do przypisania*. Gdy kategoria ma 3 operacje lub więcej, a nie ma odpowiednika, aplikacja proponuje utworzenie nowej. Przy mniejszej liczbie operacji trafiają one do „Do przypisania”, żeby lista kategorii została przejrzysta.
+   - **Stałe płatności** – stałe płatności z Money Managera (np. czynsz, Pluxee) trafią do zakładki Stałe z kolejnym terminem.
+4. **Importuj.** Przez 10 sekund możesz jeszcze kliknąć *Cofnij*.
 
-Co się przenosi:
-- **konta z saldami** – takimi samymi jak w Money Managerze; karta kredytowa z ujemnym saldem trafi do kart kredytowych;
-- **kategorie** z kolorami i budżetami; ikony są dobierane po nazwie; domyślne kategorie dziennika, których nie używasz, zostaną ukryte (przywrócisz je w *Więcej → Kategorie*);
-- **wszystkie wydatki, przychody i przelewy**, z komentarzami jako opisem;
-- konta w obcych walutach: saldo w walucie konta, a w raportach kwoty w złotych (tak jak w Money Managerze).
+**Korekty salda.** Money Manager zapisuje saldo początkowe przy zakładaniu konta i każdą zmianę salda (np. aktualizację wyceny XTB albo PPE) jako operację bez kategorii. Takie operacje są importowane jako [korekty salda](#korekta-salda): zmieniają saldo konta, ale nie są liczone jako przychody ani wydatki – tak samo jak w Money Managerze.
 
-Nie przenoszą się przypomnienia z Money Managera. Stałe płatności ustaw w zakładce Stałe.
+**Dane z pierwszej wersji importu.** Pierwsza wersja importu liczyła korekty salda jako przychody i wydatki (stąd bardzo duże kwoty) i tworzyła nowe konta zamiast łączyć je z istniejącymi. Po aktualizacji aplikacji:
+- korekty zostaną poprawione automatycznie (zobaczysz komunikat w Przeglądzie);
+- aby połączyć konta ze swoimi: *Więcej → Import → Wybierz plik .mmbackup* → w kreatorze kliknij **usuń poprzedni import** → sprawdź propozycje → **Importuj**.
 
-**Ponowny import** tej samej albo nowszej kopii nic nie zdubluje. Dojdą nowe operacje, a zmiany i usunięcia z Money Managera zostaną uwzględnione. Operacji zmienionych już w dzienniku import nie nadpisze. Dzięki temu możesz przez jakiś czas używać obu aplikacji i co jakiś czas wczytywać świeżą kopię.
+**Usunięcie danych z importu**: *Więcej → Import → Usuń dane z importu…* usuwa operacje, stałe pozycje oraz konta i kategorie utworzone przy imporcie (o ile nie mają Twoich operacji). Konta połączone z Twoimi wracają do sald sprzed importu.
 
-> Plik .mmbackup to archiwum ZIP z bazą danych SQLite. Dziennik odczytuje je samodzielnie w przeglądarce. Sprawdziłem to na kopii zbudowanej według struktury bazy Money Managera, ale nie na pliku z Twojego telefonu. Jeśli import zgłosi błąd albo coś się nie zgodzi, napisz mi, co pokazało podsumowanie.
+**Ponowny import** tej samej albo nowszej kopii nic nie zdubluje. Dojdą nowe operacje, a zmiany i usunięcia z Money Managera zostaną uwzględnione. Operacji zmienionych już w dzienniku import nie nadpisze. Aplikacja zapamiętuje, z czym połączono konta i kategorie, więc kolejne importy są szybkie.
+
+> Import sprawdziłem na prawdziwej kopii .mmbackup (z listopada 2026 r.): salda wszystkich kont zgadzają się z Money Managerem, a przychody i wydatki obejmują tylko prawdziwe operacje.
 
 ## Apple Pay: okienko z kategoriami przy każdej płatności
 
 iOS nie pozwala stronom ani zwykłym aplikacjom czytać historii płatności z Portfela. Interfejs Apple (FinanceKit) działa tylko w USA i tylko dla Apple Card.
 
 Działa natomiast **automatyzacja w aplikacji Skróty**. Uruchamia się przy każdej płatności Apple Pay dowolną kartą z Portfela i dostaje kwotę, sprzedawcę i nazwę karty. Skrót pokazuje listę Twoich kategorii, a wybór dopisuje do pliku tekstowego w telefonie. Aplikacja wczytuje ten plik jednym przyciskiem.
+
+**Czy Apple Pay jest już podłączone?** Nie samo z siebie – dopóki nie ustawisz automatyzacji w Skrótach (kroki niżej), dziennik nie dostaje żadnych płatności. Stan sprawdzisz w *Finanse → Więcej → Apple Pay*: jest tam data ostatniego importu płatności i lista kart przypisanych do kont. Napis „Nie było jeszcze żadnego importu z Apple Pay” oznacza, że automatyzacja nie jest ustawiona albo plik nie był jeszcze wczytany.
+
+**Z jakiej karty była płatność.** Skrót zapisuje nazwę karty z Portfela (np. „Erste Visa”). Gdy pierwszy raz pojawi się płatność kartą, która nie jest przypisana do żadnego konta, w Przeglądzie zobaczysz okienko **Karty bez przypisanego konta**. Wybierz konto i kliknij **Przypisz** – ta i kolejne płatności tą kartą trafią na to konto. Jeśli to karta kredytowa, zakup od razu zwiększy jej zadłużenie.
 
 > Nie mogłem przetestować Skrótu na prawdziwym iPhonie. Opis bazuje na funkcjach iOS 17–26. Nazwy akcji mogą się nieco różnić między wersjami systemu (w nawiasach podaję nazwy angielskie).
 

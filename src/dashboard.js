@@ -506,6 +506,6 @@ export async function writeDashboard(dir, payload) {
   await writeFile(path.join(dir, '.nojekyll'), '');
   // Import dynamiczny: financePage.js korzysta ze stylów i nawigacji z tego modułu.
   const { renderFinancePage, serviceWorker } = await import('./financePage.js');
-  await writeFile(path.join(dir, 'finanse.html'), renderFinancePage());
+  await writeFile(path.join(dir, 'finanse.html'), renderFinancePage({ prices: payload.prices, config: payload.config }));
   await writeFile(path.join(dir, 'sw.js'), serviceWorker(payload.meta?.generatedAt ?? new Date().toISOString()));
 }

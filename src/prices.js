@@ -7,7 +7,7 @@ import { alphaVantageDaily } from './providers/alphavantage.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const NBP_CHUNK_DAYS = 90; // API NBP przyjmuje zakres do 93 dni
-export const FX_CODES = ['USD', 'EUR', 'GBP'];
+export const FX_CODES = ['USD', 'EUR', 'GBP', 'CHF'];
 
 const toPairs = (series) => series.map((p) => [p.date, p.value]);
 const toSeries = (pairs) => pairs.map(([date, value]) => ({ date, value }));

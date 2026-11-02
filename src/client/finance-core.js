@@ -1,8 +1,12 @@
 // Rdzeń dziennika finansowego: konta, kategorie, transakcje, import (Apple Pay ze Skrótów, wyciągi CSV) i raporty.
 // Działa wyłącznie lokalnie – bez DOM, bez sieci. Plik jest wklejany do strony finanse.html i testowany w Node.
 
-export const FIN_TYPES = { wydatek: 'Wydatek', przychod: 'Przychód', przelew: 'Przelew' };
-export const ACCOUNT_TYPES = { bank: 'Konto bankowe', karta: 'Karta kredytowa', gotowka: 'Gotówka', oszczednosci: 'Oszczędności', inne: 'Inne' };
+// Korekta salda: zmiana salda konta (saldo początkowe, wycena konta inwestycyjnego, wyrównanie do banku).
+// Kwota korekty ma znak (+/−) i nie liczy się do wydatków ani przychodów.
+export const FIN_TYPES = { wydatek: 'Wydatek', przychod: 'Przychód', przelew: 'Przelew', korekta: 'Korekta salda' };
+export const ACCOUNT_TYPES = { bank: 'Konto bankowe', karta: 'Karta kredytowa', gotowka: 'Gotówka', oszczednosci: 'Oszczędności', inwestycje: 'Konto inwestycyjne', inne: 'Inne' };
+export const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF'];
+export const isFlow = (t) => t.type === 'wydatek' || t.type === 'przychod';
 export const SKIP_CATEGORY = 'pomiń';
 const PALETTE = ['#2563eb', '#16a34a', '#dc2626', '#d97706', '#7c3aed', '#0891b2', '#db2777', '#65a30d', '#ea580c', '#4f46e5', '#0d9488', '#9333ea', '#ca8a04', '#475569', '#be123c', '#059669'];
 
@@ -26,7 +30,7 @@ export const DEFAULT_CATEGORIES = [
 ].map(([id, emoji, name, kind], i) => ({ id, emoji, name, kind, color: PALETTE[i % PALETTE.length], budget: null }));
 
 export const emptyFinance = () => ({ version: 1, accounts: [], categories: DEFAULT_CATEGORIES.map((c) => ({ ...c })), txs: [], rules: [], recurring: [], updatedAt: 0 });
-export const ACCOUNT_ICONS = { bank: '🏦', karta: '💳', gotowka: '💵', oszczednosci: '🐷', inne: '👛' };
+export const ACCOUNT_ICONS = { bank: '🏦', karta: '💳', gotowka: '💵', oszczednosci: '🐷', inwestycje: '📈', inne: '👛' };
 export const isCard = (a) => a?.type === 'karta';
 export const nextColor = (n) => PALETTE[n % PALETTE.length];
 export const liveTx = (fin) => fin.txs.filter((t) => !t.deleted);
@@ -280,6 +284,11 @@ export function validateFinTx(t, fin) {
   const errors = [];
   if (!/^\d{4}-\d{2}-\d{2}$/.test(t.date ?? '')) errors.push('Podaj datę.');
   if (!FIN_TYPES[t.type]) errors.push('Wybierz typ.');
+  if (t.type === 'korekta') {
+    if (!Number.isFinite(t.amount) || Math.abs(t.amount) < 0.005) errors.push('Podaj kwotę korekty (ze znakiem minus, gdy saldo maleje).');
+    if (!t.accountId) errors.push('Wybierz konto.');
+    return errors;
+  }
   if (!(t.amount > 0)) errors.push('Podaj kwotę większą od zera.');
   if (fin.accounts.length && !t.accountId) errors.push('Wybierz konto.');
   if (t.type === 'przelew' && (!t.toAccountId || t.toAccountId === t.accountId)) errors.push('Przelew wymaga dwóch różnych kont.');
@@ -295,7 +304,7 @@ export function balances(fin, upTo = '9999-12-31') {
     if (t.date > upTo) continue;
     if (t.accountId in out && t.date >= start[t.accountId]) {
       const v = t.accountAmount ?? t.amount;
-      if (t.type === 'przychod') out[t.accountId] += v;
+      if (t.type === 'przychod' || t.type === 'korekta') out[t.accountId] += v; // korekta ma kwotę ze znakiem
       else out[t.accountId] -= v;
     }
     if (t.type === 'przelew' && t.toAccountId in out && t.date >= start[t.toAccountId]) out[t.toAccountId] += t.toAmount ?? t.amount;
@@ -326,7 +335,7 @@ export const shiftMonth = (month, n) => {
 
 // Podsumowanie okresu: przychody, wydatki, bilans, stopa oszczędności, kategorie, dni, miesiące, sprzedawcy.
 export function summarize(fin, from, to, { accountId = null } = {}) {
-  const txs = liveTx(fin).filter((t) => t.type !== 'przelew' && t.date >= from && t.date <= to && (!accountId || t.accountId === accountId));
+  const txs = liveTx(fin).filter((t) => isFlow(t) && t.date >= from && t.date <= to && (!accountId || t.accountId === accountId));
   const byCat = new Map();
   const byDay = new Map();
   const byMonth = new Map();
@@ -416,17 +425,180 @@ export function repaymentTx({ fromId, cardId, amount, date, newId, now = Date.no
   return { id: newId(), type: 'przelew', amount, date, accountId: fromId, toAccountId: cardId, merchant: 'Spłata karty', repayment: true, source: 'reczne', createdAt: now, updatedAt: now };
 }
 
-// Saldo łączne aktywnych kont w złotych (zadłużenie kart odejmuje się samo, bo saldo karty jest ujemne).
-// Pomija konta w innych walutach i oznaczone „nie wliczaj do salda łącznego”.
-export function netWorth(fin) {
-  const bal = balances(fin);
-  const counted = fin.accounts.filter((a) => !a.archived && !a.excludeFromTotal && (!a.currency || a.currency === 'PLN'));
-  const sum = (list, f) => list.reduce((s, a) => s + f(bal[a.id]), 0);
+// ---------- Kursy walut i ceny aktywów ----------
+// market = { asOf, fx: { EUR: [[data, kurs średni NBP], …] }, assets: { 'CSPX.UK': { name, currency, series, quotes } } }.
+// Dane są wklejane do strony przy każdej publikacji (GitHub Actions w dni robocze), więc strona nie łączy się z siecią.
+export const daysBetween = (a, b) => Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86400000);
+
+// Ostatnia para [data, wartość] z datą <= iso; dla daty sprzed początku danych – pierwsza para.
+function pairAt(pairs, iso) {
+  if (!pairs?.length) return null;
+  let lo = 0;
+  let hi = pairs.length - 1;
+  let found = null;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (pairs[mid][0] <= iso) {
+      found = pairs[mid];
+      lo = mid + 1;
+    } else hi = mid - 1;
+  }
+  return found ?? pairs[0];
+}
+
+export function rateOn(market, currency, date) {
+  if (!currency || currency === 'PLN') return 1;
+  return pairAt(market?.fx?.[currency], date)?.[1] ?? null;
+}
+
+export const round2 = (x) => Math.round(x * 100) / 100;
+export const accountCurrency = (fin, accountId) => fin.accounts.find((a) => a.id === accountId)?.currency || 'PLN';
+
+// Przeliczenie kwoty między walutami po kursach średnich NBP z danego dnia (null, gdy brak kursu).
+export function convert(market, amount, from, to, date) {
+  const a = rateOn(market, from, date);
+  const b = rateOn(market, to, date);
+  return a === null || b === null ? null : round2((amount * a) / b);
+}
+
+// Pozycje na koncie inwestycyjnym („partie”): { asset: ticker albo 'manual', qty, price (za sztukę, w walucie aktywa), date }.
+// Cena aktywa z rynku: notowanie, jeśli świeże, albo cena zakupu przesunięta o zmianę indeksu od dnia zakupu
+// (tak samo jak w zakładce Portfel). Aktywo z wyceną ręczną ma historię wycen w polu marks.
+export const lotCurrency = (market, lot) => (lot.asset && lot.asset !== 'manual' ? market?.assets?.[lot.asset]?.currency : lot.currency) || 'PLN';
+
+export function lotPrice(market, lot, date) {
+  if (!lot.asset || lot.asset === 'manual') return pairAt(lot.marks?.length ? lot.marks : [[lot.date, lot.price]], date)[1];
+  const a = market?.assets?.[lot.asset];
+  if (!a) return lot.price;
+  const q = a.quotes?.length ? pairAt(a.quotes, date) : null;
+  if (q && q[0] <= date && daysBetween(q[0], date) <= 7) return q[1];
+  const s0 = pairAt(a.series, lot.date);
+  const s1 = pairAt(a.series, date);
+  return s0 && s1 && s0[1] > 0 ? (lot.price * s1[1]) / s0[1] : lot.price;
+}
+
+// Pozycja liczy się od daty zakupu, a gdy jej wartość była wcześniej w saldzie gotówki (rozliczenie przy dodaniu) –
+// od dnia rozliczenia (since). Sprzedana pozycja (until) zostaje w historii do dnia sprzedaży.
+export const lotActive = (lot, date) => (lot.since && lot.since > lot.date ? lot.since : lot.date) <= date && !(lot.until && date >= lot.until);
+
+export function lotValuePLN(market, lot, date) {
+  if (!lotActive(lot, date)) return 0;
+  const r = rateOn(market, lotCurrency(market, lot), date);
+  return r === null ? null : lot.qty * lotPrice(market, lot, date) * r;
+}
+
+export function holdingsPLN(market, account, date) {
+  let sum = 0;
+  for (const lot of account.lots ?? []) {
+    const v = lotValuePLN(market, lot, date);
+    if (v === null) return null;
+    sum += v;
+  }
+  return sum;
+}
+
+// Wartość konta w złotych: saldo (gotówka, w walucie konta) po kursie z dnia + wartość pozycji inwestycyjnych.
+export function accountWorth(fin, account, market, date, balance = balances(fin, date)[account.id]) {
+  const rate = rateOn(market, account.currency || 'PLN', date);
+  const inv = account.lots?.length ? holdingsPLN(market, account, date) : 0;
+  if (rate === null || inv === null) return null;
+  return { cash: balance, cashPLN: balance * rate, investments: inv, total: balance * rate + inv };
+}
+
+// Majątek: suma aktywnych kont w złotych (zadłużenie kart odejmuje się samo, bo saldo karty jest ujemne).
+// Konta „nie wliczaj do salda łącznego” są pomijane, a konta bez kursu waluty trafiają do listy missing.
+export function netWorth(fin, market = null, date = null) {
+  const at = date ?? market?.asOf ?? new Date().toISOString().slice(0, 10);
+  const bal = balances(fin, date ?? '9999-12-31');
+  const out = { total: 0, assets: 0, debt: 0, cardDebt: 0, investments: 0, missing: [] };
+  for (const a of fin.accounts) {
+    if (a.archived || a.excludeFromTotal) continue;
+    const w = accountWorth(fin, a, market, at, bal[a.id]);
+    if (!w) {
+      out.missing.push(a.name);
+      continue;
+    }
+    out.total += w.total;
+    out.assets += Math.max(0, w.cashPLN) + w.investments;
+    out.debt += Math.max(0, -w.cashPLN);
+    if (isCard(a)) out.cardDebt += Math.max(0, -w.cashPLN);
+    out.investments += w.investments;
+  }
+  return out;
+}
+
+// Historia majątku i dochodów miesiąc po miesiącu (do wykresu). Ostatni punkt to dziś.
+export function worthHistory(fin, market, { today, months = 0 } = {}) {
+  const dates = [...liveTx(fin).map((t) => t.date), ...fin.accounts.flatMap((a) => (a.lots ?? []).map((l) => l.date))].filter((d) => d && d <= today);
+  if (!dates.length) return [];
+  let start = dates.reduce((m, d) => (d < m ? d : m)).slice(0, 7);
+  if (months) {
+    const cut = shiftMonth(today.slice(0, 7), -(months - 1));
+    if (cut > start) start = cut;
+  }
+  const points = [];
+  for (let m = start; m <= today.slice(0, 7); m = shiftMonth(m, 1)) {
+    const { from, to } = monthBounds(m);
+    const end = to < today ? to : today;
+    const s = summarize(fin, from, end);
+    points.push({ month: m, date: end, worth: netWorth(fin, market, end).total, income: s.income, expense: s.expense });
+  }
+  return points;
+}
+
+// Ustawia saldo konta na kwotę z formularza. Gdy konto ma już operacje, różnica trafia do historii jako korekta salda
+// z podaną datą – wykres majątku pokaże zmianę w dniu, w którym nastąpiła.
+export function adjustBalance(fin, accountId, target, { date, newId, now = Date.now(), market = null, note = 'Korekta salda' }) {
+  const a = fin.accounts.find((x) => x.id === accountId);
+  const delta = round2(target - balances(fin)[accountId]);
+  if (!a || Math.abs(delta) < 0.005) return fin;
+  if (!liveTx(fin).some((t) => t.accountId === accountId || t.toAccountId === accountId)) return setBalance(fin, accountId, target);
+  const cur = a.currency || 'PLN';
+  const tx = { id: newId(), type: 'korekta', amount: cur === 'PLN' ? delta : convert(market, delta, cur, 'PLN', date) ?? delta, date, accountId, merchant: note, source: 'reczne', createdAt: now, updatedAt: now };
+  if (cur !== 'PLN') tx.accountAmount = delta;
+  fin.txs.push(tx);
+  return fin;
+}
+
+// Usuwa konto. Jego operacje przenosi na inne konto (moveTo, ta sama waluta) albo usuwa razem z kontem.
+// keepTargetBalance: przy scalaniu dwóch wpisów tego samego konta saldo konta docelowego się nie zmienia.
+// Bez moveTo przelewy z innymi kontami zostają (bez usuniętej strony), żeby salda pozostałych kont się nie zmieniły.
+export function deleteAccount(fin, accountId, { moveTo = null, keepTargetBalance = false, now = Date.now() } = {}) {
+  const before = moveTo ? balances(fin)[moveTo] : null;
+  const relink = (x) => {
+    if (x.accountId !== accountId && x.toAccountId !== accountId) return [x];
+    const c = { ...x };
+    const swap = (id) => (id === accountId ? moveTo : id);
+    if (!moveTo && c.type !== 'przelew') return [];
+    c.accountId = swap(c.accountId);
+    if (c.type === 'przelew') c.toAccountId = swap(c.toAccountId);
+    if (c.type === 'przelew' && (c.accountId === c.toAccountId || (!c.accountId && !c.toAccountId))) return []; // przelew między scalanymi kontami znika
+    return [c];
+  };
+  const txs = fin.txs.flatMap(relink);
+  const kept = new Set(txs.map((t) => t.id));
+  const out = {
+    ...fin,
+    updatedAt: now,
+    txs,
+    recurring: (fin.recurring ?? []).flatMap((r) => (!moveTo && (r.accountId === accountId || r.toAccountId === accountId) ? [] : relink(r))),
+    accounts: fin.accounts.filter((a) => a.id !== accountId).map((a) => (a.payFromId === accountId || a.id === moveTo ? { ...a, payFromId: a.payFromId === accountId ? moveTo ?? undefined : a.payFromId } : a)),
+    docs: (fin.docs ?? []).map((d) => (d.txId && !kept.has(d.txId) ? { ...d, txId: null } : d)),
+  };
+  if (out.lastAccountId === accountId) delete out.lastAccountId;
+  if (moveTo && keepTargetBalance) setBalance(out, moveTo, before);
+  return out;
+}
+
+// Usuwa kategorię. Jej operacje trafiają do innej kategorii (moveTo) albo do „Do przypisania”.
+export function deleteCategory(fin, categoryId, { moveTo = null, now = Date.now() } = {}) {
   return {
-    total: sum(counted, (v) => v),
-    assets: sum(counted, (v) => Math.max(0, v)),
-    debt: sum(counted, (v) => Math.max(0, -v)),
-    cardDebt: sum(counted.filter(isCard), (v) => Math.max(0, -v)),
+    ...fin,
+    updatedAt: now,
+    categories: fin.categories.filter((c) => c.id !== categoryId),
+    txs: fin.txs.map((t) => (t.categoryId === categoryId ? { ...t, categoryId: moveTo } : t)),
+    rules: moveTo ? fin.rules.map((r) => (r.categoryId === categoryId ? { ...r, categoryId: moveTo } : r)) : fin.rules.filter((r) => r.categoryId !== categoryId),
+    recurring: (fin.recurring ?? []).map((r) => (r.categoryId === categoryId ? { ...r, categoryId: moveTo } : r)),
   };
 }
 
@@ -456,8 +628,9 @@ export function nextRecurringDate(date, freq, anchorDay) {
 
 const recActive = (r, date) => !r.paused && (!r.endDate || date <= r.endDate);
 
-export function recurringTx(rec, date, { newId, now = Date.now() }) {
-  return {
+// Kwota stałej pozycji jest w walucie konta; do raportów przeliczamy ją na złote po kursie NBP z dnia terminu.
+export function recurringTx(rec, date, { newId, now = Date.now(), fin = null, market = null }) {
+  const tx = {
     id: newId(),
     type: rec.type,
     amount: rec.amount,
@@ -472,10 +645,20 @@ export function recurringTx(rec, date, { newId, now = Date.now() }) {
     createdAt: now,
     updatedAt: now,
   };
+  const from = fin ? accountCurrency(fin, rec.accountId) : 'PLN';
+  if (from !== 'PLN') {
+    tx.accountAmount = rec.amount;
+    tx.amount = convert(market, rec.amount, from, 'PLN', date) ?? rec.amount;
+  }
+  if (rec.type === 'przelew' && fin) {
+    const to = accountCurrency(fin, rec.toAccountId);
+    if (to !== from) tx.toAmount = convert(market, rec.amount, from, to, date) ?? rec.amount;
+  }
+  return tx;
 }
 
 // Księguje automatyczne pozycje, których termin minął; zwraca też pozycje „do zatwierdzenia” (bez automatu).
-export function processRecurring(fin, today, { newId, now = Date.now() }) {
+export function processRecurring(fin, today, { newId, now = Date.now(), market = null }) {
   const keys = new Set(liveTx(fin).filter((t) => t.importKey).map((t) => t.importKey));
   const txs = [];
   const pending = [];
@@ -487,7 +670,7 @@ export function processRecurring(fin, today, { newId, now = Date.now() }) {
         pending.push({ rec: r, date: r.nextDate });
         break;
       }
-      const tx = recurringTx(r, r.nextDate, { newId, now });
+      const tx = recurringTx(r, r.nextDate, { newId, now, fin, market });
       if (!keys.has(tx.importKey)) txs.push(tx);
       r.nextDate = nextRecurringDate(r.nextDate, r.freq, r.anchorDay);
     }
@@ -496,10 +679,10 @@ export function processRecurring(fin, today, { newId, now = Date.now() }) {
 }
 
 // Zatwierdzenie lub pominięcie terminu pozycji „z potwierdzeniem” – przesuwa termin na następny.
-export function settleRecurring(fin, recId, { post, newId, now = Date.now() }) {
+export function settleRecurring(fin, recId, { post, newId, now = Date.now(), market = null }) {
   const r = fin.recurring.find((x) => x.id === recId);
   if (!r?.nextDate) return fin;
-  const tx = post ? recurringTx(r, r.nextDate, { newId, now }) : null;
+  const tx = post ? recurringTx(r, r.nextDate, { newId, now, fin, market }) : null;
   const txs = tx && !liveTx(fin).some((t) => t.importKey === tx.importKey) ? [...fin.txs, tx] : fin.txs;
   const recurring = fin.recurring.map((x) => (x.id === recId ? { ...x, nextDate: nextRecurringDate(x.nextDate, x.freq, x.anchorDay) } : x));
   return { ...fin, txs, recurring, updatedAt: now };
@@ -538,10 +721,14 @@ export function validateRecurring(r, fin) {
   return errors;
 }
 
-// Stałe pozycje w przeliczeniu na miesiąc (bez wstrzymanych i zakończonych).
-export function recurringMonthly(fin) {
+// Stałe pozycje w przeliczeniu na miesiąc i na złote (bez wstrzymanych i zakończonych).
+export function recurringMonthly(fin, market = null) {
   const out = { przychod: 0, wydatek: 0, przelew: 0 };
-  for (const r of fin.recurring ?? []) if (r.nextDate && recActive(r, r.nextDate)) out[r.type] += r.amount * (PER_MONTH[r.freq] ?? 1);
+  for (const r of fin.recurring ?? []) {
+    if (!r.nextDate || !recActive(r, r.nextDate)) continue;
+    const pln = convert(market, r.amount, accountCurrency(fin, r.accountId), 'PLN', r.nextDate) ?? r.amount;
+    out[r.type] += pln * (PER_MONTH[r.freq] ?? 1);
+  }
   return out;
 }
 
@@ -550,7 +737,7 @@ export function calendarMonth(fin, month, { accountId = null } = {}) {
   const { from, to } = monthBounds(month);
   const days = new Map();
   for (const t of liveTx(fin)) {
-    if (t.type === 'przelew' || t.date < from || t.date > to || (accountId && t.accountId !== accountId)) continue;
+    if (!isFlow(t) || t.date < from || t.date > to || (accountId && t.accountId !== accountId)) continue;
     const d = days.get(t.date) ?? { expense: 0, income: 0, count: 0 };
     if (t.type === 'przychod') d.income += t.amount;
     else d.expense += t.amount;

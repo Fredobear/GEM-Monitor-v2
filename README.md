@@ -40,12 +40,17 @@ Narzędzie, które codziennie analizuje rynki według strategii **Global Equity 
   - kalendarz: wydatki dzień po dniu, jedno dotknięcie pokazuje operacje z danego dnia;
   - stałe przelewy i dochody (pensja, czynsz, subskrypcje), zapisywane automatycznie albo po zatwierdzeniu;
   - karty kredytowe: zadłużenie jako saldo ujemne, limit, termin i spłata z wybranego konta;
-  - import danych z aplikacji Money Manager (plik .mmbackup), płatności Apple Pay przez Skróty i wyciągi CSV z banku;
+  - konta w złotych, euro, dolarach, funtach i frankach – przeliczane na złote po kursie średnim NBP;
+  - konto inwestycyjne z aktywami (ETF-y z listy GEM wyceniane co dzień roboczy, inne aktywa z wyceną ręczną);
+  - wykres majątku i dochodów miesiąc po miesiącu;
+  - dokumenty offline (paski płacowe, paragony, umowy) przy operacjach i w osobnej zakładce;
+  - usuwanie i zmiany zawsze z potwierdzeniem i przyciskiem „Cofnij”;
+  - import z aplikacji Money Manager (plik .mmbackup) z łączeniem kont i kategorii, płatności Apple Pay przez Skróty (karta → konto) i wyciągi CSV z banku;
   - strona ma zablokowaną sieć, więc dane zostają na urządzeniu.
 - **Bezpieczniki:**
   - bez kompletnych i aktualnych danych sygnał nie powstaje, a Ty dostajesz komunikat o problemie;
   - dwa niezależne źródła danych są ze sobą porównywane;
-  - 64 testy automatyczne.
+  - 75 testów automatycznych.
 
 | Rola | ETF w XTB | Waluta |
 |---|---|---|
@@ -173,7 +178,7 @@ node src/cli.js demo
 node scripts/serve.js
 ```
 
-- `npm test` uruchamia 64 testy.
+- `npm test` uruchamia 75 testów.
 - `node src/cli.js demo` buduje aplikację demonstracyjną bez kluczy API. Sygnał pochodzi z danych historycznych, a w zakładce Portfel możesz wczytać przykładowe transakcje.
 - `node scripts/serve.js` udostępnia panel pod adresem http://localhost:8080.
 

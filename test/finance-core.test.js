@@ -35,6 +35,16 @@ import {
   periodRange,
   shiftPeriod,
   liveTx,
+  rateOn,
+  convert,
+  lotPrice,
+  lotValuePLN,
+  accountWorth,
+  worthHistory,
+  adjustBalance,
+  deleteAccount,
+  deleteCategory,
+  recurringTx,
 } from '../src/client/finance-core.js';
 
 test('kwoty w polskich i angielskich formatach', () => {
@@ -178,7 +188,7 @@ test('karta kredytowa: zadłużenie jako saldo ujemne, wydatek kartą, spłata z
   let bal = balances(fin);
   assert.equal(bal.card, -1200);
   assert.deepEqual(cardStatus(fin.accounts[1], bal.card), { debt: 1200, limit: 5000, available: 3800, usedShare: 0.24 });
-  assert.deepEqual(netWorth(fin), { total: 2800, assets: 4000, debt: 1200, cardDebt: 1200 });
+  assert.deepEqual(netWorth(fin), { total: 2800, assets: 4000, debt: 1200, cardDebt: 1200, investments: 0, missing: [] });
   // Spłata całości: karta na zero, z konta schodzi tyle samo; to nie jest wydatek.
   fin.txs.push(repaymentTx({ fromId: 'bank', cardId: 'card', amount: 1200, date: '2026-11-02', newId }));
   bal = balances(fin);
@@ -192,6 +202,7 @@ test('karta kredytowa: zadłużenie jako saldo ujemne, wydatek kartą, spłata z
   // Konto w euro i konto „nie wliczaj” są poza saldem łącznym.
   fin.accounts.push({ id: 'eur', name: 'EUR', type: 'bank', currency: 'EUR', openingBalance: 100 }, { id: 'x', name: 'X', type: 'bank', excludeFromTotal: true, openingBalance: 999 });
   assert.equal(netWorth(fin).total, 2750);
+  assert.deepEqual(netWorth(fin).missing, ['EUR']); // bez kursów konto w euro nie jest wliczane
 });
 
 test('termin spłaty karty: ten albo następny miesiąc, krótsze miesiące', () => {
@@ -280,4 +291,167 @@ test('kalendarz miesiąca i okresy przeglądu', () => {
   assert.equal(shiftPeriod('tydzien', '2026-11-04', -1), '2026-10-28');
   assert.equal(shiftPeriod('miesiac', '2026-01-31', 1), '2026-02-01');
   assert.equal(shiftPeriod('rok', '2026-11-02', -1), '2025-11-02');
+});
+
+// Kursy NBP i ceny wklejane do strony przy publikacji.
+const MARKET = {
+  asOf: '2026-11-02',
+  fx: { EUR: [['2026-09-30', 4.3], ['2026-10-31', 4.4], ['2026-11-02', 4.5]], USD: [['2026-11-02', 4]] },
+  assets: {
+    'SXR8.DE': { name: 'S&P 500 (EUR)', currency: 'EUR', series: [['2026-09-30', 100], ['2026-10-31', 110], ['2026-11-02', 120]], quotes: [] },
+    'CSPX.UK': { name: 'S&P 500 (USD)', currency: 'USD', series: [['2026-11-02', 50]], quotes: [['2026-10-30', 700]] },
+  },
+};
+
+test('korekta salda zmienia saldo, ale nie jest wydatkiem ani przychodem', () => {
+  const fin = emptyFinance();
+  fin.accounts.push({ id: 'xtb', name: 'XTB', type: 'inwestycje' });
+  fin.txs.push(
+    { id: '1', type: 'korekta', amount: 138378, date: '2026-09-27', accountId: 'xtb' },
+    { id: '2', type: 'korekta', amount: -128743, date: '2026-09-27', accountId: 'xtb' },
+    { id: '3', type: 'wydatek', amount: 55, date: '2026-09-28', accountId: 'xtb', categoryId: 'inne' },
+  );
+  assert.equal(balances(fin).xtb, 9580);
+  const s = summarize(fin, '2026-09-01', '2026-09-30');
+  assert.equal(s.income, 0);
+  assert.equal(s.expense, 55);
+  assert.equal(s.uncategorized, 0);
+  assert.equal(calendarMonth(fin, '2026-09').days[26].count, 0);
+  assert.deepEqual(validateFinTx({ type: 'korekta', amount: -10, date: '2026-09-27', accountId: 'xtb' }, fin), []);
+  assert.equal(validateFinTx({ type: 'korekta', amount: 0, date: '2026-09-27', accountId: 'xtb' }, fin).length, 1);
+});
+
+test('waluty: kurs NBP z dnia, przeliczenia, majątek z kontem w euro', () => {
+  assert.equal(rateOn(MARKET, 'PLN', '2026-11-02'), 1);
+  assert.equal(rateOn(MARKET, 'EUR', '2026-11-01'), 4.4); // ostatni kurs przed datą
+  assert.equal(rateOn(MARKET, 'EUR', '2020-01-01'), 4.3); // przed początkiem danych – najstarszy kurs
+  assert.equal(rateOn(MARKET, 'CHF', '2026-11-02'), null);
+  assert.equal(convert(MARKET, 100, 'EUR', 'PLN', '2026-11-02'), 450);
+  assert.equal(convert(MARKET, 450, 'PLN', 'USD', '2026-11-02'), 112.5);
+  assert.equal(convert(MARKET, 100, 'EUR', 'USD', '2026-11-02'), 112.5);
+  const fin = emptyFinance();
+  fin.accounts.push({ id: 'pln', name: 'PLN', type: 'bank', openingBalance: 1000 }, { id: 'eur', name: 'EUR', type: 'bank', currency: 'EUR', openingBalance: 100 }, { id: 'chf', name: 'CHF', type: 'bank', currency: 'CHF', openingBalance: 10 });
+  const nw = netWorth(fin, MARKET, '2026-11-02');
+  assert.equal(nw.total, 1450);
+  assert.deepEqual(nw.missing, ['CHF']);
+  // Stała płatność z konta w euro: kwota w euro, do raportów w złotych po kursie z dnia terminu.
+  const tx = recurringTx({ id: 'r', title: 'Abonament', type: 'wydatek', amount: 10, accountId: 'eur' }, '2026-10-31', { newId: () => 'x', fin, market: MARKET });
+  assert.equal(tx.accountAmount, 10);
+  assert.equal(tx.amount, 44);
+  const tr = recurringTx({ id: 'r2', title: 'Na euro', type: 'przelew', amount: 450, accountId: 'pln', toAccountId: 'eur' }, '2026-11-02', { newId: () => 'y', fin, market: MARKET });
+  assert.equal(tr.amount, 450);
+  assert.equal(tr.toAmount, 100);
+});
+
+test('konto inwestycyjne: wycena pozycji według indeksu, notowań i ręcznych wycen', () => {
+  const lot = { asset: 'SXR8.DE', qty: 10, price: 600, date: '2026-09-30' };
+  assert.equal(lotPrice(MARKET, lot, '2026-09-30'), 600);
+  assert.equal(lotPrice(MARKET, lot, '2026-11-02'), 720); // indeks +20%
+  assert.equal(lotValuePLN(MARKET, lot, '2026-11-02'), 10 * 720 * 4.5);
+  assert.equal(lotValuePLN(MARKET, lot, '2026-09-01'), 0); // przed zakupem
+  // Wartość była w saldzie gotówki do dnia rozliczenia; sprzedana pozycja liczy się do dnia sprzedaży.
+  assert.equal(lotValuePLN(MARKET, { ...lot, since: '2026-11-02' }, '2026-10-31'), 0);
+  assert.equal(lotValuePLN(MARKET, { ...lot, since: '2026-11-02' }, '2026-11-02'), 10 * 720 * 4.5);
+  assert.equal(lotValuePLN(MARKET, { ...lot, until: '2026-11-02' }, '2026-10-31'), 10 * 660 * 4.4);
+  assert.equal(lotValuePLN(MARKET, { ...lot, until: '2026-11-02' }, '2026-11-02'), 0);
+  // Świeże notowanie (do 7 dni) ma pierwszeństwo przed indeksem.
+  assert.equal(lotPrice(MARKET, { asset: 'CSPX.UK', qty: 1, price: 650, date: '2026-10-01' }, '2026-11-02'), 700);
+  // Aktywo z wyceną ręczną: ostatnia wycena przed datą.
+  const flat = { asset: 'manual', name: 'Obligacje', currency: 'PLN', qty: 1, price: 1000, date: '2026-10-01', marks: [['2026-10-01', 1000], ['2026-11-01', 1010]] };
+  assert.equal(lotPrice(MARKET, flat, '2026-10-15'), 1000);
+  assert.equal(lotPrice(MARKET, flat, '2026-11-02'), 1010);
+  const fin = emptyFinance();
+  fin.accounts.push({ id: 'xtb', name: 'XTB EUR', type: 'inwestycje', currency: 'EUR', openingBalance: 50, lots: [lot] });
+  const w = accountWorth(fin, fin.accounts[0], MARKET, '2026-11-02');
+  assert.equal(w.cash, 50);
+  assert.equal(w.investments, 32400);
+  assert.equal(w.total, 50 * 4.5 + 32400);
+  assert.equal(netWorth(fin, MARKET, '2026-11-02').investments, 32400);
+});
+
+test('historia majątku i dochodów miesiąc po miesiącu', () => {
+  const fin = emptyFinance();
+  fin.accounts.push({ id: 'bank', name: 'Bank', type: 'bank' }, { id: 'xtb', name: 'XTB', type: 'inwestycje', currency: 'EUR', lots: [{ asset: 'SXR8.DE', qty: 1, price: 100, date: '2026-10-15' }] });
+  fin.txs.push(
+    { id: '1', type: 'korekta', amount: 1000, date: '2026-09-10', accountId: 'bank' },
+    { id: '2', type: 'przychod', amount: 5000, date: '2026-10-10', accountId: 'bank', categoryId: 'wynagrodzenie' },
+    { id: '3', type: 'wydatek', amount: 1500, date: '2026-10-20', accountId: 'bank', categoryId: 'zakupy' },
+  );
+  const h = worthHistory(fin, MARKET, { today: '2026-11-02' });
+  assert.deepEqual(h.map((p) => p.month), ['2026-09', '2026-10', '2026-11']);
+  assert.equal(h[0].worth, 1000);
+  assert.equal(h[1].worth, 1000 + 5000 - 1500 + 110 * 4.4); // pozycja wyceniona na koniec października
+  assert.equal(h[1].income, 5000);
+  assert.equal(h[1].expense, 1500);
+  assert.equal(h[2].date, '2026-11-02');
+  assert.deepEqual(worthHistory(fin, MARKET, { today: '2026-11-02', months: 2 }).map((p) => p.month), ['2026-10', '2026-11']);
+});
+
+test('zmiana salda konta: bez operacji – saldo początkowe, z operacjami – korekta z datą', () => {
+  let n = 0;
+  const newId = () => `k${++n}`;
+  const fin = emptyFinance();
+  fin.accounts.push({ id: 'a', name: 'A', type: 'bank' }, { id: 'e', name: 'E', type: 'bank', currency: 'EUR' });
+  adjustBalance(fin, 'a', 500, { date: '2026-11-02', newId });
+  assert.equal(fin.accounts[0].openingBalance, 500);
+  assert.equal(fin.txs.length, 0);
+  fin.txs.push({ id: 't', type: 'wydatek', amount: 100, date: '2026-11-01', accountId: 'a' });
+  adjustBalance(fin, 'a', 450, { date: '2026-11-02', newId });
+  assert.equal(balances(fin).a, 450);
+  assert.deepEqual(fin.txs.at(-1), { id: 'k1', type: 'korekta', amount: 50, date: '2026-11-02', accountId: 'a', merchant: 'Korekta salda', source: 'reczne', createdAt: fin.txs.at(-1).createdAt, updatedAt: fin.txs.at(-1).updatedAt });
+  fin.txs.push({ id: 'u', type: 'wydatek', amount: 10, accountAmount: 10, date: '2026-11-01', accountId: 'e' });
+  adjustBalance(fin, 'e', 90, { date: '2026-11-02', newId, market: MARKET });
+  assert.equal(balances(fin).e, 90);
+  assert.equal(fin.txs.at(-1).accountAmount, 100);
+  assert.equal(fin.txs.at(-1).amount, 450);
+});
+
+test('usuwanie konta: scalenie z innym kontem albo usunięcie z operacjami bez zmiany innych sald', () => {
+  const base = () => {
+    const fin = emptyFinance();
+    fin.accounts.push({ id: 'dup', name: 'Erste (ręcznie)', type: 'bank', openingBalance: 20000 }, { id: 'imp', name: 'ERTSE DEBIT', type: 'bank' }, { id: 'card', name: 'Karta', type: 'karta', payFromId: 'imp' });
+    fin.txs.push(
+      { id: '1', type: 'korekta', amount: 20300, date: '2026-09-27', accountId: 'imp' },
+      { id: '2', type: 'wydatek', amount: 50, date: '2026-10-01', accountId: 'imp', categoryId: 'zakupy' },
+      { id: '3', type: 'przelew', amount: 100, date: '2026-10-25', accountId: 'imp', toAccountId: 'card' },
+      { id: '4', type: 'przelew', amount: 30, date: '2026-10-26', accountId: 'dup', toAccountId: 'imp' },
+    );
+    fin.recurring.push({ id: 'r', title: 'Czynsz', type: 'wydatek', amount: 500, accountId: 'imp', freq: 'miesiac', nextDate: '2026-11-30' });
+    fin.docs = [{ id: 'd', txId: '2' }];
+    return fin;
+  };
+  // Scalenie: operacje z „imp” trafiają na „dup”, saldo „dup” zostaje takie, jak było (to ten sam rachunek).
+  let fin = base();
+  const before = balances(fin).dup;
+  fin = deleteAccount(fin, 'imp', { moveTo: 'dup', keepTargetBalance: true });
+  assert.equal(fin.accounts.length, 2);
+  assert.equal(balances(fin).dup, before);
+  assert.equal(fin.txs.find((t) => t.id === '2').accountId, 'dup');
+  assert.equal(fin.txs.find((t) => t.id === '4'), undefined); // przelew między scalanymi kontami znika
+  assert.equal(fin.recurring[0].accountId, 'dup');
+  assert.equal(fin.accounts.find((a) => a.id === 'card').payFromId, 'dup');
+  // Usunięcie z operacjami: saldo karty i drugiego konta się nie zmienia.
+  fin = base();
+  const card = balances(fin).card;
+  const dup = balances(fin).dup;
+  fin = deleteAccount(fin, 'imp');
+  assert.equal(balances(fin).card, card);
+  assert.equal(balances(fin).dup, dup);
+  assert.equal(fin.txs.find((t) => t.id === '2'), undefined);
+  assert.equal(fin.txs.find((t) => t.id === '3').accountId, null);
+  assert.equal(fin.recurring.length, 0);
+  assert.equal(fin.docs[0].txId, null); // dokument zostaje, odpięty od usuniętej operacji
+});
+
+test('usuwanie kategorii: operacje do innej kategorii albo do „Do przypisania”', () => {
+  const fin = emptyFinance();
+  fin.txs.push({ id: '1', type: 'wydatek', amount: 10, date: '2026-11-01', categoryId: 'inne' });
+  fin.rules.push({ id: 'r', pattern: 'kiosk', categoryId: 'inne' });
+  let out = deleteCategory(fin, 'inne', { moveTo: 'zakupy' });
+  assert.equal(out.txs[0].categoryId, 'zakupy');
+  assert.equal(out.rules[0].categoryId, 'zakupy');
+  assert.equal(out.categories.some((c) => c.id === 'inne'), false);
+  out = deleteCategory(fin, 'inne');
+  assert.equal(out.txs[0].categoryId, null);
+  assert.equal(out.rules.length, 0);
 });
