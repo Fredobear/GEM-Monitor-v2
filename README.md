@@ -36,13 +36,16 @@ Narzędzie, które codziennie analizuje rynki według strategii **Global Equity 
   - na koncie zwykłym, zależnie od tego, jaką walutę masz po sprzedaży, np. SXR8.DE w EUR zamiast CSPX.UK w USD, żeby uniknąć przewalutowania.
 - **Finanse (offline):**
   - dziennik wydatków i przychodów: konta, własne kategorie, budżety, reguły;
-  - raporty miesięczne, roczne i za dowolny okres;
-  - płatności Apple Pay z okienkiem kategorii (przez Skróty na iPhonie) i import wyciągów CSV z banku;
+  - przegląd jak w aplikacji Money Manager: dzień, tydzień, miesiąc, rok albo dowolny okres, wykres kategorii;
+  - kalendarz: wydatki dzień po dniu, jedno dotknięcie pokazuje operacje z danego dnia;
+  - stałe przelewy i dochody (pensja, czynsz, subskrypcje), zapisywane automatycznie albo po zatwierdzeniu;
+  - karty kredytowe: zadłużenie jako saldo ujemne, limit, termin i spłata z wybranego konta;
+  - import danych z aplikacji Money Manager (plik .mmbackup), płatności Apple Pay przez Skróty i wyciągi CSV z banku;
   - strona ma zablokowaną sieć, więc dane zostają na urządzeniu.
 - **Bezpieczniki:**
   - bez kompletnych i aktualnych danych sygnał nie powstaje, a Ty dostajesz komunikat o problemie;
   - dwa niezależne źródła danych są ze sobą porównywane;
-  - 54 testy automatyczne.
+  - 64 testy automatyczne.
 
 | Rola | ETF w XTB | Waluta |
 |---|---|---|
@@ -170,7 +173,7 @@ node src/cli.js demo
 node scripts/serve.js
 ```
 
-- `npm test` uruchamia 54 testy.
+- `npm test` uruchamia 64 testy.
 - `node src/cli.js demo` buduje aplikację demonstracyjną bez kluczy API. Sygnał pochodzi z danych historycznych, a w zakładce Portfel możesz wczytać przykładowe transakcje.
 - `node scripts/serve.js` udostępnia panel pod adresem http://localhost:8080.
 
@@ -195,6 +198,7 @@ src/dashboard.js          aplikacja WWW (docs/) – zakładki Sygnał, Portfel, 
 src/client/core.js        obliczenia portfela i podatków (przeglądarka + testy)
 src/client/ui.js          interfejs: dziennik, wykres, kalkulatory, synchronizacja
 src/client/finance-*.js   dziennik finansowy offline (obliczenia, import, raporty, interfejs)
+src/client/mmbackup.js    odczyt kopii .mmbackup z aplikacji Money Manager (ZIP + SQLite, bez sieci)
 src/financePage.js        strona finanse.html (blokada sieci) i service worker (praca offline)
 src/backtest.js, research.js  backtest od 1991 r. i scenariusze podatkowe (research/)
 .github/workflows/gem.yml harmonogram w GitHub Actions

@@ -25,7 +25,9 @@ export const DEFAULT_CATEGORIES = [
   ['inne_przychody', '💰', 'Inne przychody', 'przychod'],
 ].map(([id, emoji, name, kind], i) => ({ id, emoji, name, kind, color: PALETTE[i % PALETTE.length], budget: null }));
 
-export const emptyFinance = () => ({ version: 1, accounts: [], categories: DEFAULT_CATEGORIES.map((c) => ({ ...c })), txs: [], rules: [], updatedAt: 0 });
+export const emptyFinance = () => ({ version: 1, accounts: [], categories: DEFAULT_CATEGORIES.map((c) => ({ ...c })), txs: [], rules: [], recurring: [], updatedAt: 0 });
+export const ACCOUNT_ICONS = { bank: '🏦', karta: '💳', gotowka: '💵', oszczednosci: '🐷', inne: '👛' };
+export const isCard = (a) => a?.type === 'karta';
 export const nextColor = (n) => PALETTE[n % PALETTE.length];
 export const liveTx = (fin) => fin.txs.filter((t) => !t.deleted);
 const pad = (n) => String(n).padStart(2, '0');
@@ -284,19 +286,32 @@ export function validateFinTx(t, fin) {
   return errors;
 }
 
-// Saldo każdego konta: saldo początkowe + operacje od daty saldo początkowego.
+// Saldo każdego konta: saldo początkowe + operacje od daty salda początkowego.
+// Dla kont w innej walucie liczy kwotę w walucie konta (accountAmount, a przy przelewie toAmount).
 export function balances(fin, upTo = '9999-12-31') {
   const out = Object.fromEntries(fin.accounts.map((a) => [a.id, Number(a.openingBalance) || 0]));
   const start = Object.fromEntries(fin.accounts.map((a) => [a.id, a.openingDate ?? '0000-00-00']));
   for (const t of liveTx(fin)) {
     if (t.date > upTo) continue;
     if (t.accountId in out && t.date >= start[t.accountId]) {
-      if (t.type === 'przychod') out[t.accountId] += t.amount;
-      else out[t.accountId] -= t.amount;
+      const v = t.accountAmount ?? t.amount;
+      if (t.type === 'przychod') out[t.accountId] += v;
+      else out[t.accountId] -= v;
     }
-    if (t.type === 'przelew' && t.toAccountId in out && t.date >= start[t.toAccountId]) out[t.toAccountId] += t.amount;
+    if (t.type === 'przelew' && t.toAccountId in out && t.date >= start[t.toAccountId]) out[t.toAccountId] += t.toAmount ?? t.amount;
   }
   return out;
+}
+
+// Ustawia bieżące saldo konta (pole „Saldo obecne” albo „Zadłużenie”). Od tej chwili każda operacja na koncie,
+// także dopisana z datą wsteczną, zmienia saldo – tak jak w aplikacji Money Manager.
+export function setBalance(fin, accountId, target) {
+  const a = fin.accounts.find((x) => x.id === accountId);
+  if (!a) return fin;
+  a.openingBalance = 0;
+  a.openingDate = '1970-01-01';
+  a.openingBalance = Math.round((target - balances(fin)[accountId]) * 100) / 100;
+  return fin;
 }
 
 export function monthBounds(month) {
@@ -377,6 +392,197 @@ export function compareMonth(fin, month) {
     return { id, name: c.name, emoji: c.emoji, color: c.color, current: find(cur.expenseByCategory, id), previous: find(prev.expenseByCategory, id), avg3: find(last3.expenseByCategory, id) / 3 };
   });
   return { current: cur, previous: prev, rows: rows.sort((a, b) => b.current - a.current) };
+}
+
+// ---------- Karty kredytowe ----------
+// Saldo karty kredytowej jest ujemne (zadłużenie). Wydatek kartą zwiększa zadłużenie, spłata to przelew z konta na kartę.
+export function cardStatus(account, balance) {
+  const debt = Math.max(0, -balance);
+  const limit = Number(account.limit) || 0;
+  return { debt, limit, available: limit ? Math.max(0, limit - debt) : null, usedShare: limit ? Math.min(1, debt / limit) : null };
+}
+
+// Najbliższy termin spłaty karty (dzień miesiąca z ustawień konta); tylko gdy na karcie jest zadłużenie.
+export function cardDue(account, balance, today) {
+  if (!isCard(account) || !account.dueDay || -balance < 0.005) return null;
+  const at = (y, m) => `${y}-${pad(m)}-${pad(Math.min(account.dueDay, new Date(Date.UTC(y, m, 0)).getUTCDate()))}`;
+  const [y, m] = today.split('-').map(Number);
+  let due = at(y, m);
+  if (due < today) due = m === 12 ? at(y + 1, 1) : at(y, m + 1);
+  return { due, days: Math.round((Date.parse(`${due}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000) };
+}
+
+export function repaymentTx({ fromId, cardId, amount, date, newId, now = Date.now() }) {
+  return { id: newId(), type: 'przelew', amount, date, accountId: fromId, toAccountId: cardId, merchant: 'Spłata karty', repayment: true, source: 'reczne', createdAt: now, updatedAt: now };
+}
+
+// Saldo łączne aktywnych kont w złotych (zadłużenie kart odejmuje się samo, bo saldo karty jest ujemne).
+// Pomija konta w innych walutach i oznaczone „nie wliczaj do salda łącznego”.
+export function netWorth(fin) {
+  const bal = balances(fin);
+  const counted = fin.accounts.filter((a) => !a.archived && !a.excludeFromTotal && (!a.currency || a.currency === 'PLN'));
+  const sum = (list, f) => list.reduce((s, a) => s + f(bal[a.id]), 0);
+  return {
+    total: sum(counted, (v) => v),
+    assets: sum(counted, (v) => Math.max(0, v)),
+    debt: sum(counted, (v) => Math.max(0, -v)),
+    cardDebt: sum(counted.filter(isCard), (v) => Math.max(0, -v)),
+  };
+}
+
+// ---------- Stałe płatności i dochody ----------
+export const FREQS = { tydzien: 'Co tydzień', '2tyg': 'Co 2 tygodnie', '4tyg': 'Co 4 tygodnie', miesiac: 'Co miesiąc', '2mies': 'Co 2 miesiące', kwartal: 'Co kwartał', rok: 'Co rok' };
+const PER_MONTH = { tydzien: 52 / 12, '2tyg': 26 / 12, '4tyg': 13 / 12, miesiac: 1, '2mies': 1 / 2, kwartal: 1 / 3, rok: 1 / 12 };
+const MONTH_STEP = { miesiac: 1, '2mies': 2, kwartal: 3, rok: 12 };
+
+function isoDays(iso, n) {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+// Następny termin. Dla okresów miesięcznych pamiętamy dzień miesiąca (31 → 30 lub 28 w krótszych miesiącach).
+export function nextRecurringDate(date, freq, anchorDay) {
+  if (freq === 'tydzien') return isoDays(date, 7);
+  if (freq === '2tyg') return isoDays(date, 14);
+  if (freq === '4tyg') return isoDays(date, 28);
+  const step = MONTH_STEP[freq] ?? 1;
+  const [y, m] = date.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1 + step, 1));
+  const last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
+  t.setUTCDate(Math.min(anchorDay || Number(date.slice(8, 10)), last));
+  return t.toISOString().slice(0, 10);
+}
+
+const recActive = (r, date) => !r.paused && (!r.endDate || date <= r.endDate);
+
+export function recurringTx(rec, date, { newId, now = Date.now() }) {
+  return {
+    id: newId(),
+    type: rec.type,
+    amount: rec.amount,
+    date,
+    accountId: rec.accountId || null,
+    toAccountId: rec.type === 'przelew' ? rec.toAccountId || null : undefined,
+    categoryId: rec.type === 'przelew' ? null : rec.categoryId || null,
+    merchant: rec.title,
+    source: 'stale',
+    recurringId: rec.id,
+    importKey: `rec|${rec.id}|${date}`,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+// Księguje automatyczne pozycje, których termin minął; zwraca też pozycje „do zatwierdzenia” (bez automatu).
+export function processRecurring(fin, today, { newId, now = Date.now() }) {
+  const keys = new Set(liveTx(fin).filter((t) => t.importKey).map((t) => t.importKey));
+  const txs = [];
+  const pending = [];
+  const recurring = (fin.recurring ?? []).map((r) => ({ ...r }));
+  for (const r of recurring) {
+    let guard = 0;
+    while (r.nextDate && r.nextDate <= today && recActive(r, r.nextDate) && guard++ < 120) {
+      if (!r.auto) {
+        pending.push({ rec: r, date: r.nextDate });
+        break;
+      }
+      const tx = recurringTx(r, r.nextDate, { newId, now });
+      if (!keys.has(tx.importKey)) txs.push(tx);
+      r.nextDate = nextRecurringDate(r.nextDate, r.freq, r.anchorDay);
+    }
+  }
+  return { fin: txs.length ? { ...fin, recurring, txs: [...fin.txs, ...txs], updatedAt: now } : { ...fin, recurring }, posted: txs.length, pending };
+}
+
+// Zatwierdzenie lub pominięcie terminu pozycji „z potwierdzeniem” – przesuwa termin na następny.
+export function settleRecurring(fin, recId, { post, newId, now = Date.now() }) {
+  const r = fin.recurring.find((x) => x.id === recId);
+  if (!r?.nextDate) return fin;
+  const tx = post ? recurringTx(r, r.nextDate, { newId, now }) : null;
+  const txs = tx && !liveTx(fin).some((t) => t.importKey === tx.importKey) ? [...fin.txs, tx] : fin.txs;
+  const recurring = fin.recurring.map((x) => (x.id === recId ? { ...x, nextDate: nextRecurringDate(x.nextDate, x.freq, x.anchorDay) } : x));
+  return { ...fin, txs, recurring, updatedAt: now };
+}
+
+// Pozycje „z potwierdzeniem”, których termin już minął.
+export const dueRecurring = (fin, today) =>
+  (fin.recurring ?? []).filter((r) => !r.auto && r.nextDate && r.nextDate <= today && recActive(r, r.nextDate)).map((r) => ({ rec: r, date: r.nextDate }));
+
+// Wszystkie terminy stałych pozycji w zakresie dat (kalendarz, lista najbliższych).
+export function recurringBetween(fin, from, to) {
+  const out = [];
+  for (const r of fin.recurring ?? []) {
+    let d = r.nextDate;
+    let guard = 0;
+    while (d && d <= to && guard++ < 400) {
+      if (d >= from && recActive(r, d)) out.push({ rec: r, date: d });
+      d = nextRecurringDate(d, r.freq, r.anchorDay);
+    }
+  }
+  return out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+}
+
+export const upcomingRecurring = (fin, today, days = 30) => recurringBetween(fin, isoDays(today, 1), isoDays(today, days));
+
+export function validateRecurring(r, fin) {
+  const errors = [];
+  if (!String(r.title ?? '').trim()) errors.push('Podaj nazwę.');
+  if (!FIN_TYPES[r.type]) errors.push('Wybierz typ.');
+  if (!(r.amount > 0)) errors.push('Podaj kwotę większą od zera.');
+  if (!FREQS[r.freq]) errors.push('Wybierz, jak często.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(r.nextDate ?? '')) errors.push('Podaj najbliższy termin.');
+  else if (r.endDate && r.endDate < r.nextDate) errors.push('Ostatni termin jest wcześniejszy niż najbliższy.');
+  if (fin.accounts.length && !r.accountId) errors.push('Wybierz konto.');
+  if (r.type === 'przelew' && (!r.toAccountId || r.toAccountId === r.accountId)) errors.push('Przelew wymaga dwóch różnych kont.');
+  return errors;
+}
+
+// Stałe pozycje w przeliczeniu na miesiąc (bez wstrzymanych i zakończonych).
+export function recurringMonthly(fin) {
+  const out = { przychod: 0, wydatek: 0, przelew: 0 };
+  for (const r of fin.recurring ?? []) if (r.nextDate && recActive(r, r.nextDate)) out[r.type] += r.amount * (PER_MONTH[r.freq] ?? 1);
+  return out;
+}
+
+// ---------- Kalendarz ----------
+export function calendarMonth(fin, month, { accountId = null } = {}) {
+  const { from, to } = monthBounds(month);
+  const days = new Map();
+  for (const t of liveTx(fin)) {
+    if (t.type === 'przelew' || t.date < from || t.date > to || (accountId && t.accountId !== accountId)) continue;
+    const d = days.get(t.date) ?? { expense: 0, income: 0, count: 0 };
+    if (t.type === 'przychod') d.income += t.amount;
+    else d.expense += t.amount;
+    d.count++;
+    days.set(t.date, d);
+  }
+  const firstDow = (new Date(`${from}T12:00:00Z`).getUTCDay() + 6) % 7; // poniedziałek = 0
+  const list = [];
+  for (let day = 1; day <= Number(to.slice(8, 10)); day++) {
+    const date = `${month}-${pad(day)}`;
+    list.push({ date, day, ...(days.get(date) ?? { expense: 0, income: 0, count: 0 }) });
+  }
+  return { firstDow, days: list, maxExpense: Math.max(0, ...list.map((d) => d.expense)) };
+}
+
+// Zakres dat dla okresu przeglądu: dzień, tydzień (pn–nd), miesiąc, rok.
+export function periodRange(kind, anchor) {
+  if (kind === 'dzien') return { from: anchor, to: anchor };
+  if (kind === 'tydzien') {
+    const dow = (new Date(`${anchor}T12:00:00Z`).getUTCDay() + 6) % 7;
+    const from = isoDays(anchor, -dow);
+    return { from, to: isoDays(from, 6) };
+  }
+  if (kind === 'rok') return { from: `${anchor.slice(0, 4)}-01-01`, to: `${anchor.slice(0, 4)}-12-31` };
+  return monthBounds(anchor.slice(0, 7));
+}
+
+export function shiftPeriod(kind, anchor, n) {
+  if (kind === 'dzien') return isoDays(anchor, n);
+  if (kind === 'tydzien') return isoDays(anchor, 7 * n);
+  if (kind === 'rok') return `${Number(anchor.slice(0, 4)) + n}${anchor.slice(4)}`;
+  return `${shiftMonth(anchor.slice(0, 7), n)}-01`;
 }
 
 // Wzorzec reguły z nazwy sprzedawcy: pierwsze słowo („ORLEN Stacja 1234” → „ORLEN”), żeby pasował do innych oddziałów.

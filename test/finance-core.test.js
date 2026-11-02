@@ -18,6 +18,23 @@ import {
   shortcutCategoriesText,
   monthBounds,
   shiftMonth,
+  setBalance,
+  cardStatus,
+  cardDue,
+  repaymentTx,
+  netWorth,
+  nextRecurringDate,
+  processRecurring,
+  settleRecurring,
+  dueRecurring,
+  recurringBetween,
+  upcomingRecurring,
+  recurringMonthly,
+  validateRecurring,
+  calendarMonth,
+  periodRange,
+  shiftPeriod,
+  liveTx,
 } from '../src/client/finance-core.js';
 
 test('kwoty w polskich i angielskich formatach', () => {
@@ -147,4 +164,120 @@ test('walidacja, reguły, karty, pomocnicze', () => {
   assert.match(shortcutCategoriesText(fin), /Zakupy spożywcze\n.*\nPomiń$/s);
   assert.deepEqual(monthBounds('2026-02'), { from: '2026-02-01', to: '2026-02-28' });
   assert.equal(shiftMonth('2026-01', -1), '2025-12');
+});
+
+let seq = 0;
+const newId = () => `n${++seq}`;
+
+test('karta kredytowa: zadłużenie jako saldo ujemne, wydatek kartą, spłata z konta', () => {
+  const fin = emptyFinance();
+  fin.accounts.push({ id: 'bank', name: 'mBank', type: 'bank' }, { id: 'card', name: 'Karta', type: 'karta', limit: 5000, dueDay: 25 });
+  setBalance(fin, 'bank', 4000);
+  setBalance(fin, 'card', -1000); // zadłużenie 1000 zł
+  fin.txs.push({ id: 'e', type: 'wydatek', amount: 200, date: '2026-10-30', accountId: 'card', categoryId: 'zakupy' });
+  let bal = balances(fin);
+  assert.equal(bal.card, -1200);
+  assert.deepEqual(cardStatus(fin.accounts[1], bal.card), { debt: 1200, limit: 5000, available: 3800, usedShare: 0.24 });
+  assert.deepEqual(netWorth(fin), { total: 2800, assets: 4000, debt: 1200, cardDebt: 1200 });
+  // Spłata całości: karta na zero, z konta schodzi tyle samo; to nie jest wydatek.
+  fin.txs.push(repaymentTx({ fromId: 'bank', cardId: 'card', amount: 1200, date: '2026-11-02', newId }));
+  bal = balances(fin);
+  assert.equal(bal.card, 0);
+  assert.equal(bal.bank, 2800);
+  assert.equal(summarize(fin, '2026-10-01', '2026-11-30').expense, 200);
+  assert.equal(cardStatus(fin.accounts[1], bal.card).debt, 0);
+  // Operacja dopisana z datą wsteczną też zmienia saldo.
+  fin.txs.push({ id: 'old', type: 'wydatek', amount: 50, date: '2025-01-01', accountId: 'bank' });
+  assert.equal(balances(fin).bank, 2750);
+  // Konto w euro i konto „nie wliczaj” są poza saldem łącznym.
+  fin.accounts.push({ id: 'eur', name: 'EUR', type: 'bank', currency: 'EUR', openingBalance: 100 }, { id: 'x', name: 'X', type: 'bank', excludeFromTotal: true, openingBalance: 999 });
+  assert.equal(netWorth(fin).total, 2750);
+});
+
+test('termin spłaty karty: ten albo następny miesiąc, krótsze miesiące', () => {
+  const card = { type: 'karta', dueDay: 25 };
+  assert.deepEqual(cardDue(card, -100, '2026-11-22'), { due: '2026-11-25', days: 3 });
+  assert.deepEqual(cardDue(card, -100, '2026-11-26'), { due: '2026-12-25', days: 29 });
+  assert.deepEqual(cardDue(card, -100, '2026-12-28'), { due: '2027-01-25', days: 28 });
+  assert.equal(cardDue({ type: 'karta', dueDay: 31 }, -1, '2027-02-10').due, '2027-02-28');
+  assert.equal(cardDue(card, 0, '2026-11-22'), null);
+  assert.equal(cardDue({ type: 'bank', dueDay: 25 }, -100, '2026-11-22'), null);
+});
+
+test('stałe pozycje: terminy, automatyczne księgowanie zaległych, bez duplikatów', () => {
+  assert.equal(nextRecurringDate('2026-01-31', 'miesiac', 31), '2026-02-28');
+  assert.equal(nextRecurringDate('2026-02-28', 'miesiac', 31), '2026-03-31');
+  assert.equal(nextRecurringDate('2026-11-02', 'tydzien'), '2026-11-09');
+  assert.equal(nextRecurringDate('2026-11-30', 'kwartal', 30), '2027-02-28');
+  assert.equal(nextRecurringDate('2028-02-29', 'rok', 29), '2029-02-28');
+  const fin = emptyFinance();
+  fin.accounts.push({ id: 'bank', name: 'mBank', type: 'bank' });
+  fin.recurring.push(
+    { id: 'rent', title: 'Czynsz', type: 'wydatek', amount: 2000, accountId: 'bank', categoryId: 'mieszkanie', freq: 'miesiac', nextDate: '2026-09-10', anchorDay: 10, auto: true },
+    { id: 'pay', title: 'Pensja', type: 'przychod', amount: 9000, accountId: 'bank', categoryId: 'wynagrodzenie', freq: 'miesiac', nextDate: '2026-11-10', anchorDay: 10, auto: true },
+    { id: 'power', title: 'Prąd', type: 'wydatek', amount: 180, accountId: 'bank', freq: '2mies', nextDate: '2026-10-15', anchorDay: 15, auto: false },
+    { id: 'gym', title: 'Siłownia', type: 'wydatek', amount: 150, accountId: 'bank', freq: 'miesiac', nextDate: '2026-10-01', anchorDay: 1, auto: true, paused: true },
+    { id: 'old', title: 'Rata', type: 'wydatek', amount: 300, accountId: 'bank', freq: 'miesiac', nextDate: '2026-10-05', anchorDay: 5, auto: true, endDate: '2026-10-31' },
+  );
+  const r = processRecurring(fin, '2026-11-02', { newId, now: 1 });
+  // Czynsz: zaległe terminy z września i października (10 listopada jeszcze nie minął). Rata: tylko październik.
+  assert.equal(r.posted, 3);
+  assert.deepEqual(liveTx(r.fin).filter((t) => t.recurringId === 'rent').map((t) => t.date), ['2026-09-10', '2026-10-10']);
+  assert.equal(r.fin.recurring.find((x) => x.id === 'rent').nextDate, '2026-11-10');
+  assert.equal(r.fin.recurring.find((x) => x.id === 'old').nextDate, '2026-11-05');
+  assert.equal(r.fin.recurring.find((x) => x.id === 'gym').nextDate, '2026-10-01');
+  assert.deepEqual(r.pending.map((p) => p.rec.id), ['power']);
+  assert.deepEqual(dueRecurring(r.fin, '2026-11-02').map((p) => p.date), ['2026-10-15']);
+  assert.equal(processRecurring(r.fin, '2026-11-02', { newId, now: 2 }).posted, 0);
+  // Pozycja z potwierdzeniem: zatwierdzenie księguje i przesuwa termin, pominięcie tylko przesuwa.
+  let f2 = settleRecurring(r.fin, 'power', { post: true, newId, now: 3 });
+  assert.equal(liveTx(f2).filter((t) => t.recurringId === 'power').length, 1);
+  assert.equal(f2.recurring.find((x) => x.id === 'power').nextDate, '2026-12-15');
+  f2 = settleRecurring(f2, 'power', { post: false, newId, now: 4 });
+  assert.equal(f2.recurring.find((x) => x.id === 'power').nextDate, '2027-02-15');
+  assert.equal(liveTx(f2).filter((t) => t.recurringId === 'power').length, 1);
+  // Kalendarz i lista najbliższych terminów.
+  assert.deepEqual(upcomingRecurring(r.fin, '2026-11-02', 30).map((p) => `${p.rec.id}@${p.date}`), ['rent@2026-11-10', 'pay@2026-11-10']);
+  assert.deepEqual(recurringBetween(r.fin, '2026-10-01', '2026-12-31').map((p) => p.rec.id + p.date.slice(4)), ['power-10-15', 'rent-11-10', 'pay-11-10', 'rent-12-10', 'pay-12-10', 'power-12-15']);
+  const m = recurringMonthly(r.fin);
+  assert.equal(m.przychod, 9000);
+  assert.equal(m.wydatek, 2000 + 90); // prąd co 2 miesiące = 90 zł/mies.; siłownia wstrzymana, rata zakończona
+});
+
+test('walidacja stałej pozycji', () => {
+  const fin = emptyFinance();
+  fin.accounts.push({ id: 'a' }, { id: 'b' });
+  const ok = { title: 'Czynsz', type: 'wydatek', amount: 10, freq: 'miesiac', nextDate: '2026-11-10', accountId: 'a' };
+  assert.deepEqual(validateRecurring(ok, fin), []);
+  assert.equal(validateRecurring({ ...ok, title: ' ', amount: 0 }, fin).length, 2);
+  assert.equal(validateRecurring({ ...ok, endDate: '2026-11-01' }, fin).length, 1);
+  assert.equal(validateRecurring({ ...ok, type: 'przelew', toAccountId: 'a' }, fin).length, 1);
+  assert.deepEqual(validateRecurring({ ...ok, type: 'przelew', toAccountId: 'b' }, fin), []);
+});
+
+test('kalendarz miesiąca i okresy przeglądu', () => {
+  const fin = emptyFinance();
+  fin.txs.push(
+    { id: '1', type: 'wydatek', amount: 40, date: '2026-11-02', categoryId: 'zakupy' },
+    { id: '2', type: 'wydatek', amount: 60, date: '2026-11-02', categoryId: 'jedzenie' },
+    { id: '3', type: 'przychod', amount: 9000, date: '2026-11-10' },
+    { id: '4', type: 'przelew', amount: 500, date: '2026-11-03', accountId: 'a', toAccountId: 'b' },
+    { id: '5', type: 'wydatek', amount: 70, date: '2026-11-30', deleted: true },
+  );
+  const cal = calendarMonth(fin, '2026-11');
+  assert.equal(cal.firstDow, 6); // 1 listopada 2026 to niedziela
+  assert.equal(cal.days.length, 30);
+  assert.deepEqual(cal.days[1], { date: '2026-11-02', day: 2, expense: 100, income: 0, count: 2 });
+  assert.equal(cal.days[2].count, 0); // przelew nie jest wydatkiem
+  assert.equal(cal.days[9].income, 9000);
+  assert.equal(cal.maxExpense, 100);
+  assert.deepEqual(periodRange('tydzien', '2026-11-04'), { from: '2026-11-02', to: '2026-11-08' });
+  assert.deepEqual(periodRange('tydzien', '2026-11-01'), { from: '2026-10-26', to: '2026-11-01' });
+  assert.deepEqual(periodRange('miesiac', '2026-02-14'), { from: '2026-02-01', to: '2026-02-28' });
+  assert.deepEqual(periodRange('rok', '2026-11-02'), { from: '2026-01-01', to: '2026-12-31' });
+  assert.deepEqual(periodRange('dzien', '2026-11-02'), { from: '2026-11-02', to: '2026-11-02' });
+  assert.equal(shiftPeriod('dzien', '2026-11-30', 1), '2026-12-01');
+  assert.equal(shiftPeriod('tydzien', '2026-11-04', -1), '2026-10-28');
+  assert.equal(shiftPeriod('miesiac', '2026-01-31', 1), '2026-02-01');
+  assert.equal(shiftPeriod('rok', '2026-11-02', -1), '2025-11-02');
 });
