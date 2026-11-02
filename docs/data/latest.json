@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-02T17:06:08.615Z",
+  "generatedAt": "2026-11-02T17:20:48.713Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -791,7 +791,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 261,
+  "fetched": 263,
   "items": [
    {
     "title": "Polityczna wojna może sparaliżować NBP. Inwestorzy mają powody do obaw",
@@ -973,6 +973,22 @@
     "score": 6
    },
    {
+    "title": "Kontrakty terminowe na Wall Street odrabiają straty; wybory w centrum uwagi - Investing.com Polska: Kursy walut, kryptowalut, notowania akcji",
+    "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQeEVGVjFPOXJuRHpxVThTN0VQYXZjdXBEdlkycm5ubTFPYmNPbU0zbGJVQ3ZEZ0pFeXRZbW0xaXlxSGZXYTc5RlJRQzItbkJQT1ZoMTNlX2pYREVzWV9pZ3R4Zlh5Rk0yZno4ZGx3Y0dtQ2xyUW56Wk1aUmlnRm4teDY2emlmdGVoMkJJTExHZVpWdkhJdXNKM2lMYkdoSS1acjh2dzlvY3NuZlhjRWhVVVg2QzdJZ3VmUHhEZDVqNkEyNnZDVmxCeDNncEVPZHZNRk93?oc=5",
+    "date": "2026-11-02T00:31:00.000Z",
+    "summary": "Kontrakty terminowe na Wall Street odrabiają straty; wybory w centrum uwagi Investing.com Polska: Kursy walut, kryptowalut, notowania akcji",
+    "source": "Google News PL",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
     "title": "Bolsonaro uciekł do Trumpa, a giełda runęła. Co się dzieje w Brazylii po wyborach? - OKO.press",
     "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNbE1GbmdRMHBvUVRkWVkwYllWWUpGXzJoSkVlY0hMczk2QmNieVJTN0R3VXhUM2dOeFAydWYxaGFKUzJpLWo2YVUwbHR3c3JWeXM5VlRxTExFZUllLWkzY09qVXBBVEl3RFhUMmlscWlScHBsdkc2aWtqc2ozTlpGdXN5cTVmdE1J?oc=5",
     "date": "2026-11-01T16:24:53.000Z",
@@ -1004,27 +1020,11 @@
     "score": 6
    },
    {
-    "title": "Wybory w USA już wkrótce. Jak wpłyną na polską walutę - TVN24",
-    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPNElqYnZXS3ZvQjhabjhsZVZxM183bVhFa0poSmc0Wlp6QkRLdVcxN3QxT3RETDNTb0d4ZU5ray1XRWRpRHZQaUJwQ21ZdmZFYnBWZFA4OExJaGJ1dHE2U245VC04OTB4NFhKT2Q3OHVRak55VG1QZFE3NGx0YWtNZEpmYmZMRklZeGUxY1lSZGY5SkpCMVdTNXBKN1B5T0dVLUQ3Tk1DUnhHQ2lMVTY5UUdB?oc=5",
-    "date": "2026-10-30T17:20:45.000Z",
-    "summary": "Wybory w USA już wkrótce. Jak wpłyną na polską walutę TVN24",
-    "source": "Google News PL",
-    "regions": [
-     "USA",
-     "Polska"
-    ],
-    "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Na Wall Street odbicie po największej przecenie od czerwca. Rynek czeka na raport Apple i wybory - pb.pl",
-    "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPLTFMZUhObTRBQmRUTnVXcnhMd2tkRmpoWkxmRXdPWTR6elkwMTFVWVRYSldMc05zLXVkZUs2T0JQRGQwd2xvS0Uydzd5MnlSSWE3WjhfV3JObHNWb294TVZHVTJ6cmhYU1lZZWRMQWVyX1VCREF4X0JCVVY5bUctTzNNX3p2S2lXdEwxZnYtanBHTnBsaXZER1NOQzBHWko4NmdvWEFtUVJZRE15WTZjbHlCcXliTUVJTWFzZ19B?oc=5",
-    "date": "2026-11-02T16:15:00.000Z",
-    "summary": "Na Wall Street odbicie po największej przecenie od czerwca. Rynek czeka na raport Apple i wybory pb.pl",
-    "source": "Google News PL",
+    "title": "Prediction Markets Need Trump. Their Election Odds Risk His Fury - Sportico.com",
+    "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOT0hZbXBGVW9RQUgxQkJKR2w5cDVFZFJDUUpkUkM5QVkyTFRtMjlnU3FKaUU3TG8tMDNnQ2swejZfbkZNQVZsb2s0ZFZhaDJOVXlRWXF5LTNWalJMc1NMUXZZTHhPTHZybk5tRDJNRnl0bHlJWVB1c1M1WXZMT2FESmdFUjJxLXgzRVdDS2JwVUZmc3Q1R0FJR0dZcThmcDJNV3ltSWlZVXJXcTJ5VllISQ?oc=5",
+    "date": "2026-11-02T17:14:49.000Z",
+    "summary": "Prediction Markets Need Trump. Their Election Odds Risk His Fury Sportico.com",
+    "source": "Google News",
     "regions": [
      "USA"
     ],
@@ -1039,12 +1039,12 @@
    "Konflikty i wojny": 13,
    "Sankcje i cła": 1,
    "Banki centralne i stopy": 2,
-   "Wybory i polityka": 33,
+   "Wybory i polityka": 34,
    "Energia i surowce": 9,
    "Inflacja i recesja": 3
   },
   "regionCounts": {
-   "USA": 22,
+   "USA": 23,
    "Europa": 2,
    "Azja": 0,
    "Rynki wschodzące": 2,
@@ -1100,7 +1100,7 @@
     },
     {
      "title": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1wb0dSbFBkZ0tPUG5HQUJlN1d3elIyajFBWWxQYU44bnNnTWRZak9YcUVVUzJyUU5OVWExdDNWWjdpajJ4dGN1bDU4NzJYVThhVzBZ?oc=5",
+     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPUllpdktGODBNTTBYb0Q1SGNpcTQtbkZ0dnl3Mmp3Q05LQ3JNTHdDWlRMYk9qTGJCckc0b3FDS2pTZEdLTmQxc3huOHJvaXZudlgwLUdCUlpfMlltOUI2cEFXZGl3SE84ZTBnQWRjenJqZGFUOHl3UG5vOTBJbm5VNTh4akk0NDZ2b3VtY2swYkxrRGFjWHBTZA?oc=5",
      "date": "2026-11-02T07:00:48.000Z",
      "summary": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe Analizy.pl",
      "source": "Google News – podatki inwestora",
@@ -1239,7 +1239,7 @@
     },
     {
      "title": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1wb0dSbFBkZ0tPUG5HQUJlN1d3elIyajFBWWxQYU44bnNnTWRZak9YcUVVUzJyUU5OVWExdDNWWjdpajJ4dGN1bDU4NzJYVThhVzBZ?oc=5",
+     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPUllpdktGODBNTTBYb0Q1SGNpcTQtbkZ0dnl3Mmp3Q05LQ3JNTHdDWlRMYk9qTGJCckc0b3FDS2pTZEdLTmQxc3huOHJvaXZudlgwLUdCUlpfMlltOUI2cEFXZGl3SE84ZTBnQWRjenJqZGFUOHl3UG5vOTBJbm5VNTh4akk0NDZ2b3VtY2swYkxrRGFjWHBTZA?oc=5",
      "date": "2026-11-02T07:00:48.000Z",
      "summary": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe Analizy.pl",
      "source": "Google News – podatki inwestora",
@@ -1313,7 +1313,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-02T17:06:08.615Z",
+  "generatedAt": "2026-11-02T17:20:48.713Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
