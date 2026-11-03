@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-02T22:22:52.193Z",
+  "generatedAt": "2026-11-03T07:14:27.973Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -817,7 +817,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 312,
+  "fetched": 286,
   "items": [
    {
     "title": "NBP na krawędzi paraliżu. Inwestorzy mogą stracić cierpliwość",
@@ -837,18 +837,68 @@
     "score": 10
    },
    {
-    "title": "US-Israeli war on Iran depleted global oil stocks: CEO of Abu Dhabi National Oil Company - نورنیوز",
-    "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQUGd0cHpuRW52UERJelJpQldZMVQ4OFRUbVQzN2JJaHdSc01TWE56dmlpTS1uQWx6WGhTVkNBeVBuTEtRSS1MTFdfeWJnMU5WTDdhTjZ1U3ZSc3NVVmxXejV5MFRVRUJrOFNyNjNRaHc0YmVzSEdTeU9qWDFzQ1dxVDBiWGRRaW1TVGZXaGR2ck9XVnBMTWFKMnBUZDNVT3RhMGxDemFlVGZWR09nZnM4S2ttZFNOcFJKZWdYZTlTdw?oc=5",
-    "date": "2026-11-02T15:32:00.000Z",
-    "summary": "US-Israeli war on Iran depleted global oil stocks: CEO of Abu Dhabi National Oil Company نورنیوز",
+    "title": "Saudi Aramco profit jumps 34.6% as Middle East war shakes energy markets - Türkiye Today",
+    "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNTXFWbU55RGl2OV94aVJrYl92VGJFTlQ1dzB4c3BidHRFRjBBbWJRZl9NZHJCM0tjbnZWaXQ2MUVwT2c4SFJLVnlQckttbjhwWTJKWVVSTC1EcTViZ2xrUEt2bWI4b2tMYkZqcU1rSkJuSkRRYnp6dEwtcHhsU0pDNUgtZzQyd05rOGtoNFNpMUpBc1JmWEFyUzBsVGRmb1llUkFkcGxlck9uWWZKclE1QjcycUVGZUU?oc=5",
+    "date": "2026-11-03T06:22:58.000Z",
+    "summary": "Saudi Aramco profit jumps 34.6% as Middle East war shakes energy markets Türkiye Today",
     "source": "Google News",
     "regions": [
-     "USA",
+     "Rynki wschodzące",
      "Bliski Wschód"
     ],
     "themes": [
      "Konflikty i wojny",
      "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
+    "title": "Saudi Aramco profits surge as Middle East war rattles energy markets - Kuwait Times",
+    "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOXzFpdWZXY09jVGw3Zl9xcUY5MmVSSllOdnFKcXItOVNrVWswYWM1TGlkWkFpTGVRa0NkSV9nWHVhZmF1ME15bTVReXAzSmZOSjdvSEhJdzEzd0ZXZkJwY3kxd3JGMFVRWG5IVFQxRFBVQWtTbEVjT2RxN094WFNISVdHZXR4M1ptYnR5Wk41X3pMWFFzdkpjSGNQY0szbGw1MG0yVWtpeTVib3BmekFyQi10VW9nUjDSAbsBQVVfeXFMT01JYjYwU0E3LWJDZ2lySmRVYmZqTk1LYVh5NFd4VEdLR0JxbmxsRWFod2dsMHJjUzZualM1c2NPUzM3TXlyMFZWYU1VNW1wR1h4RFM3T2p3eDl6Tzd4Tm41M1JKRlBrMGlMWklHSzhEbDJEZkNMdERPQllabFlMd1lYNXBfR1ZtR0c5eFFvQ1NueUlyU18xMWZQTllDMlJmTW9raVgtS3pDaUJPVjVhMHAzWkc0NXJycUhnTQ?oc=5",
+    "date": "2026-11-03T06:07:57.000Z",
+    "summary": "Saudi Aramco profits surge as Middle East war rattles energy markets Kuwait Times",
+    "source": "Google News",
+    "regions": [
+     "Rynki wschodzące",
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
+    "title": "Ahead of Midterms, Oil Markets Were Voting for War - Bloomberg.com",
+    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQdFRmTDVIR1hxVExVTzlxeFhrVThDMmZVX2h6MEhPUlBVeDB6YmZiRW5oSk84enE2aHJ3Xy1MUFBndzRFUHphLXpvQm94dzZ5Sjc4VklIOE1pMXZLZFp3czFpYnJWb0hHeGJTV0NPZ2JGcWNJX3NOMjJqM1hGMFRqclk0X1E0QUk1NTZVS2xqb3dJWnhFdEgzRzM0NFBqdzE5WjJpVm5nbXNaZw?oc=5",
+    "date": "2026-11-03T04:00:00.000Z",
+    "summary": "Ahead of Midterms, Oil Markets Were Voting for War Bloomberg.com",
+    "source": "Google News",
+    "regions": [],
+    "themes": [
+     "Konflikty i wojny",
+     "Wybory i polityka",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
+    "title": "War, tariffs and China: What the US midterms mean for the Asia-Pacific",
+    "link": "https://www.aljazeera.com/news/2026/11/2/war-tariffs-and-china-what-the-us-midterms-mean-for-the-asia-pacific?traffic_source=rss",
+    "date": "2026-11-02T23:41:18.000Z",
+    "summary": "Hit hard by Trump's tariffs and the war on Iran, countries in the Asia-Pacific want 'enormous changes' in US policies.",
+    "source": "Al Jazeera",
+    "regions": [
+     "USA",
+     "Azja",
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Sankcje i cła"
     ],
     "relevant": true,
     "score": 9
@@ -871,21 +921,20 @@
     "score": 9
    },
    {
-    "title": "World drains nearly 1 billion barrels from oil stocks amid Iran war, says ADNOC chief - Telegraph India",
-    "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOaGhhaUZ2ZFVrR2dIcGQyZEw0U2hMTjY1emtTbEIza1htQ281MThRZWhrTmpoSkJnNFN0a1BRRU1Kdk10NWl4cDhRaE4tWVBGYmhHQ2QtUXhVbWpQZzgzTjdMX0tJYmJXakwwXzVhMC1UVm5BVndfN2p2YWI4NmJSUlN2X2RCbE5WeHVPcldfQXRmTFdmQlhKeWtPQ1dqR0YyZ2FwaVR5V05uSHBEQWhfZWxDX19oSVdNUVZkbHJhcWdjZ0lJaGxWS21ldFhJMl9XOFo40gHTAUFVX3lxTE5oaGFpRnZkVWtHZ0hwZDJkTDRTaExONjV6a1NsQjNrWG1DbzUxOFFlaGtOamhKQmc0U3RrUFFFTUp2TXQ1aXhwOFFoTi1ZUEZiaEdDZC1ReFVtalBnODNON0xfS0liYldqTDBfNWEwLVRWbkFWd183anZhYjg2YlJSU3ZfZEJsTlZ4dU9yV19BdGZMV2ZCWEp5a09DV2pHRjJnYXBpVHlXTm5IcERBaF9lbENfX2hJV01RVmRscmFxZ2NnSUlobFZLbWV0WEkyX1c4Wjg?oc=5",
-    "date": "2026-11-02T07:27:30.000Z",
-    "summary": "World drains nearly 1 billion barrels from oil stocks amid Iran war, says ADNOC chief Telegraph India",
+    "title": "Saudi Aramco profits surge as war rattles energy markets - Oman Observer",
+    "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNcXNYMzc1bHlZUFJEaVcxalFkTE4tYk91ZFM1ZURkQk1Tc2Y5TkRKMXZmNG5NdkpjZFFfRHlNRW1USXMwM2k4SmtFSXlVdVZIdFBaY3pGcmRVeldnU0d1MkgxZ0x4eThnNDZpWGM4bnd0MFJ4Ym5JUUZOUU9zdVNHcHNOMkJ5bldPdDVXbXR5LUxXRFZJNnAtYXdBQjdTYW5jNFN2bnpWOE9TeklwbVg3SHk4YUNqdk3SAVpBVV95cUxNS3drRms1TlZKR2lXZ3NYN1ZaNXZfVEcxVGRSc3NoX1FBUFFwTWRCcFdGVENpakV2LXVKdWRmOUdydHpwVDg3OTBOLXJJczRrSWE2TGcycGtRTmc?oc=5",
+    "date": "2026-11-03T06:56:54.000Z",
+    "summary": "Saudi Aramco profits surge as war rattles energy markets Oman Observer",
     "source": "Google News",
     "regions": [
-     "Azja",
-     "Bliski Wschód"
+     "Rynki wschodzące"
     ],
     "themes": [
      "Konflikty i wojny",
      "Energia i surowce"
     ],
     "relevant": true,
-    "score": 9
+    "score": 8
    },
    {
     "title": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso - EnergyNow.com",
@@ -904,10 +953,10 @@
     "score": 8
    },
    {
-    "title": "Top Asian LNG Markets Boost Coal Use as Iran War Limits Supply - EnergyNow.com",
-    "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPYUlWWTNuVElBVE9hN0g0WU9CQ3NseEhYWmxOY2dIVDVaTERocERNTDU1TlFXUDN0el91RUtzREd2RnFqN1NiQTdXUzV4eTZtUjVPTzlwdmdsRU1pN0Q2MTMyaDhDUjZGanVidXg2YW9nM09iUENhdTBVNHNCTWE5SkExYjFVYlg2Tmt3djdONDBwYzduMTRJYg?oc=5",
-    "date": "2026-10-31T21:50:13.000Z",
-    "summary": "Top Asian LNG Markets Boost Coal Use as Iran War Limits Supply EnergyNow.com",
+    "title": "Top Asian LNG Markets Boost Coal Use as Iran War Limits Supply - EnergyNow",
+    "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOMHhFaHFjaU1XODZmSUNsTWI4WUY3bWVBTVBLbHBBVFBWWnptMDFKdUNmalNlcG5jOXJWTERvem4wckZIcXY1LWk2bXdfQWNnTDZOSXZTVE5xZXRRNGwtZkcwalc5Q1Ywc0ZjVXFEWi12dkZDV1NKNHRCN093czBFQkJBTDVrLWFSRjg1cVU4djZkdWdwWHZJ?oc=5",
+    "date": "2026-10-31T21:42:30.000Z",
+    "summary": "Top Asian LNG Markets Boost Coal Use as Iran War Limits Supply EnergyNow",
     "source": "Google News",
     "regions": [
      "Bliski Wschód"
@@ -920,52 +969,20 @@
     "score": 8
    },
    {
-    "title": "Iran War Ceasefire Pushes Energy Markets Into Twilight Zone: Bousso - EnergyNow.com",
-    "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxPRklBQkZvb3NtU0FzeDJNcWs5MGUwNEZHek9vU253V0RKRjlkWVBqTFpRNjdlVEozUXB4TzlKTmJwMmFOZjA4bTJxOVRGQWhBMTRXMVlRS08xTWQwckdqUkI3b05CXzd5LVdPVlNQTEZWNl9waC1VelhNZU5HeWVLSTBaLWlrNklObE5yTGdrNUdzMHdzZTNqMTdITkFVQQ?oc=5",
-    "date": "2026-10-31T21:45:49.000Z",
-    "summary": "Iran War Ceasefire Pushes Energy Markets Into Twilight Zone: Bousso EnergyNow.com",
-    "source": "Google News",
+    "title": "Trump to remove Rwanda and South Africa from US trade deal",
+    "link": "https://www.bbc.co.uk/news/articles/c9j346xg0mkvo?at_medium=RSS&at_campaign=rss",
+    "date": "2026-11-03T03:00:36.000Z",
+    "summary": "The move comes barely a week after Rwanda's defence ministry was hit with sanctions by the US Treasury.",
+    "source": "BBC World",
     "regions": [
-     "Bliski Wschód"
+     "USA",
+     "Rynki wschodzące"
     ],
     "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
+     "Sankcje i cła"
     ],
     "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "World Absorbs Historic Iran War Oil Supply Loss, But Depleted Stocks Bring Risks - EnergyNow.com",
-    "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQbW5RLWt6Unk4SkNYOXIySEZqOF8tTUs3NWNZWTRWaUEzVW5MVmNqSTJqTnY5UTZZc09EY0RlLTc3UWcyTWlFcnlLdFdQSG9WSm1RcUFwNENpcGIxQkxmZU53VkFRM3o3aWtQZDRsQ0NHR0ZsejFVdHhyR09Jb1gweU1BLVFCSE1yVnBYQmV3VDRxcEJHVGMzNXh4QTlQbmQzaUJRaVBxM2FRQ3dCX0Rz?oc=5",
-    "date": "2026-10-31T21:45:23.000Z",
-    "summary": "World Absorbs Historic Iran War Oil Supply Loss, But Depleted Stocks Bring Risks EnergyNow.com",
-    "source": "Google News",
-    "regions": [
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Brent ends October up 13.6% as Iran war risks unsettle markets - Nation Thailand",
-    "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE9NbHdDWnoyUnRnZXJ5SE5saGxETWFwbjdoWlNyTUllRUJ1dUJNQkVyTmNFY2Z1OUtxdmtpcFRNX0pieFFXZWUzSVFEQ1ZROWREbzhrdFZ2RzBVOVRMU2xZ?oc=5",
-    "date": "2026-10-31T00:28:00.000Z",
-    "summary": "Brent ends October up 13.6% as Iran war risks unsettle markets Nation Thailand",
-    "source": "Google News",
-    "regions": [
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
+    "score": 7
    },
    {
     "title": "Druga czarna świeca na Nasdaqu. Wall Street w dół pomimo przeceny ropy naftowej",
@@ -984,26 +1001,10 @@
     "score": 7
    },
    {
-    "title": "Trump to remove Rwanda and South Africa from US trade deal",
-    "link": "https://www.bbc.co.uk/news/articles/c9j346xg0mkvo?at_medium=RSS&at_campaign=rss",
-    "date": "2026-11-02T19:33:10.000Z",
-    "summary": "The move comes barely a week after Rwanda's defence ministry was hit with sanctions by the US Treasury.",
-    "source": "BBC World",
-    "regions": [
-     "USA",
-     "Rynki wschodzące"
-    ],
-    "themes": [
-     "Sankcje i cła"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "DZIEŃ NA GPW: GPW jednym z najsłabszych rynków w Europie; inwestorzy czekają na wybory w USA - wnp.pl",
+    "title": "DZIEŃ NA GPW: GPW jednym z najsłabszych rynków w Europie; inwestorzy czekają na wybory w USA - WNP.PL",
     "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNOFhiYmMxajZveWhtLVpYLWpHamFhVmNhMTlmR21PM0c5YXg0ckN6SnJXYjRHeF9LYkRhUDd4emozcEFWX1BvNnNhOVNYRVVDbTdJaDdmVDF5TjNGZTBpUzB2WGpnOUZOZDVLYW45NGo5MmFISW5NcjNYYmFBSVR6ekRrRkNtZmp3STdYamcxb1J3UlhQX21SWjdmWG1tTnpRVUdCemIxNU1WWkVGWXd4SFlFbjc5RWlMRldRUElYODBZS2hpSC1r?oc=5",
     "date": "2026-11-02T15:30:00.000Z",
-    "summary": "DZIEŃ NA GPW: GPW jednym z najsłabszych rynków w Europie; inwestorzy czekają na wybory w USA wnp.pl",
+    "summary": "DZIEŃ NA GPW: GPW jednym z najsłabszych rynków w Europie; inwestorzy czekają na wybory w USA WNP.PL",
     "source": "Google News PL",
     "regions": [
      "USA",
@@ -1012,22 +1013,6 @@
     ],
     "themes": [
      "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Przed sesją na Wall Street: kontrakty sugerują odbicie, ropa tanieje, inwestorzy czekają na Apple, wybory i dane z rynku pracy - pb.pl",
-    "link": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxPX3VLRi1vdnlqUTNUMzV3dVpkWVlGejJSU21lTkdHLU81VzBiTG1nZEVyTk1vZzVuVnNqdGJZRHFqc1laWlBRYllRNEkwaUh2OE5TRkJ3dm1iSFZldGM1YTdQVWxLR0NXcW9ZQXJBcXJXOGEwWnNnci1OaEtJTF91bjFNeTNjb1QwZGVUZGVpcnZsV2tENzdHZkpXZGVNdk00U1pmS0IzVGF2ZUN5cEhsWXVOOG16cVNqZm1YaGh5Qkk3WGM5dG5xY1NqSmVfczRfYTRIazU1cFhrTlctN3Z5Wm9R?oc=5",
-    "date": "2026-11-02T12:33:00.000Z",
-    "summary": "Przed sesją na Wall Street: kontrakty sugerują odbicie, ropa tanieje, inwestorzy czekają na Apple, wybory i dane z rynku pracy pb.pl",
-    "source": "Google News PL",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka",
-     "Energia i surowce"
     ],
     "relevant": true,
     "score": 7
@@ -1061,24 +1046,39 @@
     ],
     "relevant": true,
     "score": 6
+   },
+   {
+    "title": "Global Markets: Efforts to end Middle East war continue - Manitoba Co-operator",
+    "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNUGh5cENNVzVHMEJGOEtGV1RkeXhpRWlEZ0NnTUJydmhTUzJxQml5cGJ3TGRwNmtoejFiSHNGTkJuUUJTdEpCTDF1X0o5c2ZPakhkb1VldmFxS1ZabVRoWDM1MmZNS0ppYmlOeXl2enJUWm5WenJMRlRXTENVdnExa0g3d1JIMWFtcW5OWkdVc2Y3UU4wZHhmSFRDVzhuQ1k2czZGLTdR?oc=5",
+    "date": "2026-11-02T18:03:13.000Z",
+    "summary": "Global Markets: Efforts to end Middle East war continue Manitoba Co-operator",
+    "source": "Google News",
+    "regions": [
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 20,
+   "Konflikty i wojny": 15,
    "Sankcje i cła": 3,
-   "Banki centralne i stopy": 1,
-   "Wybory i polityka": 60,
-   "Energia i surowce": 17,
+   "Banki centralne i stopy": 3,
+   "Wybory i polityka": 50,
+   "Energia i surowce": 12,
    "Inflacja i recesja": 2
   },
   "regionCounts": {
-   "USA": 35,
+   "USA": 23,
    "Europa": 3,
    "Azja": 1,
    "Rynki wschodzące": 6,
    "Polska": 6,
-   "Bliski Wschód": 12,
-   "Rosja/Ukraina": 0
+   "Bliski Wschód": 8,
+   "Rosja/Ukraina": 1
   },
   "errors": []
  },
@@ -1086,19 +1086,6 @@
  "taxMonitor": {
   "news": {
    "items": [
-    {
-     "title": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI - Forsal.pl",
-     "link": "https://news.google.com/rss/articles/CBMiogJBVV95cUxPN3k1OGRqM0tCQkg2Y2JEcWRnOGRVZ2tFNVI4SGJ3U2dPSUJqRHBVWk9NUHo3allXSHE1dVFOTXJ3dUY0dy05WWlIcEphREl4T1Bra3NqSjV2eFF1VmEwakZZemhpV3Q5dzU3WVlybW5OQXlkQ3pfS1pad2EwUVd4S3dCSlVnZDJ0YnlubkFzbVoweDJsYnhPTDdFazg4NVBDQ0lZOTlSZmROLTdqSUcxNW9sZ1k3X0hRX000RmZuT2ZUV1hYbVoxWTg4Y091bkM4ZFo3MGQxbGpTNVpuNnczLWxVMmFjTUdTN2h6UFM3TG5EVHBKRjV5d0ZaT2J1SVNQTkhmR3hYMkswZU9ZU0p5Um95bG4xWlZ2UF82MWE2Mk5pZw?oc=5",
-     "date": "2026-11-02T14:37:43.000Z",
-     "summary": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI Forsal.pl",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "OKI",
-      "Podatek Belki"
-     ],
-     "important": true,
-     "score": 9
-    },
     {
      "title": "Inwestor Wojtek: ETF-y a OKI. Jak unikniesz podatku Belki i czy nie lepiej zostać przy IKE - pb.pl",
      "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNd2ZpLWhxbmtqOE1QcXdCbXZxMmtOZWRMTThfRnVYWWVkYzdiSUZWQ0FuQ0tGYkR0dVhJUmxJa0hLTkozdWNKVVQ4eFB1MlRvRlBJelZZT3ZKUS10WkVOekRTbU1Ba19zaG9BNlNEZHRUU09LbDA5ZFRuRVJYa3lHVXpvSHpZa2wxSVFMNUxaQzVjTXdSTGwtbjc2cjVfNEp0N1Fhb2xZOVlKNHFFUy0tRUEyMWU?oc=5",
@@ -1111,6 +1098,19 @@
       "Podatek Belki"
      ],
      "important": false,
+     "score": 9
+    },
+    {
+     "title": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI - Forsal.pl",
+     "link": "https://news.google.com/rss/articles/CBMiogJBVV95cUxPN3k1OGRqM0tCQkg2Y2JEcWRnOGRVZ2tFNVI4SGJ3U2dPSUJqRHBVWk9NUHo3allXSHE1dVFOTXJ3dUY0dy05WWlIcEphREl4T1Bra3NqSjV2eFF1VmEwakZZemhpV3Q5dzU3WVlybW5OQXlkQ3pfS1pad2EwUVd4S3dCSlVnZDJ0YnlubkFzbVoweDJsYnhPTDdFazg4NVBDQ0lZOTlSZmROLTdqSUcxNW9sZ1k3X0hRX000RmZuT2ZUV1hYbVoxWTg4Y091bkM4ZFo3MGQxbGpTNVpuNnczLWxVMmFjTUdTN2h6UFM3TG5EVHBKRjV5d0ZaT2J1SVNQTkhmR3hYMkswZU9ZU0p5Um95bG4xWlZ2UF82MWE2Mk5pZw?oc=5",
+     "date": "2026-11-02T05:16:22.000Z",
+     "summary": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI Forsal.pl",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "OKI",
+      "Podatek Belki"
+     ],
+     "important": true,
      "score": 9
     },
     {
@@ -1153,19 +1153,6 @@
      "score": 8
     },
     {
-     "title": "Limity wpłat 2027 r. IKE, IKZE, OIPE, PPE - Stowarzyszenie Inwestorów Indywidualnych",
-     "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQMWdaM2NoZ1JVcEZpeEdLLV9hTXJuNjZWeHNJWTEwbnlSN1NNbzZZbC1QWmwxcGZMbzZlbVVQcjJHMEt5czFaVVdnSXF6REZLWVV1OUhTTGlPaUlTM0Nod0I0R3VKUjVHQm1xZERNcWstQU16eXk5aDV5WnBkNkY3TmdJLW04ODV3U0xEVElFM0dBQQ?oc=5",
-     "date": "2026-11-02T16:30:00.000Z",
-     "summary": "Limity wpłat 2027 r. IKE, IKZE, OIPE, PPE Stowarzyszenie Inwestorów Indywidualnych",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "PPK i emerytury"
-     ],
-     "important": true,
-     "score": 7
-    },
-    {
      "title": "Rewolucja w oszczędzaniu na emeryturę? Propozycje zmian w IKE, IKZE, PPE i PPK - RMF24",
      "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOa1lJQkNXV20zV3dtNFVIYVp5MEJxUGwxQ1psYkh5NjlRdzVfbmRqNTRyNUZydDluWlRtMlM1LXNsTG5fY2JBbUhLVTJEdjhsTmdRd0tvQzNRQ29ZX3VVVXI4MklieHhSbHhEcDNYMUJ6Tzd6TEo4ZEFtMzZ5NnIxRjVRQV82d0xXUUZrTG92MklZNm52Xy1SMHprazBZNGlkZ3dnNExkY00xRXlRZy13UEJiTk8?oc=5",
      "date": "2026-10-27T09:20:00.000Z",
@@ -1177,6 +1164,18 @@
      ],
      "important": true,
      "score": 7
+    },
+    {
+     "title": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy - INFOR.PL",
+     "link": "https://news.google.com/rss/articles/CBMi1gJBVV95cUxQWUotM3BwWWJqY29Ga3VTVUtrS2sxVDRPUUVvd2JmTEh1dFNZSk9qbVg0Mzk3Y0lHUURjTHZkaTU5V1RUemxrWDliU1prWnJZUEljelRxbURjcVB1cl9oSDV1NnJyMUhPSVZBcjBNVmlZa0VyV0FFYnUzVDljaDlzVUxpdC1BOHNQbkQtTjNTRHdFVUpueTl3cjZGUllicV9IbS1FaVZaandNUTJkMXJLWTh3TXBBRVdOdDkyTVotdmlZeks2ekJ0UGM1VUdTMFRSRWNxLS1TVDdfdEN5YWl6VW1xUXdpbTFYS2VOZUhIVkxOOFQ1X05zTFZwdFRNMHdQS2JSMzh3cWJ2cDRBXzdpWEhoWGdReHRSR1ZNdkhKX216Z3ptb0dZd2dVVjNaVnFfZkVjRDdPRU5SaW04ZlVrSHlvakxnTFZoMU9XdHNQdXA0TkY5cXc?oc=5",
+     "date": "2026-11-03T02:43:22.000Z",
+     "summary": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy INFOR.PL",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "OKI"
+     ],
+     "important": true,
+     "score": 6
     },
     {
      "title": "IKZE z wyższymi limitami. W 2027 r. wpłacisz więcej - Money.pl",
@@ -1203,21 +1202,9 @@
      "score": 6
     },
     {
-     "title": "Wyższy limit wpłat na IKZE w 2027 roku. Jest już obwieszczenie Ministra Rodziny, Pracy i Polityki Społecznej - Forsal.pl",
-     "link": "https://news.google.com/rss/articles/CBMigAJBVV95cUxOaVFwREhLeEVKS2ZUR29OZkpCZ2JkeTZwT08yajFwVTBvajF1TUhkQXFGUDVUUFRwM1B6dkNDaHAwTFVBbmVMZlhsYmJ1U3dYMXE1THEzeUZlSU94U044V2tma3V5ZVliRWw2Z3ByQS16ZWlIdjlORExtYVNMbGV1S3NRUUJWMTNRRUd4ZTZXYlBYa3p2YXplWkhQUThta1VKSDI4aU9YT3F0bEt3YVd4dWJUdWhkemRfeXFpM21MbUZiUElTTWRkS1pZRU9kc3gybTJRTnczR29hZERYb1Y5dlNrVEUyYWpMeUJmeUoyOUZrY2tsbXhOY1JON1pGT3NZ?oc=5",
-     "date": "2026-11-02T12:40:17.000Z",
-     "summary": "Wyższy limit wpłat na IKZE w 2027 roku. Jest już obwieszczenie Ministra Rodziny, Pracy i Polityki Społecznej Forsal.pl",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE"
-     ],
-     "important": true,
-     "score": 6
-    },
-    {
      "title": "Podatek na OKI – jak działa? Limity 100 tys. i 25 tys. zł, stawka i przykłady - Analizy.pl",
      "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNa0ZiSkhhbGhnMF80QzAzVEdzSEdtV2VGUjUyUkpudEo4Rk9mSGxWT3dlOURCZHdZTVFvRnA1NjgwbDFoY3JyQnpYUl9RNFozdnVMbVM3OGIwZ05UV0pUR1FhbU5WOFdMVXAydXFqMUxCSWVyYWpzNDJMYzNFWWl3QWhHV3pQN1NaTE9jc0xR?oc=5",
-     "date": "2026-11-02T10:55:17.000Z",
+     "date": "2026-11-02T10:51:49.000Z",
      "summary": "Podatek na OKI – jak działa? Limity 100 tys. i 25 tys. zł, stawka i przykłady Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1237,13 +1224,25 @@
      ],
      "important": true,
      "score": 6
+    },
+    {
+     "title": "Wyższy limit wpłat na IKZE w 2027 roku. Jest już obwieszczenie Ministra Rodziny, Pracy i Polityki Społecznej - Forsal.pl",
+     "link": "https://news.google.com/rss/articles/CBMigAJBVV95cUxOaVFwREhLeEVKS2ZUR29OZkpCZ2JkeTZwT08yajFwVTBvajF1TUhkQXFGUDVUUFRwM1B6dkNDaHAwTFVBbmVMZlhsYmJ1U3dYMXE1THEzeUZlSU94U044V2tma3V5ZVliRWw2Z3ByQS16ZWlIdjlORExtYVNMbGV1S3NRUUJWMTNRRUd4ZTZXYlBYa3p2YXplWkhQUThta1VKSDI4aU9YT3F0bEt3YVd4dWJUdWhkemRfeXFpM21MbUZiUElTTWRkS1pZRU9kc3gybTJRTnczR29hZERYb1Y5dlNrVEUyYWpMeUJmeUoyOUZrY2tsbXhOY1JON1pGT3NZ?oc=5",
+     "date": "2026-11-02T08:26:27.000Z",
+     "summary": "Wyższy limit wpłat na IKZE w 2027 roku. Jest już obwieszczenie Ministra Rodziny, Pracy i Polityki Społecznej Forsal.pl",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE"
+     ],
+     "important": true,
+     "score": 6
     }
    ],
    "important": [
     {
      "title": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI - Forsal.pl",
      "link": "https://news.google.com/rss/articles/CBMiogJBVV95cUxPN3k1OGRqM0tCQkg2Y2JEcWRnOGRVZ2tFNVI4SGJ3U2dPSUJqRHBVWk9NUHo3allXSHE1dVFOTXJ3dUY0dy05WWlIcEphREl4T1Bra3NqSjV2eFF1VmEwakZZemhpV3Q5dzU3WVlybW5OQXlkQ3pfS1pad2EwUVd4S3dCSlVnZDJ0YnlubkFzbVoweDJsYnhPTDdFazg4NVBDQ0lZOTlSZmROLTdqSUcxNW9sZ1k3X0hRX000RmZuT2ZUV1hYbVoxWTg4Y091bkM4ZFo3MGQxbGpTNVpuNnczLWxVMmFjTUdTN2h6UFM3TG5EVHBKRjV5d0ZaT2J1SVNQTkhmR3hYMkswZU9ZU0p5Um95bG4xWlZ2UF82MWE2Mk5pZw?oc=5",
-     "date": "2026-11-02T14:37:43.000Z",
+     "date": "2026-11-02T05:16:22.000Z",
      "summary": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI Forsal.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1293,10 +1292,10 @@
      "score": 8
     },
     {
-     "title": "Limity wpłat 2027 r. IKE, IKZE, OIPE, PPE - Stowarzyszenie Inwestorów Indywidualnych",
-     "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQMWdaM2NoZ1JVcEZpeEdLLV9hTXJuNjZWeHNJWTEwbnlSN1NNbzZZbC1QWmwxcGZMbzZlbVVQcjJHMEt5czFaVVdnSXF6REZLWVV1OUhTTGlPaUlTM0Nod0I0R3VKUjVHQm1xZERNcWstQU16eXk5aDV5WnBkNkY3TmdJLW04ODV3U0xEVElFM0dBQQ?oc=5",
-     "date": "2026-11-02T16:30:00.000Z",
-     "summary": "Limity wpłat 2027 r. IKE, IKZE, OIPE, PPE Stowarzyszenie Inwestorów Indywidualnych",
+     "title": "Rewolucja w oszczędzaniu na emeryturę? Propozycje zmian w IKE, IKZE, PPE i PPK - RMF24",
+     "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOa1lJQkNXV20zV3dtNFVIYVp5MEJxUGwxQ1psYkh5NjlRdzVfbmRqNTRyNUZydDluWlRtMlM1LXNsTG5fY2JBbUhLVTJEdjhsTmdRd0tvQzNRQ29ZX3VVVXI4MklieHhSbHhEcDNYMUJ6Tzd6TEo4ZEFtMzZ5NnIxRjVRQV82d0xXUUZrTG92MklZNm52Xy1SMHprazBZNGlkZ3dnNExkY00xRXlRZy13UEJiTk8?oc=5",
+     "date": "2026-10-27T09:20:00.000Z",
+     "summary": "Rewolucja w oszczędzaniu na emeryturę? Propozycje zmian w IKE, IKZE, PPE i PPK RMF24",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE",
@@ -1342,7 +1341,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-02T22:22:52.193Z",
+  "generatedAt": "2026-11-03T07:14:27.973Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
