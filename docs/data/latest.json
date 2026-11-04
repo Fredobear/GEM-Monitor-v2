@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-03T07:14:27.973Z",
+  "generatedAt": "2026-11-04T07:21:53.781Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -50,14 +50,14 @@
    "changed": false
   },
   "preview": {
-   "asOf": "2026-11-02",
+   "asOf": "2026-11-03",
    "returns": {
-    "US": 0.11456670593332552,
-    "EXUS": 0.13911682618090193,
-    "TBILLS": 0.03684283434330404,
-    "BONDS": -0.0008404747457216866,
-    "DEVX": 0.1350176955844251,
-    "EM": 0.11719108821440849
+    "US": 0.11580707069649998,
+    "EXUS": 0.1317590003470266,
+    "TBILLS": 0.036805972658511266,
+    "BONDS": -0.0019048954724908418,
+    "DEVX": 0.12775426203985152,
+    "EM": 0.1080727418337668
    },
    "decision": {
     "asset": "EXUS",
@@ -68,8 +68,8 @@
      "US"
     ],
     "absAsset": "US",
-    "excess": 0.07772387159002148,
-    "relativeMargin": 0.024550120247576412,
+    "excess": 0.07900109803798872,
+    "relativeMargin": 0.01595192965052661,
     "safeMargin": null,
     "nearTie": false,
     "bufferApplied": false
@@ -692,7 +692,7 @@
   ],
   "switchesInHistory": 6,
   "nextDecisionDate": "2026-11-30",
-  "lastDataDate": "2026-11-02",
+  "lastDataDate": "2026-11-03",
   "warnings": []
  },
  "explanation": {
@@ -716,7 +716,7 @@
    "level": "słaby"
   },
   "stabilityText": "Stabilność sygnału: słaby (do zmiany sygnału brakuje 1,7 pp).",
-  "previewNote": "Wstępny sygnał na dziś (dane do 2 listopada 2026) potwierdza EXUS.DE.",
+  "previewNote": "Wstępny sygnał na dziś (dane do 3 listopada 2026) potwierdza EXUS.DE.",
   "currency": [
    {
     "key": "IKE",
@@ -761,32 +761,32 @@
    {
     "id": "VIXCLS",
     "name": "VIX – „indeks strachu”",
-    "date": "2026-10-30",
-    "value": "19,4",
+    "date": "2026-11-02",
+    "value": "21,1",
     "tier": 1,
     "comment": "umiarkowana nerwowość"
    },
    {
     "id": "BAMLH0A0HYM2",
     "name": "Spread obligacji śmieciowych (USA)",
-    "date": "2026-10-30",
-    "value": "3,44 pp",
+    "date": "2026-11-02",
+    "value": "3,43 pp",
     "tier": 0,
     "comment": "niski stres kredytowy"
    },
    {
     "id": "T10Y3M",
     "name": "Krzywa rentowności USA (10L − 3M)",
-    "date": "2026-11-02",
-    "value": "0,70 pp",
+    "date": "2026-11-03",
+    "value": "0,74 pp",
     "tier": 0,
     "comment": "normalna"
    },
    {
     "id": "USEPUINDXD",
     "name": "Niepewność polityki gospodarczej USA (EPU)",
-    "date": "2026-11-01",
-    "value": "301",
+    "date": "2026-11-02",
+    "value": "294",
     "tier": 1,
     "comment": "podwyższona (percentyl 76 z 5 lat, średnia 30 dni)"
    },
@@ -808,97 +808,30 @@
    }
   ],
   "usdpln": {
-   "date": "2026-11-02",
-   "rate": 3.9389,
-   "change12m": 0.08214511387675483
+   "date": "2026-11-03",
+   "rate": 3.9526,
+   "change12m": 0.08231106243154418
   },
   "stress": 1,
   "summary": "Jeden wskaźnik ryzyka podwyższony – warto obserwować.",
   "errors": []
  },
  "news": {
-  "fetched": 286,
+  "fetched": 326,
   "items": [
    {
-    "title": "NBP na krawędzi paraliżu. Inwestorzy mogą stracić cierpliwość",
-    "link": "https://www.bankier.pl/wiadomosc/Polityczna-wojna-moze-sparalizowac-NBP-Inwestorzy-maja-powody-do-obaw-9222321.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-02T15:25:00.000Z",
-    "summary": "Narastający konflikt między premierem Donaldem Tuskiem, prezydentem Karolem Nawrockim i prezesem Narodowego Banku Polskiego Adamem Glapińskim może zagrozić sprawnemu funkcjonowaniu banku centralnego – ocenia Bloomberg. Zdaniem agencji polityczny impas wokół NBP budzi coraz większe obawy o niezależno",
+    "title": "Trump ucina wsparcie dla Izraela. 4 miliardy dolarów rocznie zostaną w USA",
+    "link": "https://www.bankier.pl/wiadomosc/Trump-ucina-wsparcie-dla-Izraela-4-miliardy-dolarow-rocznie-zostana-w-USA-9222858.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-03T13:55:00.000Z",
+    "summary": "Prezydent USA Donald Trump powiedział we wtorek w rozmowie ze stacją Fox News, że zawarł porozumienie z Izraelem o zakończeniu wojskowej pomocy finansowej dla tego kraju wraz z końcem roku.",
     "source": "Bankier.pl",
     "regions": [
-     "Polska"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Banki centralne i stopy",
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 10
-   },
-   {
-    "title": "Saudi Aramco profit jumps 34.6% as Middle East war shakes energy markets - Türkiye Today",
-    "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNTXFWbU55RGl2OV94aVJrYl92VGJFTlQ1dzB4c3BidHRFRjBBbWJRZl9NZHJCM0tjbnZWaXQ2MUVwT2c4SFJLVnlQckttbjhwWTJKWVVSTC1EcTViZ2xrUEt2bWI4b2tMYkZqcU1rSkJuSkRRYnp6dEwtcHhsU0pDNUgtZzQyd05rOGtoNFNpMUpBc1JmWEFyUzBsVGRmb1llUkFkcGxlck9uWWZKclE1QjcycUVGZUU?oc=5",
-    "date": "2026-11-03T06:22:58.000Z",
-    "summary": "Saudi Aramco profit jumps 34.6% as Middle East war shakes energy markets Türkiye Today",
-    "source": "Google News",
-    "regions": [
-     "Rynki wschodzące",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
-    "title": "Saudi Aramco profits surge as Middle East war rattles energy markets - Kuwait Times",
-    "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOXzFpdWZXY09jVGw3Zl9xcUY5MmVSSllOdnFKcXItOVNrVWswYWM1TGlkWkFpTGVRa0NkSV9nWHVhZmF1ME15bTVReXAzSmZOSjdvSEhJdzEzd0ZXZkJwY3kxd3JGMFVRWG5IVFQxRFBVQWtTbEVjT2RxN094WFNISVdHZXR4M1ptYnR5Wk41X3pMWFFzdkpjSGNQY0szbGw1MG0yVWtpeTVib3BmekFyQi10VW9nUjDSAbsBQVVfeXFMT01JYjYwU0E3LWJDZ2lySmRVYmZqTk1LYVh5NFd4VEdLR0JxbmxsRWFod2dsMHJjUzZualM1c2NPUzM3TXlyMFZWYU1VNW1wR1h4RFM3T2p3eDl6Tzd4Tm41M1JKRlBrMGlMWklHSzhEbDJEZkNMdERPQllabFlMd1lYNXBfR1ZtR0c5eFFvQ1NueUlyU18xMWZQTllDMlJmTW9raVgtS3pDaUJPVjVhMHAzWkc0NXJycUhnTQ?oc=5",
-    "date": "2026-11-03T06:07:57.000Z",
-    "summary": "Saudi Aramco profits surge as Middle East war rattles energy markets Kuwait Times",
-    "source": "Google News",
-    "regions": [
-     "Rynki wschodzące",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
-    "title": "Ahead of Midterms, Oil Markets Were Voting for War - Bloomberg.com",
-    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQdFRmTDVIR1hxVExVTzlxeFhrVThDMmZVX2h6MEhPUlBVeDB6YmZiRW5oSk84enE2aHJ3Xy1MUFBndzRFUHphLXpvQm94dzZ5Sjc4VklIOE1pMXZLZFp3czFpYnJWb0hHeGJTV0NPZ2JGcWNJX3NOMjJqM1hGMFRqclk0X1E0QUk1NTZVS2xqb3dJWnhFdEgzRzM0NFBqdzE5WjJpVm5nbXNaZw?oc=5",
-    "date": "2026-11-03T04:00:00.000Z",
-    "summary": "Ahead of Midterms, Oil Markets Were Voting for War Bloomberg.com",
-    "source": "Google News",
-    "regions": [],
-    "themes": [
-     "Konflikty i wojny",
-     "Wybory i polityka",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
-    "title": "War, tariffs and China: What the US midterms mean for the Asia-Pacific",
-    "link": "https://www.aljazeera.com/news/2026/11/2/war-tariffs-and-china-what-the-us-midterms-mean-for-the-asia-pacific?traffic_source=rss",
-    "date": "2026-11-02T23:41:18.000Z",
-    "summary": "Hit hard by Trump's tariffs and the war on Iran, countries in the Asia-Pacific want 'enormous changes' in US policies.",
-    "source": "Al Jazeera",
-    "regions": [
      "USA",
-     "Azja",
      "Bliski Wschód"
     ],
     "themes": [
      "Konflikty i wojny",
-     "Sankcje i cła"
+     "Wybory i polityka"
     ],
     "relevant": true,
     "score": 9
@@ -921,27 +854,11 @@
     "score": 9
    },
    {
-    "title": "Saudi Aramco profits surge as war rattles energy markets - Oman Observer",
-    "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNcXNYMzc1bHlZUFJEaVcxalFkTE4tYk91ZFM1ZURkQk1Tc2Y5TkRKMXZmNG5NdkpjZFFfRHlNRW1USXMwM2k4SmtFSXlVdVZIdFBaY3pGcmRVeldnU0d1MkgxZ0x4eThnNDZpWGM4bnd0MFJ4Ym5JUUZOUU9zdVNHcHNOMkJ5bldPdDVXbXR5LUxXRFZJNnAtYXdBQjdTYW5jNFN2bnpWOE9TeklwbVg3SHk4YUNqdk3SAVpBVV95cUxNS3drRms1TlZKR2lXZ3NYN1ZaNXZfVEcxVGRSc3NoX1FBUFFwTWRCcFdGVENpakV2LXVKdWRmOUdydHpwVDg3OTBOLXJJczRrSWE2TGcycGtRTmc?oc=5",
-    "date": "2026-11-03T06:56:54.000Z",
-    "summary": "Saudi Aramco profits surge as war rattles energy markets Oman Observer",
-    "source": "Google News",
-    "regions": [
-     "Rynki wschodzące"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso - EnergyNow.com",
-    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPaGRxVzJMUGFPeTZJb19RSzdxcEdiTjZPMGhleXFLZ3R6eTRzSkd4eTlvSVJ4NHhHTmhTX0tCR2ZDb1o5QUVnOHg2TG5vc0N0dUZTZ3ZzZ0Jvc2V6MFJUZFlpYUZyU051NUEtLW1LcG9mcXZvYUhBejBmbzJPMTZTWjRXUkkwZ2F2RDM2bG81SEdqMWljQjRDM3Q1Uy1jLVJraVo2QzZZR3pLT3BlOUk4YUFn?oc=5",
-    "date": "2026-11-02T15:27:22.000Z",
-    "summary": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso EnergyNow.com",
-    "source": "Google News",
+    "title": "Analiza rynku ropy: OPEC+ utrzymuje wydobycie, wojna z Iranem zakłóca podaż - CMB News",
+    "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQWUVMYWc4VTlwYndoejdxUEtSTGtiaXFaRmJLNGxRZ1E2VlFaMjRpdDJrQ2NrSmhXdmZRM2lnZTczdDA3N0ZQWjZ0VWFtbFdrTlhFc2FnclhWdjhjc3g2SUY5UlI1elR4RlFrVnYtUDhNVHJhQ2VHRHJObHp2R21ab19ZX1JMTU1jS3hadkVlMVJ2SDUwOTFmT3VlRHZWTGJmaUd6bjlGUU9xTUE?oc=5",
+    "date": "2026-11-02T07:55:59.000Z",
+    "summary": "Analiza rynku ropy: OPEC+ utrzymuje wydobycie, wojna z Iranem zakłóca podaż CMB News",
+    "source": "Google News PL",
     "regions": [
      "Bliski Wschód"
     ],
@@ -953,43 +870,57 @@
     "score": 8
    },
    {
-    "title": "Top Asian LNG Markets Boost Coal Use as Iran War Limits Supply - EnergyNow",
-    "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOMHhFaHFjaU1XODZmSUNsTWI4WUY3bWVBTVBLbHBBVFBWWnptMDFKdUNmalNlcG5jOXJWTERvem4wckZIcXY1LWk2bXdfQWNnTDZOSXZTVE5xZXRRNGwtZkcwalc5Q1Ywc0ZjVXFEWi12dkZDV1NKNHRCN093czBFQkJBTDVrLWFSRjg1cVU4djZkdWdwWHZJ?oc=5",
-    "date": "2026-10-31T21:42:30.000Z",
-    "summary": "Top Asian LNG Markets Boost Coal Use as Iran War Limits Supply EnergyNow",
+    "title": "Shafaq News..Oil drops as markets await US election results - شفق نيوز",
+    "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxNS0VXN19LVWd6YUpOUlZPeHBBU21qUlBfWWxJS2d4eDdkc1BfMlRzeUUybXhzWmhpcW9paWcxUnlpd3VzaVBJSjV5UklmVjNUVDRPMnlMV0YzX1ZKZDdZNGtYanY3TFhNamNrUWNXSGlfMlA5TVhHMUVLM01JNHZLZzFB?oc=5",
+    "date": "2026-11-04T05:20:48.000Z",
+    "summary": "Shafaq News..Oil drops as markets await US election results شفق نيوز",
     "source": "Google News",
     "regions": [
-     "Bliski Wschód"
+     "USA"
     ],
     "themes": [
-     "Konflikty i wojny",
+     "Wybory i polityka",
      "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Trump to remove Rwanda and South Africa from US trade deal",
-    "link": "https://www.bbc.co.uk/news/articles/c9j346xg0mkvo?at_medium=RSS&at_campaign=rss",
-    "date": "2026-11-03T03:00:36.000Z",
-    "summary": "The move comes barely a week after Rwanda's defence ministry was hit with sanctions by the US Treasury.",
-    "source": "BBC World",
-    "regions": [
-     "USA",
-     "Rynki wschodzące"
-    ],
-    "themes": [
-     "Sankcje i cła"
     ],
     "relevant": true,
     "score": 7
    },
    {
-    "title": "Druga czarna świeca na Nasdaqu. Wall Street w dół pomimo przeceny ropy naftowej",
-    "link": "https://www.bankier.pl/wiadomosc/Druga-czarna-swieca-na-Nasdaqu-Wall-Street-w-dol-pomimo-przeceny-ropy-naftowej-9222479.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-02T21:14:00.000Z",
-    "summary": "Poniedziałkowa, pierwsza w listopadzie, sesja na Wall Street przyniosła uspokojenie nastrojów po mocnej piątkowej wyprzedaży. Nasdaq spadł o 1 proc., gdyż inwestorzy przenoszą się z akcji spółek technologicznych na sektory defensywne. Rynek czeka na wyniki wyborów w USA.",
-    "source": "Bankier.pl",
+    "title": "AI’s control over the bond market is growing — even rivaling war and elections",
+    "link": "https://www.marketwatch.com/story/ais-control-over-the-bond-market-is-growing-even-rivaling-war-and-elections-5d727b35?mod=mw_rss_topstories",
+    "date": "2026-11-03T22:06:00.000Z",
+    "summary": "“Hyperscalers” burned through their cash. Now their bond deals are helping fuel the economy.",
+    "source": "MarketWatch",
+    "regions": [],
+    "themes": [
+     "Konflikty i wojny",
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Walter’s Watch: Oil falls as markets await US election fallout - Mortgage Soup",
+    "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOQTBfQzBmTW03RHlpUS1yeWdqSTRhb0dPek15OTJQVVh1dVdPN2IwZExBOXU2T0loNWlzSG8takMxRm4tODN6OEtDU3NydnUzNTdfajRaeERvQmVWbm13Ulo3Y1BhYkhmTmtVUURpN2MyVE0ybXB2VGt6U1MwQkpVWU14VHo5dGFZazFYaEJuUldtZw?oc=5",
+    "date": "2026-11-03T15:02:49.000Z",
+    "summary": "Walter’s Watch: Oil falls as markets await US election fallout Mortgage Soup",
+    "source": "Google News",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "S&P 500 Edges Up as Oil Falls on US Election Day: Markets Wrap - Bloomberg.com",
+    "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxOTGEyREpLdzRYM3VsY3NTclQ1Y2xud2pYNVl6Y0JhZ3RNczRVVjJ0aG43NmgyWkQ5SU85SmtVWGVCU0wySnBTdkhzZXR3R3RpMWloMWdlckxKM3BBUFB4VU9FbzhDQ2l2dm5xZlIwbFZJTHdJQVVyaU1Qc3djSmowcHdGMDNOVUIyMDdURnFwWWpUbmZN?oc=5",
+    "date": "2026-11-02T22:25:14.000Z",
+    "summary": "S&P 500 Edges Up as Oil Falls on US Election Day: Markets Wrap Bloomberg.com",
+    "source": "Google News",
     "regions": [
      "USA"
     ],
@@ -1022,7 +953,7 @@
     "link": "https://www.bbc.co.uk/news/articles/cr0qkve1x224o?at_medium=RSS&at_campaign=rss",
     "date": "2026-11-02T12:22:10.000Z",
     "summary": "The airline says fuel prices may rise by €2bn in 2028 unless there is an end to the US-Israel war with Iran.",
-    "source": "BBC World",
+    "source": "BBC Business",
     "regions": [
      "USA",
      "Bliski Wschód"
@@ -1034,51 +965,116 @@
     "score": 7
    },
    {
-    "title": "[New York Stock Market] Mixed Close a Day Before Election as Oil Plunges and Tech Stocks Sell Off - 아시아경제",
-    "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5TekFVYlhIdWRzNlBjUlhQbzBld2VIRWVpOThvZ3VHNUc0WXd5dFZNNk92d2g5cmJDMGN4TkdyNVY2YU8tRE1jSHRRZGNoa2ptWjItZG5wVG1SQTJJWDBzbmxFZGg?oc=5",
-    "date": "2026-11-02T21:49:41.000Z",
-    "summary": "[New York Stock Market] Mixed Close a Day Before Election as Oil Plunges and Tech Stocks Sell Off 아시아경제",
-    "source": "Google News",
-    "regions": [],
+    "title": "Rynki reagują na wyniki wyborów w USA. Dobra wiadomość dla Polski - WNP.PL",
+    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPb0RDS1hrbGx1Tk1VQkFUeVhhVjNidXg2NnU1R0xESXBsX1pHZXVlbVRqTjA2RlNYMWhPLUE3dVl1X2lCeHdXY2xNbzhpY2ZKcWJ5TWhkTDBWRkVOZnV6MldHaS12bVo1Q0ZCdWdPTmlGYmFnMUZfMTRnZUtmMEp0N0dOVVczVDRHRUpOc0paeXhGTk9NaVhJY0hDY0NLZjZsM0ptNg?oc=5",
+    "date": "2026-11-04T07:08:00.000Z",
+    "summary": "Rynki reagują na wyniki wyborów w USA. Dobra wiadomość dla Polski WNP.PL",
+    "source": "Google News PL",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
     "themes": [
-     "Wybory i polityka",
-     "Energia i surowce"
+     "Wybory i polityka"
     ],
     "relevant": true,
     "score": 6
    },
    {
-    "title": "Global Markets: Efforts to end Middle East war continue - Manitoba Co-operator",
-    "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNUGh5cENNVzVHMEJGOEtGV1RkeXhpRWlEZ0NnTUJydmhTUzJxQml5cGJ3TGRwNmtoejFiSHNGTkJuUUJTdEpCTDF1X0o5c2ZPakhkb1VldmFxS1ZabVRoWDM1MmZNS0ppYmlOeXl2enJUWm5WenJMRlRXTENVdnExa0g3d1JIMWFtcW5OWkdVc2Y3UU4wZHhmSFRDVzhuQ1k2czZGLTdR?oc=5",
-    "date": "2026-11-02T18:03:13.000Z",
-    "summary": "Global Markets: Efforts to end Middle East war continue Manitoba Co-operator",
+    "title": "How could election results affect markets and interest rates? - WKRC",
+    "link": "https://news.google.com/rss/articles/CBMigAJBVV95cUxOVlNYLWpyVXd1ZEs2aHVFZTlOa1FrZTlMR3NCNWRlcm1GSVV3TzVhbWN5dnJjNkNEYmRvUjljd0UxN05KRlFiMHBGa0UwWkxqZlZyUmtVVGtmazJZSjM2MTJOeXJERUNXeHViUFdlYUwyX05oaXhnQnNBRVgwWWU1ekdad0lQeThpNmc4N0V5YUxUQUk0eExCNWFvc2NJbllhek96UXgxdzJFYVZ1YW11Qzc4N1AwLU96M1dtdjRsX3NaVkItSzUybnhBUjFsbzNPTU41cXFucHdyT3ZlS2dtSGlEQ21scHZDTms2Z0xSQ0FIeEpaWTRCQUtucHNwMldP?oc=5",
+    "date": "2026-11-04T06:06:18.000Z",
+    "summary": "How could election results affect markets and interest rates? WKRC",
     "source": "Google News",
+    "regions": [],
+    "themes": [
+     "Banki centralne i stopy",
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Wybory w USA uderzają w rynki. Gwałtowny spadek kursu dolara - Business Insider Polska",
+    "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOTzhNM1dUQmJuLXB5c0I0N1RRYnlfQXZhXzkwd0pKUjl2SC1ZcHBaVGZSTGxXYlVIZEpCdW5oZ3ptRmpXV1l4dnEzNVl6V2p4bjFGU1IwQlZUNEp3YlNZYmdqQzl4a3hjRVBmNUFsd1RCYUZjbUFaRlZfLXVReG80UjR0Z2h2RENJbHEtdTFvVUF3dEJjS2JrNFdxNy1NczNmbzd3UTFBQktVaVM3RWlZalRtMTZucVk4WGxIVzZn?oc=5",
+    "date": "2026-11-04T05:43:41.000Z",
+    "summary": "Wybory w USA uderzają w rynki. Gwałtowny spadek kursu dolara Business Insider Polska",
+    "source": "Google News PL",
     "regions": [
-     "Bliski Wschód"
+     "USA",
+     "Polska"
     ],
     "themes": [
-     "Konflikty i wojny"
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Indian stocks inch higher as investors assess foreign fund flows, US election results - Reuters",
+    "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPT0tFa0Z0bnRlSFU3NTdYOFVXaGdid3Fad1NTRnViRDBTUWg2Um1BQ21RVlNkSWdjR2Y1Z2VXdV9fWXdjY19GZkJDZ2F0ZFFvckRQY2V0eDRwVzZJMkJ5a29mbGlLZUQyQkFzX1VwVThZdEQtZEdiUVJMRzJxeGFXQUxmclZST2l1RzN6elNobi1IZC11a2N2cFJDZEdQNVo1MmgxWlFBaHA3VXlLWHc?oc=5",
+    "date": "2026-11-04T02:39:00.000Z",
+    "summary": "Indian stocks inch higher as investors assess foreign fund flows, US election results Reuters",
+    "source": "Google News",
+    "regions": [
+     "USA",
+     "Azja"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Treasury, European Government Bond Yields Rise as Markets Await U.S. Midterm Election Results - WSJ",
+    "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNaUFIeDZYYmVzNlpvem1wamJOSFE3dlhxdnYzandzUUhNVXd4TnBoZ3RTekUxY1NOUDEzQmt4cnZCUTVsSTNhSHhjbkZGWmUtTU1yY3Z3cnVxdWR2a2NnaXdEOVlIeEEzeUZ6VTJPTzdRRGtFSW5GUklpLW5zRHZqS0pVdnYxRGktV0ZLM2tPQ2o2STgxcGtqZzQ0Zm9wdFZCZWdrV081b3l6SHNzN0hkTWNSVQ?oc=5",
+    "date": "2026-11-03T22:49:02.000Z",
+    "summary": "Treasury, European Government Bond Yields Rise as Markets Await U.S. Midterm Election Results WSJ",
+    "source": "Google News",
+    "regions": [
+     "USA",
+     "Europa"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Giełda a wynik wyborów w USA. Hossa czy bessa? Ekspert ujawnia, jaki scenariusz czeka Wall Street i GPW - FXMAG",
+    "link": "https://news.google.com/rss/articles/CBMihAJBVV95cUxPZTI2Z21wVjFlbnNkNFlWQVFJeUd3V0RfNHQwVkdMcHFsT1pNZkdLTlRwQmRscTVPQXJBTlZ1ZE1jajFpMWl6Si0xRkdVZ0dRVGF5enZjNkhVQWZ0TGM2OUlLbEVuajRRa294YWdJdmJneklhVjRWb19MeW5VQ2lUT1RPZHQ4eXROS0VSb2VtSHFNVUtob2JjZFdRMjRxUS1ZVjJ3UUZ5MXpLajFubWU5eWhBaHJJM09GUGtqYncxSmxTUVVHU2dqRTNqdUxFZnQ4bHdEYU9CQVBycXlaRDhOZ3RxRDZvWVZUbmw5YVpfMmJiTE5ZeWZCR2huT0l0bEttQ1JvXw?oc=5",
+    "date": "2026-11-03T19:34:00.000Z",
+    "summary": "Giełda a wynik wyborów w USA. Hossa czy bessa? Ekspert ujawnia, jaki scenariusz czeka Wall Street i GPW FXMAG",
+    "source": "Google News PL",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Wybory i polityka"
     ],
     "relevant": true,
     "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 15,
-   "Sankcje i cła": 3,
-   "Banki centralne i stopy": 3,
-   "Wybory i polityka": 50,
-   "Energia i surowce": 12,
+   "Konflikty i wojny": 6,
+   "Sankcje i cła": 0,
+   "Banki centralne i stopy": 5,
+   "Wybory i polityka": 83,
+   "Energia i surowce": 5,
    "Inflacja i recesja": 2
   },
   "regionCounts": {
-   "USA": 23,
+   "USA": 57,
    "Europa": 3,
    "Azja": 1,
-   "Rynki wschodzące": 6,
-   "Polska": 6,
-   "Bliski Wschód": 8,
-   "Rosja/Ukraina": 1
+   "Rynki wschodzące": 0,
+   "Polska": 11,
+   "Bliski Wschód": 3,
+   "Rosja/Ukraina": 0
   },
   "errors": []
  },
@@ -1086,6 +1082,19 @@
  "taxMonitor": {
   "news": {
    "items": [
+    {
+     "title": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI - Forsal.pl",
+     "link": "https://news.google.com/rss/articles/CBMiogJBVV95cUxPN3k1OGRqM0tCQkg2Y2JEcWRnOGRVZ2tFNVI4SGJ3U2dPSUJqRHBVWk9NUHo3allXSHE1dVFOTXJ3dUY0dy05WWlIcEphREl4T1Bra3NqSjV2eFF1VmEwakZZemhpV3Q5dzU3WVlybW5OQXlkQ3pfS1pad2EwUVd4S3dCSlVnZDJ0YnlubkFzbVoweDJsYnhPTDdFazg4NVBDQ0lZOTlSZmROLTdqSUcxNW9sZ1k3X0hRX000RmZuT2ZUV1hYbVoxWTg4Y091bkM4ZFo3MGQxbGpTNVpuNnczLWxVMmFjTUdTN2h6UFM3TG5EVHBKRjV5d0ZaT2J1SVNQTkhmR3hYMkswZU9ZU0p5Um95bG4xWlZ2UF82MWE2Mk5pZw?oc=5",
+     "date": "2026-11-03T03:20:33.000Z",
+     "summary": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI Forsal.pl",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "OKI",
+      "Podatek Belki"
+     ],
+     "important": true,
+     "score": 9
+    },
     {
      "title": "Inwestor Wojtek: ETF-y a OKI. Jak unikniesz podatku Belki i czy nie lepiej zostać przy IKE - pb.pl",
      "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNd2ZpLWhxbmtqOE1QcXdCbXZxMmtOZWRMTThfRnVYWWVkYzdiSUZWQ0FuQ0tGYkR0dVhJUmxJa0hLTkozdWNKVVQ4eFB1MlRvRlBJelZZT3ZKUS10WkVOekRTbU1Ba19zaG9BNlNEZHRUU09LbDA5ZFRuRVJYa3lHVXpvSHpZa2wxSVFMNUxaQzVjTXdSTGwtbjc2cjVfNEp0N1Fhb2xZOVlKNHFFUy0tRUEyMWU?oc=5",
@@ -1101,17 +1110,17 @@
      "score": 9
     },
     {
-     "title": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI - Forsal.pl",
-     "link": "https://news.google.com/rss/articles/CBMiogJBVV95cUxPN3k1OGRqM0tCQkg2Y2JEcWRnOGRVZ2tFNVI4SGJ3U2dPSUJqRHBVWk9NUHo3allXSHE1dVFOTXJ3dUY0dy05WWlIcEphREl4T1Bra3NqSjV2eFF1VmEwakZZemhpV3Q5dzU3WVlybW5OQXlkQ3pfS1pad2EwUVd4S3dCSlVnZDJ0YnlubkFzbVoweDJsYnhPTDdFazg4NVBDQ0lZOTlSZmROLTdqSUcxNW9sZ1k3X0hRX000RmZuT2ZUV1hYbVoxWTg4Y091bkM4ZFo3MGQxbGpTNVpuNnczLWxVMmFjTUdTN2h6UFM3TG5EVHBKRjV5d0ZaT2J1SVNQTkhmR3hYMkswZU9ZU0p5Um95bG4xWlZ2UF82MWE2Mk5pZw?oc=5",
-     "date": "2026-11-02T05:16:22.000Z",
-     "summary": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI Forsal.pl",
+     "title": "IKE i IKZE: Czy czekają nas duże zmiany? - XTB.com",
+     "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRkYyVzV5R2gwcnhlZnJiVTNVNEpfZ0VuVmJYWWZDUjAxOTdJaG00b2lERDJuVEtxeU9NS21iS0F6Ml96MnpCbThQNjdMMVFzREJBOS1EN0VIOHpWM2ZEd05kYzJFMzhDSXZmeDRmcl8tTmpTMXdXcTR6LTZIcXV4b1Fzc2RiSFl0STl1TVdjanVKSjVjYXFNVFNMaHQ?oc=5",
+     "date": "2026-11-03T22:27:40.000Z",
+     "summary": "IKE i IKZE: Czy czekają nas duże zmiany? XTB.com",
      "source": "Google News – podatki inwestora",
      "topics": [
-      "OKI",
-      "Podatek Belki"
+      "IKE/IKZE",
+      "Brokerzy i opłaty"
      ],
      "important": true,
-     "score": 9
+     "score": 8
     },
     {
      "title": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? - Rankia Polska",
@@ -1128,26 +1137,13 @@
     },
     {
      "title": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1wb0dSbFBkZ0tPUG5HQUJlN1d3elIyajFBWWxQYU44bnNnTWRZak9YcUVVUzJyUU5OVWExdDNWWjdpajJ4dGN1bDU4NzJYVThhVzBZ?oc=5",
+     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPUllpdktGODBNTTBYb0Q1SGNpcTQtbkZ0dnl3Mmp3Q05LQ3JNTHdDWlRMYk9qTGJCckc0b3FDS2pTZEdLTmQxc3huOHJvaXZudlgwLUdCUlpfMlltOUI2cEFXZGl3SE84ZTBnQWRjenJqZGFUOHl3UG5vOTBJbm5VNTh4akk0NDZ2b3VtY2swYkxrRGFjWHBTZA?oc=5",
      "date": "2026-11-02T07:00:48.000Z",
      "summary": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE",
       "PIT i rozliczenia"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
-     "title": "IKE i IKZE: Czy czekają nas duże zmiany? - XTB.com",
-     "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRkYyVzV5R2gwcnhlZnJiVTNVNEpfZ0VuVmJYWWZDUjAxOTdJaG00b2lERDJuVEtxeU9NS21iS0F6Ml96MnpCbThQNjdMMVFzREJBOS1EN0VIOHpWM2ZEd05kYzJFMzhDSXZmeDRmcl8tTmpTMXdXcTR6LTZIcXV4b1Fzc2RiSFl0STl1TVdjanVKSjVjYXFNVFNMaHQ?oc=5",
-     "date": "2026-10-27T17:11:00.000Z",
-     "summary": "IKE i IKZE: Czy czekają nas duże zmiany? XTB.com",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "Brokerzy i opłaty"
      ],
      "important": true,
      "score": 8
@@ -1166,13 +1162,25 @@
      "score": 7
     },
     {
-     "title": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy - INFOR.PL",
-     "link": "https://news.google.com/rss/articles/CBMi1gJBVV95cUxQWUotM3BwWWJqY29Ga3VTVUtrS2sxVDRPUUVvd2JmTEh1dFNZSk9qbVg0Mzk3Y0lHUURjTHZkaTU5V1RUemxrWDliU1prWnJZUEljelRxbURjcVB1cl9oSDV1NnJyMUhPSVZBcjBNVmlZa0VyV0FFYnUzVDljaDlzVUxpdC1BOHNQbkQtTjNTRHdFVUpueTl3cjZGUllicV9IbS1FaVZaandNUTJkMXJLWTh3TXBBRVdOdDkyTVotdmlZeks2ekJ0UGM1VUdTMFRSRWNxLS1TVDdfdEN5YWl6VW1xUXdpbTFYS2VOZUhIVkxOOFQ1X05zTFZwdFRNMHdQS2JSMzh3cWJ2cDRBXzdpWEhoWGdReHRSR1ZNdkhKX216Z3ptb0dZd2dVVjNaVnFfZkVjRDdPRU5SaW04ZlVrSHlvakxnTFZoMU9XdHNQdXA0TkY5cXc?oc=5",
-     "date": "2026-11-03T02:43:22.000Z",
-     "summary": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy INFOR.PL",
+     "title": "Maksymalny limit wpłat na IKE w 2027 to 30099 złotych - Czasopismo Lege Artis",
+     "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNOHZ1bnRzX3h0NUttZkIzRnZ2bHBVd21Bc0F0c2kyLXd1SlJwSmtSdloyVGZBNXBEZWJINHZFOXhzLUZFaF9MVGpqWUZ6RkZ4X05wSXg1Z3ZhVGpsdUkwM3Vxd3NaUVlHOVdFRmE0d3RsZ2JJdDFCZDJXQ0FiVjhLTVl1dmdodlA1WExXTnp3dDk0Qm5PZ2ZVRnUta3Yxa3JrcHpQN0t3LTFSQmd5MmVyWnJGY3lzOWFCY2JuMw?oc=5",
+     "date": "2026-11-03T14:51:22.000Z",
+     "summary": "Maksymalny limit wpłat na IKE w 2027 to 30099 złotych Czasopismo Lege Artis",
      "source": "Google News – podatki inwestora",
      "topics": [
-      "OKI"
+      "IKE/IKZE"
+     ],
+     "important": true,
+     "score": 6
+    },
+    {
+     "title": "Zwiększenie limitu wpłat na IKZE w 2027 r. - Inforlex",
+     "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxOc1J6ZVpOQ3FDY3lIYnhLVFExdDZsVGRCM0xDV0FNbkdIN1UyckdZcVpvQ0FwNTBOVXBIUWkxUktHVEVUNzlnZ1BpWmJ2SThzcTM3bGJRaV9CSUhvdUE4TkJ1ZmZGQ2c1ZGRlcThxdkF0N3UxMUhHUXBDX1VfTV94dzVwX1VCV0ZpNms0Mlgyb1diU0ZCclpPVFVrZ3NYUTR5bHdtZUJB?oc=5",
+     "date": "2026-11-02T19:58:27.000Z",
+     "summary": "Zwiększenie limitu wpłat na IKZE w 2027 r. Inforlex",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE"
      ],
      "important": true,
      "score": 6
@@ -1202,10 +1210,10 @@
      "score": 6
     },
     {
-     "title": "Podatek na OKI – jak działa? Limity 100 tys. i 25 tys. zł, stawka i przykłady - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNa0ZiSkhhbGhnMF80QzAzVEdzSEdtV2VGUjUyUkpudEo4Rk9mSGxWT3dlOURCZHdZTVFvRnA1NjgwbDFoY3JyQnpYUl9RNFozdnVMbVM3OGIwZ05UV0pUR1FhbU5WOFdMVXAydXFqMUxCSWVyYWpzNDJMYzNFWWl3QWhHV3pQN1NaTE9jc0xR?oc=5",
-     "date": "2026-11-02T10:51:49.000Z",
-     "summary": "Podatek na OKI – jak działa? Limity 100 tys. i 25 tys. zł, stawka i przykłady Analizy.pl",
+     "title": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy - INFOR.PL",
+     "link": "https://news.google.com/rss/articles/CBMi1gJBVV95cUxQWUotM3BwWWJqY29Ga3VTVUtrS2sxVDRPUUVvd2JmTEh1dFNZSk9qbVg0Mzk3Y0lHUURjTHZkaTU5V1RUemxrWDliU1prWnJZUEljelRxbURjcVB1cl9oSDV1NnJyMUhPSVZBcjBNVmlZa0VyV0FFYnUzVDljaDlzVUxpdC1BOHNQbkQtTjNTRHdFVUpueTl3cjZGUllicV9IbS1FaVZaandNUTJkMXJLWTh3TXBBRVdOdDkyTVotdmlZeks2ekJ0UGM1VUdTMFRSRWNxLS1TVDdfdEN5YWl6VW1xUXdpbTFYS2VOZUhIVkxOOFQ1X05zTFZwdFRNMHdQS2JSMzh3cWJ2cDRBXzdpWEhoWGdReHRSR1ZNdkhKX216Z3ptb0dZd2dVVjNaVnFfZkVjRDdPRU5SaW04ZlVrSHlvakxnTFZoMU9XdHNQdXA0TkY5cXc?oc=5",
+     "date": "2026-11-02T14:37:01.000Z",
+     "summary": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy INFOR.PL",
      "source": "Google News – podatki inwestora",
      "topics": [
       "OKI"
@@ -1214,21 +1222,9 @@
      "score": 6
     },
     {
-     "title": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani - Bezprawnik",
-     "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9GUlNDR0RXV0ZZcmJXM2g4blRiZjA5TEsyalJBUDBac2JhRzhmT3dUNnFvTmlDOHdqcG1JVUE3aHlMUGxFaEFla1k4WmtKSHVuZEJVRFJ2Nm5PZWc?oc=5",
-     "date": "2026-11-02T09:21:42.000Z",
-     "summary": "Znamy nowe limity wpłat na IKZE na 2027 r. Niektórzy mogą być rozczarowani Bezprawnik",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE"
-     ],
-     "important": true,
-     "score": 6
-    },
-    {
      "title": "Wyższy limit wpłat na IKZE w 2027 roku. Jest już obwieszczenie Ministra Rodziny, Pracy i Polityki Społecznej - Forsal.pl",
      "link": "https://news.google.com/rss/articles/CBMigAJBVV95cUxOaVFwREhLeEVKS2ZUR29OZkpCZ2JkeTZwT08yajFwVTBvajF1TUhkQXFGUDVUUFRwM1B6dkNDaHAwTFVBbmVMZlhsYmJ1U3dYMXE1THEzeUZlSU94U044V2tma3V5ZVliRWw2Z3ByQS16ZWlIdjlORExtYVNMbGV1S3NRUUJWMTNRRUd4ZTZXYlBYa3p2YXplWkhQUThta1VKSDI4aU9YT3F0bEt3YVd4dWJUdWhkemRfeXFpM21MbUZiUElTTWRkS1pZRU9kc3gybTJRTnczR29hZERYb1Y5dlNrVEUyYWpMeUJmeUoyOUZrY2tsbXhOY1JON1pGT3NZ?oc=5",
-     "date": "2026-11-02T08:26:27.000Z",
+     "date": "2026-11-02T12:40:17.000Z",
      "summary": "Wyższy limit wpłat na IKZE w 2027 roku. Jest już obwieszczenie Ministra Rodziny, Pracy i Polityki Społecznej Forsal.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1242,7 +1238,7 @@
     {
      "title": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI - Forsal.pl",
      "link": "https://news.google.com/rss/articles/CBMiogJBVV95cUxPN3k1OGRqM0tCQkg2Y2JEcWRnOGRVZ2tFNVI4SGJ3U2dPSUJqRHBVWk9NUHo3allXSHE1dVFOTXJ3dUY0dy05WWlIcEphREl4T1Bra3NqSjV2eFF1VmEwakZZemhpV3Q5dzU3WVlybW5OQXlkQ3pfS1pad2EwUVd4S3dCSlVnZDJ0YnlubkFzbVoweDJsYnhPTDdFazg4NVBDQ0lZOTlSZmROLTdqSUcxNW9sZ1k3X0hRX000RmZuT2ZUV1hYbVoxWTg4Y091bkM4ZFo3MGQxbGpTNVpuNnczLWxVMmFjTUdTN2h6UFM3TG5EVHBKRjV5d0ZaT2J1SVNQTkhmR3hYMkswZU9ZU0p5Um95bG4xWlZ2UF82MWE2Mk5pZw?oc=5",
-     "date": "2026-11-02T05:16:22.000Z",
+     "date": "2026-11-03T03:20:33.000Z",
      "summary": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI Forsal.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1251,6 +1247,19 @@
      ],
      "important": true,
      "score": 9
+    },
+    {
+     "title": "IKE i IKZE: Czy czekają nas duże zmiany? - XTB.com",
+     "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRkYyVzV5R2gwcnhlZnJiVTNVNEpfZ0VuVmJYWWZDUjAxOTdJaG00b2lERDJuVEtxeU9NS21iS0F6Ml96MnpCbThQNjdMMVFzREJBOS1EN0VIOHpWM2ZEd05kYzJFMzhDSXZmeDRmcl8tTmpTMXdXcTR6LTZIcXV4b1Fzc2RiSFl0STl1TVdjanVKSjVjYXFNVFNMaHQ?oc=5",
+     "date": "2026-11-03T22:27:40.000Z",
+     "summary": "IKE i IKZE: Czy czekają nas duże zmiany? XTB.com",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "Brokerzy i opłaty"
+     ],
+     "important": true,
+     "score": 8
     },
     {
      "title": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? - Rankia Polska",
@@ -1267,26 +1276,13 @@
     },
     {
      "title": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1wb0dSbFBkZ0tPUG5HQUJlN1d3elIyajFBWWxQYU44bnNnTWRZak9YcUVVUzJyUU5OVWExdDNWWjdpajJ4dGN1bDU4NzJYVThhVzBZ?oc=5",
+     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPUllpdktGODBNTTBYb0Q1SGNpcTQtbkZ0dnl3Mmp3Q05LQ3JNTHdDWlRMYk9qTGJCckc0b3FDS2pTZEdLTmQxc3huOHJvaXZudlgwLUdCUlpfMlltOUI2cEFXZGl3SE84ZTBnQWRjenJqZGFUOHl3UG5vOTBJbm5VNTh4akk0NDZ2b3VtY2swYkxrRGFjWHBTZA?oc=5",
      "date": "2026-11-02T07:00:48.000Z",
      "summary": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE",
       "PIT i rozliczenia"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
-     "title": "IKE i IKZE: Czy czekają nas duże zmiany? - XTB.com",
-     "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRkYyVzV5R2gwcnhlZnJiVTNVNEpfZ0VuVmJYWWZDUjAxOTdJaG00b2lERDJuVEtxeU9NS21iS0F6Ml96MnpCbThQNjdMMVFzREJBOS1EN0VIOHpWM2ZEd05kYzJFMzhDSXZmeDRmcl8tTmpTMXdXcTR6LTZIcXV4b1Fzc2RiSFl0STl1TVdjanVKSjVjYXFNVFNMaHQ?oc=5",
-     "date": "2026-10-27T17:11:00.000Z",
-     "summary": "IKE i IKZE: Czy czekają nas duże zmiany? XTB.com",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "Brokerzy i opłaty"
      ],
      "important": true,
      "score": 8
@@ -1341,7 +1337,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-03T07:14:27.973Z",
+  "generatedAt": "2026-11-04T07:21:53.781Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
