@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-08T14:08:55.615Z",
+  "generatedAt": "2026-11-08T15:42:57.815Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -817,7 +817,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 434,
+  "fetched": 432,
   "items": [
    {
     "title": "Bullion may remain under pressure as markets track US-Iran war, inflation - Business Standard",
@@ -1086,22 +1086,6 @@
     "score": 6
    },
    {
-    "title": "Saudi Aramco building in Riyadh damaged after attempted attack",
-    "link": "https://www.cnbc.com/2026/11/08/saudi-aramco-riyadh-building-attack.html",
-    "date": "2026-11-08T09:56:23.000Z",
-    "summary": "A Saudi Aramco building in Riyadh was damaged by falling debris after an attempted attack, Saudi Arabia's Energy Ministry said.",
-    "source": "CNBC",
-    "regions": [
-     "Rynki wschodzące"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
     "title": "Rosyjskie pieniądze uciekają za granicę. Nowy sposób ochrony przed Putinem",
     "link": "https://www.parkiet.com/biura-maklerskie/art45458861-rosyjskie-pieniadze-uciekaja-za-granice-nowy-sposob-ochrony-przed-putinem",
     "date": "2026-11-08T09:43:08.000Z",
@@ -1112,22 +1096,6 @@
     ],
     "themes": [
      "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Saudi Aramco building in Riyadh damaged in ‘attempted’ attack",
-    "link": "https://www.aljazeera.com/news/2026/11/8/saudi-arabia-intercepts-houthi-missiles-targeting-riyadh-eastern-province?traffic_source=rss",
-    "date": "2026-11-08T07:40:07.000Z",
-    "summary": "Saudi Arabia's Energy Ministry says building in the capital was damaged by falling shrapnel.",
-    "source": "Al Jazeera",
-    "regions": [
-     "Rynki wschodzące"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
     ],
     "relevant": true,
     "score": 6
@@ -1147,23 +1115,54 @@
     ],
     "relevant": true,
     "score": 6
+   },
+   {
+    "title": "Złoto znika z moskiewskiej giełdy. Rekordowy popyt na metale szlachetne",
+    "link": "https://www.parkiet.com/inwestycje/art45458701-zloto-znika-z-gieldy-rosja",
+    "date": "2026-11-07T09:48:23.000Z",
+    "summary": "Rosjanie uciekają na moskiewski parkiet, by kupować to, co w czasie wojny Putina daje im większe poczucie bezpieczeństwa - złoto i inne szlachetne kruszce. Popyt jest największy w historii.",
+    "source": "Parkiet",
+    "regions": [
+     "Rosja/Ukraina"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "S&P obniża perspektywę polskiego ratingu. \"Gwałtownie rosnące zadłużenie\"",
+    "link": "https://www.pb.pl/agencja-s-p-potwierdzila-rating-polski-ale-obnizyla-perspektywe-1270097",
+    "date": "2026-11-06T22:25:54.000Z",
+    "summary": "Agencja S&P potwierdziła długoterminowy rating Polski w walucie obcej na poziomie A-, a w walucie lokalnej obniżyła go do tego poziomu. Perspektywy obu ratingów obniżono do negatywnej. Powód? Rosnące zadłużenie, które może ograniczyć zdolność rządu do reagowania na wstrząsy gospodarcze.",
+    "source": "Puls Biznesu",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 9,
+   "Konflikty i wojny": 7,
    "Sankcje i cła": 2,
    "Banki centralne i stopy": 19,
-   "Wybory i polityka": 70,
-   "Energia i surowce": 17,
+   "Wybory i polityka": 67,
+   "Energia i surowce": 13,
    "Inflacja i recesja": 14,
-   "Nastroje na giełdach": 28,
-   "Spółki i wyniki": 8
+   "Nastroje na giełdach": 29,
+   "Spółki i wyniki": 9
   },
   "regionCounts": {
-   "USA": 49,
-   "Europa": 5,
+   "USA": 52,
+   "Europa": 6,
    "Azja": 4,
-   "Rynki wschodzące": 2,
+   "Rynki wschodzące": 0,
    "Polska": 23,
    "Bliski Wschód": 3,
    "Rosja/Ukraina": 3
@@ -1432,7 +1431,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-08T14:08:55.615Z",
+  "generatedAt": "2026-11-08T15:42:57.815Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -2036,8 +2035,8 @@
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (70 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „These five stock groups could rally after Democrats' midterms sweep, analysts say” (CNBC).",
-      "Nastroje na giełdach (28 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „USA wyceniają spowolnienie inwestycji w AI. Kapitał może skierować się do Europy i na GPW” (Puls Biznesu).",
+      "Wybory i polityka (67 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „These five stock groups could rally after Democrats' midterms sweep, analysts say” (CNBC).",
+      "Nastroje na giełdach (29 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „USA wyceniają spowolnienie inwestycji w AI. Kapitał może skierować się do Europy i na GPW” (Puls Biznesu).",
       "Banki centralne i stopy (19 wiadomości): decyzje o stopach zmieniają koszt pieniądza: obniżki zwykle wspierają akcje i obligacje, a podwyżki lub zapowiedzi dłużej wysokich stóp szkodzą wycenom; dla złotego ważna jest różnica stóp NBP i Fed/EBC. Przykład: „Złoto traci na wartości. Droższa ropa zwiększa obawy o inflację” (Puls Biznesu)."
      ]
     },
