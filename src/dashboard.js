@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { appIcon } from './lib/png.js';
 import { monthNamePL, monthGenitivePL, datePL } from './lib/dates.js';
 import { fmtPct } from './explain.js';
+import { writeLibrary } from './instruments.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -15,8 +16,9 @@ const zl = (x) => (Number.isFinite(x) ? `${new Intl.NumberFormat('pl-PL', { maxi
 
 function clientScript() {
   const core = readFileSync(path.join(HERE, 'client', 'core.js'), 'utf8').replace(/^export /gm, '');
+  const instruments = readFileSync(path.join(HERE, 'client', 'instruments.js'), 'utf8').replace(/^export /gm, '');
   const ui = readFileSync(path.join(HERE, 'client', 'ui.js'), 'utf8');
-  return `${core}\n${ui}`;
+  return `${core}\n${instruments}\n${ui}`;
 }
 
 const ICONS = {
@@ -29,10 +31,10 @@ const ICONS = {
 };
 export const icon = (name) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]}</svg>`;
 
+// Podatki są podkartą zakładki Rynki (adres #podatki nadal działa, także w powiadomieniach).
 const TABS = [
   ['sygnal', 'Sygnał'],
   ['portfel', 'Portfel'],
-  ['podatki', 'Podatki'],
   ['finanse', 'Finanse'],
   ['rynki', 'Rynki'],
 ];
@@ -71,7 +73,7 @@ nav.tabs a{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radiu
 nav.tabs a[aria-current=page]{background:var(--accent-soft);color:var(--accent)}
 main{max-width:960px;margin:0 auto;padding:6px 16px 48px}
 @media (max-width:760px){
- nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:6px 4px calc(env(safe-area-inset-bottom,0px) + 6px);display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:var(--surface);border-top:1px solid var(--line)}
+ nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:6px 4px calc(env(safe-area-inset-bottom,0px) + 6px);display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--surface);border-top:1px solid var(--line)}
  nav.tabs a{flex-direction:column;gap:2px;padding:6px 0;font-size:11px}
  main{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
  .updated .long{display:none}
@@ -126,6 +128,10 @@ footer{color:var(--muted);font-size:12px;margin:24px 0}
 .kpi.pos b{color:var(--pos)}.kpi.neg b{color:var(--neg)}
 .seg-scroll{overflow-x:auto;margin:6px 0 2px}
 .seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px}
+.subnav{display:flex;margin:14px 0 2px}
+.subnav[hidden]{display:none}
+.subnav a{flex:1;text-align:center;text-decoration:none;color:var(--muted);font-weight:600;padding:8px 6px;border-radius:9px}
+.subnav a[aria-current=page]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
 .seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;padding:7px 12px;border-radius:9px;cursor:pointer;white-space:nowrap}
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
 .seg.small button{padding:5px 10px;font-size:13px}
@@ -201,6 +207,19 @@ dialog h3{margin:0;font-size:19px}
 .errors{color:var(--neg);font-size:13.5px;min-height:1em}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:60;max-width:calc(100% - 32px);box-shadow:0 10px 30px rgba(2,6,23,.3)}
 @media (min-width:761px){.toast{bottom:28px}}
+.inst-picker{display:flex;flex-direction:column;gap:6px;margin:4px 0 8px}
+.inst-picker .inst-q{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.inst-results{display:flex;flex-direction:column;gap:4px;max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.inst-results:empty{display:none}
+.inst-head{margin:4px 2px 0}
+.inst-opt{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;text-align:left;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:12px;padding:8px 10px;font:inherit;cursor:pointer}
+.inst-opt:hover,.inst-opt:focus-visible{border-color:var(--accent);outline:none}
+.inst-sym{font-weight:700;font-size:13.5px;white-space:nowrap}
+.inst-name{font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inst-meta{grid-column:1/-1;font-size:12px;color:var(--muted)}
+.inst-status:empty{display:none}
+.inst-picked{border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--surface-2);font-size:13px;margin:0 0 8px}
+.inst-picked b{font-size:14px}
 `;
 
 function bar(ret, scale) {
@@ -391,7 +410,7 @@ const TX_DIALOG = `<dialog id="tx-dialog"><form method="dialog" novalidate>
 <div class="typesel" role="radiogroup" aria-label="Typ">${[['kupno', 'Kupno'], ['sprzedaz', 'Sprzedaż'], ['wplata', 'Wpłata'], ['wyplata', 'Wypłata'], ['wycena', 'Wycena']].map(([v, l]) => `<label><input type="radio" name="type" value="${v}"><span>${l}</span></label>`).join('')}</div>
 <div class="two"><label class="field">Data<input type="date" name="date" required></label><label class="field">Rachunek<select name="account"><option value="IKE">IKE</option><option value="IKZE">IKZE</option><option value="OKI">OKI</option><option value="ZWYKLE">Konto zwykłe</option></select></label></div>
 <label class="field" data-show="trade wycena">Instrument<select name="ticker" id="tx-ticker"></select></label>
-<div class="two" id="custom-ticker-row" hidden><label class="field">Ticker<input name="customTicker" placeholder="np. CNDX.UK" autocapitalize="characters"></label><label class="field">Waluta<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>PLN</option></select></label></div>
+<div id="custom-ticker-row" hidden><div id="tx-inst-picker"></div><input type="hidden" name="instName"><div class="inst-picked" id="tx-inst-info" hidden></div><div class="two"><label class="field">Symbol<input name="customTicker" placeholder="np. CDR.PL" autocapitalize="characters"></label><label class="field">Waluta<select name="currency">${['USD', 'EUR', 'GBP', 'PLN', 'CHF', 'SEK', 'NOK', 'DKK'].map((c) => `<option>${c}</option>`).join('')}</select></label></div></div>
 <div class="two" data-show="trade wycena"><label class="field" data-show="trade">Liczba jednostek<input name="quantity" inputmode="decimal" placeholder="np. 3,25"></label><label class="field" data-show="trade wycena"><span>Cena jednostki (<span id="price-ccy">USD</span>)</span><input name="price" inputmode="decimal" placeholder="z potwierdzenia"></label></div>
 <label class="field" data-show="trade cash"><span>Kwota w PLN <span class="small" data-show="trade">– opcjonalnie: kwota faktycznie pobrana lub otrzymana</span></span><input name="amountPLN" inputmode="decimal"></label>
 <p class="small muted" id="amount-hint" data-show="trade"></p>
@@ -417,7 +436,7 @@ const SETTINGS_DIALOG = (podatki) => `<dialog id="settings-dialog"><form method=
 <div class="dlg-actions"><span></span><span><button type="button" class="btn ghost" id="settings-cancel">Anuluj</button> <button type="submit" class="btn primary">Zapisz</button></span></div>
 </form></dialog>`;
 
-function clientData({ signals, explanation, config, prices, podatki, research }) {
+function clientData({ signals, explanation, config, prices, podatki, research, library }) {
   const tickerOf = (asset) => config.assets[asset]?.xtb?.ticker;
   const history = signals?.history?.map((h) => ({ forMonth: h.forMonth, ticker: tickerOf(h.asset) })) ?? [];
   if (signals) history.push({ forMonth: signals.official.forMonth, ticker: tickerOf(signals.official.decision.asset) });
@@ -440,6 +459,7 @@ function clientData({ signals, explanation, config, prices, podatki, research })
     prices: prices ? { fx: prices.fx, instruments: Object.fromEntries(Object.entries(prices.instruments).map(([t, i]) => [t, { currency: i.currency, series: i.series, quotes: i.quotes }])), benchmarks: prices.benchmarks ?? {} } : { fx: {}, instruments: {}, benchmarks: {} },
     podatki: { limits: podatki.limits, oki: podatki.oki, ike: podatki.ike, ikze: podatki.ikze, belka: podatki.belka, taxForms: podatki.taxForms, brokers: podatki.brokers },
     switchStats: research?.switchStats ?? null,
+    library: { editUrl: library?.editUrl ?? null },
   };
 }
 
@@ -464,8 +484,9 @@ ${navHtml('index')}
 ${banners.join('\n')}
 <section id="tab-sygnal" class="tabpanel">${signalTab({ signals, explanation, config, research })}</section>
 <section id="tab-portfel" class="tabpanel"><div id="portfel-root"><p class="muted">Ładowanie portfela…</p></div><noscript><p>Portfel wymaga włączonej obsługi JavaScript.</p></noscript></section>
-<section id="tab-podatki" class="tabpanel">${podatkiTab({ podatki, research, taxMonitor, now })}</section>
+<nav class="seg subnav" id="rynki-subnav" aria-label="Rynki i podatki" hidden><a href="#rynki" data-sub="rynki">Rynki i wiadomości</a><a href="#podatki" data-sub="podatki">Podatki, IKE i IKZE</a></nav>
 <section id="tab-rynki" class="tabpanel">${rynkiTab({ macro, news, ai })}</section>
+<section id="tab-podatki" class="tabpanel">${podatkiTab({ podatki, research, taxMonitor, now })}</section>
 <footer><p><b>To nie jest porada inwestycyjna ani podatkowa.</b> Narzędzie mechanicznie realizuje opublikowaną strategię GEM (G. Antonacci, „Dual Momentum Investing”, 2014) i opisuje obowiązujące przepisy. Decyzje i ich skutki podatkowe należą do Ciebie.</p><p>Źródła danych: ${esc(meta.dataSource ?? '–')}; FRED; NBP; kanały RSS. Instrumenty sprawdzone w ofercie XTB (xtb.com/pl) w listopadzie 2026 r.</p></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -479,7 +500,8 @@ ${SETTINGS_DIALOG(podatki)}
 export async function writeDashboard(dir, payload) {
   await mkdir(path.join(dir, 'data'), { recursive: true });
   await writeFile(path.join(dir, 'index.html'), renderDashboard(payload));
-  const { config, research, podatki, prices, ...rest } = payload;
+  const { config, research, podatki, prices, library, ...rest } = payload;
+  await writeLibrary(dir, library ?? {});
   await writeFile(path.join(dir, 'data', 'latest.json'), JSON.stringify(rest, null, 1));
   if (prices) await writeFile(path.join(dir, 'data', 'prices.json'), JSON.stringify(prices));
   await writeFile(
@@ -506,6 +528,6 @@ export async function writeDashboard(dir, payload) {
   await writeFile(path.join(dir, '.nojekyll'), '');
   // Import dynamiczny: financePage.js korzysta ze stylów i nawigacji z tego modułu.
   const { renderFinancePage, serviceWorker } = await import('./financePage.js');
-  await writeFile(path.join(dir, 'finanse.html'), renderFinancePage({ prices: payload.prices, config: payload.config }));
+  await writeFile(path.join(dir, 'finanse.html'), renderFinancePage({ prices: payload.prices, config: payload.config, library: payload.library }));
   await writeFile(path.join(dir, 'sw.js'), serviceWorker(payload.meta?.generatedAt ?? new Date().toISOString()));
 }

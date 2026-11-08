@@ -25,8 +25,9 @@ Narzędzie, które codziennie analizuje rynki według strategii **Global Equity 
   - wycena w PLN po kursach NBP;
   - wykres zwrotu z dowolnym zakresem dat (przyciski, daty od–do albo przeciągnięcie palcem), porównanie z modelem GEM i S&P 500;
   - zysk do PIT-38 liczony według przepisów i podpowiedzi realizacji strat;
-  - limity IKE i IKZE oraz eksport danych do pliku.
-- **Podatki:**
+  - limity IKE i IKZE oraz eksport danych do pliku;
+  - **biblioteka instrumentów XTB**: wyszukiwarka wszystkich ok. 9 000 akcji i ETF/ETN/ETC z oferty XTB (nazwa, symbol albo ISIN) z automatyczną wyceną – zob. [Biblioteka instrumentów XTB](#biblioteka-instrumentów-xtb).
+- **Podatki** (podkarta zakładki Rynki):
   - plan wpłat (IKZE → IKE → OKI → konto zwykłe) ze zwrotem z IKZE;
   - porównanie kosztów brokerów;
   - kalendarz i przypomnienia;
@@ -41,16 +42,17 @@ Narzędzie, które codziennie analizuje rynki według strategii **Global Equity 
   - stałe przelewy i dochody (pensja, czynsz, subskrypcje), zapisywane automatycznie albo po zatwierdzeniu;
   - karty kredytowe: zadłużenie jako saldo ujemne, limit, termin i spłata z wybranego konta;
   - konta w złotych, euro, dolarach, funtach i frankach – przeliczane na złote po kursie średnim NBP;
-  - konto inwestycyjne z aktywami (ETF-y z listy GEM wyceniane co dzień roboczy, inne aktywa z wyceną ręczną);
+  - konto inwestycyjne z aktywami: dowolny instrument z oferty XTB (wycena automatyczna, gdy jest darmowe źródło notowań) albo inne aktywo z wyceną ręczną;
+  - tabela porównania kategorii z poprzednim miesiącem: dotknięcie kwoty pokazuje dymek z wydatkami, z których się składa;
   - wykres majątku i dochodów miesiąc po miesiącu;
   - dokumenty offline (paski płacowe, paragony, umowy) przy operacjach i w osobnej zakładce;
   - usuwanie i zmiany zawsze z potwierdzeniem i przyciskiem „Cofnij”;
-  - import z aplikacji Money Manager (plik .mmbackup) z łączeniem kont i kategorii, płatności Apple Pay przez Skróty (karta → konto) i wyciągi CSV z banku;
+  - import z aplikacji Money Manager (plik .mmbackup) z łączeniem kont i kategorii, płatności Apple Pay przez Skróty (karta → konto, zapis dwuetapowy – płatność nie ginie, nawet gdy okno z kategoriami się nie pokaże) i wyciągi CSV z banku;
   - strona ma zablokowaną sieć, więc dane zostają na urządzeniu.
 - **Bezpieczniki:**
   - bez kompletnych i aktualnych danych sygnał nie powstaje, a Ty dostajesz komunikat o problemie;
   - dwa niezależne źródła danych są ze sobą porównywane;
-  - 75 testów automatycznych.
+  - 86 testów automatycznych.
 
 | Rola | ETF w XTB | Waluta |
 |---|---|---|
@@ -135,7 +137,7 @@ Token zostaje tylko w przeglądarce i daje dostęp wyłącznie do tego jednego r
 | ⚠️ **Zmienił się wstępny sygnał** | w trakcie miesiąca | Nic. To uprzedzenie, że na koniec miesiąca sygnał może się zmienić. |
 | 🗞️ **Podsumowanie tygodnia** | poniedziałek | Przegląd ryzyka i wiadomości. |
 | ❗ **Problem z danymi** | gdy dane są niepełne lub nieaktualne | Nie podejmuj decyzji, dopóki nie przyjdzie poprawny sygnał. |
-| 🗓️ **Przypomnienie** | terminy podatkowe (limity IKE/IKZE, PIT-38, realizacja strat) | Zajrzyj do zakładki Podatki. |
+| 🗓️ **Przypomnienie** | terminy podatkowe (limity IKE/IKZE, PIT-38, realizacja strat) | Zajrzyj do zakładki Rynki → Podatki. |
 | 📜 **Zmiany dla inwestorów** | ważne wiadomości o IKE, IKZE, OKI, podatku Belki | Sprawdź, czy dotyczą Twoich kont. |
 
 ## Konfiguracja
@@ -152,6 +154,24 @@ Wszystkie ustawienia są w [config/gem.config.js](config/gem.config.js), z opise
 Zanim cokolwiek zmienisz, przeczytaj [ANALIZA_GEM.md](ANALIZA_GEM.md), rozdz. 8.
 
 Parametry podatkowe (limity, OKI, opłaty brokerów, kalendarz) są w [config/podatki.js](config/podatki.js). Każdy ma źródło i status („oficjalne”, „prognoza”, „do weryfikacji”). Narzędzie ostrzeże Cię, gdy raport AI wykryje rozbieżność z aktualnymi przepisami, ale wartości zmieniasz sam.
+
+## Biblioteka instrumentów XTB
+
+Katalog [config/xtb-instrumenty.json](config/xtb-instrumenty.json) zawiera wszystkie akcje oraz ETF-y, ETN i ETC z oferty XTB (ok. 7 000 akcji i 2 000 funduszy z 18 giełd), przepisane z oficjalnej tabeli specyfikacji instrumentów XTB. Wyszukasz je w Portfelu (karta **Instrumenty XTB** i okno transakcji) oraz w Finansach (konto inwestycyjne → **Aktywa** → **+ Instrument z XTB**) – po nazwie, symbolu albo ISIN.
+
+Skąd aplikacja bierze ceny (aktualizacja w każdy dzień roboczy razem z sygnałem):
+
+| Instrumenty | Źródło ceny | Dokładność |
+|---|---|---|
+| ETF-y strategii GEM (CSPX.UK, EXUS.DE, IUAA.UK, IB01.UK, EIMI.UK…) | indeks-proxy i notowania z Alpha Vantage | jak dotąd |
+| Akcje, ETF-y, ETC i ETN z GPW (ok. 420) i NewConnect (ok. 290) | oficjalne archiwum notowań GPW i tabela notowań NewConnect | kurs zamknięcia z ostatniej sesji |
+| ETF-y UCITS na popularne indeksy (ok. 450, np. VWCE, IWDA, SXR8, VUAA, CNDX, złoto, obligacje USA) | zmiana amerykańskiego ETF-u na ten sam indeks (Tiingo), przeliczona na walutę funduszu | przybliżona (oznaczona „≈”) – od Twojej ceny zakupu według zmiany indeksu |
+| Akcje i ETF-y z USA | Tiingo – po dopisaniu symbolu do [config/obserwowane.txt](config/obserwowane.txt) (do 20 symboli) | kurs zamknięcia |
+| Pozostałe (np. akcje z Frankfurtu, Paryża, Londynu) | brak darmowego źródła | wycena ręczna |
+
+- **Lista obserwowanych** to zwykły plik tekstowy: jeden symbol XTB w wierszu (np. `AAPL.US`). Edytujesz go na GitHubie (link w karcie Instrumenty XTB), a ceny pojawiają się od następnej aktualizacji. Plik jest publiczny jak całe repozytorium – widać w nim tylko symbole, nigdy ilości ani kwoty.
+- **Odświeżenie katalogu**, gdy XTB opublikuje nową tabelę (kilka razy w roku): pobierz PDF ze strony XTB i uruchom `node tools/xtb-katalog.mjs <plik.pdf> <data obowiązywania>` (instrukcja w nagłówku pliku). Codzienna aktualizacja nie potrzebuje do tego żadnych dodatkowych pakietów.
+- Strona Finanse wczytuje ceny z pliku aplikacji `data/notowania.js` (to zwykłe pobranie pliku z tej samej strony), więc blokada sieci i prywatność dziennika zostają bez zmian.
 
 ## Komentarz AI (opcjonalnie)
 
@@ -178,7 +198,7 @@ node src/cli.js demo
 node scripts/serve.js
 ```
 
-- `npm test` uruchamia 75 testów.
+- `npm test` uruchamia 86 testów.
 - `node src/cli.js demo` buduje aplikację demonstracyjną bez kluczy API. Sygnał pochodzi z danych historycznych, a w zakładce Portfel możesz wczytać przykładowe transakcje.
 - `node scripts/serve.js` udostępnia panel pod adresem http://localhost:8080.
 
@@ -196,10 +216,16 @@ src/validate.js           kontrola jakości danych i porównanie źródeł
 src/explain.js            uzasadnienie po polsku
 src/macro.js, news.js     wskaźniki ryzyka i wiadomości
 src/prices.js             kursy NBP i historia cen do wyceny portfela
+src/instruments.js        biblioteka instrumentów XTB: katalog, kursy GPW/NewConnect, Tiingo, wycena przez indeks
+src/xls.js                czytnik plików Excel (.xls) z archiwum notowań GPW, bez zależności
+src/client/instruments.js wyszukiwarka instrumentów i wycena w przeglądarce (Portfel i Finanse)
+config/xtb-instrumenty.json  katalog akcji i ETF-ów z oferty XTB (z tabeli specyfikacji XTB)
+config/obserwowane.txt    obserwowane instrumenty z USA (ceny z Tiingo)
+tools/xtb-katalog.mjs     odświeżenie katalogu z nowej tabeli XTB (PDF)
 src/taxmonitor.js         monitor przepisów, przypomnienia, raport podatkowy AI
 src/ai.js                 komentarz AI (opcjonalny)
 src/notify.js             Telegram i ntfy
-src/dashboard.js          aplikacja WWW (docs/) – zakładki Sygnał, Portfel, Podatki, Rynki
+src/dashboard.js          aplikacja WWW (docs/) – zakładki Sygnał, Portfel, Finanse, Rynki (z podkartą Podatki)
 src/client/core.js        obliczenia portfela i podatków (przeglądarka + testy)
 src/client/ui.js          interfejs: dziennik, wykres, kalkulatory, synchronizacja
 src/client/finance-*.js   dziennik finansowy offline (obliczenia, import, raporty, interfejs)

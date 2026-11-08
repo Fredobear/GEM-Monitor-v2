@@ -45,7 +45,7 @@ Saldo konta zmienia każda zapisana operacja, także dopisana z datą wsteczną.
 - **Wydatki / Przychody:** przełącznik nad wykresem. Pod nim bilans okresu i jaka część przychodów zostaje.
 - **Kategorie:** dotknięcie kategorii rozwija jej operacje z tego okresu. W widoku miesiąca pasek pokazuje wykorzystanie budżetu (czerwony po przekroczeniu).
 - **Raporty pod spodem:**
-  - miesiąc: każda kategoria w porównaniu z poprzednim miesiącem i średnią z 3 miesięcy;
+  - miesiąc: każda kategoria w porównaniu z poprzednim miesiącem i średnią z 3 miesięcy. **Dotknij dowolnej kwoty**, a w dymku zobaczysz wydatki, z których się składa (w średniej – wszystkie z 3 miesięcy). Dotknięcie wydatku w dymku otwiera go do edycji, a dotknięcie poza dymkiem go zamyka;
   - rok: przychody i wydatki miesiąc po miesiącu, średnie miesięczne;
   - każdy okres: sprzedawcy, u których wydajesz najwięcej.
 - Na górze pojawiają się przypomnienia: operacje bez kategorii, stałe pozycje do zatwierdzenia, zbliżający się termin spłaty karty.
@@ -89,15 +89,22 @@ Inne:
 Rodzaj konta **Konto inwestycyjne** (np. XTB, IKE, IKZE). Jego wartość to **wolna gotówka** (saldo konta) **+ aktywa** wyceniane po bieżących cenach.
 
 1. *Konta → przy koncie inwestycyjnym → **Aktywa***.
-2. **+ ETF z listy**: wybierz ETF (te same, które śledzi zakładka Portfel, np. SXR8.DE, CSPX.UK, EXUS.DE, IB01.UK), wpisz ilość, cenę zakupu za sztukę i datę zakupu. Każdy zakup dodawaj jako osobną pozycję.
-3. **+ Inne aktywo (wycena ręczna)**: np. obligacje skarbowe, lokata, złoto. Wpisujesz wartość, a gdy się zmieni – nową wartość (aplikacja zapamięta historię wycen do wykresu).
+2. **+ Instrument z XTB**: wyszukaj dowolną akcję albo ETF z oferty XTB – po nazwie (np. „all world”), symbolu (np. „CDR”, „VWCE”) albo ISIN. Zanim cokolwiek wpiszesz, lista podpowiada ETF-y strategii GEM. Wpisz ilość, cenę zakupu za sztukę i datę zakupu. Każdy zakup dodawaj jako osobną pozycję. Przy instrumencie widać, skąd pochodzi jego cena.
+3. **+ Inne aktywo (wycena ręczna)**: np. obligacje skarbowe, lokata, złoto. Wpisujesz wartość, a gdy się zmieni – nową wartość (aplikacja zapamięta historię wycen do wykresu). Instrument z XTB bez darmowych notowań (np. akcja z Frankfurtu) aplikacja sama doda w tym trybie, z nazwą i walutą z katalogu.
 4. Opcja **Rozlicz zmianę z wolną gotówką na koncie** (domyślnie włączona):
    - nowa pozycja zmniejsza wolną gotówkę o swoją wartość – tak jest, gdy kupujesz ETF za pieniądze z rachunku albo gdy saldo konta (np. z Money Managera) obejmowało już wartość ETF-ów;
    - usunięcie pozycji to sprzedaż: jej wartość wraca do gotówki, a w historii pozycja zostaje do dnia sprzedaży.
 
    Wyłącz tę opcję, gdy saldo konta to tylko gotówka, a aktywa dopisujesz osobno.
 
-**Jak liczona jest cena ETF-u:** od ceny zakupu, którą wpisujesz, według zmiany indeksu, który ten ETF śledzi, przeliczonej na walutę ETF-u. To ten sam sposób co w zakładce Portfel. Ceny odświeżają się w każdy dzień roboczy. Wycena jest bardzo bliska notowaniu, ale może się nieznacznie różnić (np. o koszty funduszu) – dokładną cenę zawsze widzisz w XTB.
+**Jak liczona jest cena** (odświeżana w każdy dzień roboczy, ten sam sposób co w zakładce Portfel):
+- **akcje, ETF-y, ETC i ETN z GPW i NewConnect** – kurs zamknięcia z ostatniej sesji, prosto z giełdy;
+- **ETF-y strategii GEM** – notowania z codziennej aktualizacji, a między nimi zmiana indeksu, który ETF śledzi;
+- **ETF-y UCITS na popularne indeksy** (np. VWCE, IWDA, SXR8, CNDX) – od ceny zakupu według zmiany amerykańskiego ETF-u na ten sam indeks, przeliczonej na walutę funduszu. To wycena przybliżona, oznaczona „≈” (może się różnić np. o koszty funduszu i dywidendy w funduszach dystrybuujących);
+- **akcje i ETF-y z USA** – kurs zamknięcia, gdy symbol jest na liście obserwowanych (*Portfel → Instrumenty XTB → Edytuj listę obserwowanych*); bez tego – cena zakupu;
+- dokładną cenę zawsze widzisz w XTB.
+
+Ceny instrumentów spoza strategii strona wczytuje z pliku aplikacji (`data/notowania.js`). To zwykłe pobranie gotowego pliku z tej samej strony – nic nie jest wysyłane, a blokada połączeń sieciowych (`connect-src 'none'`) działa jak dotąd.
 
 ## Wykres majątku i dochodów
 
@@ -180,63 +187,95 @@ Przenosi dane z aplikacji *Money Manager: finanse, przychody i wydatki* (Orange 
 
 iOS nie pozwala stronom ani zwykłym aplikacjom czytać historii płatności z Portfela. Interfejs Apple (FinanceKit) działa tylko w USA i tylko dla Apple Card.
 
-Działa natomiast **automatyzacja w aplikacji Skróty**. Uruchamia się przy każdej płatności Apple Pay dowolną kartą z Portfela i dostaje kwotę, sprzedawcę i nazwę karty. Skrót pokazuje listę Twoich kategorii, a wybór dopisuje do pliku tekstowego w telefonie. Aplikacja wczytuje ten plik jednym przyciskiem.
+Działa natomiast **automatyzacja w aplikacji Skróty**. Uruchamia się przy każdej płatności Apple Pay dowolną kartą z Portfela i dostaje kwotę, sprzedawcę i nazwę karty. Skrót **najpierw od razu zapisuje płatność** w pliku tekstowym w telefonie, a dopiero potem pokazuje listę Twoich kategorii i dopisuje wybór. Aplikacja wczytuje ten plik jednym przyciskiem i łączy oba wiersze tej samej płatności w jedną operację.
 
-**Czy Apple Pay jest już podłączone?** Nie samo z siebie – dopóki nie ustawisz automatyzacji w Skrótach (kroki niżej), dziennik nie dostaje żadnych płatności. Stan sprawdzisz w *Finanse → Więcej → Apple Pay*: jest tam data ostatniego importu płatności i lista kart przypisanych do kont. Napis „Nie było jeszcze żadnego importu z Apple Pay” oznacza, że automatyzacja nie jest ustawiona albo plik nie był jeszcze wczytany.
+**Czy Apple Pay jest już podłączone?** Nie samo z siebie – dopóki nie ustawisz automatyzacji w Skrótach (kroki niżej), dziennik nie dostaje żadnych płatności. Stan sprawdzisz w *Finanse → Więcej → Apple Pay*: jest tam data ostatniego importu, liczba wierszy w pliku, nowe płatności, uzupełnione kategorie, wiersze z błędem (z opisem przyczyny) i lista kart przypisanych do kont.
 
 **Z jakiej karty była płatność.** Skrót zapisuje nazwę karty z Portfela (np. „Erste Visa”). Gdy pierwszy raz pojawi się płatność kartą, która nie jest przypisana do żadnego konta, w Przeglądzie zobaczysz okienko **Karty bez przypisanego konta**. Wybierz konto i kliknij **Przypisz** – ta i kolejne płatności tą kartą trafią na to konto. Jeśli to karta kredytowa, zakup od razu zwiększy jej zadłużenie.
 
 > Nie mogłem przetestować Skrótu na prawdziwym iPhonie. Opis bazuje na funkcjach iOS 17–26. Nazwy akcji mogą się nieco różnić między wersjami systemu (w nawiasach podaję nazwy angielskie).
 
+### Dlaczego okienko z kategoriami często się nie pokazuje i skąd komunikat „skrót nie zadziałał poprawnie”
+
+Automatyzacja z opcją *Uruchom natychmiast* działa w tle. Akcja **Wybierz z listy** potrzebuje jednak Twojej reakcji na ekranie, a przy płatności telefon zwykle jest zablokowany (płacisz z ekranu blokady). iOS pokazuje wtedy listę jako małe powiadomienie, które łatwo przeoczyć. Jeśli nie wybierzesz kategorii w ciągu kilkudziesięciu sekund albo zamkniesz okno, iOS **przerywa cały skrót** i wyświetla komunikat o błędzie automatyzacji.
+
+W pierwszej wersji instrukcji zapis do pliku był **po** liście, więc przerwany skrót oznaczał płatność, która w ogóle nie trafiła do pliku. Nowa wersja zapisuje płatność **przed** pokazaniem listy:
+
+- płatność jest w pliku zawsze, nawet gdy lista się nie pokaże, wygaśnie albo iOS przerwie skrót,
+- wybrana kategoria dopisuje się jako drugi wiersz, a aplikacja łączy oba wiersze przy imporcie,
+- płatności bez kategorii trafiają do okna **Do przypisania**, a „Zapamiętaj dla tego sprzedawcy” sprawia, że kolejne zakupy w tym sklepie dostają kategorię same.
+
+Komunikat o błędzie może się nadal czasem pojawić, gdy lista wygaśnie. Nic wtedy nie ginie. Jeśli komunikaty przeszkadzają, wybierz **tryb cichy** (niżej).
+
+Drugą przyczyną braku okienka jest sam wyzwalacz: uruchamia się dopiero wtedy, gdy Portfel dostanie od banku informację o transakcji. Jeśli w *Portfelu → karta → Ostatnie transakcje* nie widać płatności (albo widać ją bez kwoty i sklepu), ten bank nie przekazuje danych do Portfela i automatyzacja nie ma czego zapisać.
+
 ### 1. Pliki tylko na iPhonie (bez iCloud)
 
-Aby plik z wydatkami nie trafiał do iCloud: *Ustawienia → [Twoje imię] → iCloud → Drive* → wyłącz synchronizację dla aplikacji **Skróty**. Folder Skrótów będzie wtedy w *Plikach → Na moim iPhonie → Skróty*.
+Aby plik z wydatkami nie trafiał do iCloud: *Ustawienia → [Twoje imię] → iCloud → Drive* → wyłącz synchronizację dla aplikacji **Skróty**. Folder Skrótów będzie wtedy w *Plikach → Na moim iPhonie → Skróty*. Jeśli po tej zmianie akcja zapisu zgłasza błąd, otwórz w niej pole pliku i wskaż folder **Skróty** ręcznie.
 
-### 2. Lista kategorii
+### 2. Automatyzacja krok po kroku
 
-W aplikacji: *Finanse → Więcej → Apple Pay → Pobierz kategorie.txt*. Zapisz plik w *Na moim iPhonie → Skróty*. Gdy zmienisz kategorie w aplikacji, pobierz plik ponownie.
+Lista kategorii jest wpisana w samym skrócie, więc nie trzeba pobierać żadnego pliku. Akcje dodajesz przyciskiem **Dodaj czynność** / ikoną wyszukiwania na dole ekranu – wpisz fragment nazwy (podany niżej), a potem dotknij akcji. Kolejność akcji zmienisz, przytrzymując akcję i przeciągając ją wyżej lub niżej.
 
-### 3. Automatyzacja
+**Masz już automatyzację z poprzedniej instrukcji?** Nie musisz zaczynać od nowa. Otwórz ją (*Skróty → Automatyzacja* → dotknij jej), dodaj na samej górze kroki 4 i 5 z listy poniżej (Tekst z pustą kategorią i Dołącz do pliku tekstowego), a w akcji **Wybierz z listy** popraw pole **Komunikat**. Reszta zostaje bez zmian.
 
-Skróty → zakładka **Automatyzacja** → **+** → **Portfel** (w iOS 17–18: **Transakcja**, ang. *Transaction*):
-- **Karty:** wybierz swoje karty albo wszystkie.
-- **Uruchom natychmiast** (*Run Immediately*): włączone.
-- Dalej → **Nowy pusty skrót** i dodaj kolejno akcje:
+1. Otwórz **Skróty** → zakładka **Automatyzacja** (na dole) → **+** (albo **Nowa automatyzacja**).
+2. Przewiń listę wyzwalaczy i wybierz **Portfel** (w niektórych wersjach iOS: **Transakcja**). Wymaga iOS 17 lub nowszego.
+3. **Karty:** zaznacz karty z Portfela (albo wszystkie). **Kategorie** zostaw wszystkie. Zaznacz **Uruchom natychmiast** (bez pytania). → **Dalej** → **Nowy pusty skrót**.
+4. **Zapis płatności – akcja Tekst** (wyszukaj „tekst”, ang. *Text*). Wpisz pięć pól oddzielonych średnikiem, wstawiając zmienne z paska nad klawiaturą:
+   - **Bieżąca data** → dotknij jej i ustaw **Format daty: ISO 8601** (z godziną);
+   - `;` → **Dane wejściowe skrótu** → **Kwota**;
+   - `;` → **Dane wejściowe skrótu** → **Sprzedawca**;
+   - `;;` (dwa średniki – kategoria zostaje pusta);
+   - **Dane wejściowe skrótu** → **Karta** (może się nazywać „Karta lub karta Wallet” / „Nazwa”).
 
-| # | Akcja (PL / EN) | Ustawienia |
-|---|---|---|
-| 1 | **Pobierz plik** (*Get File*) | Plik: `kategorie.txt` w folderze Skróty; „Pokaż wybór dokumentu” wyłączone |
-| 2 | **Podziel tekst** (*Split Text*) | Tekst: wynik kroku 1; separator: **Nowe wiersze** |
-| 3 | **Wybierz z listy** (*Choose from List*) | Lista: wynik kroku 2; monit: `Kategoria: ` + zmienne **Sprzedawca** i **Kwota** z *Danych wejściowych skrótu* |
-| 4 | **Formatuj datę** (*Format Date*) | Data: **Bieżąca data**; format: **ISO 8601**, z godziną |
-| 5 | **Tekst** (*Text*) | `[Sformatowana data];[Kwota];[Sprzedawca];[Wybrany element];[Karta]`. Zmienne Kwota, Sprzedawca i Karta (nazwa karty lub karty pokładowej) wybierz z *Danych wejściowych skrótu* |
-| 6 | **Dołącz do pliku tekstowego** (*Append to Text File*) | Tekst: wynik kroku 5; ścieżka: `wydatki.txt`; **Utwórz nowy wiersz** włączone |
-| 7 | *(opcjonalnie)* **Pokaż powiadomienie** | `Zapisano: [Kwota] – [Wybrany element]` |
+   Gotowy tekst wygląda tak: `Bieżąca data;Kwota;Sprzedawca;;Karta`.
+5. Akcja **Dołącz do pliku tekstowego** (wyszukaj „dołącz”, ang. *Append to Text File*). Tekst: wynik kroku 4. Plik/ścieżka: `wydatki.txt`. Włącz **Utwórz nowy wiersz**. Od tej chwili płatność jest zapisana, cokolwiek stanie się dalej.
+6. Akcja **Lista** (wyszukaj „lista”, ang. *List*). Wpisz po kolei nazwy kategorii, **dokładnie tak jak w aplikacji** (*Finanse → Więcej → Kategorie*), np. „Zakupy spożywcze”, „Restauracje i kawiarnie”, „Transport i paliwo”… Na końcu dodaj dwie pozycje: **Później** i **Pomiń**.
+7. Akcja **Wybierz z listy** (wyszukaj „wybierz z”, ang. *Choose from List*). Powinna sama połączyć się z Listą z kroku 6. Rozwiń ją (strzałka) i w polu **Komunikat** (ang. *Prompt*) wpisz `Kategoria:`, a potem wstaw zmienne: **Dane wejściowe skrótu** → **Kwota** i **Dane wejściowe skrótu** → **Sprzedawca**. Przełącznik **Zaznaczanie wielokrotne** zostaw wyłączony.
+8. **Zapis kategorii – akcja Tekst**. Tak samo jak w kroku 4, ale w czwartym polu wstaw **Wybrany element** (wynik kroku 7): `Bieżąca data;Kwota;Sprzedawca;Wybrany element;Karta`.
+9. Akcja **Dołącz do pliku tekstowego**. Tekst: wynik kroku 8. Ten sam plik `wydatki.txt`, **Utwórz nowy wiersz** włączone.
+10. *(opcjonalnie)* Akcja **Pokaż powiadomienie**: `Zapisano: Kwota – Wybrany element`.
+11. **Gotowe** (prawy górny róg).
 
-Po płatności zobaczysz listę kategorii.
-- Jeśli wybierzesz **Pomiń**, płatność nie zostanie zapisana (np. zwrot, przelew między kontami).
-- Jeśli zamkniesz listę, płatność trafi do aplikacji jako „Do przypisania”. Kategorię wybierzesz przy imporcie.
+W skrócie kolejność akcji to: **Tekst → Dołącz do pliku → Lista → Wybierz z listy → Tekst → Dołącz do pliku**.
+
+**Tryb cichy** (bez okienek i bez komunikatów o błędach): zostaw tylko kroki 1–5. Każda płatność trafi do pliku bez kategorii. Po imporcie przypiszesz kategorie w oknie **Do przypisania**, zaznaczając „Zapamiętaj dla tego sprzedawcy” – po kilku tygodniach większość płatności będzie dostawać kategorię automatycznie.
+
+**Sprawdzenie:** zapłać telefonem (np. drobny zakup). Potem w *Plikach* otwórz `wydatki.txt` w folderze **Skróty** (w iCloud Drive albo Na moim iPhonie). Po płatności powinien tam być jeden wiersz z pustą kategorią (`…;Biedronka;;mBank Visa`), a po wyborze z listy – drugi z kategorią. Brak pierwszego wiersza oznacza, że automatyzacja się nie uruchomiła (zob. przyczyny wyżej) albo zapis do pliku zgłosił błąd.
+
+Co oznaczają pozycje na liście:
+- **Pomiń** – płatność zostanie usunięta przy imporcie (np. zwrot, przelew między kontami).
+- **Później** – płatność trafi do aplikacji jako „Do przypisania”; kategorię wybierzesz przy imporcie.
+- Zamknięcie listy, jej wygaśnięcie albo błąd skrótu – płatność zostaje zapisana bez kategorii (też trafi do „Do przypisania”).
+
+Gdy dodasz albo zmienisz kategorię w aplikacji, popraw też akcję **Lista** w skrócie (Skróty → Automatyzacja → dotknij automatyzacji). Pomocą jest przycisk *Więcej → Apple Pay → Pobierz kategorie.txt*, który zapisuje aktualne nazwy do skopiowania.
+
+**Jeśli nie ma akcji „Dołącz do pliku tekstowego”** (inna wersja iOS): użyj akcji **Dołącz do notatki** (aplikacja Notatki, ang. *Append to Note*) z notatką „Wydatki” – w obu miejscach (kroki 5 i 9). Raz na jakiś czas skopiuj zawartość notatki i wklej ją w *Więcej → Apple Pay → Wklej wpisy ręcznie*.
 
 Płatność trafi na konto, przy którym w polu **Karty w Apple Pay** wpiszesz nazwę karty z Portfela (np. „mBank Visa”). Jeśli to karta kredytowa, zakup od razu zwiększy jej zadłużenie.
 
-### 4. Import do aplikacji
+### 3. Import do aplikacji
 
 *Finanse → Więcej → Apple Pay → Importuj wydatki.txt* → wybierz plik z folderu Skróty.
-- Wpisy już zaimportowane są pomijane, więc plik może się wydłużać, a Ty importujesz go tyle razy, ile chcesz.
+- Oba wiersze tej samej płatności (bez kategorii i z kategorią) łączą się w jedną operację: ta sama kwota, sprzedawca i karta, do 15 minut różnicy. Działa to także wtedy, gdy zaimportujesz plik pomiędzy zapisem płatności a wyborem kategorii – kategoria uzupełni się przy następnym imporcie.
+- Wpisy już zaimportowane są pomijane, więc plik może się wydłużać, a Ty importujesz go tyle razy, ile chcesz. Działają też pliki zapisane według poprzedniej instrukcji (jeden wiersz z kategorią).
 - Płatności bez kategorii otwierają się od razu w oknie **Do przypisania**: kategoria jednym dotknięciem, z opcją zapamiętania dla tego sprzedawcy.
+- Po imporcie w *Więcej → Apple Pay* zobaczysz podsumowanie: ile wierszy przeczytano, ile płatności dodano, ile kategorii uzupełniono i które wiersze mają błąd (np. „brak kwoty” – bank nie przekazał kwoty do Portfela, albo „nie rozpoznano daty” – w akcji Tekst nie ustawiono formatu ISO 8601).
 
 Format wiersza, jeśli chcesz coś wkleić ręcznie (*Wklej wpisy ręcznie*):
 
 ```
-2026-11-02T14:33:00+01:00;45,20 zł;Biedronka;Zakupy spożywcze;mBank Visa
+2026-11-02T14:33:00+01:00;45,20 zł;Biedronka;;mBank Visa
+2026-11-02T14:33:20+01:00;45,20 zł;Biedronka;Zakupy spożywcze;mBank Visa
 ```
 
 ### Ograniczenia automatyzacji
 
 - Działa tylko dla **płatności Apple Pay** (telefonem lub zegarkiem). Nie obejmuje płatności fizyczną kartą, BLIK-iem, przelewów ani poleceń zapłaty. Te operacje dodasz z wyciągu CSV, ręcznie albo jako stałe pozycje.
-- Niektórzy wydawcy kart nie przekazują kwoty albo nazwy sprzedawcy. Takie wiersze aplikacja pokaże jako błędne albo bez nazwy.
+- Niektórzy wydawcy kart nie przekazują kwoty albo nazwy sprzedawcy. Takie wiersze aplikacja pokaże w podsumowaniu importu jako błędne albo bez nazwy sklepu.
 - Automatyzacja może się uruchomić także dla płatności odrzuconej. Taki wpis usuniesz w aplikacji.
-- Przy zablokowanym telefonie lista może pojawić się jako powiadomienie. Dotknij go, aby wybrać kategorię.
+- Przy zablokowanym telefonie lista pojawia się jako powiadomienie. Dotknij go, aby wybrać kategorię – a jeśli nie zdążysz, płatność i tak jest już zapisana.
 
 ## Import wyciągu z banku (CSV)
 

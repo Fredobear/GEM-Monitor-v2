@@ -199,7 +199,7 @@ export default {
     frequency: 'sygnal_i_tydzien',
   },
 
-  // Monitor przepisów podatkowych w Polsce (zakładka Podatki).
+  // Monitor przepisów podatkowych w Polsce (zakładka Rynki → Podatki).
   taxNews: {
     maxAgeDays: 14,
     feeds: [

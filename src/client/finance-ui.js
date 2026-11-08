@@ -61,6 +61,31 @@ function fxInfo(cur, date) {
   return { rate: p[1], date: p[0] };
 }
 const valuationDate = () => today();
+
+// Instrumenty z biblioteki XTB (akcje i ETF-y z GPW, obserwowane z USA, ETF-y UCITS wyceniane według indeksu):
+// notowania z pliku aplikacji data/notowania.js (zwykły skrypt z tej samej strony – nic nie jest wysyłane).
+let libraryQuotes = null;
+function addLibraryAsset(symbol, name, currency) {
+  if (!libraryQuotes || !symbol || (MARKET.assets?.[symbol] && !MARKET.assets[symbol].library)) return false;
+  const entry = instEntry(libraryQuotes, symbol, currency || 'PLN', MARKET.fx);
+  if (!entry) return false;
+  MARKET.assets ??= {};
+  MARKET.assets[symbol] = { name: name || symbol, ...entry, library: true };
+  return true;
+}
+async function ensureLibraryAssets() {
+  const lots = fin.accounts.flatMap((a) => a.lots ?? []).filter((l) => l.asset && l.asset !== 'manual' && !MARKET.assets?.[l.asset]);
+  if (!lots.length) return false;
+  libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+  let added = false;
+  for (const l of lots) added = addLibraryAsset(l.asset, l.name, l.currency) || added;
+  return added;
+}
+const refreshLibraryAssets = () =>
+  ensureLibraryAssets()
+    .then((added) => added && render())
+    .catch(() => {});
+
 function marketNote() {
   if (!MARKET.asOf) return 'Brak kursów walut i cen ETF-ów (pojawią się po najbliższej aktualizacji aplikacji). Konta w obcych walutach i aktywa nie są na razie wliczane do majątku.';
   return `Kursy walut: średnie NBP z ${shortDate(MARKET.asOf, true)}.${MARKET.pricesAsOf ? ` Ceny ETF-ów: z ${shortDate(MARKET.pricesAsOf, true)}.` : ''} Aktualizacja w każdy dzień roboczy razem z aplikacją.`;
@@ -562,10 +587,12 @@ function reportCards(s) {
   if (ui.period === 'miesiac') {
     const month = ui.anchor.slice(0, 7);
     const cmp = compareMonth(fin, month);
+    // Każda kwota otwiera dymek z wydatkami, z których się składa (kategoria × okres).
+    const amt = (id, col, value, cls = '') => `<button type="button" class="amt-pop ${cls}" data-cmp="${esc(id ?? '_none')}|${col}" aria-haspopup="dialog">${zl0(value)}</button>`;
     if (cmp.rows.length)
-      out.push(`<section class="card"><h2>Kategorie w porównaniu z poprzednim miesiącem</h2><div class="tbl-wrap"><table><thead><tr><th>Kategoria</th><th class="num">${esc(MONTHS_SHORT[Number(month.slice(5, 7)) - 1])}</th><th class="num">Poprz.</th><th class="num">Śr. 3 mies.</th></tr></thead><tbody>${cmp.rows
-        .map((r) => `<tr><td>${esc(r.emoji)} ${esc(r.name)}</td><td class="num"><b>${zl0(r.current)}</b></td><td class="num ${r.current > r.previous ? 'neg' : 'pos'}">${zl0(r.previous)}</td><td class="num muted">${zl0(r.avg3)}</td></tr>`)
-        .join('')}</tbody><tfoot><tr><td><b>Razem</b></td><td class="num"><b>${zl0(cmp.current.expense)}</b></td><td class="num">${zl0(cmp.previous.expense)}</td><td></td></tr></tfoot></table></div></section>`);
+      out.push(`<section class="card"><h2>Kategorie w porównaniu z poprzednim miesiącem</h2><div class="tbl-wrap"><table class="cmp-table"><thead><tr><th>Kategoria</th><th class="num">${esc(MONTHS_SHORT[Number(month.slice(5, 7)) - 1])}</th><th class="num">Poprz.</th><th class="num">Śr. 3 mies.</th></tr></thead><tbody>${cmp.rows
+        .map((r) => `<tr><td>${esc(r.emoji)} ${esc(r.name)}</td><td class="num">${amt(r.id, 'cur', r.current, 'strong')}</td><td class="num ${r.current > r.previous ? 'neg' : 'pos'}">${amt(r.id, 'prev', r.previous)}</td><td class="num muted">${amt(r.id, 'avg', r.avg3)}</td></tr>`)
+        .join('')}</tbody><tfoot><tr><td><b>Razem</b></td><td class="num">${amt('_all', 'cur', cmp.current.expense, 'strong')}</td><td class="num">${amt('_all', 'prev', cmp.previous.expense)}</td><td></td></tr></tfoot></table></div><p class="small muted">Dotknij kwoty, aby zobaczyć wydatki, z których się składa.</p></section>`);
   }
   if (ui.period === 'rok') {
     const y = ui.anchor.slice(0, 4);
@@ -714,7 +741,8 @@ function investmentLines(a, cash) {
   const lines = (a.lots ?? []).filter((l) => !l.until).map((l) => {
     const v = lotValuePLN(MARKET, l, at);
     const change = l.asset !== 'manual' && l.price > 0 ? lotPrice(MARKET, l, at) / l.price - 1 : null;
-    return `<div class="inv-line"><span>${esc(lotLabel(l))} · ${esc(fmtQty(l.qty))} szt.${change !== null && Math.abs(change) >= 0.0005 ? ` <span class="${change >= 0 ? 'pos' : 'neg'}">${change >= 0 ? '+' : '−'}${pct(Math.abs(change))}</span>` : ''}</span><b>${v === null ? 'brak kursu' : esc(zl(v))}</b></div>`;
+    const approx = MARKET.assets?.[l.asset]?.source === 'proxy' ? '≈ ' : '';
+    return `<div class="inv-line"><span>${esc(lotLabel(l))} · ${esc(fmtQty(l.qty))} szt.${change !== null && Math.abs(change) >= 0.0005 ? ` <span class="${change >= 0 ? 'pos' : 'neg'}">${change >= 0 ? '+' : '−'}${pct(Math.abs(change))}</span>` : ''}</span><b>${v === null ? 'brak kursu' : esc(approx + zl(v))}</b></div>`;
   });
   return `${lines.join('')}<div class="inv-line"><span>Wolna gotówka</span><b>${esc(money(cash, a.currency))}</b></div>`;
 }
@@ -891,13 +919,20 @@ function settingsApplePay() {
   const ap = fin.applePay;
   const mapped = fin.accounts.filter((a) => a.cards?.length);
   const fromAp = liveTx(fin).filter((t) => t.source === 'applepay');
+  const noCat = fromAp.filter((t) => !t.categoryId).length;
+  const diag = ap?.lastImport
+    ? `<p>Ostatni import: <b>${esc(shortDate(new Date(ap.lastImport).toISOString().slice(0, 10), true))}</b>${ap.lastLines !== undefined ? ` · wierszy w pliku: ${ap.lastLines}` : ''} · nowe płatności: ${ap.lastAdded}${ap.lastUpdated ? ` · uzupełnione kategorie: ${ap.lastUpdated}` : ''}${ap.lastRemoved ? ` · usunięte („Pomiń”): ${ap.lastRemoved}` : ''}. Razem z Apple Pay: ${fromAp.length}.</p>
+       ${noCat ? `<p class="small">Płatności bez kategorii: <b>${noCat}</b> – <button class="link" data-act="inbox">przypisz teraz</button>. To normalne, gdy okno z listą się nie pokazało: płatność i tak jest zapisana.</p>` : ''}
+       ${ap.errorCount ? `<div class="banner warn small"><b>Wiersze z błędem: ${ap.errorCount}.</b><ul class="plain">${(ap.lastErrors ?? []).map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>` : ''}`
+    : '<p class="warn"><b>Nie było jeszcze żadnego importu z Apple Pay.</b> Strona nie może sama czytać Portfela – płatności trafiają tu przez automatyzację w aplikacji Skróty (instrukcja poniżej).</p>';
   return `<section class="card"><h2>Stan połączenia z Apple Pay</h2>
-    ${ap?.lastImport ? `<p>Ostatni import płatności: <b>${esc(shortDate(new Date(ap.lastImport).toISOString().slice(0, 10), true))}</b>, nowe płatności: ${ap.lastAdded}. Razem z Apple Pay: ${fromAp.length}.</p>` : '<p class="warn"><b>Nie było jeszcze żadnego importu z Apple Pay.</b> Strona nie może sama czytać Portfela – płatności trafiają tu przez automatyzację w aplikacji Skróty (instrukcja poniżej).</p>'}
+    ${diag}
     ${mapped.length ? `<ul class="cat-list">${mapped.map((a) => `<li><div class="cat-row"><span>💳 ${esc(a.cards.join(', '))}</span><span class="small">→ ${esc(a.name)}</span></div></li>`).join('')}</ul>` : '<p class="small muted">Żadna karta nie jest jeszcze przypisana do konta. Przypiszesz ją w Konta → Edytuj (pole „Karty w Apple Pay”) albo przy pierwszym imporcie.</p>'}</section>
   ${cardPrompt()}
   <section class="card" id="applepay"><h2>Apple Pay na iPhonie (Skróty)</h2>
-    <p>Po każdej płatności Apple Pay automatyzacja w aplikacji <b>Skróty</b> pokaże listę Twoich kategorii, a wybór zapisze w pliku na iPhonie (bez internetu) razem z nazwą karty. Plik wczytujesz tutaj jednym przyciskiem, a płatność trafia na konto przypisane do tej karty. Szczegółowa instrukcja jest w pliku FINANSE.md.</p>
-    <ol class="steps-mini"><li>Pobierz listę kategorii i zapisz ją w Plikach: <i>Na moim iPhonie → Skróty → kategorie.txt</i>.</li><li>W Skrótach utwórz automatyzację „Transakcja” (w nowszych iOS: „Portfel”) → dowolna karta → <i>Uruchom natychmiast</i>.</li><li>Akcje: <i>Pobierz plik</i> kategorie.txt → <i>Podziel tekst</i> (nowe wiersze) → <i>Wybierz z listy</i> → <i>Tekst</i>: Data ISO 8601;Kwota;Sprzedawca;Wybrany element;Karta → <i>Dołącz do pliku tekstowego</i> wydatki.txt.</li><li>Raz na jakiś czas: <b>Importuj wydatki.txt</b>. Duplikaty są pomijane automatycznie.</li></ol>
+    <p>Po każdej płatności Apple Pay automatyzacja w aplikacji <b>Skróty</b> <b>najpierw od razu zapisuje płatność</b> w pliku na iPhonie (bez internetu), a dopiero potem pokazuje listę kategorii i dopisuje wybór. Jeśli okno z listą się nie pokaże albo iOS przerwie skrót („skrót nie zadziałał poprawnie”), płatność i tak jest w pliku – kategorię wybierzesz po imporcie w oknie „Do przypisania”.</p>
+    <ol class="steps-mini"><li>Skróty → Automatyzacja → <b>+</b> → <b>Portfel</b> (albo „Transakcja”) → wybierz karty → <i>Uruchom natychmiast</i> → Nowy pusty skrót.</li><li><b>Tekst</b>: Bieżąca data (ISO 8601);Kwota;Sprzedawca;<b>;</b>Karta – czwarte pole puste (dwa średniki obok siebie).</li><li><b>Dołącz do pliku tekstowego</b>: wydatki.txt, „Utwórz nowy wiersz” włączone. Na tym etapie płatność jest już zapisana.</li><li><b>Lista</b>: nazwy kategorii dokładnie jak w aplikacji, na końcu „Później” i „Pomiń”.</li><li><b>Wybierz z listy</b> (komunikat: Kategoria: Kwota Sprzedawca).</li><li><b>Tekst</b>: Bieżąca data (ISO 8601);Kwota;Sprzedawca;Wybrany element;Karta.</li><li><b>Dołącz do pliku tekstowego</b>: ten sam plik wydatki.txt, nowy wiersz.</li><li>Raz na jakiś czas: <b>Importuj wydatki.txt</b>. Oba wiersze tej samej płatności łączą się w jedną operację, duplikaty są pomijane.</li></ol>
+    <p class="small muted"><b>Tryb cichy</b> (bez okienek i bez komunikatów o błędach): zostaw tylko kroki 1–3. Kategorie przypiszesz po imporcie, a „Zapamiętaj dla tego sprzedawcy” sprawi, że kolejne płatności w tym samym sklepie dostaną kategorię same. Pełna instrukcja: plik FINANSE.md. „Pobierz kategorie.txt” zapisuje aktualne nazwy kategorii do skopiowania.</p>
     <div class="row-btns"><button class="btn" data-act="dl-cats">Pobierz kategorie.txt</button><button class="btn primary" data-act="import-ap">Importuj wydatki.txt</button></div>
     <input type="file" id="ap-file" accept=".txt,text/plain,.csv" hidden>
     <details><summary>Wklej wpisy ręcznie</summary><textarea id="ap-paste" rows="4" placeholder="2026-11-02T14:33:00+01:00;45,20 zł;Biedronka;Zakupy spożywcze;mBank Visa"></textarea><button class="btn" data-act="paste-ap">Dodaj wklejone</button></details></section>`;
@@ -935,7 +970,72 @@ function csvMapping() {
 // ---------- Render i nawigacja ----------
 const VIEWS = { przeglad: viewOverview, kalendarz: viewCalendar, operacje: viewTransactions, konta: viewAccounts, stale: viewRecurring, ustawienia: viewSettings };
 
+// ---------- Dymek z wydatkami (tabela porównania kategorii) ----------
+const cmpPop = document.createElement('div');
+cmpPop.id = 'cmp-pop';
+cmpPop.className = 'pop';
+cmpPop.setAttribute('role', 'dialog');
+cmpPop.hidden = true;
+document.body.append(cmpPop);
+let cmpAnchor = null;
+
+function hideCmpPop() {
+  cmpPop.hidden = true;
+  cmpAnchor?.setAttribute('aria-expanded', 'false');
+  cmpAnchor = null;
+}
+
+// Wydatki kategorii (albo wszystkie) w miesiącu z tabeli, w poprzednim albo w 3 poprzednich miesiącach.
+function cmpExpenses(key, month) {
+  const [catKey, col] = key.split('|');
+  const range = col === 'cur' ? monthBounds(month) : col === 'prev' ? monthBounds(shiftMonth(month, -1)) : { from: monthBounds(shiftMonth(month, -3)).from, to: monthBounds(shiftMonth(month, -1)).to };
+  const label = col === 'cur' ? monthLabel(month) : col === 'prev' ? monthLabel(shiftMonth(month, -1)) : `${MONTHS[Number(shiftMonth(month, -3).slice(5, 7)) - 1]} – ${monthLabel(shiftMonth(month, -1))}`;
+  const list = liveTx(fin)
+    .filter((t) => t.type === 'wydatek' && t.date >= range.from && t.date <= range.to && (catKey === '_all' || (catKey === '_none' ? !t.categoryId : t.categoryId === catKey)))
+    .sort(byNewest);
+  const c = catKey === '_all' ? { emoji: '🧾', name: 'Wszystkie wydatki' } : catKey === '_none' ? NONE_CAT : cat(catKey) ?? NONE_CAT;
+  return { list, label, col, c, total: list.reduce((s, t) => s + t.amount, 0) };
+}
+
+function toggleCmpPop(btn, key) {
+  if (cmpAnchor === btn && !cmpPop.hidden) return hideCmpPop();
+  hideCmpPop();
+  const { list, label, col, c, total } = cmpExpenses(key, ui.anchor.slice(0, 7));
+  const avg = col === 'avg' ? ` · średnio ${zl(total / 3)} / mies.` : '';
+  const shown = list.slice(0, 40);
+  cmpPop.innerHTML = `<div class="pop-head"><div><b>${esc(c.emoji)} ${esc(c.name)}</b><small>${esc(label)} · ${list.length} ${plural(list.length, 'wydatek', 'wydatki', 'wydatków')} · ${esc(zl(total))}${esc(avg)}</small></div><button type="button" class="pop-x" aria-label="Zamknij">×</button></div>
+  <div class="pop-list">${shown.length ? shown.map(txRow).join('') : '<p class="muted small">Brak wydatków w tym okresie.</p>'}${list.length > shown.length ? `<p class="muted small">…i ${list.length - shown.length} więcej. Pełną listę zobaczysz w Operacjach.</p>` : ''}</div>`;
+  cmpPop.hidden = false;
+  cmpAnchor = btn;
+  btn.setAttribute('aria-expanded', 'true');
+  // Pozycja: pod kwotą, w granicach ekranu; strzałka wskazuje kliknięte pole.
+  const r = btn.getBoundingClientRect();
+  const width = Math.min(360, window.innerWidth - 16);
+  const left = Math.max(8, Math.min(window.innerWidth - width - 8, r.left + r.width / 2 - width / 2));
+  cmpPop.style.width = `${width}px`;
+  cmpPop.style.left = `${left + window.scrollX}px`;
+  cmpPop.style.top = `${r.bottom + window.scrollY + 8}px`;
+  cmpPop.style.setProperty('--arrow-x', `${Math.max(14, Math.min(width - 14, r.left + r.width / 2 - left))}px`);
+  const bottom = r.bottom + 8 + cmpPop.offsetHeight;
+  if (bottom > window.innerHeight - 70) window.scrollBy({ top: Math.min(bottom - window.innerHeight + 80, r.top - 80), behavior: 'smooth' });
+}
+
+cmpPop.addEventListener('click', (ev) => {
+  if (ev.target.closest('.pop-x')) return hideCmpPop();
+  const e = ev.target.closest('[data-edit]');
+  if (!e) return;
+  const t = fin.txs.find((x) => x.id === e.dataset.edit);
+  hideCmpPop();
+  if (t) openTx(t);
+});
+document.addEventListener('click', (ev) => {
+  if (!cmpPop.hidden && !cmpPop.contains(ev.target) && !ev.target.closest('[data-cmp]')) hideCmpPop();
+});
+document.addEventListener('keydown', (ev) => ev.key === 'Escape' && !cmpPop.hidden && hideCmpPop());
+window.addEventListener('resize', () => !cmpPop.hidden && hideCmpPop());
+
 function render() {
+  hideCmpPop();
   for (const b of $$('#fin-nav button')) b.classList.toggle('on', b.dataset.view === ui.view);
   const root = $('#fin-root');
   root.innerHTML = ui.inbox ? viewInbox() : VIEWS[ui.view]();
@@ -1096,10 +1196,12 @@ $('#fin-root').addEventListener('click', async (ev) => {
     const t = fin.txs.find((x) => x.id === d.edit);
     return t && openTx(t);
   }
+  if (d.cmp) return toggleCmpPop(b, d.cmp);
   if (d.assign) {
     const t = fin.txs.find((x) => x.id === d.assign);
     const remember = $(`[data-remember="${CSS.escape(d.assign)}"]`)?.checked;
     t.categoryId = d.cat;
+    delete t.catAuto;
     t.updatedAt = Date.now();
     if (remember && t.merchant) {
       const pattern = rulePatternFor(t.merchant);
@@ -1423,14 +1525,20 @@ $('#fin-root').addEventListener(
 );
 
 function importShortcutText(text, source) {
-  const { txs, errors } = parseShortcutLog(text, fin);
+  const { txs, errors, lines } = parseShortcutLog(text, fin);
   const r = mergeImported(fin, txs.map(localizeTx), { newId });
   fin = r.fin;
-  fin.applePay = { lastImport: Date.now(), lastAdded: r.added };
+  // Diagnostyka ostatniego importu (Więcej → Apple Pay): ile wierszy, co dodano, co uzupełniono, jakie błędy.
+  fin.applePay = { lastImport: Date.now(), lastAdded: r.added, lastUpdated: r.updated, lastRemoved: r.removed, lastLines: lines, errorCount: errors.length, lastErrors: errors.slice(0, 5) };
   save();
   const unmapped = unmappedCards();
-  toast(`Z ${source}: dodano ${r.added}${r.skipped ? `, pominięto ${r.skipped} już zapisanych` : ''}${errors.length ? `, ${errors.length} wierszy z błędem` : ''}.${unmapped.length ? ' Przypisz karty do kont (Przegląd).' : ''}`, 6000);
-  if (txs.some((t) => !t.categoryId)) ui.inbox = true;
+  const parts = [`dodano ${r.added}`];
+  if (r.updated) parts.push(`uzupełniono kategorię w ${r.updated}`);
+  if (r.removed) parts.push(`usunięto ${r.removed} oznaczonych „Pomiń”`);
+  if (r.skipped) parts.push(`pominięto ${r.skipped} już zapisanych`);
+  if (errors.length) parts.push(`${errors.length} wierszy z błędem (szczegóły: Więcej → Apple Pay)`);
+  toast(`Z ${source}: ${parts.join(', ')}.${unmapped.length ? ' Przypisz karty do kont (Przegląd).' : ''}`, 7000);
+  if (r.added && txs.some((t) => !t.categoryId && !t.apSkip)) ui.inbox = true;
   else if (unmapped.length) ui.view = 'przeglad';
   render();
 }
@@ -1611,6 +1719,7 @@ txForm.addEventListener('submit', async (ev) => {
   };
   delete t.accountAmount;
   delete t.toAmount;
+  if (prev && prev.categoryId !== t.categoryId) delete t.catAuto; // kategoria wybrana ręcznie
   if (cur !== 'PLN') t.accountAmount = amt;
   if (type === 'przelew' && t.toAccountId) {
     const toCur = accountCurrency(fin, t.toAccountId);
@@ -1760,8 +1869,30 @@ $('#ad-delete').addEventListener('click', () => deleteAccountFlow(accForm.datase
 const LOTS = $('#lots-dialog');
 const lotsForm = $('form', LOTS);
 let lotsState = null;
-const assetList = () => Object.entries(MARKET.assets ?? {});
+// ETF-y strategii GEM (ceny dołączone do strony) – pokazywane w wyszukiwarce, zanim cokolwiek wpiszesz.
+const gemAssets = () => Object.entries(MARKET.assets ?? {}).filter(([, a]) => !a.library);
 const latestMark = (l) => (l.marks?.length ? l.marks.at(-1)[1] : l.price);
+
+const lotPicker = instPicker({
+  extra: () => gemAssets().map(([symbol, a]) => ({ symbol, name: a.name, currency: a.currency })),
+  onPick: async (it) => {
+    libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+    const gem = MARKET.assets?.[it.symbol] && !MARKET.assets[it.symbol].library;
+    if (!gem) addLibraryAsset(it.symbol, it.name, it.currency);
+    const priced = gem || MARKET.assets?.[it.symbol] || it.market === 'PL' || it.market === 'US' || it.proxy;
+    if (priced) {
+      const last = instLastPrice(MARKET.assets?.[it.symbol]);
+      lotsState.lots.push({ id: newId(), asset: it.symbol, name: it.name, currency: it.currency, qty: 0, price: 0, date: today(), hint: last ? `Ostatni kurs: ${fmtInput(last[1])} ${it.currency} (${shortDate(last[0], true)}).` : '' });
+    } else {
+      // Brak darmowych notowań (np. akcje z Frankfurtu czy Paryża): pozycja z wyceną ręczną z historią zmian.
+      lotsState.lots.push({ id: newId(), asset: 'manual', name: `${it.symbol} · ${it.name}`, currency: it.currency, qty: 0, price: 0, value: 0, date: today() });
+    }
+    lotPicker.reset();
+    $('#ld-picker').hidden = true;
+    renderLots();
+    $('#ld-rows').lastElementChild?.querySelector('[data-lf="qty"]')?.focus();
+  },
+});
 
 function openLots(accountId) {
   const a = acc(accountId);
@@ -1772,12 +1903,28 @@ function openLots(accountId) {
     before: holdingsPLN(MARKET, a, valuationDate()) ?? 0,
   };
   $('#ld-title').textContent = `Aktywa: ${a.name}`;
-  $('#ld-info').textContent = `${marketNote()} Wartość ETF-u liczę od ceny zakupu według zmiany indeksu, który ten ETF śledzi – dokładną cenę zawsze sprawdzisz w XTB.`;
-  $('#ld-add').disabled = !assetList().length;
+  $('#ld-info').textContent = `${marketNote()} Akcje i ETF-y z GPW wyceniam po kursie zamknięcia z giełdy, popularne ETF-y UCITS – od ceny zakupu według zmiany indeksu, który śledzą (wycena przybliżona, oznaczona „≈”). Dokładną cenę zawsze sprawdzisz w XTB.`;
+  if (!$('#ld-picker').firstChild) $('#ld-picker').append(lotPicker);
+  $('#ld-picker').hidden = true;
+  lotPicker.reset();
   lotsForm.elements.settle.checked = true;
   $('#ld-errors').textContent = '';
   renderLots();
   openDialog(LOTS);
+  instLoadQuotes().then((data) => {
+    libraryQuotes = libraryQuotes ?? data;
+    if (lotsState?.accountId === accountId && lotsState.lots.some((l) => l.asset !== 'manual' && !MARKET.assets?.[l.asset] && addLibraryAsset(l.asset, l.name, l.currency))) renderLots();
+  });
+}
+
+// Opis źródła ceny pozycji (GEM, GPW, USA, indeks albo cena zakupu).
+function lotSource(l) {
+  const a = MARKET.assets?.[l.asset];
+  if (a && !a.library) return 'ETF strategii GEM – cena z codziennej aktualizacji';
+  if (a) return instSourceLabel(a, libraryQuotes);
+  if (l.asset?.endsWith('.US')) return 'Brak notowań – wycena według ceny zakupu. Dopisz symbol do obserwowanych (Portfel → Instrumenty XTB), aby pobierać kurs.';
+  if (l.asset?.endsWith('.PL')) return 'Kurs z GPW pojawi się po najbliższej aktualizacji aplikacji.';
+  return 'Brak notowań – wycena według ceny zakupu.';
 }
 
 function lotSummary(l) {
@@ -1792,26 +1939,26 @@ function lotSummary(l) {
 }
 
 function renderLots() {
-  const assets = assetList();
   $('#ld-rows').innerHTML = lotsState.lots.length
     ? lotsState.lots
         .map((l, i) => {
           const cur = lotCurrency(MARKET, l);
+          const pence = l.asset !== 'manual' ? instPenceHint({ market: l.asset.slice(l.asset.lastIndexOf('.') + 1), currency: cur, name: l.name ?? '' }) : '';
           const body =
             l.asset === 'manual'
               ? `<label class="field full">Nazwa aktywa<input data-lf="name" value="${esc(l.name ?? '')}" placeholder="np. Obligacje skarbowe EDO"></label>
-                 <label class="field">Waluta<select data-lf="currency">${CURRENCIES.map((c) => `<option ${c === (l.currency || 'PLN') ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+                 <label class="field">Waluta<select data-lf="currency">${[...new Set([...CURRENCIES, l.currency || 'PLN'])].map((c) => `<option ${c === (l.currency || 'PLN') ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
                  <label class="field">Ilość<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
                  <label class="field">Wartość za sztukę dziś (${esc(curLabel(cur))})<input data-lf="value" inputmode="decimal" value="${esc(fmtInput(l.value))}"></label>
                  <label class="field">Od kiedy<input type="date" data-lf="date" value="${esc(l.date)}"></label>`
-              : `<label class="field full">ETF<select data-lf="asset">${assets.map(([k, a]) => `<option value="${esc(k)}" ${k === l.asset ? 'selected' : ''}>${esc(k)} – ${esc(a.name)}</option>`).join('')}</select></label>
+              : `<div class="full lot-inst"><b>${esc(l.asset)}</b> ${esc(l.name ?? MARKET.assets?.[l.asset]?.name ?? '')}<div class="small muted">${esc(lotSource(l))}</div>${l.hint ? `<div class="small muted">${esc(l.hint)}</div>` : ''}${pence ? `<div class="small warn">${esc(pence)}</div>` : ''}</div>
                  <label class="field">Ilość (szt.)<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
                  <label class="field">Cena zakupu za szt. (${esc(curLabel(cur))})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}"></label>
                  <label class="field">Data zakupu<input type="date" data-lf="date" value="${esc(l.date)}"></label>`;
           return `<div class="lot-row" data-lot="${i}">${body}<div class="lot-foot full"><span class="small muted" data-lot-val="${i}">${esc(lotSummary(l))}</span><button type="button" class="link small danger-text" data-lot-del="${i}">Usuń</button></div></div>`;
         })
         .join('')
-    : '<p class="muted small">Brak aktywów. Dodaj ETF z listy (wycena aktualizowana w dni robocze) albo inne aktywo z wyceną ręczną.</p>';
+    : '<p class="muted small">Brak aktywów. Dodaj instrument z oferty XTB (wyszukaj po nazwie, symbolu albo ISIN) albo inne aktywo z wyceną ręczną, np. obligacje skarbowe.</p>';
   updateLotsSum();
 }
 
@@ -1852,10 +1999,9 @@ $('#ld-rows').addEventListener('click', (ev) => {
   renderLots();
 });
 $('#ld-add').addEventListener('click', () => {
-  const first = assetList()[0]?.[0];
-  if (!first) return;
-  lotsState.lots.push({ id: newId(), asset: first, qty: 0, price: 0, date: today() });
-  renderLots();
+  const box = $('#ld-picker');
+  box.hidden = !box.hidden;
+  if (!box.hidden) lotPicker.focusInput();
 });
 $('#ld-add-manual').addEventListener('click', () => {
   lotsState.lots.push({ id: newId(), asset: 'manual', name: '', currency: 'PLN', qty: 1, price: 0, value: 0, date: today() });
@@ -1878,7 +2024,7 @@ lotsForm.addEventListener('submit', (ev) => {
   }
   const t = valuationDate();
   const lots = lotsState.lots.map((l) => {
-    if (l.asset !== 'manual') return { id: l.id, asset: l.asset, qty: l.qty, price: Math.round(l.price * 1e6) / 1e6, date: l.date, since: l.since };
+    if (l.asset !== 'manual') return { id: l.id, asset: l.asset, name: l.name, currency: l.currency, qty: l.qty, price: Math.round(l.price * 1e6) / 1e6, date: l.date, since: l.since };
     // Aktywo z wyceną ręczną: każda zmiana wartości to nowy punkt historii (do wykresu majątku).
     const old = (a.lots ?? []).find((x) => x.id === l.id);
     let marks = old?.marks?.map((m) => [...m]) ?? [];
@@ -2113,6 +2259,7 @@ document.addEventListener('visibilitychange', () => {
 
 runRecurring();
 render();
+refreshLibraryAssets();
 handleHash();
 scheduleDocCleanup(20000);
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});

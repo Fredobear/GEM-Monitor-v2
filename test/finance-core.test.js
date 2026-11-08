@@ -80,20 +80,80 @@ test('plik ze Skrótu Apple Pay: kategoria, karta → konto, „Pomiń”, brak 
     'zepsuty wiersz',
   ].join('\n');
   const { txs, errors } = parseShortcutLog(log, fin);
-  assert.equal(txs.length, 3);
+  const kept = txs.filter((t) => !t.apSkip);
+  assert.equal(kept.length, 3);
   assert.equal(errors.length, 1);
-  assert.equal(txs[0].categoryId, 'zakupy');
-  assert.equal(txs[0].accountId, 'mb');
-  assert.equal(txs[0].amount, 45.2);
-  assert.equal(txs[1].categoryId, 'transport'); // z reguły
-  assert.equal(txs[2].categoryId, null); // do przypisania
-  assert.equal(txs[2].accountId, null);
-  // Ponowny import tego samego pliku nie dubluje wpisów.
+  assert.equal(kept[0].categoryId, 'zakupy');
+  assert.equal(kept[0].accountId, 'mb');
+  assert.equal(kept[0].amount, 45.2);
+  assert.equal(kept[1].categoryId, 'transport'); // z reguły
+  assert.equal(kept[1].catAuto, true);
+  assert.equal(kept[2].categoryId, null); // do przypisania
+  assert.equal(kept[2].accountId, null);
+  // Ponowny import tego samego pliku nie dubluje wpisów, a „Pomiń” nie trafia do dziennika.
   let r = mergeImported(fin, txs, { now: 1 });
   assert.equal(r.added, 3);
+  assert.ok(!r.fin.txs.some((t) => t.merchant === 'Kawiarnia'));
+  assert.ok(!r.fin.txs.some((t) => 'apSkip' in t || 'apCategory' in t));
   r = mergeImported(r.fin, parseShortcutLog(log, fin).txs, { now: 2 });
   assert.equal(r.added, 0);
   assert.equal(r.skipped, 3);
+});
+
+test('Apple Pay dwuetapowo: płatność zapisana od razu, kategoria z drugiego wiersza, także między importami', () => {
+  const fin = emptyFinance();
+  fin.accounts.push({ id: 'mb', name: 'mBank', cards: ['mBank Visa'] });
+  fin.rules.push({ pattern: 'orlen', categoryId: 'transport' });
+  const step1 = [
+    '2026-11-02T14:33:05+01:00;45,20 zł;Biedronka;;mBank Visa', // pierwszy zapis
+    '2026-11-02T14:33:40+01:00;45,20 zł;Biedronka;Zakupy spożywcze;mBank Visa', // wybór z listy po 35 s
+    '2026-11-02T15:10:00+01:00;12,00 zł;Kawiarnia;;mBank Visa',
+    '2026-11-02T15:10:30+01:00;12,00 zł;Kawiarnia;Pomiń;mBank Visa',
+    '2026-11-02T16:00:00+01:00;8,50 zł;Kiosk;;mBank Visa', // lista wygasła – brak drugiego wiersza
+    '2026-11-02T16:05:00+01:00;8,50 zł;Kiosk;;mBank Visa', // druga, osobna płatność w tym samym kiosku
+    '2026-11-02T17:00:00+01:00;60,00 zł;ORLEN;;mBank Visa',
+    '2026-11-02T17:00:20+01:00;60,00 zł;ORLEN;Później;mBank Visa',
+  ];
+  const parsed = parseShortcutLog(step1.join('\n'), fin);
+  assert.equal(parsed.lines, 8);
+  let r = mergeImported(fin, parsed.txs, { now: 1 });
+  const live = r.fin.txs.filter((t) => !t.deleted);
+  assert.equal(r.added, 4); // Biedronka, 2× Kiosk, ORLEN
+  assert.equal(live.find((t) => t.merchant === 'Biedronka').categoryId, 'zakupy');
+  assert.equal(live.find((t) => t.merchant === 'Biedronka').time, '14:33'); // czas pierwszego zapisu
+  assert.equal(live.filter((t) => t.merchant === 'Kiosk').length, 2);
+  assert.ok(live.filter((t) => t.merchant === 'Kiosk').every((t) => !t.categoryId));
+  assert.ok(!live.some((t) => t.merchant === 'Kawiarnia'));
+  assert.equal(live.find((t) => t.merchant === 'ORLEN').categoryId, 'transport'); // „Później” + reguła
+
+  // Import pomiędzy pierwszym zapisem a wyborem z listy: kategoria i „Pomiń” uzupełnią się przy kolejnym imporcie.
+  const early = ['2026-11-03T09:00:00+01:00;20,00 zł;Apteka;;mBank Visa', '2026-11-03T10:00:00+01:00;5,00 zł;Parking;;mBank Visa', '2026-11-03T11:00:00+01:00;30,00 zł;ORLEN;;mBank Visa'];
+  r = mergeImported(r.fin, parseShortcutLog(early.join('\n'), fin).txs, { now: 2 });
+  assert.equal(r.added, 3);
+  const later = [...early, '2026-11-03T09:00:50+01:00;20,00 zł;Apteka;Zdrowie i uroda;mBank Visa', '2026-11-03T10:01:00+01:00;5,00 zł;Parking;Pomiń;mBank Visa', '2026-11-03T11:00:30+01:00;30,00 zł;ORLEN;Zakupy spożywcze;mBank Visa'];
+  r = mergeImported(r.fin, parseShortcutLog(later.join('\n'), fin).txs, { now: 3 });
+  assert.equal(r.added, 0);
+  assert.equal(r.updated, 2); // Apteka, ORLEN (kategoria z reguły zastąpiona wyborem z listy)
+  assert.equal(r.removed, 1); // Parking
+  const after = r.fin.txs.filter((t) => !t.deleted);
+  assert.equal(after.find((t) => t.merchant === 'Apteka').categoryId, 'zdrowie');
+  assert.equal(after.find((t) => t.merchant === 'ORLEN' && t.date === '2026-11-03').categoryId, 'zakupy');
+  assert.ok(!after.some((t) => t.merchant === 'Parking'));
+
+  // Kategoria zmieniona ręcznie w aplikacji nie jest nadpisywana przy kolejnych importach.
+  const fin2 = { ...r.fin, txs: r.fin.txs.map((t) => (t.merchant === 'Apteka' ? { ...t, categoryId: 'inne' } : t)) };
+  r = mergeImported(fin2, parseShortcutLog(later.join('\n'), fin2).txs, { now: 4 });
+  assert.equal(r.updated, 0);
+  assert.equal(r.fin.txs.find((t) => t.merchant === 'Apteka').categoryId, 'inne');
+
+  // Sam drugi wiersz, gdy pierwszy był już wczytany wcześniej (np. nowy plik): dopasowanie po kwocie, sklepie i karcie.
+  const solo = mergeImported(r.fin, parseShortcutLog('2026-11-02T16:00:40+01:00;8,50 zł;Kiosk;Rozrywka i hobby;mBank Visa', fin2).txs, { now: 5 });
+  assert.equal(solo.added, 0);
+  assert.equal(solo.updated, 1);
+  // Błędy z podpowiedzią przyczyny.
+  const bad = parseShortcutLog('2026-11-02;;Biedronka;;Visa\nwczoraj;5 zł;X;;Visa', fin);
+  assert.match(bad.errors[0], /brak kwoty/);
+  assert.match(bad.errors[1], /ISO 8601/);
 });
 
 test('CSV z banku: separator, cudzysłowy, nagłówek po kilku wierszach, Windows-style', () => {

@@ -1,4 +1,4 @@
-// Interfejs aplikacji: zakładki, Portfel (dziennik, wykres, podatki, limity), kalkulatory w zakładce Podatki,
+// Interfejs aplikacji: zakładki, Portfel (dziennik, wykres, podatki, limity), kalkulatory w podkarcie Podatki (zakładka Rynki),
 // ustawienia i synchronizacja. Korzysta z funkcji z core.js (wklejonych wyżej w tym samym skrypcie).
 
 const D = JSON.parse(document.getElementById('gem-data').textContent);
@@ -45,6 +45,36 @@ const state = {
   ui: { account: 'ALL', range: 'MAX', from: null, to: null, mode: 'pct', bench: { gem: true, sp500: false }, ...store.get(KEYS.ui, {}) },
 };
 const DATA_DAY = lastDataDate(D.prices) ?? todayIso();
+
+// ---------- Biblioteka instrumentów XTB ----------
+// Nazwa instrumentu: ETF-y strategii z konfiguracji, pozostałe – nazwa zapisana przy transakcji (z katalogu XTB).
+function tickerName(ticker) {
+  return D.instruments[ticker]?.name ?? state.txs.find((x) => x.ticker === ticker && x.name)?.name ?? '';
+}
+// Ceny instrumentów spoza strategii (GPW, obserwowane z USA, ETF-y UCITS wyceniane przez indeks) z data/notowania.js.
+let libraryData = null;
+async function ensureLibraryPrices() {
+  const missing = [...new Set(activeTx(state.txs).filter((t) => t.ticker && !D.instruments[t.ticker]).map((t) => t.ticker))];
+  if (!missing.length) return false;
+  libraryData = libraryData ?? (await instLoadQuotes());
+  if (!libraryData) return false;
+  let added = false;
+  for (const sym of missing) {
+    if (D.prices.instruments[sym]?.library) continue;
+    const currency = state.txs.find((t) => t.ticker === sym && t.currency)?.currency ?? 'USD';
+    const entry = instEntry(libraryData, sym, currency, D.prices.fx);
+    if (entry) {
+      D.prices.instruments[sym] = { ...entry, library: true };
+      added = true;
+    }
+  }
+  return added;
+}
+function refreshLibraryPrices() {
+  ensureLibraryPrices()
+    .then((added) => added && !$('#tab-portfel').hidden && renderPortfolio())
+    .catch(() => {});
+}
 const saveUi = () => store.set(KEYS.ui, state.ui);
 const taxRate = () => (state.settings.taxForm === 'ryczalt' ? Number(state.settings.ryczaltRate) || 0 : D.podatki.taxForms[state.settings.taxForm]?.rate ?? 0.12);
 
@@ -56,11 +86,19 @@ function applyTheme() {
 
 // ---------- Zakładki ----------
 const TABS = ['sygnal', 'portfel', 'podatki', 'rynki'];
+// Podatki to podkarta zakładki Rynki: w menu podświetlone są Rynki, a nad treścią jest przełącznik.
+const NAV_OF = { podatki: 'rynki' };
 function showTab(id, scroll = true) {
   if (!TABS.includes(id)) id = 'sygnal';
+  const nav = NAV_OF[id] ?? id;
   for (const t of TABS) {
     $(`#tab-${t}`).hidden = t !== id;
-    for (const a of $$(`[data-tab="${t}"]`)) a.setAttribute('aria-current', t === id ? 'page' : 'false');
+    for (const a of $$(`[data-tab="${t}"]`)) a.setAttribute('aria-current', t === nav ? 'page' : 'false');
+  }
+  const sub = $('#rynki-subnav');
+  if (sub) {
+    sub.hidden = nav !== 'rynki';
+    for (const a of $$('[data-sub]', sub)) a.setAttribute('aria-current', a.dataset.sub === id ? 'page' : 'false');
   }
   if (id === 'portfel') renderPortfolio();
   if (id === 'podatki') renderTaxTools();
@@ -276,7 +314,8 @@ function renderPortfolio() {
   const root = $('#portfel-root');
   const active = activeTx(state.txs);
   if (!active.some((t) => t.type === 'kupno' || t.type === 'sprzedaz')) {
-    root.innerHTML = emptyPortfolio() + contributionsCard() + dataCard();
+    root.innerHTML = emptyPortfolio() + contributionsCard() + libraryCard() + dataCard();
+    mountLibrary(root);
     bindPortfolio(root);
     return;
   }
@@ -321,7 +360,9 @@ function renderPortfolio() {
   ${acc === 'ALL' || acc === 'ZWYKLE' ? taxCard() : ''}
   ${contributionsCard()}
   ${transactionsCard(acc)}
+  ${libraryCard()}
   ${dataCard()}`;
+  mountLibrary(root);
 
   const chartEl = $('#chart', root);
   const lines = [];
@@ -361,7 +402,8 @@ function holdingsCard(acc) {
   const rows = list
     .map((h) => {
       const ok = matchesSignal(h.ticker);
-      return `<tr><td><b>${esc(h.ticker)}</b> <span class="tag">${esc(ACCOUNT_LABELS[h.account])}</span><div class="muted small">${esc(D.instruments[h.ticker]?.name ?? '')}</div>${target ? `<div class="small ${ok ? 'pos' : 'warn'}">${ok ? '✓ zgodne z sygnałem' : `sygnał GEM: ${esc(target)}`}</div>` : ''}</td><td class="num">${NF4.format(h.quantity)}</td><td class="num">${pln(h.value)}<div class="muted small">${Math.round(h.weight * 100)}%</div></td><td class="num ${tone(h.gain)}">${plnSigned(h.gain)}<div class="small">${pct(h.gainPct)}</div></td></tr>`;
+      const lib = D.prices.instruments[h.ticker]?.library ? D.prices.instruments[h.ticker] : null;
+      return `<tr><td><b>${esc(h.ticker)}</b> <span class="tag">${esc(ACCOUNT_LABELS[h.account])}</span><div class="muted small">${esc(tickerName(h.ticker))}</div>${lib ? `<div class="muted small">${esc(instSourceLabel(lib, libraryData))}</div>` : ''}${target ? `<div class="small ${ok ? 'pos' : 'warn'}">${ok ? '✓ zgodne z sygnałem' : `sygnał GEM: ${esc(target)}`}</div>` : ''}</td><td class="num">${NF4.format(h.quantity)}</td><td class="num">${pln(h.value)}<div class="muted small">${Math.round(h.weight * 100)}%</div></td><td class="num ${tone(h.gain)}">${plnSigned(h.gain)}<div class="small">${pct(h.gainPct)}</div></td></tr>`;
     })
     .join('');
   return `<section class="card"><h2>Pozycje</h2><div class="tbl-wrap"><table><thead><tr><th>Instrument</th><th class="num">Jednostki</th><th class="num">Wartość</th><th class="num">Zysk</th></tr></thead><tbody>${rows}</tbody></table></div><p class="muted small">Wycena: ostatnia cena z Twoich transakcji lub wycen, przesunięta o zmianę indeksu i kursu NBP. Aby zgrać się z XTB co do grosza, dodaj czasem „Wycenę” z ceną z aplikacji.</p></section>`;
@@ -422,6 +464,49 @@ function transactionsCard(acc) {
   </section>`;
 }
 
+// Karta wyszukiwarki: dowolna akcja lub ETF z oferty XTB, ostatni kurs i źródło wyceny, lista obserwowanych.
+function libraryCard() {
+  const edit = D.library?.editUrl;
+  return `<section class="card" id="lib-card"><h2>Instrumenty XTB</h2>
+  <p class="small muted">Wyszukaj dowolną akcję lub ETF z oferty XTB i sprawdź, skąd aplikacja weźmie jego cenę. Akcje i ETF-y z GPW mają kurs zamknięcia z giełdy (dni robocze), popularne ETF-y UCITS – wycenę według indeksu, a akcje z USA – kurs po dopisaniu do listy obserwowanych.</p>
+  <div id="lib-picker"></div><div id="lib-detail"></div>
+  <div id="lib-watch" class="small"></div>
+  <p class="small">${edit ? `<a href="${esc(edit)}" target="_blank" rel="noopener">Edytuj listę obserwowanych na GitHubie</a> (plik config/obserwowane.txt, ceny od następnej aktualizacji).` : 'Lista obserwowanych: plik config/obserwowane.txt w repozytorium.'}</p>
+  </section>`;
+}
+
+function mountLibrary(root) {
+  const host = $('#lib-picker', root);
+  if (!host) return;
+  const extra = () => Object.entries(D.instruments).map(([symbol, i]) => ({ symbol, name: i.name, currency: i.currency }));
+  host.append(instPicker({ onPick: (it) => showLibDetail(it), extra }));
+  instLoadQuotes().then((data) => {
+    libraryData = libraryData ?? data;
+    const el = $('#lib-watch', root);
+    if (!el || !data) return;
+    const rows = (data.watchlist ?? []).map((s) => {
+      const q = data.quotes?.[s]?.at(-1);
+      return `<b>${esc(s)}</b>${q ? ` ${NF2.format(q[1])} (${dShort(q[0])})` : ' – brak notowań'}`;
+    });
+    el.innerHTML = `<p class="muted">Notowania GPW z ${data.gpwDate ? dShort(data.gpwDate) : '–'}.${rows.length ? ` Obserwowane: ${rows.join(' · ')}.` : ' Lista obserwowanych jest pusta.'}</p>`;
+  });
+}
+
+async function showLibDetail(it) {
+  const el = $('#lib-detail');
+  if (!el) return;
+  libraryData = libraryData ?? (await instLoadQuotes());
+  const own = D.prices.instruments[it.symbol] && !D.prices.instruments[it.symbol].library ? D.prices.instruments[it.symbol] : null;
+  const entry = own ?? instEntry(libraryData, it.symbol, it.currency, D.prices.fx);
+  const last = instLastPrice(entry);
+  const source = own ? 'ETF strategii GEM – notowania i indeks z codziennej aktualizacji' : instExpectedSource(it, libraryData, D.prices.fx);
+  const pence = instPenceHint(it);
+  el.innerHTML = `<div class="inst-picked"><b>${esc(it.symbol)}</b> ${esc(it.name)}<br><span class="muted">${esc([it.isin, it.marketName, it.currency, it.type === 'E' ? 'ETF/ETC' : it.type === 'A' ? 'akcje' : ''].filter(Boolean).join(' · '))}${it.closeOnly ? ' · tylko zamknięcie pozycji' : ''}</span>
+  ${last ? `<br>Ostatni kurs: <b>${NF2.format(last[1])} ${esc(it.currency)}</b> (${dShort(last[0])})` : ''}
+  <br><span class="muted">Wycena: ${esc(source)}</span>${pence ? `<br><span class="warn">${esc(pence)}</span>` : ''}
+  <div class="row-btns" style="margin-top:8px"><button class="btn small" type="button" data-act="lib-add" data-sym="${esc(it.symbol)}" data-cur="${esc(it.currency)}" data-name="${esc(it.name)}">Dodaj transakcję</button></div></div>`;
+}
+
 function dataCard() {
   const n = activeTx(state.txs).length;
   const s = state.sync;
@@ -460,6 +545,10 @@ function bindPortfolio(root) {
     if (b.dataset.edit) return openTxDialog(state.txs.find((t) => t.id === b.dataset.edit));
     const act = b.dataset.act;
     if (act === 'add') openTxDialog(null);
+    else if (act === 'lib-add') {
+      const known = Boolean(D.instruments[b.dataset.sym]);
+      openTxDialog(null, { ticker: b.dataset.sym, currency: b.dataset.cur, name: known ? undefined : b.dataset.name });
+    }
     else if (act === 'demo') loadDemo();
     else if (act === 'clear-demo') {
       saveTxs(state.txs.map((t) => (t.demo ? { ...t, deleted: true, updatedAt: Date.now() } : t)));
@@ -584,11 +673,12 @@ function loadDemo() {
 }
 
 // ---------- Okno transakcji ----------
-function openTxDialog(tx) {
+let txPicked = null; // instrument wybrany z katalogu XTB w oknie transakcji
+function openTxDialog(tx, prefill = null) {
   const dlg = $('#tx-dialog');
   const f = $('form', dlg);
   const editing = Boolean(tx);
-  const t = tx ?? { type: 'kupno', date: todayIso(), account: state.settings.defaultAccount, ticker: D.signal?.ticker ?? Object.keys(D.instruments)[0], feePLN: 0 };
+  const t = tx ?? { type: 'kupno', date: todayIso(), account: state.settings.defaultAccount, ticker: D.signal?.ticker ?? Object.keys(D.instruments)[0], feePLN: 0, ...prefill };
   $('#tx-title').textContent = editing ? 'Edytuj wpis' : 'Nowy wpis';
   f.reset();
   f.elements.id.value = tx?.id ?? '';
@@ -598,6 +688,9 @@ function openTxDialog(tx) {
   const known = Object.keys(D.instruments).includes(t.ticker);
   f.elements.ticker.value = !t.ticker ? Object.keys(D.instruments)[0] : known ? t.ticker : '__other';
   f.elements.customTicker.value = known ? '' : t.ticker ?? '';
+  f.elements.instName.value = known ? '' : t.name ?? '';
+  txPicked = !known && t.ticker ? instFind(self.GEM_KATALOG, t.ticker) ?? (t.name ? { symbol: t.ticker, name: t.name, currency: t.currency } : null) : null;
+  $('#tx-inst-picker .inst-picker')?.reset?.();
   f.elements.currency.value = t.currency ?? D.instruments[f.elements.ticker.value]?.currency ?? 'USD';
   f.elements.quantity.value = t.quantity ?? '';
   f.elements.price.value = t.price ?? '';
@@ -628,6 +721,7 @@ function readTxForm() {
   else {
     t.ticker = ticker;
     t.currency = f.elements.currency.value;
+    if (tickerSel === '__other' && f.elements.instName.value) t.name = f.elements.instName.value;
     t.price = num(f.elements.price.value);
     if (type !== 'wycena') {
       t.quantity = num(f.elements.quantity.value);
@@ -651,6 +745,20 @@ function updateTxForm() {
   $('#custom-ticker-row').hidden = !other || cashOnly;
   if (!other && D.instruments[f.elements.ticker.value]) f.elements.currency.value = D.instruments[f.elements.ticker.value].currency;
   $('#price-ccy').textContent = f.elements.currency.value;
+  // Instrument z katalogu: opis, źródło ceny i ostatni kurs; ręcznie zmieniony symbol kasuje wybór.
+  const sym = f.elements.customTicker.value.trim().toUpperCase();
+  if (txPicked && sym !== txPicked.symbol) {
+    txPicked = null;
+    f.elements.instName.value = '';
+  }
+  const info = $('#tx-inst-info');
+  info.hidden = !(other && txPicked);
+  if (other && txPicked) {
+    const entry = instEntry(libraryData, txPicked.symbol, f.elements.currency.value, D.prices.fx);
+    const last = instLastPrice(entry);
+    const pence = instPenceHint(txPicked);
+    info.innerHTML = `<b>${esc(txPicked.symbol)}</b> ${esc(txPicked.name ?? '')}${last ? `<br>Ostatni kurs: ${NF2.format(last[1])} ${esc(f.elements.currency.value)} (${dShort(last[0])})` : ''}<br><span class="muted">Wycena: ${esc(txPicked.market ? instExpectedSource(txPicked, libraryData, D.prices.fx) : instSourceLabel(entry, libraryData))}</span>${pence ? `<br><span class="warn">${esc(pence)}</span>` : ''}`;
+  }
   const t = readTxForm();
   const hint = $('#amount-hint');
   if (trade && t.quantity > 0 && t.price > 0 && t.date) {
@@ -664,7 +772,26 @@ function bindTxDialog() {
   const f = $('form', dlg);
   $('#tx-ticker').innerHTML = `${Object.entries(D.instruments)
     .map(([t, i]) => `<option value="${esc(t)}">${esc(t)} – ${esc(i.name)}</option>`)
-    .join('')}<option value="__other">Inny instrument…</option>`;
+    .join('')}<option value="__other">Inny instrument z oferty XTB (wyszukaj)…</option>`;
+  const picker = instPicker({
+    onPick: (it) => {
+      if (D.instruments[it.symbol]) {
+        f.elements.ticker.value = it.symbol;
+      } else {
+        f.elements.customTicker.value = it.symbol;
+        f.elements.currency.value = it.currency;
+        f.elements.instName.value = it.name;
+        txPicked = it;
+      }
+      picker.reset();
+      instLoadQuotes().then((data) => {
+        libraryData = libraryData ?? data;
+        updateTxForm();
+      });
+      updateTxForm();
+    },
+  });
+  $('#tx-inst-picker').append(picker);
   f.addEventListener('input', updateTxForm);
   f.addEventListener('change', updateTxForm);
   f.addEventListener('submit', (ev) => {
@@ -688,6 +815,7 @@ function bindTxDialog() {
     dlg.close ? dlg.close() : dlg.removeAttribute('open');
     renderPortfolio();
     toast(prev ? 'Zapisano zmiany.' : 'Dodano wpis.');
+    refreshLibraryPrices();
   });
   $('#tx-delete').addEventListener('click', () => {
     const id = f.elements.id.value;
@@ -917,5 +1045,6 @@ window.addEventListener('resize', () => {
 document.documentElement.classList.add('js');
 showTab(location.hash.slice(1) || 'sygnal', false);
 renderSignalCheck();
+refreshLibraryPrices();
 if (state.sync?.token) syncNow(false);
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});

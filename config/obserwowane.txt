@@ -1,0 +1,17 @@
+# Obserwowane instrumenty z automatycznymi cenami spoza GPW
+#
+# Wpisz symbole XTB (takie jak w aplikacji XTB), po jednym w wierszu, np.:
+#   AAPL.US
+#   MSFT.US
+#   BRKB.US
+#
+# Co dostaje ceny automatycznie BEZ wpisywania tutaj:
+#   • wszystkie akcje, ETF-y, ETC i ETN z GPW i NewConnect (symbole .PL) – kurs zamknięcia z GPW,
+#   • ETF-y UCITS śledzące popularne indeksy (S&P 500, MSCI World, FTSE All-World, Nasdaq-100, rynki
+#     wschodzące, złoto, obligacje USA…) – wycena przybliżona według amerykańskiego ETF-u na ten sam indeks.
+#
+# Tutaj dopisz akcje i ETF-y z USA (symbole .US) – ceny pobiera Tiingo (do 20 symboli, darmowy plan).
+# Akcje z innych giełd (.DE, .UK, .FR…) nie mają darmowego źródła – wyceniasz je ręcznie w aplikacji.
+#
+# Ten plik jest publiczny (jak całe repozytorium) – widać w nim tylko symbole, nigdy ilości ani kwoty.
+

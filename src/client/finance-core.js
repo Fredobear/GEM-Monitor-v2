@@ -122,37 +122,69 @@ export function accountForCard(accounts, card) {
 }
 
 // Plik zapisywany przez Skrót iOS: jeden wiersz na płatność, pola: data;kwota;sprzedawca;kategoria;karta.
+// Automatyzacja Apple Pay zapisuje płatność dwuetapowo: najpierw od razu wiersz bez kategorii (płatność nie przepadnie,
+// nawet gdy okno z listą się nie pokaże albo iOS przerwie skrót), a po wyborze z listy – drugi wiersz z kategorią.
+// Wiersze tej samej płatności łączymy: ta sama kwota, sprzedawca i karta, czas do 15 minut różnicy.
+const AP_PAIR_MINUTES = 15;
+const apMinutes = (t) => Date.parse(`${t.date}T${t.time ?? '12:00'}:00Z`) / 60000;
+export const isSameApplePay = (a, b) =>
+  Math.abs(a.amount - b.amount) < 0.005 && norm(a.merchant) === norm(b.merchant) && norm(a.card ?? '') === norm(b.card ?? '') && Math.abs(apMinutes(a) - apMinutes(b)) <= AP_PAIR_MINUTES;
+
 export function parseShortcutLog(text, fin) {
-  const txs = [];
+  const rows = [];
   const errors = [];
+  let lines = 0;
   text.split(/\r?\n/).forEach((raw, i) => {
     const line = raw.trim();
     if (!line || line.startsWith('#')) return;
+    lines++;
     const sep = line.includes(';') ? ';' : line.includes('|') ? '|' : '\t';
     const f = line.split(sep).map((x) => x.trim());
-    if (f.length < 3) return errors.push(`Wiersz ${i + 1}: za mało pól.`);
+    if (f.length < 3) return errors.push(`Wiersz ${i + 1}: za mało pól („${line.slice(0, 60)}”).`);
     const when = parseDate(f[0]);
     const amount = parseAmount(f[1]);
-    if (!when || !Number.isFinite(amount) || amount === 0) return errors.push(`Wiersz ${i + 1}: nie rozpoznano daty albo kwoty („${f[0]}”, „${f[1]}”).`);
-    const merchant = f[2] || 'Apple Pay';
-    const categoryName = f[3] ?? '';
-    if (norm(categoryName) === norm(SKIP_CATEGORY)) return;
-    const card = f.slice(4).join(' ').trim();
-    const category = findCategory(fin.categories, categoryName);
+    if (!when) return errors.push(`Wiersz ${i + 1}: nie rozpoznano daty („${f[0]}”) – w akcji Tekst ustaw format daty ISO 8601.`);
+    if (!Number.isFinite(amount) || amount === 0) return errors.push(`Wiersz ${i + 1}: brak kwoty („${f[1]}”) – bank tej karty nie przekazał kwoty do Portfela albo w akcji Tekst brakuje zmiennej Kwota.`);
+    rows.push({ amount: Math.abs(amount), date: when.date, time: when.time, merchant: f[2] || 'Apple Pay', categoryName: f[3] ?? '', card: f.slice(4).join(' ').trim() });
+  });
+  // Łączenie par z jednego pliku. Wiersz z pustą kategorią to zawsze nowa płatność (pierwszy zapis). Wiersz z wyborem
+  // z listy (kategoria, „Później” albo „Pomiń”) uzupełnia najbliższy wcześniejszy, jeszcze niepołączony pierwszy zapis
+  // tej samej płatności; bez pary jest samodzielną płatnością (format z poprzedniej wersji instrukcji).
+  const entries = [];
+  for (const r of rows) {
+    if (!norm(r.categoryName)) {
+      entries.push(r);
+      continue;
+    }
+    const partner = [...entries].reverse().find((e) => !e.paired && !e.standalone && !norm(e.categoryName) && isSameApplePay(e, r));
+    if (partner) {
+      partner.categoryName = r.categoryName;
+      partner.paired = true;
+    } else entries.push({ ...r, standalone: true });
+  }
+  const txs = [];
+  for (const e of entries) {
+    // „Pomiń” z listy: płatność nie trafi do dziennika (a wczytana wcześniej bez kategorii zostanie usunięta).
+    const skip = norm(e.categoryName) === norm(SKIP_CATEGORY);
+    const category = findCategory(fin.categories, e.categoryName);
+    const ruleCat = category ? null : applyRules(e.merchant, fin.rules);
     txs.push({
       type: 'wydatek',
-      amount: Math.abs(amount),
-      date: when.date,
-      time: when.time,
-      merchant,
-      categoryId: category?.id ?? applyRules(merchant, fin.rules),
-      accountId: accountForCard(fin.accounts, card),
-      card: card || undefined,
+      amount: e.amount,
+      date: e.date,
+      time: e.time,
+      merchant: e.merchant,
+      categoryId: category?.id ?? ruleCat,
+      catAuto: ruleCat ? true : undefined,
+      accountId: accountForCard(fin.accounts, e.card),
+      card: e.card || undefined,
       source: 'applepay',
-      importKey: `ap|${when.date}|${when.time ?? ''}|${Math.abs(amount).toFixed(2)}|${norm(merchant)}`,
+      importKey: `ap|${e.date}|${e.time ?? ''}|${e.amount.toFixed(2)}|${norm(e.merchant)}`,
+      apSkip: skip || undefined,
+      apCategory: category ? true : undefined, // kategoria wybrana na liście w Skrótach
     });
-  });
-  return { txs, errors };
+  }
+  return { txs, errors, lines };
 }
 
 // Plik CSV z banku: wykrywanie separatora, cudzysłowy, znaki nowej linii w polach.
@@ -265,8 +297,39 @@ export function mergeImported(fin, txs, { now = Date.now(), newId } = {}) {
   const keys = new Set(live.filter((t) => t.importKey).map((t) => t.importKey));
   const fresh = [];
   let crossSource = 0;
+  let updated = 0;
+  let removed = 0;
+  let duplicates = 0;
+  const changed = new Map();
+  // Kategoria albo „Pomiń” z listy w Skrótach dla płatności wczytanej wcześniej bez kategorii (albo z kategorią z reguły).
+  // Kategorii wybranej ręcznie w aplikacji nie zmieniamy.
+  const applyChoice = (prev, t) => {
+    const cur = changed.get(prev.id) ?? prev;
+    if (cur.deleted || (cur.categoryId && !cur.catAuto)) return false;
+    if (t.apSkip) {
+      changed.set(prev.id, { ...cur, deleted: true, updatedAt: now });
+      removed++;
+      return true;
+    }
+    if (!t.apCategory || !t.categoryId || t.categoryId === cur.categoryId) return false;
+    changed.set(prev.id, { ...cur, categoryId: t.categoryId, catAuto: undefined, updatedAt: now });
+    updated++;
+    return true;
+  };
   for (const t of txs) {
-    if (keys.has(t.importKey)) continue;
+    if (keys.has(t.importKey)) {
+      const prev = t.source === 'applepay' && (t.apCategory || t.apSkip) ? live.find((o) => o.importKey === t.importKey) : null;
+      if (!prev || !applyChoice(prev, t)) duplicates++;
+      continue;
+    }
+    if (t.source === 'applepay' && (t.apCategory || t.apSkip)) {
+      const prev = live.find((o) => o.source === 'applepay' && isSameApplePay(o, t));
+      if (prev) {
+        if (!applyChoice(prev, t)) duplicates++;
+        continue;
+      }
+      if (t.apSkip) continue;
+    }
     const other = t.source === 'csv' ? 'applepay' : t.source === 'applepay' ? 'csv' : null;
     const twin = other && live.find((o) => o.source === other && isSamePayment(o, t));
     if (twin) {
@@ -275,9 +338,11 @@ export function mergeImported(fin, txs, { now = Date.now(), newId } = {}) {
       continue;
     }
     keys.add(t.importKey);
-    fresh.push({ ...t, id: newId ? newId() : `${now}-${fresh.length}`, createdAt: now, updatedAt: now });
+    const { apSkip, apCategory, ...clean } = t;
+    fresh.push({ ...clean, id: newId ? newId() : `${now}-${fresh.length}`, createdAt: now, updatedAt: now });
   }
-  return { fin: { ...fin, txs: [...fin.txs, ...fresh], updatedAt: now }, added: fresh.length, skipped: txs.length - fresh.length, crossSource };
+  const txsOut = fin.txs.map((x) => changed.get(x.id) ?? x);
+  return { fin: { ...fin, txs: [...txsOut, ...fresh], updatedAt: now }, added: fresh.length, skipped: duplicates + crossSource, crossSource, updated, removed };
 }
 
 export function validateFinTx(t, fin) {
@@ -464,17 +529,22 @@ export function convert(market, amount, from, to, date) {
 // Pozycje na koncie inwestycyjnym („partie”): { asset: ticker albo 'manual', qty, price (za sztukę, w walucie aktywa), date }.
 // Cena aktywa z rynku: notowanie, jeśli świeże, albo cena zakupu przesunięta o zmianę indeksu od dnia zakupu
 // (tak samo jak w zakładce Portfel). Aktywo z wyceną ręczną ma historię wycen w polu marks.
-export const lotCurrency = (market, lot) => (lot.asset && lot.asset !== 'manual' ? market?.assets?.[lot.asset]?.currency : lot.currency) || 'PLN';
+// Instrument z katalogu XTB ma walutę zapisaną przy pozycji – wycena działa także bez notowań.
+export const lotCurrency = (market, lot) => (lot.asset && lot.asset !== 'manual' ? market?.assets?.[lot.asset]?.currency ?? lot.currency : lot.currency) || 'PLN';
 
 export function lotPrice(market, lot, date) {
   if (!lot.asset || lot.asset === 'manual') return pairAt(lot.marks?.length ? lot.marks : [[lot.date, lot.price]], date)[1];
   const a = market?.assets?.[lot.asset];
   if (!a) return lot.price;
   const q = a.quotes?.length ? pairAt(a.quotes, date) : null;
-  if (q && q[0] <= date && daysBetween(q[0], date) <= 7) return q[1];
-  const s0 = pairAt(a.series, lot.date);
+  const quote = q && q[0] <= date ? q : null;
+  if (quote && daysBetween(quote[0], date) <= 7) return quote[1];
+  // Najnowsza znana cena – notowanie (jeśli późniejsze niż zakup) albo cena zakupu – przesunięta o zmianę indeksu.
+  const base = quote && quote[0] > lot.date ? quote : [lot.date, lot.price];
+  if (!a.series?.length) return base[1];
+  const s0 = pairAt(a.series, base[0]);
   const s1 = pairAt(a.series, date);
-  return s0 && s1 && s0[1] > 0 ? (lot.price * s1[1]) / s0[1] : lot.price;
+  return s0 && s1 && s0[1] > 0 ? (base[1] * s1[1]) / s0[1] : base[1];
 }
 
 // Pozycja liczy się od daty zakupu, a gdy jej wartość była wcześniej w saldzie gotówki (rozliczenie przy dodaniu) –
@@ -508,7 +578,8 @@ export function accountWorth(fin, account, market, date, balance = balances(fin,
 // Majątek: suma aktywnych kont w złotych (zadłużenie kart odejmuje się samo, bo saldo karty jest ujemne).
 // Konta „nie wliczaj do salda łącznego” są pomijane, a konta bez kursu waluty trafiają do listy missing.
 export function netWorth(fin, market = null, date = null) {
-  const at = date ?? market?.asOf ?? new Date().toISOString().slice(0, 10);
+  // Domyślnie wycena na dziś (jak na liście kont): najnowsze kursy i notowania, także z biblioteki instrumentów.
+  const at = date ?? new Date().toISOString().slice(0, 10);
   const bal = balances(fin, date ?? '9999-12-31');
   const out = { total: 0, assets: 0, debt: 0, cardDebt: 0, investments: 0, missing: [] };
   for (const a of fin.accounts) {

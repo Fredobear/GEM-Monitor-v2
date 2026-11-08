@@ -9,6 +9,7 @@ import { loadMacro } from './macro.js';
 import { loadNews } from './news.js';
 import { aiCommentary } from './ai.js';
 import { buildPrices } from './prices.js';
+import { buildQuotes, loadCatalog, loadWatchlist, readNotowania } from './instruments.js';
 import { loadTaxNews, dueReminders, upcoming, aiTaxReport, compareWithConfig } from './taxmonitor.js';
 import { writeDashboard } from './dashboard.js';
 import { send, channels, signalMessage, previewFlipMessage, digestMessage, errorMessage, reminderMessage, taxNewsMessage, stripTags } from './notify.js';
@@ -21,6 +22,11 @@ export async function loadConfig(root) {
 
 export async function loadPodatki(root) {
   return (await import(pathToFileURL(path.join(root, 'config', 'podatki.js')).href)).default;
+}
+
+// Link do edycji listy obserwowanych instrumentów w repozytorium (GitHub Actions podaje nazwę repozytorium i gałęzi).
+export function watchlistEditUrl(env) {
+  return env.GITHUB_REPOSITORY ? `https://github.com/${env.GITHUB_REPOSITORY}/edit/${env.GITHUB_REF_NAME || 'main'}/config/obserwowane.txt` : null;
 }
 
 export function pagesUrl(env) {
@@ -65,7 +71,7 @@ export async function run({ flags = new Set(), root, env = process.env, now = ne
     state.lastError = { at: now.toISOString(), message: err.message };
     if (dry) throw err;
     const last = await readJson(path.join(docsDir, 'data', 'latest.json'));
-    await writeDashboard(docsDir, { ...(last ?? {}), config, research, podatki, prices: previousPrices, meta: { ...(last?.meta ?? {}), generatedAt: now.toISOString(), error: err.message } });
+    await writeDashboard(docsDir, { ...(last ?? {}), config, research, podatki, prices: previousPrices, library: { editUrl: watchlistEditUrl(env) }, meta: { ...(last?.meta ?? {}), generatedAt: now.toISOString(), error: err.message } });
     if (state.lastErrorNotified !== today && channels(env).length) {
       await send(errorMessage({ error: err.message, lastSignal: state.official?.ticker, dashboardUrl }), { env, dashboardUrl });
       state.lastErrorNotified = today;
@@ -88,6 +94,16 @@ export async function run({ flags = new Set(), root, env = process.env, now = ne
     priceWarnings.push(...prices.warnings);
   } catch (err) {
     priceWarnings.push(`Ceny do wyceny portfela nie zostały odświeżone: ${err.message}`);
+  }
+
+  // Biblioteka instrumentów XTB: kursy z GPW i NewConnect, obserwowane z USA, wycena ETF-ów UCITS przez indeks-proxy.
+  const library = { editUrl: watchlistEditUrl(env) };
+  try {
+    library.catalog = await loadCatalog(root);
+    library.notowania = await buildQuotes({ config, catalog: library.catalog, market, previous: await readNotowania(docsDir), watchlist: await loadWatchlist(root), env, now });
+    priceWarnings.push(...library.notowania.warnings.map((w) => `Biblioteka instrumentów – ${w}`));
+  } catch (err) {
+    priceWarnings.push(`Biblioteka instrumentów nie została odświeżona: ${err.message}`);
   }
 
   const isNewOfficial = state.official?.forMonth !== official.forMonth;
@@ -130,7 +146,7 @@ export async function run({ flags = new Set(), root, env = process.env, now = ne
 
   const warnings = [...market.warnings, ...priceWarnings, ...(macro.errors ?? []).map((e) => `Wskaźniki: ${e}`), ...(news.errors ?? []).map((e) => `Wiadomości: ${e}`), ...(taxNews.errors ?? []).map((e) => `Podatki: ${e}`)];
   const meta = { generatedAt: now.toISOString(), dataSource: `${market.source}${market.check ? ` (kontrola: ${market.check.source})` : ''}`, warnings: market.warnings, crossCheck: market.check };
-  await writeDashboard(docsDir, { signals, explanation, macro, news, ai, research, config, podatki, prices, taxMonitor, meta });
+  await writeDashboard(docsDir, { signals, explanation, macro, news, ai, research, config, podatki, prices, taxMonitor, meta, library });
 
   log(`Sygnał na ${official.forMonth}: ${explanation.action.text} (${explanation.stabilityText})`);
   if (preview) log(`Podgląd (${preview.asOf}): ${config.assets[preview.decision.asset].xtb.ticker}${preview.differsFromOfficial ? ' – RÓŻNI SIĘ' : ''}`);

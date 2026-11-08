@@ -174,7 +174,7 @@ Strategia ma sens dla kogoś, kto boi się spadku o połowę bardziej niż słab
 
 ### 5.1 Instrumenty
 
-Wszystkie instrumenty sprawdzono w ofercie na xtb.com/pl 2 listopada 2026 r.
+Wszystkie instrumenty sprawdzono w ofercie na xtb.com/pl 2 listopada 2026 r., a 7 listopada 2026 r. porównano je ze wszystkimi alternatywami z tabeli specyfikacji instrumentów XTB (OMI, obowiązuje od 5.10.2026).
 
 | Rola w GEM | Indeks | Ticker XTB | ETF | ISIN | Rynek, waluta | TER |
 |---|---|---|---|---|---|---:|
@@ -190,10 +190,29 @@ Alternatywy dostępne w XTB:
 
 TER pochodzi od emitentów. Przed pierwszym zakupem sprawdź dokument KID.
 
-Dlaczego te fundusze:
-- **UCITS:** ETF-y notowane w USA (SPY, AGG) nie są dostępne dla inwestorów detalicznych z UE, bo nie mają dokumentu KID.
-- **Akumulujące:** dywidendy są reinwestowane w funduszu, co odpowiada stopie zwrotu całkowitego używanej w sygnale.
-- **Notowane w USD**, gdzie to możliwe.
+#### Dlaczego akurat te fundusze
+
+Sygnał liczę na amerykańskich ETF-ach (SPY, ACWX, AGG, BIL), bo mają długą, codzienną historię z dywidendami. Kupić ich w XTB nie można, więc dla każdej roli wybrałem fundusz UCITS według kryteriów, w tej kolejności:
+
+1. **Ten sam indeks co sygnał.** Wtedy kupujesz dokładnie to, co strategia zmierzyła, a różnica wyników to tylko koszty.
+2. **UCITS z dokumentem KID.** ETF-y z USA są dla klientów detalicznych z UE niedostępne (brak KID).
+3. **Fundusz irlandzki.** Umowa USA–Irlandia obniża podatek u źródła od dywidend z USA do 15% (fundusze z innych krajów płacą zwykle 30%). Inwestor spoza USA nie podlega też amerykańskiemu podatkowi spadkowemu.
+4. **Akumulujący.** Dywidendy zostają w funduszu, tak jak w stopie zwrotu całkowitego, na której liczony jest sygnał. Na koncie zwykłym nie ma corocznego podatku od wypłat, a na IKE/IKZE nie trzeba reinwestować gotówki.
+5. **Niski koszt i duża płynność.** Spośród zgodnych funduszy w XTB wybrałem najtańsze z największymi obrotami, czyli z najwęższym spreadem.
+6. **Replikacja fizyczna.** Fundusz trzyma prawdziwe akcje i obligacje, bez ryzyka kontrahenta swapu.
+7. **Notowanie w walucie funduszu (USD)**, gdy to możliwe. Na subkoncie USD nie ma wtedy żadnego przewalutowania. Na IKE/IKZE (tylko PLN) każda linia niezłotowa kosztuje tak samo 0,5%, więc liczy się płynność. Doradca waluty w zakładce Sygnał podpowiada najtańszy wariant dla Twojego rachunku.
+
+Ocena każdej roli na tle wszystkich alternatyw w XTB:
+
+| Rola | Wybór | Zgodność z sygnałem | Alternatywy w XTB i dlaczego nie |
+|---|---|---|---|
+| Akcje USA | CSPX.UK | ✅ ten sam indeks (S&P 500), najniższy TER w grupie, największy ETF UCITS na S&P 500 | SXR8.DE – ten sam fundusz w EUR (dobry na koncie z EUR). VUAA.DE (Vanguard, TER 0,07%) – równorzędny. SPXS.UK i I500 – replikacja syntetyczna (swap), historycznie ok. 0,2–0,3 pp rocznie lepsze dzięki braku podatku od dywidend z USA, ale z ryzykiem kontrahenta (ograniczonym przepisami UCITS). IUSA, SPY5 – dystrybuujące. ETFBSPXPL.PL – w PLN z zabezpieczeniem walutowym, bez przewalutowania na IKE, ale to inny wynik niż sygnał i wyższe koszty. |
+| Akcje poza USA | EXUS.DE | ⚠️ kompromis: sygnał liczony na MSCI ACWI ex USA, a fundusz obejmuje tylko rynki rozwinięte (World ex USA, ok. 72% indeksu) | W XTB nie ma żadnego ETF-u UCITS na ACWI ex USA (sprawdzone w pełnej tabeli). IXUA.DE (iShares) – ten sam indeks co EXUS, mniejsze obroty. EXU1.DE – dystrybuujący. XMWX.UK – EXUS w GBP. Wierne odtworzenie: ok. 72% EXUS.DE + 28% EIMI.UK (rozdz. 5.2). |
+| Obligacje | IUAA.UK | ✅ ten sam indeks co AGG (Bloomberg US Aggregate), który był bezpieczną przystanią w oryginale Antonacciego | Jedyny akumulujący fundusz na ten indeks w USD. IUAG.UK – dystrybuujący. CBU0.UK (obligacje skarbowe 7–10 lat, TER 0,07%) – tańszy, ale to inny indeks: dłuższy czas trwania, więcej zyskuje przy spadku stóp i więcej traci przy wzroście (2022). AGGU.UK – obligacje globalne, inna ekspozycja. |
+| Bony skarbowe | IB01.UK | ✅ bardzo bliski BIL: obligacje skarbowe USA do 1 roku (ok. 0,5 roku czasu trwania) zamiast bonów 1–3-miesięcznych; różnica w stopie zwrotu to ułamki punktu | U03A.UK (0–3 miesiące) – jeszcze bliżej BIL, ale znacznie mniejsze obroty. PR1T/PR1H (Amundi), T1EU/TRD1 (Invesco), BBLL.DE (JPM) – równorzędne, notowane w EUR. |
+| Rynki wschodzące (wariant rozszerzony) | EIMI.UK | ✅ ten sam indeks co IEMG (MSCI EM IMI), największy ETF UCITS na rynki wschodzące | IS3N.DE i EMIM.UK – ten sam fundusz w EUR i GBP. VFEA.DE (Vanguard FTSE EM) – inny dostawca indeksu (bez Korei Południowej w rynkach wschodzących). |
+
+Wniosek: cztery z pięciu ról mają w XTB fundusz na dokładnie ten sam indeks, na którym liczony jest sygnał. Jedynym realnym kompromisem są akcje poza USA (brak rynków wschodzących w EXUS.DE). Jeśli chcesz pełnej zgodności, kupuj w tej roli ok. 72% EXUS.DE i 28% EIMI.UK albo wybierz wariant rozszerzony. Z punktu widzenia kosztów warto rozważyć jeszcze tylko syntetyczny fundusz na S&P 500 (SPXS.UK) – to decyzja między ok. 0,2–0,3 pp rocznie a ryzykiem kontrahenta.
 
 ### 5.2 Problem akcji poza USA
 

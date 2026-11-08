@@ -64,8 +64,8 @@ export function cashPLN(tx, fx) {
   return rate ? tx.quantity * tx.price * rate : null;
 }
 
-// Cena instrumentu w jego walucie w dniu iso: notowanie (jeśli świeże) albo ostatnia znana cena
-// (transakcja lub ręczna wycena) przesunięta o zmianę indeksu-proxy.
+// Cena instrumentu w jego walucie w dniu iso: notowanie (jeśli świeże), a w przeciwnym razie najnowsza znana cena –
+// notowanie albo cena z transakcji lub ręcznej wyceny – przesunięta o zmianę indeksu-proxy.
 export function makePricer(prices, txs) {
   const anchors = {};
   for (const t of sortTx(activeTx(txs))) {
@@ -77,13 +77,15 @@ export function makePricer(prices, txs) {
     const quote = inst?.quotes?.length ? lastOnOrBefore(inst.quotes, iso) : null;
     if (quote && dayDiff(quote[0], iso) <= 7) return quote[1];
     const anchor = anchors[ticker] ? lastOnOrBefore(anchors[ticker], iso) : null;
-    if (!anchor) return quote ? quote[1] : null;
+    const base = quote && (!anchor || quote[0] > anchor[0]) ? quote : anchor;
+    // Zakup późniejszy niż ostatnie dane (np. dzisiejszy): do czasu notowań wycena według ceny zakupu.
+    if (!base) return anchors[ticker]?.[0]?.[1] ?? null;
     if (inst?.series?.length) {
-      const s0 = lastOnOrBefore(inst.series, anchor[0]);
+      const s0 = lastOnOrBefore(inst.series, base[0]);
       const s1 = lastOnOrBefore(inst.series, iso);
-      if (s0 && s1) return (anchor[1] * s1[1]) / s0[1];
+      if (s0 && s1) return (base[1] * s1[1]) / s0[1];
     }
-    return anchor[1];
+    return base[1];
   };
 }
 
