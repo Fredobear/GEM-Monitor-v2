@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-06T07:20:50.614Z",
+  "generatedAt": "2026-11-08T09:46:01.829Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -50,14 +50,14 @@
    "changed": false
   },
   "preview": {
-   "asOf": "2026-11-05",
+   "asOf": "2026-11-06",
    "returns": {
-    "US": 0.09344376854838421,
-    "EXUS": 0.11813639176734525,
-    "TBILLS": 0.03669271012514774,
-    "BONDS": 0.007383617396909514,
-    "DEVX": 0.12801199758476867,
-    "EM": 0.06518803179414112
+    "US": 0.10875609165964817,
+    "EXUS": 0.12505122754769626,
+    "TBILLS": 0.03691953268053072,
+    "BONDS": 0.0029380790691893033,
+    "DEVX": 0.12161679274585713,
+    "EM": 0.09633086096248134
    },
    "decision": {
     "asset": "EXUS",
@@ -68,8 +68,8 @@
      "US"
     ],
     "absAsset": "US",
-    "excess": 0.05675105842323647,
-    "relativeMargin": 0.02469262321896104,
+    "excess": 0.07183655897911745,
+    "relativeMargin": 0.016295135888048096,
     "safeMargin": null,
     "nearTie": false,
     "bufferApplied": false
@@ -692,7 +692,7 @@
   ],
   "switchesInHistory": 6,
   "nextDecisionDate": "2026-11-30",
-  "lastDataDate": "2026-11-05",
+  "lastDataDate": "2026-11-06",
   "warnings": []
  },
  "explanation": {
@@ -716,7 +716,7 @@
    "level": "słaby"
   },
   "stabilityText": "Stabilność sygnału: słaby (do zmiany sygnału brakuje 1,7 pp).",
-  "previewNote": "Wstępny sygnał na dziś (dane do 5 listopada 2026) potwierdza EXUS.DE.",
+  "previewNote": "Wstępny sygnał na dziś (dane do 6 listopada 2026) potwierdza EXUS.DE.",
   "currency": [
    {
     "key": "IKE",
@@ -761,23 +761,23 @@
    {
     "id": "VIXCLS",
     "name": "VIX – „indeks strachu”",
-    "date": "2026-11-04",
-    "value": "16,6",
-    "tier": 1,
-    "comment": "umiarkowana nerwowość"
+    "date": "2026-11-05",
+    "value": "28,2",
+    "tier": 2,
+    "comment": "podwyższony strach"
    },
    {
     "id": "BAMLH0A0HYM2",
     "name": "Spread obligacji śmieciowych (USA)",
-    "date": "2026-11-04",
-    "value": "3,32 pp",
+    "date": "2026-11-05",
+    "value": "3,48 pp",
     "tier": 0,
     "comment": "niski stres kredytowy"
    },
    {
     "id": "T10Y3M",
     "name": "Krzywa rentowności USA (10L − 3M)",
-    "date": "2026-11-05",
+    "date": "2026-11-06",
     "value": "0,67 pp",
     "tier": 0,
     "comment": "normalna"
@@ -785,10 +785,10 @@
    {
     "id": "USEPUINDXD",
     "name": "Niepewność polityki gospodarczej USA (EPU)",
-    "date": "2026-11-04",
-    "value": "288",
+    "date": "2026-11-05",
+    "value": "274",
     "tier": 1,
-    "comment": "podwyższona (percentyl 75 z 5 lat, średnia 30 dni)"
+    "comment": "podwyższona (percentyl 73 z 5 lat, średnia 30 dni)"
    },
    {
     "id": "DTWEXBGS",
@@ -808,22 +808,22 @@
    }
   ],
   "usdpln": {
-   "date": "2026-11-05",
-   "rate": 3.9101,
-   "change12m": 0.05870089080226348
+   "date": "2026-11-06",
+   "rate": 3.9321,
+   "change12m": 0.06218428374618434
   },
-  "stress": 0,
-  "summary": "Wskaźniki ryzyka w normie.",
+  "stress": 1,
+  "summary": "Jeden wskaźnik ryzyka podwyższony – warto obserwować.",
   "errors": []
  },
  "news": {
-  "fetched": 323,
+  "fetched": 294,
   "items": [
    {
-    "title": "Oil Prices Rebound Following Historic Selloff as Markets Weigh Iran War Risks and U.S. Election Fallout - EnergyNow.com",
-    "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOUzNtQlZEMG02UmwxRzZfeEViVXh1dDd3Vk0zc1dXWHNVU1c1NTE1eTRFUG9obldldjg1c3l3OTdldm5SSlo1dWotRkN0MnlpaTBUSmxEb2dNTzQ5dlpJTktCX2JDWmR6MFRJdXN0dWNhcjZOaE1iSzR4c1ZOTFFJcUYtNU5pREhuNzRzNUpSR19jaWVTQ05nU04zenlyZTJkcXpyT2RfejRfR01WeS1jeERCVkx4dzNka2Y2UHdfVzhBcVpRUmw0SnU0b09JZw?oc=5",
-    "date": "2026-11-05T12:30:00.000Z",
-    "summary": "Oil Prices Rebound Following Historic Selloff as Markets Weigh Iran War Risks and U.S. Election Fallout EnergyNow.com",
+    "title": "Bullion may remain under pressure as markets track US-Iran war, inflation - Business Standard",
+    "link": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxNR2xDbjRHR19fS3lpV3FKNnNVSmYtdk4tYVVSSFJvb1lTeTJPTlNJOWJqV3ZfTmowbEZGUjBNSk9aV2JHbjMxRWtmbkhidHk2dlRkQzNoNzB4TDF1Z05WbFc2WkZWcHoxUzMtY1kzbmJtZHhRWnlhd0tfZ0tRWWN2NDZPQUU1SGgzVXlTbEV5dkFfSmNIVEVFRlJwejZMaEdmT2FlanlMLVhibzk5c2hWUndHd3lpWk11RUQtN2RkMzc1Z3JyNS1aZF9LNnhrTVdlV2pFNW4wWFU0Ync5MUpz0gHkAUFVX3lxTE9uRkhMRUloQ2hjYWMzUmZuaXVqa3dXcjFGUjZEbVFJVnNaWlUwS2kya3lubGpuOFdSLWdBQmYtNDNXZ3V5Q2hEdjVvRm5RSEQ0RWVVOWFncXdEdVNlSlp1ZFd4emVCTThjdExJZEtJMGhvSDlfQjZGSWdPWHZFUzFZcE1qaVVXVEh6SFZUUXZQVHJTMS1FUDlzTjVOQ3JCX3liQlNPR0hXQ21MOWttZTRQWS1XUmtqVml5VHE2bHZJRVE0NENKV3o4T3JJLUdtNjBxTXJRb2VvajZkVnFyNlFvVGtmQQ?oc=5",
+    "date": "2026-11-08T06:17:09.000Z",
+    "summary": "Bullion may remain under pressure as markets track US-Iran war, inflation Business Standard",
     "source": "Google News",
     "regions": [
      "USA",
@@ -831,85 +831,34 @@
     ],
     "themes": [
      "Konflikty i wojny",
-     "Wybory i polityka",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 11
-   },
-   {
-    "title": "RPP może uniknąć podwyżek stóp. Kluczowe będą ceny energii i paliw",
-    "link": "https://www.bankier.pl/wiadomosc/RPP-moze-uniknac-podwyzek-stop-Kluczowe-beda-ceny-energii-i-paliw-9224541.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-05T18:14:00.000Z",
-    "summary": "Są duże szanse na uniknięcie podwyżek stóp procentowych w związku z lepszą sytuacją na rynku surowców i rosnącym prawdopodobieństwem przedłużenia CPN - ocenił analityk Piotr Bielski z banku Erste. Dodał, że w takim scenariuszu inflacja, mimo iż wzrośnie, to nieznacznie powyżej 4 proc. w I kw. 2027 r",
-    "source": "Bankier.pl",
-    "regions": [
-     "Polska"
-    ],
-    "themes": [
-     "Banki centralne i stopy",
-     "Energia i surowce",
      "Inflacja i recesja"
     ],
     "relevant": true,
     "score": 9
    },
    {
-    "title": "Copper Moves Lower as US Election Undermines AI and Tariff Trade - Bloomberg.com",
-    "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPWnlsdF9sNDNwY0VTbjBVa1QwUmFYZXJQUWhfcEdtSF9NUWFlNS1KOTh5RW1EcXQ3NUpsVnFVazZsSmRBZ01pUkRkVFRRTXlvWkcxUjFzYVlMa2d3YmZqaWs0dXBzLTBWNE5MZ19wWW1LQldvbFJSNUM4MzBnUUZsYVlDczRmLWI3UnZ2WTFxT1VwWkFWZHBUdXYyUWlZeE9XSWVxTDhSSmxyUktGb0dIaXMyUnJqdw?oc=5",
-    "date": "2026-11-06T03:57:00.000Z",
-    "summary": "Copper Moves Lower as US Election Undermines AI and Tariff Trade Bloomberg.com",
-    "source": "Google News",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Sankcje i cła",
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Reakcja rynków na wyniki wyborów w USA. Tanieje ropa, a giganci branży AI tracą - Polskie Radio 24",
-    "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOODZZT3BfbEQ5WVZ2dHBfWV8yY3RuSWhxRjh6TUgyVnZuY1F6WldzbTVzeEY3U0tEajZHSkc4LUtpdkQtTFBvWFJ6YldoVE5XSDhnZW14Z0JIbW5CdGc3Tkc3ZF9wU2pyb3pVMEVZajFqNVI4RzRJaDdxNU13YmVBVTNzcnp3TzZPbktHUHpQclBSUFpJSmRWZXQ2cGRYek56SnNleDNzNA?oc=5",
-    "date": "2026-11-05T08:10:57.000Z",
-    "summary": "Reakcja rynków na wyniki wyborów w USA. Tanieje ropa, a giganci branży AI tracą Polskie Radio 24",
-    "source": "Google News PL",
-    "regions": [
-     "USA",
-     "Polska"
-    ],
-    "themes": [
-     "Wybory i polityka",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Wybory w USA, napięcia wokół TK i NBP. Czy polityka i AI zatrzęsą rynkami? PB RYNKI - pb.pl",
-    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNSG1fZ1JpcGNzWmRXQjIxaTB3NmFQOGZ6ZVAwb05UT1prWlJuM3J2VnB2b1dxQ3NGc1o4MTlua2p5SlhVV2dUNzFBY25Rc25jU2pFVmtCZXBLeXNqS1NIM1p0RjN3emMzeTRVZERrUlBsMV8yTmZENnRDTFNvM3FnUS1wTDBCa3JORGltc01VN2hCWG9XMUl6aTNEUV82NjRoRXpwbkx1dmcwdw?oc=5",
-    "date": "2026-11-04T12:03:00.000Z",
-    "summary": "Wybory w USA, napięcia wokół TK i NBP. Czy polityka i AI zatrzęsą rynkami? PB RYNKI pb.pl",
-    "source": "Google News PL",
+    "title": "Tym będą żyły rynki: inflacyjny test dla USA i prawda o polskim PKB",
+    "link": "https://www.bankier.pl/wiadomosc/Tym-beda-zyly-rynki-inflacyjny-test-dla-USA-i-prawda-o-polskim-PKB-9224737.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-06T09:00:00.000Z",
+    "summary": "Drugi tydzień listopada przyniesie inwestorom przede wszystkim kluczowe odczyty inflacyjne ze Stanów Zjednoczonych, które będą kształtować rynkowe oczekiwania wobec dalszej ścieżki stóp procentowych Fed. Z perspektywy krajowego rynku najważniejszy będzie piątek, kiedy GUS przedstawi wstępny szacunek",
+    "source": "Bankier.pl",
     "regions": [
      "USA",
      "Polska"
     ],
     "themes": [
      "Banki centralne i stopy",
-     "Wybory i polityka"
+     "Inflacja i recesja"
     ],
     "relevant": true,
     "score": 8
    },
    {
-    "title": "U.S. election fallout exposes new risks for AI infrastructure and energy markets - Oil & Gas 360",
-    "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPWUdYZ3ZvczJCWkh2TjNQaF9udm1LSVZYUEp3MVdvdGRsUFhuZHlwTEJ4QUd2ZEZTeEQ5VTgwMExMRkVQb25vNWxZd0RTWnZ6OFEwd3daZFJGMW0xaVgxQUxNMFI1cXR6WGFmX1NQWkI0Q0trTkZrRUhCSkx0OHpleVVDWDY3eF9SMGZ0Z2dnZDhSeVQ5cXNEZG02MnpvVzFjeXBHMWZnYUZycGpxR0E?oc=5",
-    "date": "2026-11-06T00:00:45.000Z",
-    "summary": "U.S. election fallout exposes new risks for AI infrastructure and energy markets Oil & Gas 360",
-    "source": "Google News",
+    "title": "Największy tygodniowy spadek cen ropy od 2020 roku. W tle wybory w USA i negocjacje - Bankier.pl",
+    "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQNXJpa0R3d3plazRIQTFGSEdhM3FOMk12a2IwaFZnX3NfZjlGUkZNa01ITXNRbnY4N1NkbktBODZVWTgtcE1MWlZ4VnBXb3F2MlAyV0xteXJiZVA0NFFyeDRzQmlCb3puNC1zQUR1clNzR3NRRnJTUl90N2pKNTVJZjJrRkdIUEMxTGx2NTN3YjdkYjdWbklPcTRsMGV0WXcxZmV3R3VhbjdhM2NaQnRfancwMm8zX3RWZWhXanhENVIzdW1CSHhF?oc=5",
+    "date": "2026-11-06T07:55:00.000Z",
+    "summary": "Największy tygodniowy spadek cen ropy od 2020 roku. W tle wybory w USA i negocjacje Bankier.pl",
+    "source": "Google News PL",
     "regions": [
      "USA"
     ],
@@ -921,10 +870,10 @@
     "score": 7
    },
    {
-    "title": "Nasdaq sees worst day in 18 months as investors bet on AI slowdown after Democrats’ election triumph - The Guardian",
+    "title": "Nasdaq sees worst day in 19 months as investors bet on AI slowdown after Democrats’ election triumph - The Guardian",
     "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPMWdpd3MxX005Y1RwQUo5WkxPVzlNRGpxMGJPcWV4WHd6TWh4a1Y5YUdrLXhYTEplalpXSE03S0NqX0xLcHIwbzBOdjI1VEJGdVdmSDlhejNMd2lnb3lJQTBtT21yVkxSTGh3RFFGUXZ5UTRPa0tQSUZZRjJhbFBFTkJxWjkzaTFhanpScXU1Y0lYdElWNVJzMDB2UHVjSEZUZUJUdHpQSWd0c2IzX2ZhMGQ0dlluRU1OekpvOVVWN2g1aUxmTVZhUEVWLVA?oc=5",
     "date": "2026-11-05T17:31:00.000Z",
-    "summary": "Nasdaq sees worst day in 18 months as investors bet on AI slowdown after Democrats’ election triumph The Guardian",
+    "summary": "Nasdaq sees worst day in 19 months as investors bet on AI slowdown after Democrats’ election triumph The Guardian",
     "source": "Google News",
     "regions": [
      "USA"
@@ -937,57 +886,10 @@
     "score": 7
    },
    {
-    "title": "DZIEŃ NA GPW: Przed otwarciem GPW rosną kontrakty w Europie, rynki analizują wybory w USA - Portal Samorządowy",
-    "link": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxNeWI0d2VXclZGeURjT3podjVIWDktZ3hqb28teWpLNnpYcjljajJRMGtZeDJqOUpLb1F0UU8tNUFrUU5JWGQtdWZEV204a1BNajAzUmFIRHVxV0NVdldCeU1aQ3dlam5UYkpReHBPOTlkWmhzeHJzc1RrdkFyc2trdXFveUlkbUdJNHRucDZVN25TT2VEX3JwQU5rZXNTbFJtSVJMR2NNdm50ckItUl94TmthOUN1N3pVT09pakY0d1plbF9GckNxelZ5dG11dG9MamFXVTA0R2F2UG5BLUZmeTNjX0FKc3lEN25rbTd3?oc=5",
-    "date": "2026-11-05T07:37:52.000Z",
-    "summary": "DZIEŃ NA GPW: Przed otwarciem GPW rosną kontrakty w Europie, rynki analizują wybory w USA Portal Samorządowy",
-    "source": "Google News PL",
-    "regions": [
-     "USA",
-     "Europa",
-     "Polska"
-    ],
-    "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "S&P 500 Edges Up as Oil Falls on US Election Day: Markets Wrap - Bloomberg.com",
-    "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxOTGEyREpLdzRYM3VsY3NTclQ1Y2xud2pYNVl6Y0JhZ3RNczRVVjJ0aG43NmgyWkQ5SU85SmtVWGVCU0wySnBTdkhzZXR3R3RpMWloMWdlckxKM3BBUFB4VU9FbzhDQ2l2dm5xZlIwbFZJTHdJQVVyaU1Qc3djSmowcHdGMDNOVUIyMDdURnFwWWpUbmZN?oc=5",
-    "date": "2026-11-03T21:23:57.000Z",
-    "summary": "S&P 500 Edges Up as Oil Falls on US Election Day: Markets Wrap Bloomberg.com",
-    "source": "Google News",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Consumer Watch: Election Results Rattle Oil Markets - NBC Palm Springs",
-    "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQeWUydDk5V2lXMkczNkQxb2xTVFYwZDZzZkxCZWZCSmNjTlVRR1Z1ZU9wcE44aUFmWm53dVd5X0EyLXFnS1RmNTlSbmdEVi1fYUZ3dFZZRl9BU0hTTEZYMUE1ZGg2Mi1wZEsxRGNSY19jYkpQVDhJSVdibk84TWdPWjcwQ0lNWEFaaDJock94Yko4ejh6dUp2alU1Q0cxc2cxcG41QzhTZ1M0T1d1?oc=5",
-    "date": "2026-11-06T04:30:00.000Z",
-    "summary": "Consumer Watch: Election Results Rattle Oil Markets NBC Palm Springs",
-    "source": "Google News",
-    "regions": [],
-    "themes": [
-     "Wybory i polityka",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Live Q&A: How Trump’s Midterms Defeat Affects Asia, From Markets Rout to Tariffs - Bloomberg.com",
-    "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPOTlNZzdPcThZUFFkRDE4NkZTMUEzTTd6SEI2N0I5LUZpTEFDU1pqS3NuYUpsa1lBdVNZenp0bmVjQ3VnTWp4Ymsxb2ZWTS1lYmpldW9LaXZWMElReVA3ZGNBYXR5LXRjTWlEOUhxMnlPTURyQi03ZjJXTjFka01sMHptZGRhSTYwVU01V2lsbVNBQ0dsYUo3a2laNUVEMUFzWDlCUnN0SEF6d2dSTVhYaG5GdFBZVmF3M1EyZVU5MUx2UVBsWHdJ?oc=5",
-    "date": "2026-11-06T02:30:00.000Z",
-    "summary": "Live Q&A: How Trump’s Midterms Defeat Affects Asia, From Markets Rout to Tariffs Bloomberg.com",
+    "title": "3 New Zealand Export Stocks Less Exposed To US Tariffs - Simply Wall St",
+    "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOSndLOUc1RXprTXBWZ2ZOQUNPTGJYcEcwajZ0bWZWdzh4SUlkenlTNFlPcnd0aEotaFpfZTgyY3ZlcnpkOG51RThyNFZ4WW9OZzhsanZkRXZFOWd5VjV3Nl82REZ6NmxHZXNPb1pqdWhzMDVRZFRvT05JTG5CeWpSQ0NqakQ1VlVDRUF6Sjd6YkVxdHRpSGR0V0xlbDhvTzRKQ3ViWnJuOV9xb2Jhb2paLTA0Y2wtZWNsMnphMGFuVHLSAcYBQVVfeXFMTms4amU1VDl0dmZtNl9LZUJYb0hhaEJhNTFiUEdxUGFTZzI3V3NzX09UekpRdHE1QWpzS0lCa3JuenZlNDlsNjJNaVZWUVdHZlZWRjg1YmhVWmJyRHVjWXJFVGYzZXNuVFVSSHhJQ3dzTjkzWC1TRml5TTd6M0M5VHA1RXQ4YXFvOXRHeHdhVWRXa2JmZzRQT1h3N3JOM1NScjYzWW5SQWJSVnNhT3JCNjJsd1pLVVZtREF6SzAwYTZKMXJqYjhB?oc=5",
+    "date": "2026-11-08T07:16:46.000Z",
+    "summary": "3 New Zealand Export Stocks Less Exposed To US Tariffs Simply Wall St",
     "source": "Google News",
     "regions": [
      "USA"
@@ -999,15 +901,33 @@
     "score": 6
    },
    {
-    "title": "Gas Prices Could Fall Below $4 as Election Results Rattle Oil Markets - WQOW",
-    "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPUjMwTEUzQ0tSaFJhVTJqdkszbVVyYkxnanVHNHIwa1c4LW9nb2VUYTJNSEdSVTlxTHJFVTBPRGdYcmZJOGw2czlnN19FUF9fcjVjakpGQk1hT2lPcDJoQzRvOHdaLVRDUUljd1ZuZGhINmpqMTNMbUZQNW5qTzNCc0FVcV9Nd0FyLU5TZFc5TmNlTnNUOThaN000QmFQMFpGUmloU1NfVlR4ZFAxbjIxZDM0Zmt1VFNZYmtmSG1QZy1lYjcteE5CaFdtQ1gxRFd0OGlnV1hkSXo5SGs?oc=5",
-    "date": "2026-11-05T14:17:00.000Z",
-    "summary": "Gas Prices Could Fall Below $4 as Election Results Rattle Oil Markets WQOW",
+    "title": "How anti-AI trade after US midterm election results is reviving Indian, Chinese stocks - Livemint",
+    "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQQkxWZXJKVS1JRWRfLXZiZ0Zxc2xHczVvRVRUMThacVM1YXNSZWdiSThudEx1aEd5SWVsbHFob1NyUmdFNm1aZUxva3JRcTdjTTgxZHRXanh6b2wta1VNWHQ0cWZwc09uSVVoOVZVWGVsMkFCam13a0c4OGcyS196eUNPMkt0aFF4MlcwZFJlUWVIRjlfN1NxcWg1OGNzelJ3dGp4V09tM0NuYUxSSUZRRnh2US05S290ai1SdXprcTZ6aFpCWUktM3dCWTlaeFozWnN30gHYAUFVX3lxTE1YWnA3V0VQa1JTenE4OGJRWHpRTVVmNmxCbDVmTFZLQVdCckFTU1V1MjlwWFYzS0ZXM2FwaXhQclV2cElaTU9oRE5UTWtkanNIVXFyVlJqNHRuNHFMY2lldFRyaW9iNmxWVC1mM3ZBcjVQUW5EYmlOYVJkajhPRWFVajcxVGJFVW8yUEtKakRacW1HQ0JfdndPWkFLZS1icnVqMW9aUHR4TzFLTHBIdUduWEVfVW5DZThXQ2VQLTlsZ19Pb2UxS0hTbHVlbUxBM1Z5VlZtMEJpcw?oc=5",
+    "date": "2026-11-08T01:34:37.000Z",
+    "summary": "How anti-AI trade after US midterm election results is reviving Indian, Chinese stocks Livemint",
     "source": "Google News",
-    "regions": [],
+    "regions": [
+     "USA",
+     "Azja"
+    ],
     "themes": [
-     "Wybory i polityka",
-     "Energia i surowce"
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "European stocks plunge after US midterm election results shock markets - France 24",
+    "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOVzBFYkRISnp6Q01vdDZFckppcEduSWlrdTIwRHVxa2NJT0ViQ2ItZl9TUEVmcE1yRzFQNTRkeWVDQm0yaExGdUR1Q2NVUTR1a3FYYmlwSWw5YWw0Rl9Vcmd0VE44LXZPdHR0aVdPY3dINmZVUHB5SzRoSkJJVWd5OVBBNGl5elAyMlVRMUVwUnhoZlF5bFlWV1RSVmhoOWxmN29hM1o0bDB1ZHBEMXd1M2QzWmdDRlpPRU1aRUh3?oc=5",
+    "date": "2026-11-06T09:37:30.000Z",
+    "summary": "European stocks plunge after US midterm election results shock markets France 24",
+    "source": "Google News",
+    "regions": [
+     "USA",
+     "Europa"
+    ],
+    "themes": [
+     "Wybory i polityka"
     ],
     "relevant": true,
     "score": 6
@@ -1015,7 +935,7 @@
    {
     "title": "Dollar little changed as oil prices bounce, payrolls eyed - Reuters",
     "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOS3ZvRzF1aTlTZE9WT0NxYkU4TWFHTi04YnhEVXd1VTJRTXdibGtPdGZtTWkwZEVBLU0xNmtZaEc4R2lWZWVSdGJtY1FSdzhIazR5a2YwdDJoRzFFTHN1Z2FNb2l5b2x5SllyTE9sTTZTNkxFODFJVkhxOGhlblRTXzNiLTZpc3FKcXBqRzZUMjYtY3VXOHlnR0hPOFFYTldZaXpzSGNTbzlPNlhUdHF1amJTcFp1dw?oc=5",
-    "date": "2026-11-05T01:06:00.000Z",
+    "date": "2026-11-05T20:43:47.000Z",
     "summary": "Dollar little changed as oil prices bounce, payrolls eyed Reuters",
     "source": "Google News",
     "regions": [],
@@ -1027,54 +947,124 @@
     "score": 6
    },
    {
-    "title": "Raport z GPW 4.11.2026. Rynki reagują na wybory połówkowe w USA - Forsal.pl",
-    "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPcTJRZVVHakt3Q0I2ekdoUEw2Z3I2Mmo4T1dqMU53azRIeHV0b0VwdG1xc3RuSnR2N1BEaTk1VUxiX09XakdHS3JPWUdPVFMxVkswdjg1dnRtam1vUEE2dnpRZ09KUDJJU2ZXYUZSOU5EVG5UbXhkUWptVHo4eVIyVTZGVUpTeXVWZU9mcm8zeGx2aEFod0V5N2UwZ29SdEtBNThZV0dLaUVUOHRYWk5z?oc=5",
-    "date": "2026-11-04T09:13:52.000Z",
-    "summary": "Raport z GPW 4.11.2026. Rynki reagują na wybory połówkowe w USA Forsal.pl",
-    "source": "Google News PL",
-    "regions": [
-     "USA",
-     "Polska"
-    ],
+    "title": "Gas Prices Could Fall Below $4 as Election Results Rattle Oil Markets - KITV",
+    "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxNeWxNLWNMR0t0dWJTSjVJQkNDWllDSHRPQ1ZTcnFiTlNabjVHVFVrckJoODl2QjlLQjcxeGVtWDVydGcwdS0yRlpGQlJaUWlpel9ta3lDN0hETjZRMmxBeEtTM1VycTZsM1k5bVd1THdPdXB2X1QyZ1ZUMGZ4c0I1ZDZQZUhnWnZUdk93enVPanZOOWptaDBxYXJGeVd5cmtxekpVWUNKeUd0YVhhSVJJQVFwLXp3cnJxNW9YRXd5V09uYTZUZnB5T2JKSERsb1lZdmdESEZmOW9DWlE?oc=5",
+    "date": "2026-11-05T14:17:00.000Z",
+    "summary": "Gas Prices Could Fall Below $4 as Election Results Rattle Oil Markets KITV",
+    "source": "Google News",
+    "regions": [],
     "themes": [
-     "Wybory i polityka"
+     "Wybory i polityka",
+     "Energia i surowce"
     ],
     "relevant": true,
     "score": 6
    },
    {
-    "title": "Giełdy po amerykańskich wyborach. Europejskie indeksy w górę - TVN24",
-    "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQajZnbGFncktNeDVhcmlYcmNFODRqOGhJQTVrVEcxb1Y0cmNhR0VRTW5OVXd0ODhfdkxFandqLVk1OUVTcndtQ3ZQWjI2XzM3Z0U3cWp1eG8wUjRjMU1rVzJvaTVod1I0QlNTcEh5WjJwWjZFeWh4WllMT29QVTNCM1pYaWtvSEVsT2xlZ2dSVlBWT2U5Z3JfY0N2bVQwU1hvc29iZVczTHZoNXhVZmtv?oc=5",
-    "date": "2026-11-04T07:51:23.000Z",
-    "summary": "Giełdy po amerykańskich wyborach. Europejskie indeksy w górę TVN24",
-    "source": "Google News PL",
+    "title": "Bohaterowie walczą o życie w szpitalu. „Powstrzymali mordercę własnym ciałem”",
+    "link": "https://www.bankier.pl/wiadomosc/Bohaterowie-walcza-o-zycie-w-szpitalu-Powstrzymali-morderce-wlasnym-cialem-9225667.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-08T07:44:00.000Z",
+    "summary": "Stan jednego policjanta rannego w sobotnim ataku w Krakowie jest stabilny; drugiego jest ciężki, ale stabilny – poinformowała PAP w niedzielę rano rzeczniczka MSWiA Karolina Gałecka. Dodała, że stan sprawcy ataku na Rynku Głównym w Krakowie jest ciężki, lecz stabilny.",
+    "source": "Bankier.pl",
+    "regions": [],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 5
+   },
+   {
+    "title": "Wall Street’s Stunning Post-Election Rebound Puts Bitcoin and Crypto Markets in Focus - ZyCrypto",
+    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQM2RBanVfeGtWUFB1dVpvRklJTWNkcFZoOVNLbjRJOVFXTE12QzYyYjJjSnhtQ2ttU3F0OWFQM1NtVkRjUWV2NnEzTFh3U09wNk82a252U0xJYUNqeVczaTJGNlJpXzBCSF83SFM5TUNDX1BfdFI2SGVrZk82ZzZSOEh0OGlfS0Y0T0R5anBKZTNDYW5UNEFjT0RCM1c5NDYtQXNiVWVfYV80QdIBrwFBVV95cUxPcUJkYmxCbUVwbDZOdThveDFTSDNvRlB6TTlhekxFWkJHYlczTG9zLVdtWGVNbnpDYzZpMWw1Yy0zT2hhVXNRMG1ud2g4aGxjc0YtcFdBbFJUUWhPbmxLUmFJU2JHckJCWWptMGtMOTV3bWtFbE1jQ2hqYjhpajN3S0dLOXlWWEtLeklZRThhbEFIWUlDSVR2QjBkWVBhbHNTXzUzTnZ5UUZFOTV0UU1J?oc=5",
+    "date": "2026-11-07T18:50:19.000Z",
+    "summary": "Wall Street’s Stunning Post-Election Rebound Puts Bitcoin and Crypto Markets in Focus ZyCrypto",
+    "source": "Google News",
     "regions": [
-     "USA",
-     "Europa"
+     "USA"
     ],
     "themes": [
      "Wybory i polityka"
     ],
     "relevant": true,
-    "score": 6
+    "score": 5
+   },
+   {
+    "title": "Wybory w USA a giełda. Co wynik oznacza dla akcji i dolara - Bezprawnik",
+    "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE1ZaUVxQ1ZubVZUQTFBMzhReEU0cXlKcmpYMnVyTFh2MGR1UHNwMktXand0NWJRSGFKekxlY3FpYlJiaXBrR2Q3NXdkSkNDcUVpcWowQQ?oc=5",
+    "date": "2026-11-07T10:03:54.000Z",
+    "summary": "Wybory w USA a giełda. Co wynik oznacza dla akcji i dolara Bezprawnik",
+    "source": "Google News PL",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 5
+   },
+   {
+    "title": "Zbyt wierny Trumpowi? Vance może zapłacić za polityczne uzależnienie od prezydenta",
+    "link": "https://www.bankier.pl/wiadomosc/Zbyt-wierny-Trumpowi-Vance-moze-zaplacic-za-polityczne-uzaleznienie-od-prezydenta-9225324.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-07T07:00:00.000Z",
+    "summary": "J.D. Vance liczy na sukcesję po Donaldzie Trumpie, ale jego szanse maleją - zauważa w piątek „New York Times\". Inne media zwracają uwagę na spadek popularności wiceprezydenta USA w sondażach i gorsze notowania w zakładach bukmacherskich.",
+    "source": "Bankier.pl",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 5
+   },
+   {
+    "title": "Wybory połówkowe w USA. Nie było apokalipsy na rynkach finansowych - Gazeta Prawna",
+    "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQZ1lKV0dHQ2FhcjJsZWJqNEUyZ0JKQ0VNUHowaDBocHhyYXZHQm1xekg0VVcwLVdoclU4OFVNLUZpVEJiRTZkUF9YMzVUTGx5YjZQa2gyVnlXWWh1eGFXWFlOTWlDcVFuVGdfR2QxVDF0Y2xhNlpSbGRiNHhYWDRVU1VCb19oTnI0cDREaHQtZ2hGOTBhdTVod1JvSE9odFplbnFCZzMtejBhbkRRd0EwQlZZcnlTQ0hvcnBBQg?oc=5",
+    "date": "2026-11-07T05:00:35.000Z",
+    "summary": "Wybory połówkowe w USA. Nie było apokalipsy na rynkach finansowych Gazeta Prawna",
+    "source": "Google News PL",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 5
+   },
+   {
+    "title": "US stock markets recovering after post-election drop & other stories | Searched - Modern Ghana",
+    "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE4zdm5FOTUzR3lJaWZqSEpqNnlaeFRRYWYzdVNxdFlFS0NwVm5ISnBreXRKUjFKLWxFRjN5aTlqTGNrTmZoNkRjUmtYWXFuS1pNXzVkUmp4OVk5QkpURTlR0gFcQVVfeXFMT0FwRDU1WWljTEZJcmo5NFhrSmFaaGFsNnRpdWsxS3JfUHcwRi0zSlZIandEaDlzUkFST0dUbVhjTXdDZ21yd1Q4TWtXWFpJMlpqNy1OZC16aWxURDA?oc=5",
+    "date": "2026-11-07T00:10:00.000Z",
+    "summary": "US stock markets recovering after post-election drop & other stories | Searched Modern Ghana",
+    "source": "Google News",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 5
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 1,
+   "Konflikty i wojny": 2,
    "Sankcje i cła": 2,
-   "Banki centralne i stopy": 9,
-   "Wybory i polityka": 86,
-   "Energia i surowce": 12,
-   "Inflacja i recesja": 6
+   "Banki centralne i stopy": 10,
+   "Wybory i polityka": 67,
+   "Energia i surowce": 4,
+   "Inflacja i recesja": 5
   },
   "regionCounts": {
-   "USA": 46,
-   "Europa": 5,
-   "Azja": 0,
-   "Rynki wschodzące": 0,
-   "Polska": 9,
-   "Bliski Wschód": 2,
-   "Rosja/Ukraina": 1
+   "USA": 25,
+   "Europa": 3,
+   "Azja": 1,
+   "Rynki wschodzące": 1,
+   "Polska": 2,
+   "Bliski Wschód": 1,
+   "Rosja/Ukraina": 0
   },
   "errors": []
  },
@@ -1110,22 +1100,9 @@
      "score": 9
     },
     {
-     "title": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPUllpdktGODBNTTBYb0Q1SGNpcTQtbkZ0dnl3Mmp3Q05LQ3JNTHdDWlRMYk9qTGJCckc0b3FDS2pTZEdLTmQxc3huOHJvaXZudlgwLUdCUlpfMlltOUI2cEFXZGl3SE84ZTBnQWRjenJqZGFUOHl3UG5vOTBJbm5VNTh4akk0NDZ2b3VtY2swYkxrRGFjWHBTZA?oc=5",
-     "date": "2026-11-04T07:32:57.000Z",
-     "summary": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe Analizy.pl",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "PIT i rozliczenia"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
      "title": "IKE i IKZE: Czy czekają nas duże zmiany? - XTB.com",
      "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRkYyVzV5R2gwcnhlZnJiVTNVNEpfZ0VuVmJYWWZDUjAxOTdJaG00b2lERDJuVEtxeU9NS21iS0F6Ml96MnpCbThQNjdMMVFzREJBOS1EN0VIOHpWM2ZEd05kYzJFMzhDSXZmeDRmcl8tTmpTMXdXcTR6LTZIcXV4b1Fzc2RiSFl0STl1TVdjanVKSjVjYXFNVFNMaHQ?oc=5",
-     "date": "2026-11-03T22:27:40.000Z",
+     "date": "2026-11-03T08:00:00.000Z",
      "summary": "IKE i IKZE: Czy czekają nas duże zmiany? XTB.com",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1140,6 +1117,19 @@
      "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQSldqcWpJeXlnUy05MUFTaEZmQmhMTThnMzV4RHRrN0lxY3RYVE43ZG9UZ0JKRGQ2RFg5Vk5QNVBSY014a25JMTdkbE50TEJPOUJDaWFINmdrQTFoZ3NObDFHTWRzZU5WaXhsUGl4ekg1MWRqMi1va25FRDhTeXNYX1pmNUdlRno5aGFSbg?oc=5",
      "date": "2026-11-02T09:18:57.000Z",
      "summary": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? Rankia Polska",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "PIT i rozliczenia"
+     ],
+     "important": true,
+     "score": 8
+    },
+    {
+     "title": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe - Analizy.pl",
+     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPUllpdktGODBNTTBYb0Q1SGNpcTQtbkZ0dnl3Mmp3Q05LQ3JNTHdDWlRMYk9qTGJCckc0b3FDS2pTZEdLTmQxc3huOHJvaXZudlgwLUdCUlpfMlltOUI2cEFXZGl3SE84ZTBnQWRjenJqZGFUOHl3UG5vOTBJbm5VNTh4akk0NDZ2b3VtY2swYkxrRGFjWHBTZA?oc=5",
+     "date": "2026-11-02T07:00:36.000Z",
+     "summary": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE",
@@ -1178,7 +1168,7 @@
     {
      "title": "Rewolucja w oszczędzaniu na emeryturę? Propozycje zmian w IKE, IKZE, PPE i PPK - RMF24",
      "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOa1lJQkNXV20zV3dtNFVIYVp5MEJxUGwxQ1psYkh5NjlRdzVfbmRqNTRyNUZydDluWlRtMlM1LXNsTG5fY2JBbUhLVTJEdjhsTmdRd0tvQzNRQ29ZX3VVVXI4MklieHhSbHhEcDNYMUJ6Tzd6TEo4ZEFtMzZ5NnIxRjVRQV82d0xXUUZrTG92MklZNm52Xy1SMHprazBZNGlkZ3dnNExkY00xRXlRZy13UEJiTk8?oc=5",
-     "date": "2026-10-27T09:20:00.000Z",
+     "date": "2026-10-27T07:00:00.000Z",
      "summary": "Rewolucja w oszczędzaniu na emeryturę? Propozycje zmian w IKE, IKZE, PPE i PPK RMF24",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1189,6 +1179,42 @@
      "score": 7
     },
     {
+     "title": "Limit wpłat na IKE w 2027 r. wyniesie 30 099 zł - Inforlex",
+     "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQNHc4WWZ4dkQzSVJPRWFkbVlMWmFNS0dMTE1tSnpzSkNNbVRUa2s3UkQ4RXZtM1hWbzZremJ1RVNQQXEyTksxM3d4Y0RlYTRzb25Pa0l1ZkpyLXN5T2xxd1l5ZmxLdmU2QWN4ZDA3b2dVYXhLUnB2eTdwMmVUOGFmQjRVZldES3Jxd0FuRzdGX1NjdTgwQUJNdHJFUHJ0Z1poWUxDTkhRb1FQR2pk?oc=5",
+     "date": "2026-11-07T02:41:45.000Z",
+     "summary": "Limit wpłat na IKE w 2027 r. wyniesie 30 099 zł Inforlex",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE"
+     ],
+     "important": true,
+     "score": 6
+    },
+    {
+     "title": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy - INFOR.PL",
+     "link": "https://news.google.com/rss/articles/CBMi1gJBVV95cUxQWUotM3BwWWJqY29Ga3VTVUtrS2sxVDRPUUVvd2JmTEh1dFNZSk9qbVg0Mzk3Y0lHUURjTHZkaTU5V1RUemxrWDliU1prWnJZUEljelRxbURjcVB1cl9oSDV1NnJyMUhPSVZBcjBNVmlZa0VyV0FFYnUzVDljaDlzVUxpdC1BOHNQbkQtTjNTRHdFVUpueTl3cjZGUllicV9IbS1FaVZaandNUTJkMXJLWTh3TXBBRVdOdDkyTVotdmlZeks2ekJ0UGM1VUdTMFRSRWNxLS1TVDdfdEN5YWl6VW1xUXdpbTFYS2VOZUhIVkxOOFQ1X05zTFZwdFRNMHdQS2JSMzh3cWJ2cDRBXzdpWEhoWGdReHRSR1ZNdkhKX216Z3ptb0dZd2dVVjNaVnFfZkVjRDdPRU5SaW04ZlVrSHlvakxnTFZoMU9XdHNQdXA0TkY5cXc?oc=5",
+     "date": "2026-11-06T08:00:00.000Z",
+     "summary": "Konto OKI od 2027 r. – co po śmierci właściciela, problem przy wspólności majątkowej małżonków, egzekucja. Adwokat wyjaśnia prawne kwestie, o których warto wiedzieć przed podpisaniem umowy INFOR.PL",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "OKI"
+     ],
+     "important": true,
+     "score": 6
+    },
+    {
+     "title": "Limit IKE wzrośnie do 30 099 zł w 2027 r. Co z IKZE dla przedsiębiorców? - Comparic.pl",
+     "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNWGtvYW80WFU2N25rbDJuR0VUVkJmdmFpdmt2b0pHU1VNN0RxS2hqRi1aZUIwRW1jYXZFY1p5UTBseFZSWjR2TGg2SDBEX2hOTm1RcUVET1A2TWhpYlFNV0Q4V2tKZXN2RjJkRmp5Q3g2ekppWk15LXZxb2x2bVdDUGVjai1MeFhOTlg0OWtlTEpHdi1yT3Uxb2NLc0tpSklM?oc=5",
+     "date": "2026-11-06T07:34:54.000Z",
+     "summary": "Limit IKE wzrośnie do 30 099 zł w 2027 r. Co z IKZE dla przedsiębiorców? Comparic.pl",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE"
+     ],
+     "important": true,
+     "score": 6
+    },
+    {
      "title": "Nowe wyższe limity wpłat na IKE i IKZE w 2027 r. - Strefa Inwestorów",
      "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9hRmV2Rlg5bWJpUnMyX2w2blY3NXFTQUpHSTRZb1d6cmpkYjRoZUdfdTVUanl0WE40QXNnU1p3SDNKSzVEQlBwS0t4QkpHUjZfa0J6Z0JObzI4UW0zckpQSDZFVFlGVkRyN3c?oc=5",
      "date": "2026-11-05T10:38:00.000Z",
@@ -1196,42 +1222,6 @@
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE"
-     ],
-     "important": true,
-     "score": 6
-    },
-    {
-     "title": "Więcej pieniędzy bez podatku. Znamy limity wpłat na IKE i IKZE w 2027 roku - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOdEhnYU93TnVtTmlJTmhRY3ZwWFlsbk9tNi03c3BLbGgtRy1hd0Mtc2pENkFCU05oOURxdjJQUXpjRG90OG5iNGdCX19Oc0VaYVhXV3hyajJSSFNnOVdJc3lnV0s4WEpxcHliWU8tU3ljYlpLRml3bGZsd0cwTEtxVDJ6SlNyNTV6bnhZQ0ZUWFM1Y2JPVWlCakxacVM5VjBNalozZkN3dEFQZkJBM2JYeVBodw?oc=5",
-     "date": "2026-11-05T10:19:11.000Z",
-     "summary": "Więcej pieniędzy bez podatku. Znamy limity wpłat na IKE i IKZE w 2027 roku Analizy.pl",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE"
-     ],
-     "important": true,
-     "score": 6
-    },
-    {
-     "title": "OKI od 2027 r. Prezes zarządu VIG/C-QUADRAT TFI: może się opłacać, ale podatek zapłacisz nawet w roku straty - Bankier.pl",
-     "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxOMXlCNV9CSlRLSzlzWURqa29wdFgwYW5VS05vN1dmRTFob3F6V0pWVXgwUVZheW03Wmw2RV9hT05SRmJOSWhzVVdmRTRzbTZGR1lXYzBpMHdycUVDc2l4VWE4QkRELWhYWVNTcE5LZU5MM1FWYVpDTWR6YTBoc0N0N0prQ1ZTYWxXYWlZTXRNMWVnbEFXMm04TDc0MzByQ1dob2NRa1BndkdNVDVlNVpBd2theEtFMERMcDFzVHFLUmlFclpCY0I0ZFc4Nk92bVE?oc=5",
-     "date": "2026-11-04T17:54:00.000Z",
-     "summary": "OKI od 2027 r. Prezes zarządu VIG/C-QUADRAT TFI: może się opłacać, ale podatek zapłacisz nawet w roku straty Bankier.pl",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "OKI"
-     ],
-     "important": true,
-     "score": 6
-    },
-    {
-     "title": "Prezydent podpisał ustawę o OKI. Nowe konta mają ruszyć od 2027 roku - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQaGgxRnJzNU9kYVZ5WXJPQS1ib2JscnRGano5ZmhibHRZSVhIaGFzamE1cEJQOG9OTFVBeUU0Nm4yYlJEMmt4RkNQQmw2ZWlHVVR0R2ZqUjEtX25GTHQ5cW56eDF6MWR6T1NNVkhuS0dSeU5VcXdQTVU1RW9EWVlwdGpubk9BNkhleVVMX3FJQkp2NEE2MjRxa29CbXA5QmE3eFRtUQ?oc=5",
-     "date": "2026-11-04T10:37:57.000Z",
-     "summary": "Prezydent podpisał ustawę o OKI. Nowe konta mają ruszyć od 2027 roku Analizy.pl",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "OKI"
      ],
      "important": true,
      "score": 6
@@ -1252,22 +1242,9 @@
      "score": 9
     },
     {
-     "title": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPUllpdktGODBNTTBYb0Q1SGNpcTQtbkZ0dnl3Mmp3Q05LQ3JNTHdDWlRMYk9qTGJCckc0b3FDS2pTZEdLTmQxc3huOHJvaXZudlgwLUdCUlpfMlltOUI2cEFXZGl3SE84ZTBnQWRjenJqZGFUOHl3UG5vOTBJbm5VNTh4akk0NDZ2b3VtY2swYkxrRGFjWHBTZA?oc=5",
-     "date": "2026-11-04T07:32:57.000Z",
-     "summary": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe Analizy.pl",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "PIT i rozliczenia"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
      "title": "IKE i IKZE: Czy czekają nas duże zmiany? - XTB.com",
      "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRkYyVzV5R2gwcnhlZnJiVTNVNEpfZ0VuVmJYWWZDUjAxOTdJaG00b2lERDJuVEtxeU9NS21iS0F6Ml96MnpCbThQNjdMMVFzREJBOS1EN0VIOHpWM2ZEd05kYzJFMzhDSXZmeDRmcl8tTmpTMXdXcTR6LTZIcXV4b1Fzc2RiSFl0STl1TVdjanVKSjVjYXFNVFNMaHQ?oc=5",
-     "date": "2026-11-03T22:27:40.000Z",
+     "date": "2026-11-03T08:00:00.000Z",
      "summary": "IKE i IKZE: Czy czekają nas duże zmiany? XTB.com",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1282,6 +1259,19 @@
      "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQSldqcWpJeXlnUy05MUFTaEZmQmhMTThnMzV4RHRrN0lxY3RYVE43ZG9UZ0JKRGQ2RFg5Vk5QNVBSY014a25JMTdkbE50TEJPOUJDaWFINmdrQTFoZ3NObDFHTWRzZU5WaXhsUGl4ekg1MWRqMi1va25FRDhTeXNYX1pmNUdlRno5aGFSbg?oc=5",
      "date": "2026-11-02T09:18:57.000Z",
      "summary": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? Rankia Polska",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "PIT i rozliczenia"
+     ],
+     "important": true,
+     "score": 8
+    },
+    {
+     "title": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe - Analizy.pl",
+     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPUllpdktGODBNTTBYb0Q1SGNpcTQtbkZ0dnl3Mmp3Q05LQ3JNTHdDWlRMYk9qTGJCckc0b3FDS2pTZEdLTmQxc3huOHJvaXZudlgwLUdCUlpfMlltOUI2cEFXZGl3SE84ZTBnQWRjenJqZGFUOHl3UG5vOTBJbm5VNTh4akk0NDZ2b3VtY2swYkxrRGFjWHBTZA?oc=5",
+     "date": "2026-11-02T07:00:36.000Z",
+     "summary": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE",
@@ -1340,7 +1330,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-06T07:20:50.614Z",
+  "generatedAt": "2026-11-08T09:46:01.829Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
