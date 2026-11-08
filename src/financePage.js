@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CSS, HEAD_COMMON, navHtml } from './dashboard.js';
-import { ACCOUNT_ICONS, ACCOUNT_TYPES, CURRENCIES, FREQS } from './client/finance-core.js';
+import { ACCOUNT_ICONS, ACCOUNT_TYPES, CURRENCIES, FREQS, GEM_ACCOUNTS, LOAN_KINDS, LOAN_RATE_TYPES } from './client/finance-core.js';
 import { addDays } from './lib/dates.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -12,7 +12,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 // Kursy NBP i ceny instrumentów dla dziennika (z danych pobieranych przez GitHub Actions do portfela GEM):
 // ostatnie 100 dni dzień po dniu, wcześniej ostatni dzień każdego miesiąca. Trafiają do strony jako dane,
 // więc dziennik nie musi niczego pobierać z sieci.
-export function marketSnapshot(prices, config) {
+export function marketSnapshot(prices, config, podatki = null) {
   const thin = (pairs = []) => {
     if (!pairs.length) return [];
     const cut = addDays(pairs[pairs.length - 1][0], -100);
@@ -25,7 +25,9 @@ export function marketSnapshot(prices, config) {
     assets[ticker] = { name: inst.name ?? config?.portfolio?.instruments?.[ticker]?.name ?? ticker, currency: inst.currency, series: thin(inst.series), quotes: (inst.quotes ?? []).slice(-10) };
   }
   const latest = (list) => list.filter(Boolean).sort().at(-1) ?? null;
-  return { asOf: latest(Object.values(fx).map((p) => p.at(-1)[0])), pricesAsOf: latest(Object.values(assets).map((a) => a.series.at(-1)?.[0])), fx, assets };
+  // Limity wpłat IKE/IKZE (do paska limitu przy koncie powiązanym z portfelem GEM).
+  const limits = Object.fromEntries(Object.entries(podatki?.limits ?? {}).map(([y, l]) => [y, { ike: l.ike, ikze: l.ikze, ikzeFirma: l.ikzeFirma, status: l.status }]));
+  return { asOf: latest(Object.values(fx).map((p) => p.at(-1)[0])), pricesAsOf: latest(Object.values(assets).map((a) => a.series.at(-1)?.[0])), fx, assets, limits };
 }
 
 const FIN_CSS = `
@@ -167,6 +169,21 @@ dialog{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .acc-bal{font-weight:800;font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
 .acc-more{margin-left:56px}.acc-more .meter{margin:10px 0 4px}
 .acc-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ln-sec{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px;border-top:1px solid var(--line);padding-top:12px}
+#ad-loan .typesel{margin-bottom:6px}
+.loan-line{font-size:13px;margin:4px 0;line-height:1.45}.loan-line b{font-variant-numeric:tabular-nums}
+.loan-kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 10px}
+.loan-kpi>div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;min-width:0}
+.loan-kpi span{display:block;font-size:11.5px;color:var(--muted)}.loan-kpi b{display:block;font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.loan-kpi small{color:var(--muted);font-size:11.5px}
+@media (max-width:420px){.loan-kpi{grid-template-columns:1fr 1fr}.loan-kpi b{font-size:13.5px}}
+.kv{width:100%;border-collapse:collapse;font-size:13.5px}.kv td{padding:6px 0;border-bottom:1px solid var(--line)}.kv td:last-child{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.lv-box{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:10px 0;background:var(--surface-2)}
+.lv-box h4{margin:0 0 8px;font-size:14px}
+.sched{width:100%;border-collapse:collapse;font-size:12.5px}.sched th,.sched td{padding:5px 4px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sched th:first-child,.sched td:first-child{text-align:left}.sched tr.now td{font-weight:700;background:var(--accent-soft)}.sched tr.op td{color:var(--pos)}.sched tr.past td{color:var(--muted)}
+.sched-wrap{max-height:340px;overflow:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px}
+.rate-list{list-style:none;padding:0;margin:6px 0}.rate-list li{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:3px 0}
+.ike-line{font-size:13px;margin:6px 0}
 .acc-head{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;margin:4px 0 12px}
 .pend-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .pend-row:first-of-type{border-top:0}
@@ -237,6 +254,7 @@ const TX_DIALOG = `<dialog id="fin-dialog"><form method="dialog" novalidate>
 <label class="field" id="fd-to" hidden>Na konto<select name="toAccountId"></select></label>
 <label class="field" id="fd-to-amount-wrap" hidden><span id="fd-to-amount-label">Na konto wpłynie</span><input name="toAmount" inputmode="decimal" placeholder="0,00" autocomplete="off"><small>Wpisz kwotę, która faktycznie wpłynęła (np. po kursie z XTB). Domyślnie liczę po kursie NBP.</small></label>
 <p class="dlg-hint" id="fd-hint" hidden></p>
+<label class="check small" id="fd-gem" hidden><input type="checkbox" name="gem"> <span id="fd-gem-label">Zapisz też w portfelu GEM</span></label>
 <label class="field">Opis / sprzedawca<input name="merchant" maxlength="80" placeholder="np. Biedronka"></label>
 <label class="field">Notatka<input name="note" maxlength="1000"></label>
 <label class="field" id="fd-repeat">Powtarzaj<select name="repeat"><option value="">Nie powtarzaj</option>${Object.entries(FREQS).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></label>
@@ -255,7 +273,37 @@ const ACC_DIALOG = `<dialog id="acc-dialog"><form method="dialog" novalidate>
 <div id="ad-card" hidden>
 <label class="field">Zadłużenie na karcie (zł)<input name="debt" inputmode="decimal" placeholder="0,00" autocomplete="off"><small>Kwota do spłaty, np. 1250. Saldo karty będzie ujemne, a każdy wydatek tą kartą je powiększy.</small></label>
 <div class="two"><label class="field">Limit karty (zł)<input name="limit" inputmode="decimal" placeholder="np. 5000" autocomplete="off"></label><label class="field">Dzień spłaty<input name="dueDay" inputmode="numeric" placeholder="np. 25" maxlength="2" autocomplete="off"></label></div>
+<div class="two"><label class="field">Oprocentowanie karty (% rocznie)<input name="cardRate" inputmode="decimal" placeholder="np. 18,5" autocomplete="off"></label><label class="field">Minimalna spłata (% zadłużenia)<input name="minPayPct" inputmode="decimal" placeholder="np. 3" autocomplete="off"></label></div>
 <label class="field">Spłacaj z konta<select name="payFromId"></select></label>
+</div>
+<div id="ad-loan" hidden>
+<label class="field">Rodzaj<select name="lnKind">${Object.entries(LOAN_KINDS).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></label>
+<div class="two"><label class="field">Kwota kredytu z umowy (zł)<input name="lnAmount" inputmode="decimal" placeholder="np. 300 000" autocomplete="off"></label><label class="field">Data uruchomienia<input type="date" name="lnStart"></label></div>
+<label class="field">Liczba rat w umowie (miesięcy)<input name="lnMonths" inputmode="numeric" placeholder="np. 360 (30 lat)" autocomplete="off"></label>
+<label class="check small"><input type="checkbox" name="lnExisting"> <span>Kredyt jest już spłacany – podam stan na dziś z aplikacji banku (dokładniej)</span></label>
+<div id="ad-ln-existing" hidden><div class="two"><label class="field">Kapitał do spłaty dziś<input name="lnRemaining" inputmode="decimal" placeholder="np. 285 120,45" autocomplete="off"></label><label class="field">Pozostało rat<input name="lnLeft" inputmode="numeric" placeholder="np. 340" autocomplete="off"></label></div>
+<label class="field">Termin najbliższej raty<input type="date" name="lnNextDue"></label></div>
+<label class="field" id="ad-ln-first">Termin pierwszej raty<input type="date" name="lnFirstDue"><small>Zwykle miesiąc po uruchomieniu. Ten sam dzień miesiąca to dzień każdej kolejnej raty.</small></label>
+<div class="ln-sec">Oprocentowanie</div>
+<div class="typesel" role="radiogroup" aria-label="Oprocentowanie">${Object.entries(LOAN_RATE_TYPES).map(([k, l]) => `<label><input type="radio" name="lnRateType" value="${k}"><span>${l.split(' (')[0]}</span></label>`).join('')}</div>
+<label class="field" id="ad-ln-fixed">Oprocentowanie (% rocznie)<input name="lnRate" inputmode="decimal" placeholder="np. 7,35" autocomplete="off"><small>Oprocentowanie nominalne z umowy (nie RRSO).</small></label>
+<div id="ad-ln-var" hidden><div class="two"><label class="field">Stawka referencyjna<select name="lnRefName">${['WIBOR 3M', 'WIBOR 6M', 'WIRON 1M', 'WIRON 3M', 'EURIBOR 3M', 'EURIBOR 6M', 'inna'].map((x) => `<option>${x}</option>`).join('')}</select></label><label class="field">Wartość stawki (%)<input name="lnRef" inputmode="decimal" placeholder="np. 4,21" autocomplete="off"></label></div>
+<label class="field">Marża banku (%)<input name="lnMargin" inputmode="decimal" placeholder="np. 2,10" autocomplete="off"></label></div>
+<label class="field" id="ad-ln-fixed-until">Stała stopa do (opcjonalnie)<input type="date" name="lnFixedUntil"><small>Przy okresowo stałej stopie (np. na 5 lat) przypomnę, kiedy się kończy.</small></label>
+<div class="ln-sec">Raty</div>
+<div class="two"><label class="field">Rodzaj rat<select name="lnInstallments"><option value="rowne">równe (annuitetowe)</option><option value="malejace">malejące</option></select></label><label class="field">Karencja (mies., opcjonalnie)<input name="lnGrace" inputmode="numeric" placeholder="0" autocomplete="off"></label></div>
+<label class="field">Rata z harmonogramu banku (opcjonalnie)<input name="lnPayment" inputmode="decimal" placeholder="wyliczę sam" autocomplete="off"><small>Wpisz, jeśli bank podaje inną ratę niż wyliczona. Obowiązuje do najbliższej zmiany oprocentowania.</small></label>
+<div class="ln-sec">Koszty</div>
+<div class="two"><label class="field">Prowizja (zł)<input name="lnFee" inputmode="decimal" placeholder="0" autocomplete="off"></label><label class="field">Ubezpieczenie i opłaty miesięcznie (zł)<input name="lnInsurance" inputmode="decimal" placeholder="0" autocomplete="off"></label></div>
+<label class="check small"><input type="checkbox" name="lnFeeFinanced"> <span>Prowizja doliczona do kwoty kredytu (kredytowana)</span></label>
+<div class="ln-sec">Spłata</div>
+<label class="field">Spłacam z konta<select name="lnPayFrom"></select></label>
+<label class="check small"><input type="checkbox" name="lnAuto"> <span>Zapisuj raty w dzienniku w dniu terminu: część kapitałowa jako przelew na kredyt, odsetki i opłaty jako wydatek „Kredyty i odsetki”</span></label>
+<p class="dlg-hint" id="ad-ln-preview"></p>
+</div>
+<div id="ad-gem" hidden>
+<label class="field">Rachunek w portfelu GEM<select name="gemAccount"><option value="">— nie łącz —</option>${Object.entries(GEM_ACCOUNTS).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select><small>Przelew na to konto zapisze się też jako wpłata w zakładce GEM → Mój portfel GEM (liczy się do limitu IKE/IKZE).</small></label>
+<label class="check small"><input type="checkbox" name="gemValuation"> <span>Wartość konta według wyceny portfela GEM (bez dodawania aktywów tutaj)</span></label>
 </div>
 <label class="field">Karty w Apple Pay (nazwy z Portfela, po przecinku)<input name="cards" placeholder="np. mBank Visa"></label>
 <label class="check small"><input type="checkbox" name="excludeFromTotal"> Nie wliczaj do salda łącznego</label>
@@ -311,6 +359,14 @@ const LOTS_DIALOG = `<dialog id="lots-dialog"><form method="dialog" novalidate>
 ${actions()}
 </form></dialog>`;
 
+// Szczegóły kredytu: podsumowanie, koszty, oprocentowanie, nadpłata, symulacje i harmonogram (treść z finance-ui.js).
+const LOAN_DIALOG = `<dialog id="loan-dialog"><form method="dialog" novalidate>
+<h3 id="lv-title">Kredyt</h3>
+<div id="lv-body"></div>
+<div class="errors" id="lv-errors" role="alert"></div>
+<div class="dlg-actions"><button type="button" class="btn ghost" id="lv-edit">Edytuj parametry</button><span style="flex:1"></span><button type="button" class="btn" data-close>Zamknij</button></div>
+</form></dialog>`;
+
 // Potwierdzenie operacji, których nie da się łatwo odwrócić (usuwanie, nadpisanie danych).
 const CONFIRM_DIALOG = `<dialog id="confirm-dialog"><form method="dialog" novalidate>
 <h3 id="cf-title"></h3>
@@ -326,9 +382,9 @@ const DOC_DIALOG = `<dialog id="doc-dialog"><form method="dialog" novalidate>
 <div class="dlg-actions"><span style="flex:1"></span><button type="button" class="btn" id="dv-share">Udostępnij / zapisz</button><button type="button" class="btn primary" data-close>Zamknij</button></div>
 </form></dialog>`;
 
-export function renderFinancePage({ prices = null, config = null } = {}) {
+export function renderFinancePage({ prices = null, config = null, podatki = null } = {}) {
   const read = (name) => readFileSync(path.join(HERE, 'client', name), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '');
-  const market = JSON.stringify(marketSnapshot(prices, config)).replace(/</g, '\\u003c');
+  const market = JSON.stringify(marketSnapshot(prices, config, podatki)).replace(/</g, '\\u003c');
   // blob: tylko do podglądu dokumentów zapisanych na urządzeniu; połączenia sieciowe nadal zablokowane.
   const csp = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'self'; manifest-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'";
   return `<!doctype html><html lang="pl"><head>${HEAD_COMMON}
@@ -343,7 +399,7 @@ ${navHtml('finanse')}
 <footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów strategii są dołączane do strony przy każdej aktualizacji aplikacji, a ceny pozostałych akcji i ETF-ów z oferty XTB oraz wyceny funduszy ING TFI strona wczytuje z plików aplikacji (data/notowania.js, data/fundusze.js) – to tylko pobranie gotowego pliku, bez wysyłania jakichkolwiek danych. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
-${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}${LOTS_DIALOG}${CONFIRM_DIALOG}${DOC_DIALOG}
+${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}${LOTS_DIALOG}${LOAN_DIALOG}${CONFIRM_DIALOG}${DOC_DIALOG}
 <noscript><p>Dziennik wymaga włączonej obsługi JavaScript.</p></noscript>
 <script type="application/json" id="fin-market">${market}</script>
 <script type="module">${read('finance-core.js')}\n${read('instruments.js')}\n${read('mmbackup.js')}\n${read('finance-ui.js')}</script>

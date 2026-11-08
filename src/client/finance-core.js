@@ -4,7 +4,7 @@
 // Korekta salda: zmiana salda konta (saldo początkowe, wycena konta inwestycyjnego, wyrównanie do banku).
 // Kwota korekty ma znak (+/−) i nie liczy się do wydatków ani przychodów.
 export const FIN_TYPES = { wydatek: 'Wydatek', przychod: 'Przychód', przelew: 'Przelew', korekta: 'Korekta salda' };
-export const ACCOUNT_TYPES = { bank: 'Konto bankowe', karta: 'Karta kredytowa', gotowka: 'Gotówka', oszczednosci: 'Oszczędności', inwestycje: 'Konto inwestycyjne', inne: 'Inne' };
+export const ACCOUNT_TYPES = { bank: 'Konto bankowe', karta: 'Karta kredytowa', gotowka: 'Gotówka', oszczednosci: 'Oszczędności', inwestycje: 'Konto inwestycyjne', kredyt: 'Kredyt / pożyczka', inne: 'Inne' };
 export const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF'];
 export const isFlow = (t) => t.type === 'wydatek' || t.type === 'przychod';
 export const SKIP_CATEGORY = 'pomiń';
@@ -30,7 +30,7 @@ export const DEFAULT_CATEGORIES = [
 ].map(([id, emoji, name, kind], i) => ({ id, emoji, name, kind, color: PALETTE[i % PALETTE.length], budget: null }));
 
 export const emptyFinance = () => ({ version: 1, accounts: [], categories: DEFAULT_CATEGORIES.map((c) => ({ ...c })), txs: [], rules: [], recurring: [], updatedAt: 0 });
-export const ACCOUNT_ICONS = { bank: '🏦', karta: '💳', gotowka: '💵', oszczednosci: '🐷', inwestycje: '📈', inne: '👛' };
+export const ACCOUNT_ICONS = { bank: '🏦', karta: '💳', gotowka: '💵', oszczednosci: '🐷', inwestycje: '📈', kredyt: '🏠', inne: '👛' };
 export const isCard = (a) => a?.type === 'karta';
 export const nextColor = (n) => PALETTE[n % PALETTE.length];
 export const liveTx = (fin) => fin.txs.filter((t) => !t.deleted);
@@ -613,7 +613,10 @@ export function investSummary(market, account, date) {
 }
 
 // Wartość konta w złotych: saldo (gotówka, w walucie konta) po kursie z dnia + wartość pozycji inwestycyjnych.
+// Konto powiązane z portfelem GEM (gemValuation) ma wartość z wyceny portfela – saldo to wtedy suma przelewów (wpłaty netto).
 export function accountWorth(fin, account, market, date, balance = balances(fin, date)[account.id]) {
+  const gem = account.gemValuation && account.gemAccount ? market?.gemValues?.[account.gemAccount] : null;
+  if (gem && Number.isFinite(gem.value) && date >= isoDays(gem.date, -7)) return { cash: balance, cashPLN: 0, investments: gem.value, total: gem.value, gem: true };
   const rate = rateOn(market, account.currency || 'PLN', date);
   const inv = account.lots?.length ? holdingsPLN(market, account, date) : 0;
   if (rate === null || inv === null) return null;
@@ -808,7 +811,7 @@ export function settleRecurring(fin, recId, { post, newId, now = Date.now(), mar
 export const dueRecurring = (fin, today) =>
   (fin.recurring ?? []).filter((r) => !r.auto && r.nextDate && r.nextDate <= today && recActive(r, r.nextDate)).map((r) => ({ rec: r, date: r.nextDate }));
 
-// Wszystkie terminy stałych pozycji w zakresie dat (kalendarz, lista najbliższych).
+// Wszystkie terminy stałych pozycji w zakresie dat (kalendarz, lista najbliższych), razem z ratami kredytów.
 export function recurringBetween(fin, from, to) {
   const out = [];
   for (const r of fin.recurring ?? []) {
@@ -818,6 +821,10 @@ export function recurringBetween(fin, from, to) {
       if (d >= from && recActive(r, d)) out.push({ rec: r, date: d });
       d = nextRecurringDate(d, r.freq, r.anchorDay);
     }
+  }
+  for (const a of fin.accounts ?? []) {
+    if (!isLoan(a) || a.archived) continue;
+    for (const row of loanSchedule(a.loan)) if (row.kind === 'rata' && row.date >= from && row.date <= to) out.push({ rec: loanPlanItem(a, row), date: row.date, loan: true });
   }
   return out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 }
@@ -837,15 +844,324 @@ export function validateRecurring(r, fin) {
   return errors;
 }
 
-// Stałe pozycje w przeliczeniu na miesiąc i na złote (bez wstrzymanych i zakończonych).
-export function recurringMonthly(fin, market = null) {
-  const out = { przychod: 0, wydatek: 0, przelew: 0 };
+// Stałe pozycje w przeliczeniu na miesiąc i na złote (bez wstrzymanych i zakończonych) oraz najbliższe raty kredytów.
+export function recurringMonthly(fin, market = null, today = new Date().toISOString().slice(0, 10)) {
+  const out = { przychod: 0, wydatek: 0, przelew: 0, kredyty: 0 };
   for (const r of fin.recurring ?? []) {
     if (!r.nextDate || !recActive(r, r.nextDate)) continue;
     const pln = convert(market, r.amount, accountCurrency(fin, r.accountId), 'PLN', r.nextDate) ?? r.amount;
     out[r.type] += pln * (PER_MONTH[r.freq] ?? 1);
   }
+  for (const a of fin.accounts ?? []) {
+    if (!isLoan(a) || a.archived) continue;
+    const next = loanSchedule(a.loan).find((r) => r.kind === 'rata' && r.date > today);
+    if (next) out.kredyty += convert(market, next.payment + (Number(a.loan.insurance) || 0), a.currency || 'PLN', 'PLN', next.date) ?? next.payment;
+  }
   return out;
+}
+
+// ---------- Kredyty i pożyczki ----------
+// Konto „Kredyt / pożyczka” ma saldo ujemne (zadłużenie – jak karta kredytowa), a parametry umowy w polu loan:
+//   kind, amount (kwota z umowy), principal (kapitał na początku harmonogramu), start (uruchomienie albo ostatnia rata
+//   przed „stanem na dziś”), firstDue (termin pierwszej raty harmonogramu), months (liczba rat w harmonogramie),
+//   installments ('rowne' | 'malejace'), rateType ('stale' | 'zmienne' | 'zero'), rates ([[od dnia, % rocznie], …]),
+//   refName / margin (stawka referencyjna i marża przy oprocentowaniu zmiennym), fixedUntil (koniec okresu stałej stopy),
+//   payment / paymentFrom (rata z harmonogramu banku), grace (karencja w miesiącach – same odsetki), fee, feeFinanced
+//   (prowizja i czy jest doliczona do kredytu), insurance (ubezpieczenie i opłaty co miesiąc), payFromId, autoPost,
+//   trackFrom (od kiedy raty trafiają do dziennika), overpayments ([{ id, date, amount, mode: 'okres' | 'rata', txId }]).
+// Odsetki liczone są jak w typowym kalkulatorze: saldo × oprocentowanie / 12, ze stopą obowiązującą na początku okresu.
+// Bank liczy według dni, więc kwoty mogą różnić się o kilka złotych – rata z harmonogramu banku ma pierwszeństwo.
+export const LOAN_KINDS = { hipoteczny: 'Kredyt hipoteczny', gotowkowy: 'Kredyt gotówkowy', samochodowy: 'Kredyt samochodowy', ratalny: 'Zakup na raty', konsolidacyjny: 'Kredyt konsolidacyjny', pozyczka: 'Pożyczka', inny: 'Inny kredyt' };
+export const LOAN_RATE_TYPES = { stale: 'stałe', zmienne: 'zmienne (stawka referencyjna + marża)', zero: '0% (raty bez odsetek)' };
+export const LOAN_CATEGORY = { id: 'kredyty', emoji: '🏦', name: 'Kredyty i odsetki', kind: 'wydatek', color: '#475569', budget: null };
+export const isLoan = (a) => a?.type === 'kredyt' && Boolean(a?.loan);
+
+export const shiftMonthsKeepDay = (iso, n, day = Number(iso.slice(8, 10))) => {
+  const [y, m] = iso.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1 + n, 1));
+  const last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
+  t.setUTCDate(Math.min(day, last));
+  return t.toISOString().slice(0, 10);
+};
+export const loanDueDate = (loan, n) => shiftMonthsKeepDay(loan.firstDue, n - 1, Number(loan.firstDue.slice(8, 10)));
+export const loanStartBalance = (loan) => round2((Number(loan.principal) || 0) + (loan.feeFinanced ? Number(loan.fee) || 0 : 0));
+const sortedRates = (loan) => [...(loan.rates ?? [])].filter((r) => r && Number.isFinite(r[1])).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+
+/** Oprocentowanie nominalne (% rocznie) obowiązujące w danym dniu. Pierwszy wpis obowiązuje też wcześniej. */
+export function loanRateAt(loan, date) {
+  if (loan.rateType === 'zero') return 0;
+  let rate = null;
+  for (const [d, v] of sortedRates(loan)) {
+    if (rate === null || d <= date) rate = v;
+    else break;
+  }
+  return rate ?? 0;
+}
+// Data ostatniej zmiany oprocentowania obowiązującej w danym dniu.
+const loanRateSince = (loan, date) => {
+  let since = null;
+  for (const [d] of sortedRates(loan)) if (since === null || d <= date) since = d;
+  return since;
+};
+
+const annuity = (b, i, n) => (n <= 0 ? b : i === 0 ? b / n : (b * i) / (1 - (1 + i) ** -n));
+const nper = (b, i, p) => (p <= 0 ? Infinity : i === 0 ? b / p : p <= b * i ? Infinity : -Math.log(1 - (b * i) / p) / Math.log(1 + i));
+
+/**
+ * Harmonogram spłaty: wiersze { kind: 'rata', n, date, payment, principal, interest, rate, balance }
+ * oraz { kind: 'nadplata', date, overpay, mode, balance } w kolejności dat.
+ */
+export function loanSchedule(loan, { maxRows = 1200 } = {}) {
+  const rows = [];
+  if (!loan?.firstDue || !(loan.principal > 0)) return rows;
+  const months = Math.max(1, Math.round(Number(loan.months) || 1));
+  const grace = Math.min(Math.max(0, Math.round(Number(loan.grace) || 0)), months - 1);
+  let balance = loanStartBalance(loan);
+  const ops = (loan.overpayments ?? []).filter((o) => o.amount > 0 && o.date).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  let k = 0;
+  let remaining = months - grace; // raty kapitałowe do spłaty (bez karencji)
+  let payment = null; // rata równa
+  let capPart = null; // część kapitałowa raty malejącej
+  let lastRate = null;
+  let prev = loan.start || loan.firstDue;
+  for (let n = 1; balance > 0.005 && n <= maxRows; n++) {
+    const date = loanDueDate(loan, n);
+    let recalc = false;
+    while (k < ops.length && ops[k].date <= date) {
+      const op = ops[k++];
+      const amt = round2(Math.min(op.amount, balance));
+      if (amt <= 0) continue;
+      balance = round2(balance - amt);
+      rows.push({ kind: 'nadplata', date: op.date, overpay: amt, mode: op.mode === 'rata' ? 'rata' : 'okres', balance, id: op.id });
+      if (op.mode === 'rata') recalc = true;
+      else if (balance > 0.005 && n > grace) {
+        // Skrócenie okresu: ta sama rata (albo ta sama część kapitałowa), mniej rat.
+        if (loan.installments === 'malejace') remaining = Math.max(1, Math.ceil(balance / (capPart ?? balance / remaining) - 1e-9));
+        else if (payment) remaining = Math.max(1, Math.min(remaining, Math.ceil(nper(balance, loanRateAt(loan, prev) / 1200, payment) - 1e-9)));
+      }
+    }
+    if (balance <= 0.005) break;
+    const ratePct = loanRateAt(loan, prev);
+    const i = ratePct / 1200;
+    const interest = round2(balance * i);
+    let principal;
+    if (n <= grace) principal = 0;
+    else if (loan.installments === 'malejace') {
+      if (capPart === null || recalc) capPart = balance / remaining;
+      principal = capPart;
+    } else {
+      const since = loanRateSince(loan, prev);
+      const custom = loan.payment > 0 && (!loan.paymentFrom || date >= loan.paymentFrom) && (!since || !loan.paymentFrom || since <= loan.paymentFrom);
+      if (custom) payment = Number(loan.payment);
+      else if (payment === null || recalc || ratePct !== lastRate || n === grace + 1 || (loan.payment > 0 && payment === Number(loan.payment))) payment = annuity(balance, i, remaining);
+      principal = Math.max(0, payment - interest);
+    }
+    if (n > grace && remaining <= 1) principal = balance; // ostatnia rata spłaca resztę
+    principal = round2(Math.min(balance, principal));
+    balance = round2(balance - principal);
+    rows.push({ kind: 'rata', n, date, payment: round2(principal + interest), principal, interest, rate: ratePct, balance });
+    if (n > grace) remaining = Math.max(1, remaining - 1);
+    lastRate = ratePct;
+    prev = date;
+  }
+  return rows;
+}
+
+/** Kapitał do spłaty w danym dniu (po ratach i nadpłatach z datą ≤ date). */
+export function loanBalanceAt(loan, rows, date) {
+  let bal = loanStartBalance(loan);
+  for (const r of rows) {
+    if (r.date > date) break;
+    bal = r.balance;
+  }
+  return bal;
+}
+
+/** RRSO (rzeczywista roczna stopa oprocentowania) z przepływów: wypłata kredytu, raty, ubezpieczenie, prowizja, nadpłaty. */
+export function loanApr(loan, rows = loanSchedule(loan)) {
+  if (!rows.length || !loan.start) return null;
+  const fee = Number(loan.fee) || 0;
+  const ins = Number(loan.insurance) || 0;
+  const t0 = Date.parse(`${loan.start}T00:00:00Z`);
+  const flows = [[0, (Number(loan.principal) || 0) - (loan.feeFinanced ? 0 : fee)]];
+  for (const r of rows) flows.push([(Date.parse(`${r.date}T00:00:00Z`) - t0) / 86400000 / 365, -(r.kind === 'rata' ? r.payment + ins : r.overpay)]);
+  const f = (x) => flows.reduce((s, [t, cf]) => s + cf / (1 + x) ** t, 0);
+  let lo = -0.9;
+  let hi = 10;
+  if (!(f(lo) * f(hi) < 0)) return null;
+  for (let it = 0; it < 200; it++) {
+    const mid = (lo + hi) / 2;
+    if (f(lo) * f(mid) <= 0) hi = mid;
+    else lo = mid;
+  }
+  return Math.round(((lo + hi) / 2) * 1e6) / 1e6;
+}
+
+/** Podsumowanie kredytu na dany dzień: ile zostało, ile spłacono, odsetki, koszt, najbliższa rata, koniec spłaty, RRSO. */
+export function loanSummary(loan, today) {
+  const rows = loanSchedule(loan);
+  const inst = rows.filter((r) => r.kind === 'rata');
+  const past = inst.filter((r) => r.date <= today);
+  const future = inst.filter((r) => r.date > today);
+  const sum = (list, key) => round2(list.reduce((s, r) => s + (r[key] || 0), 0));
+  const start = loanStartBalance(loan);
+  const original = Math.max(Number(loan.amount) || 0, start);
+  const remaining = loanBalanceAt(loan, rows, today);
+  const ins = Number(loan.insurance) || 0;
+  const fee = Number(loan.fee) || 0;
+  const totalInterest = sum(inst, 'interest');
+  return {
+    rows,
+    installments: inst,
+    original,
+    start,
+    remaining,
+    paidPrincipal: round2(original - remaining),
+    progress: original > 0 ? Math.min(1, Math.max(0, (original - remaining) / original)) : 0,
+    paidInterest: sum(past, 'interest'),
+    futureInterest: sum(future, 'interest'),
+    totalInterest,
+    insuranceTotal: round2(ins * inst.length),
+    totalCost: round2(totalInterest + fee + ins * inst.length),
+    overpaid: sum(rows.filter((r) => r.kind === 'nadplata'), 'overpay'),
+    next: future[0] ?? null,
+    last: past.at(-1) ?? null,
+    left: future.length,
+    count: inst.length,
+    end: inst.at(-1)?.date ?? null,
+    rate: loanRateAt(loan, today),
+    monthly: future[0] ? round2(future[0].payment + ins) : 0,
+    apr: loanApr(loan, rows),
+  };
+}
+
+/** Co da nadpłata: oszczędność na odsetkach, skrócenie okresu albo niższa rata. */
+export function loanOverpaySim(loan, { amount, date, mode = 'okres' }) {
+  const base = loanSummary(loan, date);
+  const alt = loanSummary({ ...loan, overpayments: [...(loan.overpayments ?? []), { id: 'symulacja', date, amount, mode }] }, date);
+  return {
+    interestSaved: round2(base.futureInterest - alt.futureInterest),
+    monthsShorter: base.left - alt.left,
+    paymentBefore: base.next?.payment ?? 0,
+    paymentAfter: alt.next?.payment ?? 0,
+    endBefore: base.end,
+    endAfter: alt.end,
+  };
+}
+
+/** Rata przy oprocentowaniu zmienionym o deltaPp punktów procentowych od początku najbliższego okresu. */
+export function loanRateSim(loan, deltaPp, today) {
+  const s = loanSummary(loan, today);
+  if (!s.next || loan.rateType === 'zero') return null;
+  const from = s.last?.date ?? loan.start;
+  const alt = loanSummary({ ...loan, payment: null, rates: [...sortedRates(loan), [from, Math.max(0, loanRateAt(loan, from) + deltaPp)]] }, today);
+  return { rate: loanRateAt(loan, from) + deltaPp, payment: alt.next?.payment ?? 0, diff: round2((alt.next?.payment ?? 0) - s.next.payment), totalInterestDiff: round2(alt.futureInterest - s.futureInterest) };
+}
+
+/** Pozycja planu (kalendarz, „Najbliższe 30 dni”) dla raty kredytu. Kwota w walucie kredytu. */
+export function loanPlanItem(account, row) {
+  const ins = Number(account.loan.insurance) || 0;
+  return { id: `loan:${account.id}`, title: `Rata: ${account.name}`, type: 'wydatek', amount: round2(row.payment + ins), accountId: account.id, categoryId: LOAN_CATEGORY.id, freq: 'miesiac', auto: Boolean(account.loan.autoPost), loanId: account.id, nextDate: row.date };
+}
+
+/** Operacje dla raty: przelew części kapitałowej z konta spłaty na kredyt i wydatek (odsetki + ubezpieczenie). */
+export function loanTxsFor(fin, account, row, { newId, now = Date.now(), market = null }) {
+  const loan = account.loan;
+  const fromId = loan.payFromId;
+  const fromCur = accountCurrency(fin, fromId);
+  const loanCur = account.currency || 'PLN';
+  const base = { date: row.date, source: 'kredyt', loanId: account.id, loanNo: row.n, createdAt: now, updatedAt: now };
+  const out = [];
+  if (row.principal > 0.004) {
+    const pln = convert(market, row.principal, loanCur, 'PLN', row.date);
+    const fromAmt = convert(market, row.principal, loanCur, fromCur, row.date);
+    if (pln === null || fromAmt === null) return null;
+    const t = { ...base, id: newId(), type: 'przelew', amount: pln, accountId: fromId, toAccountId: account.id, merchant: `${account.name}: rata ${row.n} – kapitał`, importKey: `loan|${account.id}|${row.n}|k` };
+    if (fromCur !== 'PLN') t.accountAmount = fromAmt;
+    if (loanCur !== fromCur) t.toAmount = row.principal;
+    out.push(t);
+  }
+  const cost = round2(row.interest + (Number(loan.insurance) || 0));
+  if (cost > 0.004) {
+    const pln = convert(market, cost, loanCur, 'PLN', row.date);
+    const fromAmt = convert(market, cost, loanCur, fromCur, row.date);
+    if (pln === null || fromAmt === null) return null;
+    const t = { ...base, id: newId(), type: 'wydatek', amount: pln, accountId: fromId, categoryId: LOAN_CATEGORY.id, merchant: `${account.name}: rata ${row.n} – odsetki${Number(loan.insurance) ? ' i opłaty' : ''}`, importKey: `loan|${account.id}|${row.n}|o` };
+    if (fromCur !== 'PLN') t.accountAmount = fromAmt;
+    out.push(t);
+  }
+  return out;
+}
+
+/** Zapisuje w dzienniku raty z terminem do dziś (od dnia trackFrom), raz dla każdej raty – także po usunięciu. */
+export function processLoans(fin, today, { newId, now = Date.now(), market = null }) {
+  const keys = new Set(fin.txs.filter((t) => t.importKey).map((t) => t.importKey));
+  const txs = [];
+  for (const a of fin.accounts) {
+    if (!isLoan(a) || a.archived || !a.loan.autoPost || !fin.accounts.some((x) => x.id === a.loan.payFromId)) continue;
+    const from = a.loan.trackFrom ?? today;
+    for (const row of loanSchedule(a.loan)) {
+      if (row.kind !== 'rata' || row.date < from || row.date > today) continue;
+      if (keys.has(`loan|${a.id}|${row.n}|k`) || keys.has(`loan|${a.id}|${row.n}|o`)) continue;
+      const list = loanTxsFor(fin, a, row, { newId, now, market });
+      if (list) txs.push(...list);
+    }
+  }
+  if (!txs.length) return { fin, posted: 0 };
+  const categories = fin.categories.some((c) => c.id === LOAN_CATEGORY.id) ? fin.categories : [...fin.categories, { ...LOAN_CATEGORY }];
+  return { fin: { ...fin, categories, txs: [...fin.txs, ...txs], updatedAt: now }, posted: new Set(txs.map((t) => `${t.loanId}|${t.loanNo}`)).size };
+}
+
+/** Sprawdzenie parametrów kredytu z formularza. */
+export function validateLoan(loan, fin = null) {
+  const errors = [];
+  if (!(loan.principal > 0)) errors.push(loan.existing ? 'Podaj kapitał, który został do spłaty.' : 'Podaj kwotę kredytu.');
+  if (!(loan.months >= 1 && loan.months <= 1200)) errors.push(loan.existing ? 'Podaj, ile rat zostało (1–1200).' : 'Podaj liczbę rat (1–1200).');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(loan.start ?? '')) errors.push('Podaj datę uruchomienia kredytu.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(loan.firstDue ?? '')) errors.push(loan.existing ? 'Podaj termin najbliższej raty.' : 'Podaj termin pierwszej raty.');
+  else if (loan.start && loan.firstDue <= loan.start) errors.push('Termin pierwszej raty musi być po dacie uruchomienia.');
+  if (loan.rateType !== 'zero' && !(sortedRates(loan).length && sortedRates(loan).every((r) => r[1] >= 0 && r[1] < 100))) errors.push('Podaj oprocentowanie (np. 7,5).');
+  if (loan.autoPost && !loan.payFromId) errors.push('Wybierz konto, z którego spłacasz raty (albo wyłącz automatyczne zapisywanie rat).');
+  if (fin && loan.payFromId && !fin.accounts.some((a) => a.id === loan.payFromId)) errors.push('Konto spłaty nie istnieje.');
+  if (!errors.length && loan.payment > 0 && loan.installments !== 'malejace') {
+    const first = loanSchedule({ ...loan, payment: null }).find((r) => r.kind === 'rata' && r.n > (Number(loan.grace) || 0));
+    if (first && loan.payment <= first.interest) errors.push(`Rata ${String(loan.payment).replace('.', ',')} nie pokrywa nawet odsetek (${String(first.interest).replace('.', ',')}). Sprawdź kwotę.`);
+  }
+  return errors;
+}
+
+// ---------- Konta powiązane z portfelem GEM (IKE, IKZE, OKI, konto zwykłe) ----------
+// Przelew na konto powiązane zapisuje się w Finansach jako przelew między kontami, a w portfelu GEM – jako wpłata
+// (liczy się do limitu IKE/IKZE). Wartość takiego konta może pochodzić z wyceny portfela GEM.
+export const GEM_ACCOUNTS = { IKE: 'IKE', IKZE: 'IKZE', OKI: 'OKI', ZWYKLE: 'konto zwykłe' };
+
+/** Czy przelew dotyczy konta powiązanego z portfelem GEM: { type: 'wplata' | 'wyplata', account, accountId } albo null. */
+export function gemTransferInfo(fin, t) {
+  if (t?.type !== 'przelew') return null;
+  const from = fin.accounts.find((a) => a.id === t.accountId);
+  const to = fin.accounts.find((a) => a.id === t.toAccountId);
+  if (to?.gemAccount && from?.gemAccount !== to.gemAccount) return { type: 'wplata', account: to.gemAccount, accountId: to.id };
+  if (from?.gemAccount && to?.gemAccount !== from.gemAccount) return { type: 'wyplata', account: from.gemAccount, accountId: from.id };
+  return null;
+}
+
+/** Wpis do portfela GEM (format zakładki Mój portfel GEM) dla przelewu z Finansów. */
+export function gemTxFromTransfer(t, info, { id, now = Date.now() }) {
+  const amountPLN = round2(info.type === 'wplata' ? t.toAmount ?? t.amount : t.amount);
+  return { id, type: info.type, date: t.date, account: info.account, amountPLN, note: `Przelew z Finansów${t.merchant ? `: ${t.merchant}` : ''}`, finTxId: t.id, createdAt: now, updatedAt: now };
+}
+
+/** Wpłaty i wypłaty z portfela GEM na rachunek powiązany z kontem, których nie ma jeszcze w Finansach. */
+export function unlinkedGemTxs(fin, gemTxs, account) {
+  if (!account?.gemAccount) return [];
+  const linked = new Set(fin.txs.filter((t) => t.gemTxId && !t.deleted).map((t) => t.gemTxId));
+  const since = account.gemLinkedAt ?? '0000-00-00';
+  return (gemTxs ?? []).filter((g) => !g.deleted && (g.type === 'wplata' || g.type === 'wyplata') && g.account === account.gemAccount && !g.finTxId && !linked.has(g.id) && g.date >= since && g.amountPLN > 0);
+}
+
+/** Suma wpłat w roku kalendarzowym na rachunek w portfelu GEM (do limitu IKE/IKZE – jak w portfelu). */
+export function gemYearDeposits(gemTxs, gemAccount, year) {
+  return round2((gemTxs ?? []).filter((g) => !g.deleted && g.type === 'wplata' && g.account === gemAccount && String(g.date).startsWith(String(year))).reduce((s, g) => s + (g.amountPLN || 0), 0));
 }
 
 // ---------- Kalendarz ----------

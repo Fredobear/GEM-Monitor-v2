@@ -72,8 +72,34 @@ async function ensureLibraryPrices() {
 }
 function refreshLibraryPrices() {
   ensureLibraryPrices()
-    .then((added) => added && !$('#tab-portfel').hidden && renderPortfolio())
-    .catch(() => {});
+    .then((added) => {
+      if (added && !$('#tab-portfel').hidden) renderPortfolio();
+      publishGemSummary();
+    })
+    .catch(() => publishGemSummary());
+}
+
+// Wycena rachunków portfela GEM dla dziennika finansowego (ta sama przeglądarka, klucz gem.v1.summary): konto
+// w Finansach powiązane np. z IKE pokazuje wartość, wpłaty netto i zysk bez ponownego wpisywania ETF-ów.
+function publishGemSummary() {
+  try {
+    const r2 = (x) => Math.round(x * 100) / 100;
+    const live = activeTx(state.txs);
+    const accounts = {};
+    for (const acc of ACCOUNTS) {
+      const own = live.filter((t) => t.account === acc);
+      if (!own.length) continue;
+      const last = buildTimeline(state.txs, D.prices, { account: acc, today: DATA_DAY }).points.at(-1);
+      if (last) accounts[acc] = { value: r2(last.value), invested: r2(last.invested), date: last.date };
+      else {
+        const net = own.reduce((s, t) => s + (t.type === 'wplata' ? t.amountPLN || 0 : t.type === 'wyplata' ? -(t.amountPLN || 0) : 0), 0);
+        accounts[acc] = { value: r2(net), invested: r2(net), date: DATA_DAY };
+      }
+    }
+    store.set('gem.v1.summary', { date: DATA_DAY, updatedAt: Date.now(), accounts });
+  } catch {
+    // wycena dla dziennika nie jest konieczna do działania portfela
+  }
 }
 const saveUi = () => store.set(KEYS.ui, state.ui);
 const taxRate = () => (state.settings.taxForm === 'ryczalt' ? Number(state.settings.ryczaltRate) || 0 : D.podatki.taxForms[state.settings.taxForm]?.rate ?? 0.12);
@@ -131,6 +157,7 @@ function saveTxs(txs, { sync = true } = {}) {
   state.txs = txs;
   if (!store.set(KEYS.tx, txs)) toast('Nie udało się zapisać danych w przeglądarce (tryb prywatny?). Wyeksportuj kopię.');
   if (sync && state.sync?.token) schedulePush();
+  publishGemSummary();
 }
 const newId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
 

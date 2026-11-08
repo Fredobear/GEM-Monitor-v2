@@ -92,6 +92,43 @@ async function ensureLibraryAssets() {
   for (const l of lots) added = addLibraryAsset(l.asset, l.name, l.currency) || added;
   return added;
 }
+// ---------- Portfel GEM (zakładka GEM → Mój portfel GEM w tej samej przeglądarce) ----------
+// Dziennik czyta i dopisuje wpłaty w portfelu GEM (klucz gem.v1.transactions) oraz czyta wycenę rachunków, którą
+// zapisuje zakładka GEM (gem.v1.summary). To dane z tej samej przeglądarki – nic nie jest wysyłane.
+const GEM_TX_KEY = 'gem.v1.transactions';
+function gemTxsLoad() {
+  try {
+    const v = JSON.parse(localStorage.getItem(GEM_TX_KEY));
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+function gemTxsSave(list) {
+  try {
+    localStorage.setItem(GEM_TX_KEY, JSON.stringify(list));
+    return true;
+  } catch {
+    return false;
+  }
+}
+{
+  let s = null;
+  try {
+    s = JSON.parse(localStorage.getItem('gem.v1.summary'));
+  } catch {
+    // brak wyceny portfela GEM – konto pokaże saldo przelewów
+  }
+  if (s?.accounts) MARKET.gemValues = Object.fromEntries(Object.entries(s.accounts).filter(([, v]) => Number.isFinite(v?.value)).map(([k, v]) => [k, { value: v.value, invested: v.invested, date: v.date ?? s.date ?? today() }]));
+}
+// Limit wpłat w roku (IKE, IKZE) z danych podatkowych aplikacji.
+function gemLimit(gemAccount, year) {
+  const years = Object.keys(MARKET.limits ?? {}).map(Number).sort((a, b) => a - b);
+  const y = years.includes(year) ? year : years.filter((x) => x <= year).pop();
+  const l = y ? MARKET.limits[y] : null;
+  return gemAccount === 'IKE' ? l?.ike ?? null : gemAccount === 'IKZE' ? l?.ikze ?? null : null;
+}
+
 const refreshLibraryAssets = () =>
   ensureLibraryAssets()
     .then((added) => added && render())
@@ -172,8 +209,8 @@ function toast(text, ms = 3500) {
   toast.t = setTimeout(() => (el.hidden = true), ms);
 }
 
-// Powiadomienie z przyciskiem „Cofnij” (przywraca stan sprzed zmiany).
-function showUndo(text, snapshot) {
+// Powiadomienie z przyciskiem „Cofnij” (przywraca stan sprzed zmiany; gemSnapshot – także wpisy portfela GEM).
+function showUndo(text, snapshot, gemSnapshot = null) {
   const el = $('#toast');
   el.innerHTML = `<span>${esc(text)}</span><button type="button" class="toast-btn">Cofnij</button>`;
   el.hidden = false;
@@ -181,18 +218,20 @@ function showUndo(text, snapshot) {
   $('.toast-btn', el).onclick = () => {
     fin = { ...emptyFinance(), ...JSON.parse(snapshot) };
     save();
+    if (gemSnapshot !== null) gemTxsSave(JSON.parse(gemSnapshot));
     el.hidden = true;
     render();
     toast('Przywrócono poprzedni stan.');
   };
   toast.t = setTimeout(() => (el.hidden = true), 10000);
 }
-function undoable(text, mutate) {
+function undoable(text, mutate, { gem = false } = {}) {
   const snapshot = JSON.stringify(fin);
+  const gemSnapshot = gem ? JSON.stringify(gemTxsLoad()) : null;
   mutate();
   save();
   render();
-  showUndo(text, snapshot);
+  showUndo(text, snapshot, gemSnapshot);
   scheduleDocCleanup();
 }
 
@@ -578,6 +617,12 @@ function alerts() {
   if (due.length) out.push(`<section class="card pend"><h2>Stałe pozycje do zatwierdzenia</h2>${due.map(pendRow).join('')}</section>`);
   const bal = balances(fin);
   for (const a of activeAccounts()) {
+    // Kredyt bez automatycznego zapisu rat: przypomnienie o racie na 3 dni przed terminem.
+    if (isLoan(a) && !a.loan.autoPost) {
+      const next = loanSchedule(a.loan).find((r) => r.kind === 'rata' && r.date >= today());
+      const days = next ? daysBetween(today(), next.date) : 99;
+      if (days <= 3) out.push(`<div class="banner info">🏠 <b>${esc(a.name)}</b>: rata ${days === 0 ? 'dziś' : days === 1 ? 'jutro' : `za ${days} dni (${esc(shortDate(next.date))})`} – ${esc(money(next.payment + (Number(a.loan.insurance) || 0), a.currency))}. <button class="link" data-loan="${esc(a.id)}">Szczegóły</button></div>`);
+    }
     const d = cardDue(a, bal[a.id], today());
     if (d && d.days <= 5) {
       const when = d.days === 0 ? 'dziś' : d.days === 1 ? 'jutro' : `za ${d.days} dni (${shortDate(d.due)})`;
@@ -787,22 +832,97 @@ function investmentLines(a, cash) {
   return `${head}${lines.join('')}${realized}<div class="inv-line"><span>Wolna gotówka</span><b>${esc(money(cash, a.currency))}</b></div>`;
 }
 
+const pctNum = (x) => NF2.format(Math.round(x * 100) / 100).replace(/,00$/, '');
+const monthYear = (iso) => (iso ? `${MONTHS[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}` : '–');
+
+// Karta kredytowa: minimalna spłata i odsetki, gdy zadłużenie nie zostanie spłacone w terminie (z ustawień karty).
+function cardCostLine(a, debt) {
+  if (debt < 0.005 || !(a.cardRate > 0 || a.minPayPct > 0)) return '';
+  const parts = [];
+  if (a.minPayPct > 0) parts.push(`minimalna spłata ok. <b>${esc(zl(Math.min(debt, (debt * a.minPayPct) / 100)))}</b> (bank może mieć też kwotę minimalną)`);
+  if (a.cardRate > 0) parts.push(`odsetki przy spłacie po terminie ok. <b>${esc(zl((debt * a.cardRate) / 1200))}</b> miesięcznie (${esc(pctNum(a.cardRate))}% rocznie)`);
+  return `<div class="small muted">${parts.join(' · ')}</div>`;
+}
+
+// Kredyt: postęp spłaty, najbliższa rata, oprocentowanie i zgodność salda z harmonogramem.
+function loanRateText(L, rate) {
+  if (L.rateType === 'zero') return '0%';
+  const ref = L.rateType === 'zmienne' && Number.isFinite(L.margin) ? ` (${L.refName || 'stawka'} ${pctNum(rate - L.margin)}% + marża ${pctNum(L.margin)}%)` : '';
+  return `${pctNum(rate)}%${ref}`;
+}
+function loanInfo(a, b) {
+  const L = a.loan;
+  const cur = a.currency || 'PLN';
+  const s = loanSummary(L, today());
+  const ins = Number(L.insurance) || 0;
+  const next = s.next
+    ? `Następna rata: <b>${esc(shortDate(s.next.date))}</b> · <b>${esc(money(s.next.payment + ins, cur))}</b> <span class="muted">(kapitał ${esc(money(s.next.principal, cur))}, odsetki ${esc(money(s.next.interest, cur))}${ins ? `, opłaty ${esc(money(ins, cur))}` : ''})</span>`
+    : '<b class="pos">Kredyt spłacony 🎉</b>';
+  const drift = round2(-b - s.remaining);
+  const fixedEnd = L.fixedUntil && L.fixedUntil >= today() && daysBetween(today(), L.fixedUntil) <= 120 ? `<div class="small warn">Okres stałej stopy kończy się ${esc(shortDate(L.fixedUntil, true))} – sprawdź w banku nowe oprocentowanie i wpisz je w szczegółach kredytu.</div>` : '';
+  return `<div class="meter" title="Spłacony kapitał"><span style="width:${(s.progress * 100).toFixed(1)}%;background:var(--pos)"></span></div>
+  <div class="loan-line">Spłacono <b>${esc(pct1(s.progress))}</b> kapitału · zostało <b>${esc(money(s.remaining, cur))}</b> z ${esc(money(s.original, cur))}</div>
+  <div class="loan-line">${next}</div>
+  <div class="loan-line muted">${esc(LOAN_KINDS[L.kind] ?? 'Kredyt')} · oprocentowanie ${esc(loanRateText(L, s.rate))} · raty ${L.installments === 'malejace' ? 'malejące' : 'równe'} · ${s.left} ${plural(s.left, 'rata', 'raty', 'rat')} do końca${s.end ? ` (${esc(monthYear(s.end))})` : ''}</div>
+  ${fixedEnd}
+  ${Math.abs(drift) >= 1 ? `<div class="small warn">Saldo w dzienniku różni się od harmonogramu o ${esc(money(Math.abs(drift), cur))}. <button class="link small" data-loan-sync="${esc(a.id)}">Ustaw według harmonogramu</button></div>` : ''}`;
+}
+
+// Konto powiązane z portfelem GEM (np. XTB IKE): limit wpłat, wycena z portfela i wpłaty z portfela do zapisania tutaj.
+function gemInfo(a, b) {
+  const gemTxs = gemTxsLoad();
+  const year = Number(today().slice(0, 4));
+  const limit = gemLimit(a.gemAccount, year);
+  const dep = gemYearDeposits(gemTxs, a.gemAccount, year);
+  const out = [];
+  if (limit) {
+    const share = Math.min(1, dep / limit);
+    out.push(`<div class="meter" title="Wykorzystany limit wpłat"><span style="width:${(share * 100).toFixed(1)}%;background:${share >= 1 ? 'var(--warn)' : 'var(--accent)'}"></span></div><div class="ike-line">Wpłaty w ${year}: <b>${esc(zl(dep))}</b> z ${esc(zl0(limit))} limitu ${esc(a.gemAccount)} · zostało <b>${esc(zl(Math.max(0, limit - dep)))}</b></div>`);
+  }
+  const g = MARKET.gemValues?.[a.gemAccount];
+  if (g) {
+    const gain = Number.isFinite(g.invested) ? g.value - g.invested : null;
+    out.push(`<div class="ike-line">Portfel GEM (${esc(GEM_ACCOUNTS[a.gemAccount] ?? a.gemAccount)}): wartość <b>${esc(zl(g.value))}</b>${Number.isFinite(g.invested) ? ` · wpłacono netto ${esc(zl(g.invested))} · zysk <b class="${gainClass(gain)}">${esc(gainText(gain, g.invested > 0 ? g.value / g.invested - 1 : null))}</b>` : ''} <span class="muted">(wycena z ${esc(shortDate(g.date, true))})</span></div>`);
+  } else if (a.gemValuation) out.push('<div class="ike-line muted">Wycena pojawi się po otwarciu zakładki GEM → Mój portfel GEM (na tym urządzeniu). Do tego czasu konto pokazuje sumę przelewów.</div>');
+  if (a.gemValuation) out.push(`<div class="ike-line muted">Przelewy na to konto (wpłaty netto w dzienniku): ${esc(money(b, a.currency))}</div>`);
+  const pending = unlinkedGemTxs(fin, gemTxs, a);
+  if (pending.length) {
+    const list = pending.slice(0, 6).map((g2) => `${g2.type === 'wplata' ? 'wpłata' : 'wypłata'} ${shortDate(g2.date)} – ${zl(g2.amountPLN)}`).join(', ');
+    out.push(`<div class="lv-box small">W portfelu GEM ${pending.length === 1 ? 'jest operacja' : 'są operacje'} na ${esc(a.gemAccount)}, ${pending.length === 1 ? 'której' : 'których'} nie ma w Finansach: ${esc(list)}${pending.length > 6 ? '…' : ''}.
+    <label class="field">Z konta / na konto<select data-gem-from="${esc(a.id)}">${accountOptions(defaultAccount('przelew'), { none: false, filter: (x) => x.id !== a.id && !isLoan(x) && !x.gemAccount })}</select></label>
+    <button type="button" class="btn small" data-gem-link="${esc(a.id)}">Zapisz jako ${pending.length === 1 ? 'przelew' : `przelewy (${pending.length})`}</button></div>`);
+  }
+  return out.join('');
+}
+
 function accountItem(a, b) {
   const card = isCard(a);
-  const inv = a.type === 'inwestycje' || a.lots?.length;
+  const loan = isLoan(a);
+  const gemVal = Boolean(a.gemAccount && a.gemValuation);
+  const inv = !loan && (a.type === 'inwestycje' || a.lots?.length);
   const cur = a.currency || 'PLN';
   const st = card ? cardStatus(a, b) : null;
   const due = card ? cardDue(a, b, today()) : null;
   const w = accountWorth(fin, a, MARKET, valuationDate(), b);
-  const sub = [ACCOUNT_TYPES[a.type] ?? 'Konto', cur !== 'PLN' ? cur : '', a.excludeFromTotal ? 'poza majątkiem' : ''].filter(Boolean).join(' · ');
-  const main = inv ? (w ? zl(w.total) : money(b, cur)) : money(b, cur);
-  const conv = !inv && cur !== 'PLN' && w ? `<span class="acc-sub">≈ ${esc(zl(w.cashPLN))}</span>` : inv && !w ? '<span class="acc-sub">brak kursu</span>' : '';
+  const sub = [ACCOUNT_TYPES[a.type] ?? 'Konto', a.gemAccount ? `portfel GEM: ${GEM_ACCOUNTS[a.gemAccount] ?? a.gemAccount}` : '', cur !== 'PLN' ? cur : '', a.excludeFromTotal ? 'poza majątkiem' : ''].filter(Boolean).join(' · ');
+  const main = inv || gemVal ? (w ? zl(w.total) : money(b, cur)) : money(b, cur);
+  const conv = !inv && !gemVal && cur !== 'PLN' && w ? `<span class="acc-sub">≈ ${esc(zl(w.cashPLN))}</span>` : inv && !w ? '<span class="acc-sub">brak kursu</span>' : '';
   const cardInfo = card
-    ? `${st.limit ? `<div class="meter" title="Wykorzystany limit"><span style="width:${(st.usedShare * 100).toFixed(1)}%;background:${st.usedShare > 0.8 ? 'var(--neg)' : 'var(--accent)'}"></span></div>` : ''}<div class="small muted">${st.debt > 0.004 ? `Do spłaty <b class="neg">${esc(zl(st.debt))}</b>` : 'Karta spłacona ✓'}${st.limit ? ` · limit ${esc(zl0(st.limit))} · dostępne ${esc(zl(st.available))}` : ''}${due ? ` · termin ${esc(shortDate(due.due))}` : ''}</div>`
+    ? `${st.limit ? `<div class="meter" title="Wykorzystany limit"><span style="width:${(st.usedShare * 100).toFixed(1)}%;background:${st.usedShare > 0.8 ? 'var(--neg)' : 'var(--accent)'}"></span></div>` : ''}<div class="small muted">${st.debt > 0.004 ? `Do spłaty <b class="neg">${esc(zl(st.debt))}</b>` : 'Karta spłacona ✓'}${st.limit ? ` · limit ${esc(zl0(st.limit))} · dostępne ${esc(zl(st.available))}` : ''}${due ? ` · termin ${esc(shortDate(due.due))}` : ''}</div>${cardCostLine(a, st.debt)}`
     : '';
   const cards = a.cards?.length ? `<div class="small muted">Apple Pay: ${esc(a.cards.join(', '))}</div>` : '';
-  return `<li class="acc-item"><div class="acc-line"><span class="acc-ico" style="${colorVar(a.color)}">${esc(accIcon(a))}</span><span class="acc-main"><b>${esc(a.name)}</b><small>${esc(sub)}</small></span><span class="acc-bal ${(inv ? w?.total ?? b : b) < -0.004 ? 'neg' : ''}">${esc(main)}${conv}</span></div>
-  <div class="acc-more">${inv ? investmentLines(a, b) : ''}${cardInfo}${cards}<div class="acc-actions">${card && st.debt > 0.004 ? `<button class="btn small primary" data-repay="${esc(a.id)}">Spłać kartę</button>` : ''}${inv ? `<button class="btn small primary" data-lots="${esc(a.id)}">Aktywa</button>` : ''}<button class="btn small" data-history="${esc(a.id)}">Historia</button><button class="btn small ghost" data-edit-acc="${esc(a.id)}">Edytuj</button></div></div></li>`;
+  const details = `${inv && !gemVal ? investmentLines(a, b) : ''}${a.gemAccount ? gemInfo(a, b) : ''}${loan ? loanInfo(a, b) : ''}${cardInfo}${cards}`;
+  const buttons = [
+    card && st.debt > 0.004 ? `<button class="btn small primary" data-repay="${esc(a.id)}">Spłać kartę</button>` : '',
+    loan ? `<button class="btn small primary" data-loan="${esc(a.id)}">Szczegóły kredytu</button>` : '',
+    a.gemAccount ? `<button class="btn small primary" data-gem-pay="${esc(a.id)}">Wpłać na ${esc(a.gemAccount === 'ZWYKLE' ? 'konto' : a.gemAccount)}</button>` : '',
+    inv && !gemVal ? `<button class="btn small ${a.gemAccount ? '' : 'primary'}" data-lots="${esc(a.id)}">Aktywa</button>` : '',
+    `<button class="btn small" data-history="${esc(a.id)}">Historia</button>`,
+    `<button class="btn small ghost" data-edit-acc="${esc(a.id)}">Edytuj</button>`,
+  ].join('');
+  const negative = (inv || gemVal ? w?.total ?? b : b) < -0.004;
+  return `<li class="acc-item"><div class="acc-line"><span class="acc-ico" style="${colorVar(a.color)}">${esc(accIcon(a))}</span><span class="acc-main"><b>${esc(a.name)}</b><small>${esc(sub)}</small></span><span class="acc-bal ${negative ? 'neg' : ''}">${esc(main)}${conv}</span></div>
+  <div class="acc-more">${details}<div class="acc-actions">${buttons}</div></div></li>`;
 }
 
 function viewAccounts() {
@@ -846,10 +966,19 @@ function viewRecurring() {
     const list = recs.filter((r) => r.type === type).sort((a, b) => (a.nextDate < b.nextDate ? -1 : 1));
     return list.length ? `<div class="day-sep"><span>${title}</span></div>${list.map(recRow).join('')}` : '';
   };
-  return `<section class="card"><div class="sum3"><div><span>Stałe przychody</span><b class="pos">+${esc(zl(m.przychod))}</b><small>miesięcznie</small></div><div><span>Stałe wydatki</span><b class="neg">−${esc(zl(m.wydatek))}</b><small>miesięcznie</small></div><div><span>Zostaje</span><b class="${m.przychod - m.wydatek >= 0 ? 'pos' : 'neg'}">${esc(signed(m.przychod - m.wydatek))}</b><small>miesięcznie</small></div></div></section>
+  const out = m.wydatek + m.kredyty;
+  const loans = fin.accounts.filter((a) => isLoan(a) && !a.archived);
+  const loanRows = loans
+    .map((a) => {
+      const s = loanSummary(a.loan, today());
+      return `<button class="ftx" data-loan="${esc(a.id)}"><span class="cat-ico" style="${colorVar(a.color ?? LOAN_CATEGORY.color)}">${esc(accIcon(a))}</span><span class="ftx-main"><b>${esc(a.name)}</b><small>${s.next ? `${esc(shortDate(s.next.date))} · co miesiąc · ${s.left} ${plural(s.left, 'rata', 'raty', 'rat')} do końca${a.loan.autoPost ? '' : ' · zapis ręczny'}` : 'spłacony'}</small></span><span class="ftx-amt neg">${s.next ? `−${esc(money(s.next.payment + (Number(a.loan.insurance) || 0), a.currency))}` : ''}</span></button>`;
+    })
+    .join('');
+  return `<section class="card"><div class="sum3"><div><span>Stałe przychody</span><b class="pos">+${esc(zl(m.przychod))}</b><small>miesięcznie</small></div><div><span>Stałe wydatki</span><b class="neg">−${esc(zl(out))}</b><small>${m.kredyty ? `w tym raty ${esc(zl(m.kredyty))}` : 'miesięcznie'}</small></div><div><span>Zostaje</span><b class="${m.przychod - out >= 0 ? 'pos' : 'neg'}">${esc(signed(m.przychod - out))}</b><small>miesięcznie</small></div></div></section>
   ${due.length ? `<section class="card pend"><h2>Do zatwierdzenia</h2>${due.map(pendRow).join('')}</section>` : ''}
   <section class="card"><div class="card-head"><h2>Stałe przelewy i dochody</h2><button class="btn small primary" data-act="add-rec">+ Dodaj</button></div>
-  ${recs.length ? `${group('przychod', 'Dochody')}${group('wydatek', 'Płatności')}${group('przelew', 'Przelewy między kontami')}` : '<p class="muted">Dodaj pensję, czynsz, rachunki, subskrypcje albo stały przelew na oszczędności. W dniu terminu operacja zapisze się sama albo poprosi o zatwierdzenie (gdy kwota co miesiąc jest inna).</p>'}</section>
+  ${recs.length ? `${group('przychod', 'Dochody')}${group('wydatek', 'Płatności')}${group('przelew', 'Przelewy między kontami')}` : '<p class="muted">Dodaj pensję, czynsz, rachunki, subskrypcje albo stały przelew na oszczędności. W dniu terminu operacja zapisze się sama albo poprosi o zatwierdzenie (gdy kwota co miesiąc jest inna).</p>'}
+  ${loans.length ? `<div class="day-sep"><span>Raty kredytów</span></div>${loanRows}` : '<p class="small muted">Kredyt albo pożyczkę dodasz w Kontach (rodzaj „Kredyt / pożyczka”) – raty pojawią się tutaj i w kalendarzu.</p>'}</section>
   ${up.length ? `<section class="card"><h2>Najbliższe 30 dni</h2>${up.map(planRow).join('')}</section>` : ''}`;
 }
 
@@ -1115,8 +1244,14 @@ function runRecurring() {
   const before = fin.recurring.map((r) => r.nextDate).join();
   const r = processRecurring(fin, today(), { newId, market: MARKET });
   fin = r.fin;
-  if (r.posted || fin.recurring.map((x) => x.nextDate).join() !== before) save();
-  if (r.posted) toast(`Zapisano ${r.posted} ${plural(r.posted, 'stałą pozycję', 'stałe pozycje', 'stałych pozycji')} z terminem do dziś.`);
+  // Raty kredytów z automatycznym zapisem: kapitał jako przelew na kredyt, odsetki i opłaty jako wydatek.
+  const l = processLoans(fin, today(), { newId, market: MARKET });
+  fin = l.fin;
+  if (r.posted || l.posted || fin.recurring.map((x) => x.nextDate).join() !== before) save();
+  const parts = [];
+  if (r.posted) parts.push(`${r.posted} ${plural(r.posted, 'stałą pozycję', 'stałe pozycje', 'stałych pozycji')}`);
+  if (l.posted) parts.push(`${l.posted} ${plural(l.posted, 'ratę kredytu', 'raty kredytów', 'rat kredytów')}`);
+  if (parts.length) toast(`Zapisano ${parts.join(' i ')} z terminem do dziś.`);
 }
 
 $('#fin-nav').addEventListener('click', (ev) => {
@@ -1148,14 +1283,31 @@ async function deleteTxFlow(id) {
   if (!t) return;
   closeDialog(TX);
   const docs = (fin.docs ?? []).filter((d) => d.txId === id).length;
-  const res = await confirmAction({ title: 'Usunąć operację?', body: `${txSummary(t)}${docs ? `<p class="small muted">Dołączone dokumenty (${docs}) zostaną w zakładce Dokumenty.</p>` : ''}`, ok: 'Usuń operację' });
+  const res = await confirmAction({ title: 'Usunąć operację?', body: `${txSummary(t)}${docs ? `<p class="small muted">Dołączone dokumenty (${docs}) zostaną w zakładce Dokumenty.</p>` : ''}${t.gemTxId ? '<p class="small muted">Powiązana wpłata w portfelu GEM też zostanie usunięta.</p>' : ''}${t.loanId && !t.overpay ? '<p class="small muted">To rata kredytu zapisana automatycznie – nie zapisze się ponownie.</p>' : ''}`, ok: 'Usuń operację' });
   if (!res) return;
-  undoable('Usunięto operację.', () => {
-    const x = fin.txs.find((y) => y.id === id);
-    x.deleted = true;
-    x.updatedAt = Date.now();
-    fin.docs = (fin.docs ?? []).map((d) => (d.txId === id ? { ...d, txId: null } : d));
-  });
+  undoable(
+    'Usunięto operację.',
+    () => {
+      const x = fin.txs.find((y) => y.id === id);
+      x.deleted = true;
+      x.updatedAt = Date.now();
+      fin.docs = (fin.docs ?? []).map((d) => (d.txId === id ? { ...d, txId: null } : d));
+      if (x.gemTxId) {
+        const list = gemTxsLoad();
+        const g = list.find((y) => y.id === x.gemTxId);
+        if (g) {
+          Object.assign(g, { deleted: true, updatedAt: Date.now() });
+          gemTxsSave(list);
+        }
+      }
+      // Nadpłata usunięta z dziennika znika też z harmonogramu kredytu.
+      if (x.overpay && x.loanId) {
+        const loanAcc = acc(x.loanId);
+        if (isLoan(loanAcc)) loanAcc.loan.overpayments = (loanAcc.loan.overpayments ?? []).filter((o) => o.txId !== x.id);
+      }
+    },
+    { gem: Boolean(t.gemTxId) },
+  );
 }
 
 async function deleteAccountFlow(id) {
@@ -1289,6 +1441,14 @@ $('#fin-root').addEventListener('click', async (ev) => {
   }
   if (d.repay) return openRepay(d.repay);
   if (d.lots) return openLots(d.lots);
+  if (d.loan) return openLoan(d.loan);
+  if (d.loanSync) return syncLoanBalance(d.loanSync);
+  if (d.gemPay) {
+    const a = acc(d.gemPay);
+    return openTx(null, { type: 'przelew', toAccountId: a.id, accountId: defaultAccount('przelew'), merchant: `Wpłata na ${a.gemAccount === 'ZWYKLE' ? 'konto inwestycyjne' : a.gemAccount}` });
+  }
+  if (d.gemLink) return linkGemTxs(d.gemLink);
+  if (d.editRec?.startsWith('loan:')) return openLoan(d.editRec.slice(5));
   if (d.history) {
     Object.assign(ui, { account: d.history, category: '', type: '', q: '' });
     return setView('operacje');
@@ -1641,6 +1801,7 @@ function openTx(t, prefill = {}, { recId = '' } = {}) {
   f.elements.toAccountId.innerHTML = accountOptions(tx.toAccountId);
   f.elements.repeat.value = '';
   f.elements.remember.checked = false;
+  f.dataset.gemTouched = '';
   $('#fd-delete').hidden = !t;
   $('#fd-errors').textContent = '';
   txDocs = { pending: [], existing: t ? (fin.docs ?? []).filter((d) => d.txId === t.id) : [] };
@@ -1675,6 +1836,17 @@ function syncTxForm() {
           : '';
   $('#fd-hint').textContent = hint;
   $('#fd-hint').hidden = !hint;
+  // Przelew na konto powiązane z portfelem GEM (np. IKE): wpłata zapisze się też w zakładce GEM → Mój portfel GEM.
+  const gemInfoTx = type === 'przelew' ? gemTransferInfo(fin, { type, accountId: f.elements.accountId.value, toAccountId: f.elements.toAccountId.value }) : null;
+  const linked = f.dataset.id ? fin.txs.find((x) => x.id === f.dataset.id)?.gemTxId : null;
+  $('#fd-gem').hidden = !gemInfoTx;
+  if (gemInfoTx) {
+    const where = gemInfoTx.account === 'ZWYKLE' ? 'na koncie zwykłym' : `na ${gemInfoTx.account}`;
+    $('#fd-gem-label').textContent = linked ? `Powiązana ${gemInfoTx.type === 'wplata' ? 'wpłata' : 'wypłata'} w portfelu GEM zostanie zaktualizowana.` : `Zapisz też w portfelu GEM jako ${gemInfoTx.type === 'wplata' ? 'wpłatę' : 'wypłatę'} ${where}${gemInfoTx.type === 'wplata' && ['IKE', 'IKZE'].includes(gemInfoTx.account) ? ' (liczy się do limitu)' : ''}`;
+    f.elements.gem.disabled = Boolean(linked);
+    if (linked) f.elements.gem.checked = true;
+    else if (f.dataset.gemTouched !== '1') f.elements.gem.checked = true;
+  }
   const salary = type === 'przychod' && /wynagr|pensj|wypłat|wyplat/i.test(`${cat(f.dataset.cat)?.name ?? ''} ${f.elements.merchant.value}`);
   $('#fd-docs-title').textContent = salary ? 'Dokumenty – dołącz pasek płacowy' : type === 'wydatek' ? 'Dokumenty (np. paragon, faktura)' : 'Dokumenty';
   syncTxAmounts();
@@ -1717,6 +1889,7 @@ txForm.addEventListener('change', (ev) => {
   if (ev.target.dataset.pendingKind !== undefined) txDocs.pending[Number(ev.target.dataset.pendingKind)].kind = ev.target.value;
   else if (['type', 'accountId', 'toAccountId'].includes(n)) syncTxForm();
   else if (n === 'date') syncTxAmounts();
+  else if (n === 'gem') txForm.dataset.gemTouched = '1';
 });
 txForm.addEventListener('input', (ev) => {
   if (ev.target.name === 'amount') syncTxAmounts();
@@ -1796,6 +1969,25 @@ txForm.addEventListener('submit', async (ev) => {
     return;
   }
   if (f.elements.remember.checked && t.merchant && t.categoryId) fin.rules.push({ id: newId(), pattern: rulePatternFor(t.merchant), categoryId: t.categoryId });
+  // Portfel GEM: przelew na powiązany rachunek (np. IKE) zapisuje albo aktualizuje wpłatę w zakładce GEM.
+  const gi = gemTransferInfo(fin, t);
+  let gemList = null;
+  if (gi && (t.gemTxId || f.elements.gem.checked)) {
+    gemList = gemTxsLoad();
+    const nowTs = Date.now();
+    const linkedGem = t.gemTxId ? gemList.find((g) => g.id === t.gemTxId) : null;
+    if (linkedGem) Object.assign(linkedGem, { type: gi.type, date: t.date, account: gi.account, amountPLN: round2(gi.type === 'wplata' ? t.toAmount ?? t.amount : t.amount), deleted: false, updatedAt: nowTs });
+    else {
+      const g = gemTxFromTransfer(t, gi, { id: newId(), now: nowTs });
+      gemList.push(g);
+      t.gemTxId = g.id;
+    }
+  } else if (!gi && prev?.gemTxId) {
+    gemList = gemTxsLoad();
+    const g = gemList.find((x) => x.id === prev.gemTxId);
+    if (g) Object.assign(g, { deleted: true, updatedAt: Date.now() });
+    delete t.gemTxId;
+  }
   const rec = f.dataset.rec && fin.recurring.find((x) => x.id === f.dataset.rec);
   if (rec) {
     Object.assign(t, { recurringId: rec.id, importKey: `rec|${rec.id}|${rec.nextDate}`, source: 'stale' });
@@ -1812,10 +2004,11 @@ txForm.addEventListener('submit', async (ev) => {
   if (t.type === 'wydatek' && t.accountId) fin.lastAccountId = t.accountId;
   for (const d of txDocs.pending) await saveDocFile(d.file, { kind: d.kind, date: t.date, txId: t.id, buffer: await d.file.arrayBuffer() });
   save();
+  const gemNote = gemList ? (gemTxsSave(gemList) ? (gi ? ` Zapisano też w portfelu GEM (${gi.type === 'wplata' ? 'wpłata' : 'wypłata'}, ${gi.account}).` : ' Usunięto powiązany wpis w portfelu GEM.') : ' Nie udało się zapisać w portfelu GEM.') : '';
   closeDialog(TX);
   const docsNote = txDocs.pending.length ? ` Dołączone dokumenty: ${txDocs.pending.length}.` : '';
   txDocs = { pending: [], existing: [] };
-  toast(prev ? `Zapisano zmiany.${docsNote}` : `Dodano ${FIN_TYPES[t.type].toLowerCase()}: ${zl(Math.abs(t.amount))}${freq ? ` (powtarza się: ${FREQS[freq].toLowerCase()})` : ''}.${docsNote}`);
+  toast(prev ? `Zapisano zmiany.${docsNote}${gemNote}` : `Dodano ${FIN_TYPES[t.type].toLowerCase()}: ${zl(Math.abs(t.amount))}${freq ? ` (powtarza się: ${FREQS[freq].toLowerCase()})` : ''}.${docsNote}${gemNote}`, gemNote ? 6000 : 3500);
   if (freq && !prev) runRecurring();
   render();
 });
@@ -1844,6 +2037,11 @@ function openAccount(id) {
   f.elements.payFromId.innerHTML = `<option value="">— wybiorę przy spłacie —</option>${accountOptions(a?.payFromId, { none: false, filter: (x) => !isCard(x) && x.id !== a?.id })}`;
   f.elements.cards.value = (a?.cards ?? []).join(', ');
   f.elements.excludeFromTotal.checked = Boolean(a?.excludeFromTotal);
+  f.elements.cardRate.value = a?.cardRate ? fmtInput(a.cardRate) : '';
+  f.elements.minPayPct.value = a?.minPayPct ? fmtInput(a.minPayPct) : '';
+  f.elements.gemAccount.value = a?.gemAccount ?? '';
+  f.elements.gemValuation.checked = a?.gemAccount ? Boolean(a.gemValuation) : true;
+  fillLoanForm(a?.loan ?? null);
   $('#ad-delete').hidden = !a;
   $('#ad-archive').hidden = !a;
   $('#ad-archive').textContent = a?.archived ? 'Przywróć' : 'Ukryj';
@@ -1853,10 +2051,137 @@ function openAccount(id) {
   openDialog(ACC);
 }
 
+// ---------- Formularz kredytu (rodzaj konta „Kredyt / pożyczka”) ----------
+const lnRadio = () => accForm.querySelector('input[name="lnRateType"]:checked')?.value ?? 'stale';
+const round4 = (x) => Math.round(x * 1e4) / 1e4;
+const isoAddDays = (iso, n) => {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+// Początek bieżącego okresu odsetkowego: termin ostatniej raty przed dziś (albo uruchomienie kredytu).
+const loanPeriodStart = (L, date = today()) => loanSchedule(L).filter((r) => r.kind === 'rata' && r.date <= date).at(-1)?.date ?? L.start;
+
+function fillLoanForm(L) {
+  const e = accForm.elements;
+  const t = today();
+  const rate = L ? loanRateAt(L, t) : null;
+  e.lnKind.value = L?.kind ?? 'hipoteczny';
+  e.lnExisting.checked = Boolean(L?.existing);
+  e.lnAmount.value = L ? fmtInput(L.amount ?? L.principal) : '';
+  e.lnStart.value = L ? (L.existing ? L.origStart ?? '' : L.start) : '';
+  e.lnMonths.value = L ? String((L.existing ? L.origMonths : L.months) ?? '') : '';
+  e.lnRemaining.value = L?.existing ? fmtInput(L.principal) : '';
+  e.lnLeft.value = L?.existing ? String(L.months) : '';
+  e.lnNextDue.value = L?.existing ? L.firstDue : '';
+  e.lnFirstDue.value = L && !L.existing ? L.firstDue : '';
+  for (const r of accForm.querySelectorAll('input[name="lnRateType"]')) r.checked = r.value === (L?.rateType ?? 'stale');
+  e.lnRate.value = L && L.rateType !== 'zero' ? fmtInput(rate) : '';
+  e.lnRefName.value = L?.refName ?? 'WIBOR 3M';
+  e.lnMargin.value = Number.isFinite(L?.margin) ? fmtInput(L.margin) : '';
+  e.lnRef.value = L?.rateType === 'zmienne' && Number.isFinite(L?.margin) ? fmtInput(round4(rate - L.margin)) : '';
+  e.lnFixedUntil.value = L?.fixedUntil ?? '';
+  e.lnInstallments.value = L?.installments ?? 'rowne';
+  e.lnGrace.value = L?.grace ? String(L.grace) : '';
+  e.lnPayment.value = L?.payment ? fmtInput(L.payment) : '';
+  e.lnFee.value = L?.fee ? fmtInput(L.fee) : '';
+  e.lnFeeFinanced.checked = Boolean(L?.feeFinanced);
+  e.lnInsurance.value = L?.insurance ? fmtInput(L.insurance) : '';
+  e.lnPayFrom.innerHTML = accountOptions(L ? L.payFromId : defaultAccount('przelew'), { none: true, filter: (x) => !isLoan(x) && x.id !== accForm.dataset.id && x.type !== 'kredyt' });
+  e.lnAuto.checked = L ? Boolean(L.autoPost) : true;
+}
+
+// Parametry kredytu z formularza (prev – dotychczasowe, żeby zachować historię oprocentowania i nadpłaty).
+function readLoanForm(prev) {
+  const e = accForm.elements;
+  const num = (el) => (el.value.trim() ? parseAmount(el.value) : NaN);
+  const int = (el) => (el.value.trim() ? Math.round(Number(el.value.replace(',', '.'))) : NaN);
+  const t = today();
+  const existing = e.lnExisting.checked;
+  const rateType = lnRadio();
+  const L = { ...(prev ?? {}), overpayments: prev?.overpayments ?? [] };
+  L.kind = e.lnKind.value;
+  L.existing = existing || undefined;
+  L.rateType = rateType;
+  L.installments = e.lnInstallments.value;
+  L.grace = int(e.lnGrace) || 0;
+  L.fee = Math.abs(num(e.lnFee)) || 0;
+  L.feeFinanced = (!existing && e.lnFeeFinanced.checked) || undefined;
+  L.insurance = Math.abs(num(e.lnInsurance)) || 0;
+  L.payFromId = e.lnPayFrom.value || null;
+  L.autoPost = e.lnAuto.checked;
+  L.refName = rateType === 'zmienne' ? e.lnRefName.value : undefined;
+  L.margin = rateType === 'zmienne' ? num(e.lnMargin) : undefined;
+  L.fixedUntil = rateType === 'stale' ? e.lnFixedUntil.value || undefined : undefined;
+  const amount = Math.abs(num(e.lnAmount));
+  if (existing) {
+    // Stan na dziś z aplikacji banku: harmonogram zaczyna się od najbliższej raty.
+    L.amount = Number.isFinite(amount) ? amount : undefined;
+    L.origStart = e.lnStart.value || undefined;
+    L.origMonths = int(e.lnMonths) || undefined;
+    L.principal = Math.abs(num(e.lnRemaining));
+    L.months = int(e.lnLeft);
+    L.firstDue = e.lnNextDue.value;
+    L.start = L.firstDue ? shiftMonthsKeepDay(L.firstDue, -1) : '';
+  } else {
+    L.amount = amount;
+    L.principal = amount;
+    L.start = e.lnStart.value;
+    L.months = int(e.lnMonths);
+    L.firstDue = e.lnFirstDue.value || (L.start ? shiftMonthsKeepDay(L.start, 1) : '');
+    delete L.origStart;
+    delete L.origMonths;
+  }
+  const formRate = rateType === 'zero' ? 0 : rateType === 'zmienne' ? num(e.lnRef) + num(e.lnMargin) : num(e.lnRate);
+  const anchorChanged = !prev || prev.start !== L.start || prev.principal !== L.principal || Boolean(prev.existing) !== existing;
+  if (rateType === 'zero') L.rates = [];
+  else if (anchorChanged || !prev?.rates?.length) L.rates = Number.isFinite(formRate) ? [[L.start, round4(formRate)]] : [];
+  else if (Number.isFinite(formRate) && Math.abs(formRate - loanRateAt(prev, t)) > 1e-9) L.rates = [...prev.rates, [loanPeriodStart(prev, t), round4(formRate)]];
+  const pay = num(e.lnPayment);
+  if (Number.isFinite(pay) && pay > 0) {
+    if (anchorChanged || Math.abs((prev?.payment ?? 0) - pay) > 0.004 || !prev?.paymentFrom) {
+      L.payment = round2(pay);
+      L.paymentFrom = anchorChanged ? L.start : loanPeriodStart(L, t);
+    }
+  } else {
+    delete L.payment;
+    delete L.paymentFrom;
+  }
+  L.trackFrom = prev?.trackFrom ?? t;
+  return L;
+}
+
+function syncLoanForm() {
+  const e = accForm.elements;
+  const existing = e.lnExisting.checked;
+  const rateType = lnRadio();
+  $('#ad-ln-existing').hidden = !existing;
+  $('#ad-ln-first').hidden = existing;
+  $('#ad-ln-fixed').hidden = rateType !== 'stale';
+  $('#ad-ln-fixed-until').hidden = rateType !== 'stale';
+  $('#ad-ln-var').hidden = rateType !== 'zmienne';
+  const L = readLoanForm(acc(accForm.dataset.id)?.loan ?? null);
+  const errors = validateLoan({ ...L, autoPost: false });
+  const el = $('#ad-ln-preview');
+  if (errors.length) {
+    el.textContent = 'Uzupełnij kwotę, daty, liczbę rat i oprocentowanie – zobaczysz tu ratę i koszt kredytu.';
+    return;
+  }
+  const cur = accForm.elements.currency.value;
+  const s = loanSummary(L, today());
+  const first = s.next ?? s.installments[0];
+  const ins = Number(L.insurance) || 0;
+  el.innerHTML = `Rata: <b>${esc(money((first?.payment ?? 0) + ins, cur))}</b>${L.installments === 'malejace' ? ' (pierwsza, potem maleje)' : ''} · do spłaty dziś: <b>${esc(money(s.remaining, cur))}</b> · koniec: <b>${esc(monthYear(s.end))}</b><br>Odsetki do końca: ${esc(money(s.futureInterest, cur))} · całkowity koszt kredytu: ${esc(money(s.totalCost, cur))}${s.apr !== null ? ` · RRSO ok. ${esc(pctNum(s.apr * 100))}%` : ''}`;
+}
+
 function syncAccForm() {
   const f = accForm;
   const type = f.elements.type.value;
   const card = type === 'karta';
+  const loanType = type === 'kredyt';
+  $('#ad-loan').hidden = !loanType;
+  $('#ad-gem').hidden = type !== 'inwestycje';
+  if (loanType) syncLoanForm();
   const wasCard = f.dataset.type === 'karta';
   // Przy zmianie rodzaju przenosimy kwotę: saldo ujemne ↔ zadłużenie.
   if (card && !wasCard && !f.elements.debt.value) {
@@ -1868,7 +2193,7 @@ function syncAccForm() {
   }
   f.dataset.type = type;
   const cur = curLabel(f.elements.currency.value);
-  $('#ad-plain').hidden = card;
+  $('#ad-plain').hidden = card || loanType;
   $('#ad-card').hidden = !card;
   $('#ad-balance-label').textContent = type === 'inwestycje' ? `Wolna gotówka na rachunku (${cur})` : `Saldo obecne (${cur})`;
   $('#ad-balance-hint').textContent =
@@ -1879,19 +2204,24 @@ function syncAccForm() {
         : 'Ile jest teraz na koncie. Każda zapisana operacja zmieni to saldo.';
 }
 
-accForm.addEventListener('change', (ev) => ['type', 'currency'].includes(ev.target.name) && syncAccForm());
+accForm.addEventListener('change', (ev) => (['type', 'currency', 'lnExisting', 'lnRateType', 'lnInstallments', 'lnFeeFinanced'].includes(ev.target.name) ? syncAccForm() : ev.target.name?.startsWith('ln') && accForm.elements.type.value === 'kredyt' && syncLoanForm()));
+accForm.addEventListener('input', (ev) => ev.target.name?.startsWith('ln') && accForm.elements.type.value === 'kredyt' && syncLoanForm());
 accForm.addEventListener('submit', (ev) => {
   ev.preventDefault();
   const f = accForm;
   const prev = acc(f.dataset.id);
   const type = f.elements.type.value;
   const card = type === 'karta';
+  const loanType = type === 'kredyt';
   const name = f.elements.name.value.trim();
   const num = (input) => (input.value.trim() ? parseAmount(input.value) : 0);
-  const target = card ? -Math.abs(num(f.elements.debt)) : num(f.elements.balance);
+  const loan = loanType ? readLoanForm(isLoan(prev) ? prev.loan : null) : null;
   const errors = [];
   if (!name) errors.push('Podaj nazwę konta.');
-  if (!Number.isFinite(target)) errors.push(card ? 'Nie rozpoznano kwoty zadłużenia.' : 'Nie rozpoznano salda.');
+  if (loanType) errors.push(...validateLoan(loan, fin));
+  // Kredyt: saldo = −kapitał do spłaty z harmonogramu na dzień przed rozpoczęciem zapisywania rat.
+  const target = loanType ? (prev && isLoan(prev) ? balances(fin)[prev.id] : -loanBalanceAt(loan, loanSchedule(loan), isoAddDays(loan.trackFrom, -1))) : card ? -Math.abs(num(f.elements.debt)) : num(f.elements.balance);
+  if (!loanType && !Number.isFinite(target)) errors.push(card ? 'Nie rozpoznano kwoty zadłużenia.' : 'Nie rozpoznano salda.');
   const dueDay = f.elements.dueDay.value.trim() ? Math.round(Number(f.elements.dueDay.value)) : null;
   if (card && dueDay !== null && !(dueDay >= 1 && dueDay <= 31)) errors.push('Dzień spłaty to liczba od 1 do 31.');
   if (errors.length) {
@@ -1906,12 +2236,20 @@ accForm.addEventListener('submit', (ev) => {
   a.limit = card ? Math.abs(num(f.elements.limit)) || undefined : undefined;
   a.dueDay = card ? dueDay ?? undefined : undefined;
   a.payFromId = card ? f.elements.payFromId.value || undefined : undefined;
+  a.cardRate = card ? Math.abs(num(f.elements.cardRate)) || undefined : undefined;
+  a.minPayPct = card ? Math.abs(num(f.elements.minPayPct)) || undefined : undefined;
+  const gemAccount = type === 'inwestycje' ? f.elements.gemAccount.value || undefined : undefined;
+  a.gemLinkedAt = gemAccount ? (prev?.gemAccount === gemAccount ? prev.gemLinkedAt ?? today() : today()) : undefined;
+  a.gemAccount = gemAccount;
+  a.gemValuation = gemAccount ? f.elements.gemValuation.checked || undefined : undefined;
+  a.loan = loanType ? loan : undefined;
   fin.accounts = prev ? fin.accounts.map((x) => (x.id === id ? a : x)) : [...fin.accounts, a];
-  if (!prev) setBalance(fin, id, target);
-  else if (Math.abs(balances(fin)[id] - target) >= 0.005) adjustBalance(fin, id, target, { date: today(), newId, market: MARKET });
+  if (!prev || (loanType && !isLoan(prev))) setBalance(fin, id, target);
+  else if (!loanType && Math.abs(balances(fin)[id] - target) >= 0.005) adjustBalance(fin, id, target, { date: today(), newId, market: MARKET });
+  if (loanType) runRecurring();
   save();
   closeDialog(ACC);
-  toast(prev ? 'Zapisano konto.' : card ? 'Dodano kartę kredytową.' : type === 'inwestycje' ? 'Dodano konto inwestycyjne. Aktywa dodasz przyciskiem „Aktywa”.' : 'Dodano konto.', 5000);
+  toast(prev ? 'Zapisano konto.' : card ? 'Dodano kartę kredytową.' : loanType ? 'Dodano kredyt. Szczegóły, harmonogram i nadpłaty znajdziesz pod przyciskiem „Szczegóły kredytu”.' : type === 'inwestycje' ? (gemAccount ? `Dodano konto powiązane z portfelem GEM (${gemAccount}). Przelewy na nie zapiszą się też jako wpłaty w portfelu.` : 'Dodano konto inwestycyjne. Aktywa dodasz przyciskiem „Aktywa”.') : 'Dodano konto.', 6000);
   render();
 });
 $('#ad-archive').addEventListener('click', () => {
@@ -2222,6 +2560,207 @@ lotsForm.addEventListener('submit', (ev) => {
     fin.txs.push(tx);
   });
 });
+
+// ---------- Szczegóły kredytu: koszty, oprocentowanie, nadpłata, symulacje, harmonogram ----------
+const LOAN = $('#loan-dialog');
+let loanView = { id: null, full: false };
+
+function openLoan(id) {
+  if (!isLoan(acc(id))) return;
+  loanView = { id, full: false };
+  $('#lv-errors').textContent = '';
+  renderLoanView();
+  openDialog(LOAN);
+}
+
+function loanSchedRow(r, L, cur, t, next) {
+  const ins = Number(L.insurance) || 0;
+  if (r.kind === 'nadplata') return `<tr class="op"><td>Nadpłata ${esc(shortDate(r.date, true))}</td><td>${esc(money(r.overpay, cur))}</td><td>${esc(money(r.overpay, cur))}</td><td>–</td><td>${esc(money(r.balance, cur))}</td></tr>`;
+  const cls = [r.date <= t ? 'past' : '', next && r.n === next.n ? 'now' : ''].filter(Boolean).join(' ');
+  return `<tr class="${cls}"><td>${r.n}. ${esc(shortDate(r.date, true))}</td><td>${esc(money(r.payment + ins, cur))}</td><td>${esc(money(r.principal, cur))}</td><td>${esc(money(r.interest, cur))}</td><td>${esc(money(r.balance, cur))}</td></tr>`;
+}
+
+function renderLoanView() {
+  const a = acc(loanView.id);
+  if (!isLoan(a)) return closeDialog(LOAN);
+  const L = a.loan;
+  const cur = a.currency || 'PLN';
+  const t = today();
+  const s = loanSummary(L, t);
+  const ins = Number(L.insurance) || 0;
+  const mny = (x) => money(x, cur);
+  $('#lv-title').textContent = a.name;
+  const facts = [
+    ['Rodzaj', LOAN_KINDS[L.kind] ?? 'Kredyt'],
+    ['Oprocentowanie teraz', `${loanRateText(L, s.rate)}${L.rateType === 'stale' ? ` – stałe${L.fixedUntil ? ` do ${shortDate(L.fixedUntil, true)}` : ''}` : L.rateType === 'zmienne' ? ' – zmienne' : ''}`],
+    ['RRSO (szacunek)', s.apr !== null ? `${pctNum(s.apr * 100)}%` : '–'],
+    ['Raty', `${L.installments === 'malejace' ? 'malejące' : 'równe'}${L.payment ? ` · rata wg banku ${mny(L.payment)}` : ''}${L.grace ? ` · karencja ${L.grace} mies.` : ''}`],
+    ['Rat do końca', `${s.left} z ${s.count}${s.end ? ` · koniec ${monthYear(s.end)}` : ''}`],
+    [`Odsetki zapłacone${L.existing ? ` (od ${shortDate(L.start, true)})` : ''}`, mny(s.paidInterest)],
+    ['Odsetki do końca', mny(s.futureInterest)],
+    ['Prowizja', L.fee ? `${mny(L.fee)}${L.feeFinanced ? ' (doliczona do kredytu)' : ''}` : '–'],
+    ['Ubezpieczenie i opłaty', ins ? `${mny(ins)} miesięcznie · razem ${mny(s.insuranceTotal)}` : '–'],
+    ['Całkowity koszt kredytu', `${mny(s.totalCost)} (odsetki, prowizja i opłaty${L.existing ? ' od stanu na dziś' : ''})`],
+    ['Nadpłacono', s.overpaid ? mny(s.overpaid) : '–'],
+    ['Spłata', L.payFromId ? `z konta ${accName(L.payFromId)}${L.autoPost ? ' · raty zapisują się same' : ''}` : 'konto spłaty nie jest wybrane'],
+  ];
+  const rates = [...(L.rates ?? [])].sort((x, y) => (x[0] < y[0] ? -1 : 1));
+  const sims = L.rateType === 'zero' || !s.next ? '' : [-1, 1, 2].map((d) => {
+    const r = loanRateSim(L, d, t);
+    return r ? `${d > 0 ? '+' : '−'}${Math.abs(d)} pp: rata <b>${esc(mny(r.payment + ins))}</b> (${r.diff >= 0 ? '+' : '−'}${esc(mny(Math.abs(r.diff)))})` : '';
+  }).filter(Boolean).join(' · ');
+  const pStart = loanPeriodStart(L, t);
+  const rateBox = `<div class="lv-box"><h4>Oprocentowanie</h4>
+    ${rates.length ? `<ul class="rate-list">${rates.map(([d, v], i) => `<li><span>od ${esc(shortDate(d, true))}</span><span><b>${esc(pctNum(v))}%</b>${i > 0 ? ` <button type="button" class="link small danger-text" data-lv-rate-del="${i}">usuń</button>` : ''}</span></li>`).join('')}</ul>` : ''}
+    ${L.rateType === 'zero' ? '<p class="small muted">Kredyt 0% – bez odsetek.</p>' : `<div class="two"><label class="field">Od dnia<input type="date" id="lv-rate-date" value="${esc(pStart)}"></label><label class="field">${L.rateType === 'zmienne' ? `Nowa stawka ${esc(L.refName || 'referencyjna')} (%)` : 'Nowe oprocentowanie (%)'}<input id="lv-rate" inputmode="decimal" placeholder="${esc(pctNum(L.rateType === 'zmienne' && Number.isFinite(L.margin) ? s.rate - L.margin : s.rate))}"></label></div>
+    <p class="small muted">${L.rateType === 'zmienne' && Number.isFinite(L.margin) ? `Oprocentowanie = stawka + marża ${esc(pctNum(L.margin))}%. ` : ''}Nowa stopa obowiązuje od pierwszej raty po tym dniu (bank ustala ją na początku okresu odsetkowego).</p>
+    <button type="button" class="btn small" data-lv="rate">Zapisz zmianę oprocentowania</button>
+    ${sims ? `<p class="small">Gdyby oprocentowanie się zmieniło: ${sims}</p>` : ''}`}</div>`;
+  const ops = [...(L.overpayments ?? [])].sort((x, y) => (x.date < y.date ? -1 : 1));
+  const opBox = `<div class="lv-box"><h4>Nadpłata</h4>
+    <div class="two"><label class="field">Kwota (${esc(curLabel(cur))})<input id="lv-op-amount" inputmode="decimal" placeholder="np. 10 000"></label><label class="field">Data<input type="date" id="lv-op-date" value="${esc(t)}"></label></div>
+    <div class="typesel" role="radiogroup" aria-label="Efekt nadpłaty"><label><input type="radio" name="lvOpMode" value="okres" checked><span>Skróć okres</span></label><label><input type="radio" name="lvOpMode" value="rata"><span>Zmniejsz ratę</span></label></div>
+    <label class="field">Z konta<select id="lv-op-from">${accountOptions(L.payFromId ?? defaultAccount('przelew'), { none: false, filter: (x) => !isLoan(x) && x.id !== a.id })}</select></label>
+    <p class="dlg-hint" id="lv-op-sim">Wpisz kwotę, a pokażę, ile zaoszczędzisz na odsetkach.</p>
+    <button type="button" class="btn small primary" data-lv="overpay">Zapisz nadpłatę</button>
+    ${ops.length ? `<ul class="rate-list">${ops.map((o) => `<li><span>${esc(shortDate(o.date, true))} · ${o.mode === 'rata' ? 'niższa rata' : 'krótszy okres'}</span><span><b>${esc(mny(o.amount))}</b> <button type="button" class="link small danger-text" data-lv-op-del="${esc(o.id)}">usuń</button></span></li>`).join('')}</ul>` : ''}
+    <p class="small muted">W Polsce nadpłata kredytu hipotecznego ze zmienną stopą jest bezpłatna po 3 latach od zawarcia umowy; wcześniej bank może pobrać prowizję (sprawdź umowę).</p></div>`;
+  const rows = s.rows;
+  const nextIdx = s.next ? rows.indexOf(s.next) : rows.length;
+  const shown = loanView.full ? rows : rows.slice(Math.max(0, nextIdx - 3), nextIdx + 12);
+  const sched = `<div class="lv-box"><h4>Harmonogram</h4><div class="sched-wrap"><table class="sched"><thead><tr><th>Nr i data</th><th>Rata</th><th>Kapitał</th><th>Odsetki</th><th>Saldo</th></tr></thead><tbody>${shown.map((r) => loanSchedRow(r, L, cur, t, s.next)).join('')}</tbody></table></div>
+    <button type="button" class="link small" data-lv="full">${loanView.full ? 'Pokaż mniej' : `Pokaż cały harmonogram (${s.count} rat)`}</button>
+    <p class="small muted">Harmonogram przybliżony: odsetki = saldo × oprocentowanie / 12. Bank liczy według dni, więc kwoty mogą różnić się o kilka złotych – ratę z harmonogramu banku wpiszesz w „Edytuj parametry”.</p></div>`;
+  $('#lv-body').innerHTML = `<div class="loan-kpi"><div><span>Zostało do spłaty</span><b class="neg">${esc(mny(s.remaining))}</b><small>z ${esc(mny(s.original))}</small></div><div><span>Spłacono</span><b class="pos">${esc(pct1(s.progress))}</b><small>${esc(mny(s.paidPrincipal))} kapitału</small></div><div><span>Najbliższa rata</span><b>${s.next ? esc(mny(s.next.payment + ins)) : '–'}</b><small>${s.next ? esc(shortDate(s.next.date, true)) : 'kredyt spłacony'}</small></div></div>
+  <div class="meter" title="Spłacony kapitał"><span style="width:${(s.progress * 100).toFixed(1)}%;background:var(--pos)"></span></div>
+  <table class="kv">${facts.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table>
+  ${rateBox}${opBox}${sched}`;
+}
+
+function loanOverpaySimText() {
+  const a = acc(loanView.id);
+  if (!isLoan(a)) return;
+  const amount = Math.abs(parseAmount($('#lv-op-amount').value));
+  const el = $('#lv-op-sim');
+  if (!(amount > 0)) {
+    el.textContent = 'Wpisz kwotę, a pokażę, ile zaoszczędzisz na odsetkach.';
+    return;
+  }
+  const mode = $('input[name="lvOpMode"]:checked', LOAN)?.value ?? 'okres';
+  const cur = a.currency || 'PLN';
+  const r = loanOverpaySim(a.loan, { amount, date: $('#lv-op-date').value || today(), mode });
+  const ins = Number(a.loan.insurance) || 0;
+  el.innerHTML =
+    mode === 'rata'
+      ? `Rata spadnie z ${esc(money(r.paymentBefore + ins, cur))} do <b>${esc(money(r.paymentAfter + ins, cur))}</b>. Oszczędność na odsetkach: <b class="pos">${esc(money(r.interestSaved, cur))}</b>.`
+      : `Kredyt skończy się <b>${r.monthsShorter} ${plural(r.monthsShorter, 'miesiąc', 'miesiące', 'miesięcy')}</b> wcześniej (${esc(monthYear(r.endAfter))} zamiast ${esc(monthYear(r.endBefore))}). Oszczędność na odsetkach: <b class="pos">${esc(money(r.interestSaved, cur))}</b>.`;
+}
+
+LOAN.addEventListener('input', (ev) => ['lv-op-amount', 'lv-op-date'].includes(ev.target.id) && loanOverpaySimText());
+LOAN.addEventListener('change', (ev) => (ev.target.name === 'lvOpMode' || ev.target.id === 'lv-op-date') && loanOverpaySimText());
+$('#lv-edit').addEventListener('click', () => {
+  closeDialog(LOAN);
+  openAccount(loanView.id);
+});
+LOAN.addEventListener('click', (ev) => {
+  const b = ev.target.closest('button');
+  if (!b) return;
+  const a = acc(loanView.id);
+  if (!isLoan(a)) return;
+  const L = a.loan;
+  const err = (msg) => ($('#lv-errors').textContent = msg);
+  if (b.dataset.lv === 'full') {
+    loanView.full = !loanView.full;
+    return renderLoanView();
+  }
+  if (b.dataset.lv === 'rate') {
+    const date = $('#lv-rate-date').value;
+    const v = parseAmount($('#lv-rate').value);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(v)) return err('Podaj datę i nowe oprocentowanie.');
+    const rate = round4(L.rateType === 'zmienne' && Number.isFinite(L.margin) ? v + L.margin : v);
+    if (!(rate >= 0 && rate < 100)) return err('Oprocentowanie musi być między 0 a 100%.');
+    undoable(`Zapisano oprocentowanie ${pctNum(rate)}% od ${shortDate(date, true)}.`, () => {
+      L.rates = [...(L.rates ?? []).filter((r) => r[0] !== date), [date, rate]];
+    });
+    return renderLoanView();
+  }
+  if (b.dataset.lvRateDel) {
+    const sorted = [...(L.rates ?? [])].sort((x, y) => (x[0] < y[0] ? -1 : 1));
+    const del = sorted[Number(b.dataset.lvRateDel)];
+    undoable('Usunięto zmianę oprocentowania.', () => {
+      L.rates = sorted.filter((r) => r !== del);
+    });
+    return renderLoanView();
+  }
+  if (b.dataset.lv === 'overpay') {
+    const amount = round2(Math.abs(parseAmount($('#lv-op-amount').value)));
+    const date = $('#lv-op-date').value;
+    const fromId = $('#lv-op-from').value;
+    const mode = $('input[name="lvOpMode"]:checked', LOAN)?.value ?? 'okres';
+    if (!(amount > 0)) return err('Podaj kwotę nadpłaty.');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return err('Podaj datę nadpłaty.');
+    if (!fromId) return err('Wybierz konto, z którego nadpłacasz.');
+    const remaining = loanBalanceAt(L, loanSchedule(L), date);
+    if (amount > remaining + 0.005) return err(`Do spłaty zostało ${money(remaining, a.currency)} – nadpłata nie może być większa.`);
+    const fromCur = accountCurrency(fin, fromId);
+    const loanCur = a.currency || 'PLN';
+    const pln = convert(MARKET, amount, loanCur, 'PLN', date);
+    const fromAmt = convert(MARKET, amount, loanCur, fromCur, date);
+    if (pln === null || fromAmt === null) return err('Brak kursu waluty – nie mogę przeliczyć kwoty.');
+    const tx = { id: newId(), type: 'przelew', amount: pln, date, accountId: fromId, toAccountId: a.id, merchant: `${a.name}: nadpłata`, source: 'kredyt', loanId: a.id, overpay: true, createdAt: Date.now(), updatedAt: Date.now() };
+    if (fromCur !== 'PLN') tx.accountAmount = fromAmt;
+    if (loanCur !== fromCur) tx.toAmount = amount;
+    undoable(`Zapisano nadpłatę ${money(amount, a.currency)}.`, () => {
+      fin.txs.push(tx);
+      L.overpayments = [...(L.overpayments ?? []), { id: newId(), date, amount, mode, txId: tx.id }];
+    });
+    return renderLoanView();
+  }
+  if (b.dataset.lvOpDel) {
+    const op = (L.overpayments ?? []).find((o) => o.id === b.dataset.lvOpDel);
+    if (!op) return;
+    undoable('Usunięto nadpłatę (razem z przelewem w dzienniku).', () => {
+      L.overpayments = L.overpayments.filter((o) => o.id !== op.id);
+      const tx = fin.txs.find((x) => x.id === op.txId);
+      if (tx) Object.assign(tx, { deleted: true, updatedAt: Date.now() });
+    });
+    return renderLoanView();
+  }
+});
+
+// Saldo kredytu w dzienniku = −kapitał z harmonogramu na dziś (korekta salda z dzisiejszą datą).
+function syncLoanBalance(id) {
+  const a = acc(id);
+  if (!isLoan(a)) return;
+  const target = -loanBalanceAt(a.loan, loanSchedule(a.loan), today());
+  undoable('Saldo kredytu ustawione według harmonogramu.', () => {
+    adjustBalance(fin, id, target, { date: today(), newId, market: MARKET, note: 'Wyrównanie do harmonogramu kredytu' });
+  });
+}
+
+// Wpłaty z portfela GEM, których nie ma w dzienniku → przelewy między kontami (i powiązanie w obu miejscach).
+function linkGemTxs(accountId) {
+  const a = acc(accountId);
+  const otherId = $(`[data-gem-from="${accountId}"]`)?.value;
+  if (!a || !otherId) return toast('Wybierz konto, z którego były wpłaty.');
+  const gemTxs = gemTxsLoad();
+  const list = unlinkedGemTxs(fin, gemTxs, a);
+  if (!list.length) return;
+  const now = Date.now();
+  undoable(`Zapisano ${list.length} ${plural(list.length, 'przelew', 'przelewy', 'przelewów')} z portfela GEM.`, () => {
+    for (const g of list) {
+      const t = { id: newId(), type: 'przelew', amount: round2(g.amountPLN), date: g.date, accountId: g.type === 'wplata' ? otherId : a.id, toAccountId: g.type === 'wplata' ? a.id : otherId, merchant: `${g.type === 'wplata' ? 'Wpłata na' : 'Wypłata z'} ${a.gemAccount === 'ZWYKLE' ? 'konto inwestycyjne' : a.gemAccount}`, source: 'gem', gemTxId: g.id, createdAt: now, updatedAt: now };
+      const fromCur = accountCurrency(fin, t.accountId);
+      const toCur = accountCurrency(fin, t.toAccountId);
+      if (fromCur !== 'PLN') t.accountAmount = convert(MARKET, t.amount, 'PLN', fromCur, t.date) ?? t.amount;
+      if (toCur !== fromCur) t.toAmount = convert(MARKET, t.amount, 'PLN', toCur, t.date) ?? t.amount;
+      fin.txs.push(t);
+      g.finTxId = t.id;
+      g.updatedAt = now;
+    }
+    gemTxsSave(gemTxs);
+  }, { gem: true });
+}
 
 // Stała pozycja: pensja, czynsz, rachunki, subskrypcje, stały przelew.
 const REC = $('#rec-dialog');

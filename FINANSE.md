@@ -63,6 +63,7 @@ Saldo konta zmienia każda zapisana operacja, także dopisana z datą wsteczną.
 **Karta kredytowa ma saldo ujemne – to Twoje zadłużenie.**
 - Przy dodawaniu karty (*Konta → + Dodaj konto → Karta kredytowa*) wpisujesz **zadłużenie na karcie**, np. 1250. Saldo karty pokaże się jako −1250,00 zł.
 - Możesz podać **limit** (aplikacja pokaże wykorzystanie i ile zostało do wykorzystania) i **dzień spłaty** (5 dni przed terminem w Przeglądzie pojawi się przypomnienie).
+- Opcjonalnie **oprocentowanie karty** (np. 18,5%) i **minimalną spłatę** (% zadłużenia, np. 3%). Przy karcie pojawi się wtedy kwota minimalnej spłaty i szacunek odsetek, które bank naliczy, jeśli nie spłacisz całości w terminie (okres bezodsetkowy obejmuje tylko spłatę w terminie).
 - **Każdy wydatek opłacony kartą** zwiększa zadłużenie: po zakupie za 200 zł saldo spada z −1250 do −1450 zł. Okno operacji przypomina o tym, gdy wybierzesz kartę.
 
 **Spłata karty** (*Konta → Spłać kartę*):
@@ -75,6 +76,48 @@ Inne:
 - **Majątek** sumuje wszystkie aktywne konta w złotych: konta w innych walutach po bieżącym kursie NBP, konta inwestycyjne razem z aktywami, a zadłużenie kart odejmuje się samo. Pomijane są tylko konta oznaczone „Nie wliczaj do salda łącznego” (np. PPE, z którego nie możesz swobodnie korzystać).
 - **Historia** przy koncie pokazuje wszystkie jego operacje i saldo.
 - **Ukryj** chowa konto, którego już nie używasz, ale zostawia jego historię. **Usuń…** – patrz [Usuwanie i cofanie zmian](#usuwanie-i-cofanie-zmian).
+
+## Przelew na IKE (konto powiązane z portfelem GEM)
+
+Wpłatę na IKE, IKZE albo OKI zapisujesz raz, a trafia w dwa miejsca: do dziennika jako **przelew między Twoimi kontami** (nie wydatek, więc nie psuje budżetu) i do zakładki **GEM → Mój portfel GEM** jako **wpłata** (liczy się do rocznego limitu).
+
+1. *Konta → + Dodaj konto* (albo **Edytuj** istniejące) → rodzaj **Konto inwestycyjne** → pole **Rachunek w portfelu GEM**: wybierz **IKE** (albo IKZE, OKI, konto zwykłe). Saldo zostaw 0.
+2. Zostaw zaznaczone **Wartość konta według wyceny portfela GEM**. Wtedy konto pokazuje wartość rachunku z portfela GEM (ETF-y i gotówka po bieżących cenach), a w majątku liczy się jako inwestycja. ETF-ów nie trzeba wpisywać drugi raz. Wycena odświeża się, gdy otworzysz na tym urządzeniu zakładkę GEM.
+3. Przy koncie jest przycisk **Wpłać na IKE**. Otwiera przelew z Twojego konta bankowego na IKE z zaznaczonym polem **„Zapisz też w portfelu GEM jako wpłatę na IKE (liczy się do limitu)”**. To samo pole pojawia się przy każdym przelewie na powiązane konto. Przelew z IKE na konto bankowe zapisze się jako wypłata.
+4. Przy koncie widać **wykorzystanie limitu** w tym roku (np. „Wpłaty w 2026: 1 990 zł z 28 260 zł limitu IKE”) oraz wartość, wpłaty netto i zysk z portfela GEM.
+
+**Wpłata dodana w zakładce GEM.** Jeśli wpiszesz wpłatę w *GEM → Mój portfel GEM*, przy koncie w Finansach pojawi się ramka „W portfelu GEM jest operacja na IKE, której nie ma w Finansach”. Wybierz konto, z którego były pieniądze, i dotknij **Zapisz jako przelew**. Ramka pokazuje wpłaty od dnia powiązania konta (starsze są już zwykle w saldach).
+
+**Edycja i usuwanie.** Zmiana kwoty lub daty przelewu poprawia też wpłatę w portfelu GEM, a usunięcie przelewu usuwa ją (z możliwością „Cofnij”).
+
+Prywatność: Finanse i portfel GEM działają w tej samej przeglądarce na Twoim urządzeniu. Dziennik czyta i dopisuje wpłaty w portfelu GEM lokalnie – nic nie jest wysyłane. Jeśli masz włączoną synchronizację portfela GEM z prywatnym repozytorium, wpłata trafi tam przy następnym otwarciu zakładki GEM (jak każda inna wpłata w portfelu). Dane dziennika nadal nie są synchronizowane.
+
+## Kredyty i pożyczki
+
+Rodzaj konta **Kredyt / pożyczka** śledzi kredyt hipoteczny, gotówkowy, samochodowy, zakup na raty (także 0%), kredyt konsolidacyjny albo pożyczkę. Saldo jest ujemne: to kapitał, który został do spłaty (zadłużenie liczy się w majątku jak karta kredytowa).
+
+**Dodanie kredytu** (*Konta → + Dodaj konto → Kredyt / pożyczka*):
+- **Rodzaj**, **kwota z umowy**, **data uruchomienia**, **liczba rat** i **termin pierwszej raty** (jego dzień miesiąca to dzień każdej raty).
+- **Kredyt spłacany od dawna?** Zaznacz „Kredyt jest już spłacany – podam stan na dziś” i przepisz z aplikacji banku: **kapitał do spłaty**, **ile rat zostało** i **termin najbliższej raty**. To dokładniejsze niż liczenie od początku, bo uwzględnia wszystkie dawne zmiany stóp.
+- **Oprocentowanie**:
+  - **stałe** – stopa z umowy (nominalna, nie RRSO) i opcjonalnie data końca okresu stałej stopy. Na 120 dni przed końcem przy kredycie pojawi się przypomnienie;
+  - **zmienne** – stawka referencyjna (WIBOR 3M, WIBOR 6M, WIRON, EURIBOR…), jej obecna wartość i marża banku. Oprocentowanie to ich suma;
+  - **0%** – raty bez odsetek.
+- **Raty**: równe albo malejące; opcjonalnie **karencja** (pierwsze miesiące tylko odsetki) i **rata z harmonogramu banku**, jeśli bank podaje inną kwotę niż wyliczona.
+- **Koszty**: **prowizja** (zapłacona albo doliczona do kredytu) i **ubezpieczenie oraz opłaty** co miesiąc – wchodzą do całkowitego kosztu kredytu i RRSO.
+- **Spłata**: konto, z którego idą raty, i **zapisywanie rat w dzienniku**. W dniu raty część kapitałowa zapisze się jako przelew na kredyt (zmniejsza zadłużenie, nie jest wydatkiem), a odsetki z opłatami jako wydatek w kategorii **Kredyty i odsetki**. Raty zapisują się od dnia dodania kredytu (wcześniejsze są już w saldach kont).
+- Na dole formularza widać na żywo: ratę, ile zostało do spłaty, koniec spłaty, odsetki do końca, całkowity koszt i RRSO.
+
+**Przy kredycie na liście kont**: pasek spłaconego kapitału, „zostało X z Y”, najbliższa rata z podziałem na kapitał, odsetki i opłaty, oprocentowanie (np. „6,31% – WIBOR 3M 4,21% + marża 2,10%”) i liczba rat do końca. Raty widać też w **Kalendarzu**, w **Stałych** (razem z miesięczną sumą rat) i na liście najbliższych 30 dni.
+
+**Szczegóły kredytu** (przycisk przy kredycie):
+- podsumowanie: zostało do spłaty, spłacono (%), najbliższa rata, RRSO, odsetki zapłacone i do końca, prowizja, ubezpieczenie, **całkowity koszt kredytu**, nadpłaty;
+- **zmiana oprocentowania**: data i nowa stopa (przy zmiennym – nowa wartość WIBOR/WIRON, marża dolicza się sama). Obowiązuje od pierwszej raty po tym dniu. Historia zmian zostaje na liście;
+- **gdyby oprocentowanie się zmieniło**: rata przy −1, +1 i +2 punktach procentowych;
+- **nadpłata z symulacją**: wpisz kwotę i wybierz **Skróć okres** albo **Zmniejsz ratę** – zobaczysz, o ile miesięcy krócej spłacasz albo o ile spadnie rata i ile zaoszczędzisz na odsetkach. **Zapisz nadpłatę** dopisuje przelew z wybranego konta na kredyt i przelicza harmonogram;
+- **harmonogram**: każda rata z podziałem na kapitał i odsetki oraz saldo po racie (najbliższe raty albo cały).
+
+**Dokładność.** Odsetki liczone są jak w typowym kalkulatorze kredytowym (saldo × oprocentowanie / 12, stopa z początku okresu). Bank liczy według liczby dni, więc kwoty mogą różnić się o kilka złotych. Jeśli saldo w dzienniku rozjedzie się z harmonogramem, przy kredycie pojawi się różnica i przycisk **Ustaw według harmonogramu** (korekta salda). Gdy bank przyśle nowy harmonogram, wpisz ratę z banku w *Edytuj parametry*.
 
 ## Waluty
 

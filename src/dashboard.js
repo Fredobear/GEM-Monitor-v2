@@ -557,6 +557,7 @@ const TX_DIALOG = `<dialog id="tx-dialog"><form method="dialog" novalidate>
 <div id="custom-ticker-row" hidden><div id="tx-inst-picker"></div><input type="hidden" name="instName"><div class="inst-picked" id="tx-inst-info" hidden></div><div class="two"><label class="field">Symbol<input name="customTicker" placeholder="np. CDR.PL" autocapitalize="characters"></label><label class="field">Waluta<select name="currency">${['USD', 'EUR', 'GBP', 'PLN', 'CHF', 'SEK', 'NOK', 'DKK'].map((c) => `<option>${c}</option>`).join('')}</select></label></div></div>
 <div class="two" data-show="trade wycena"><label class="field" data-show="trade">Liczba jednostek<input name="quantity" inputmode="decimal" placeholder="np. 3,25"></label><label class="field" data-show="trade wycena"><span>Cena jednostki (<span id="price-ccy">USD</span>)</span><input name="price" inputmode="decimal" placeholder="z potwierdzenia"></label></div>
 <label class="field" data-show="trade cash"><span>Kwota w PLN <span class="small" data-show="trade">– opcjonalnie: kwota faktycznie pobrana lub otrzymana</span></span><input name="amountPLN" inputmode="decimal"></label>
+<p class="small muted" data-show="cash">Wygodniej: zapisz przelew w Finansach (konto powiązane z IKE → „Wpłać na IKE”) – trafi i tu, i do dziennika. Wpłaty dodane tutaj Finanse pokażą do zapisania jednym dotknięciem.</p>
 <p class="small muted" id="amount-hint" data-show="trade"></p>
 <label class="field" data-show="trade">Prowizja / opłaty w PLN (opcjonalnie)<input name="feePLN" inputmode="decimal" placeholder="0"></label>
 <label class="field">Notatka<input name="note" maxlength="120"></label>
@@ -677,6 +678,6 @@ export async function writeDashboard(dir, payload) {
   await writeFile(path.join(dir, '.nojekyll'), '');
   // Import dynamiczny: financePage.js korzysta ze stylów i nawigacji z tego modułu.
   const { renderFinancePage, serviceWorker } = await import('./financePage.js');
-  await writeFile(path.join(dir, 'finanse.html'), renderFinancePage({ prices: payload.prices, config: payload.config, library: payload.library }));
+  await writeFile(path.join(dir, 'finanse.html'), renderFinancePage({ prices: payload.prices, config: payload.config, library: payload.library, podatki: payload.podatki }));
   await writeFile(path.join(dir, 'sw.js'), serviceWorker(payload.meta?.generatedAt ?? new Date().toISOString()));
 }

@@ -44,7 +44,9 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
   - przegląd jak w aplikacji Money Manager: dzień, tydzień, miesiąc, rok albo dowolny okres, wykres kategorii;
   - kalendarz: wydatki dzień po dniu, jedno dotknięcie pokazuje operacje z danego dnia;
   - stałe przelewy i dochody (pensja, czynsz, subskrypcje), zapisywane automatycznie albo po zatwierdzeniu;
-  - karty kredytowe: zadłużenie jako saldo ujemne, limit, termin i spłata z wybranego konta;
+  - karty kredytowe: zadłużenie jako saldo ujemne, limit, termin, oprocentowanie, minimalna spłata i spłata z wybranego konta;
+  - **kredyty i pożyczki**: oprocentowanie stałe, zmienne (WIBOR/WIRON + marża) albo 0%, raty równe lub malejące, karencja, prowizja, ubezpieczenie, harmonogram, RRSO, całkowity koszt, zmiany oprocentowania, nadpłaty z symulacją (krótszy okres albo niższa rata) i raty zapisywane w dzienniku (kapitał jako przelew, odsetki jako wydatek);
+  - **przelew na IKE/IKZE/OKI**: konto powiązane z portfelem GEM – przelew zapisuje się w dzienniku i jako wpłata w portfelu GEM (limit), a konto pokazuje wycenę z portfela;
   - konta w złotych, euro, dolarach, funtach i frankach – przeliczane na złote po kursie średnim NBP;
   - konto inwestycyjne z aktywami: dowolny instrument z oferty XTB (wycena automatyczna, gdy jest darmowe źródło notowań), fundusz ING TFI z PPE (wycena jednostki z ING TFI) albo inne aktywo z wyceną ręczną;
   - przy każdym koncie inwestycyjnym i każdej pozycji: **ile zainwestowano, ile to jest warte i jaki jest zysk** (w złotych i procentach, z efektem kursu walut), a w podsumowaniu majątku – łączny zysk z inwestycji;
@@ -57,7 +59,7 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
 - **Bezpieczniki:**
   - bez kompletnych i aktualnych danych sygnał nie powstaje, a Ty dostajesz komunikat o problemie;
   - dwa niezależne źródła danych są ze sobą porównywane;
-  - 99 testów automatycznych.
+  - 106 testów automatycznych.
 
 | Rola | ETF w XTB | Waluta |
 |---|---|---|
@@ -239,7 +241,7 @@ node src/cli.js demo
 node scripts/serve.js
 ```
 
-- `npm test` uruchamia 99 testów.
+- `npm test` uruchamia 106 testów.
 - `node src/cli.js demo` buduje aplikację demonstracyjną bez kluczy API. Sygnał pochodzi z danych historycznych, a w zakładce GEM → Mój portfel GEM możesz wczytać przykładowe transakcje.
 - `node scripts/serve.js` udostępnia panel pod adresem http://localhost:8080.
 
