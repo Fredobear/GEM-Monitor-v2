@@ -8,6 +8,7 @@ const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const NF0 = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 0 });
 const NF2 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const NF1 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const NF4 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 const tidy = (x) => (Math.abs(x) < 0.005 ? 0 : x);
 const zl = (x) => `${NF2.format(tidy(x))} zł`;
@@ -15,6 +16,11 @@ const zl0 = (x) => `${NF0.format(Math.round(tidy(x)))} zł`;
 const money = (x, cur) => (!cur || cur === 'PLN' ? zl(x) : `${NF2.format(tidy(x))} ${cur}`);
 const signed = (x) => `${x < -0.004 ? '−' : '+'}${zl(Math.abs(x))}`;
 const pct = (x) => (x === null || !Number.isFinite(x) ? '–' : `${Math.round(x * 100)}%`);
+const pct1 = (x) => `${NF1.format(Math.abs(x * 100))}%`;
+// Zysk lub strata z procentem, np. „+2 085,79 zł (+28,0%)”.
+const gainText = (gain, gainPct) => `${signed(gain)}${gainPct === null || !Number.isFinite(gainPct) ? '' : ` (${gainPct < -0.00005 ? '−' : '+'}${pct1(gainPct)})`}`;
+const gainClass = (x) => (x > 0.004 ? 'pos' : x < -0.004 ? 'neg' : '');
+const isFundLot = (l) => typeof l?.asset === 'string' && l.asset.startsWith(FUND_PREFIX);
 const compact = (x) => (x >= 10000 ? `${NF0.format(Math.round(x / 1000))} tys.` : NF0.format(Math.round(x)));
 const fmtInput = (x) => (Number.isFinite(x) && Math.abs(x) >= 0.005 ? String(round2(x)).replace('.', ',') : '');
 const fmtQty = (q) => (Number.isFinite(q) && q ? String(Number(q.toFixed(6))).replace('.', ',') : '');
@@ -65,9 +71,13 @@ const valuationDate = () => today();
 // Instrumenty z biblioteki XTB (akcje i ETF-y z GPW, obserwowane z USA, ETF-y UCITS wyceniane według indeksu):
 // notowania z pliku aplikacji data/notowania.js (zwykły skrypt z tej samej strony – nic nie jest wysyłane).
 let libraryQuotes = null;
+// Fundusze ING TFI (np. w PPE): wyceny jednostek z pliku data/fundusze.js.
+let fundsData = null;
 function addLibraryAsset(symbol, name, currency) {
-  if (!libraryQuotes || !symbol || (MARKET.assets?.[symbol] && !MARKET.assets[symbol].library)) return false;
-  const entry = instEntry(libraryQuotes, symbol, currency || 'PLN', MARKET.fx);
+  if (!symbol || (MARKET.assets?.[symbol] && !MARKET.assets[symbol].library)) return false;
+  const fund = symbol.startsWith(FUND_PREFIX);
+  if (fund ? !fundsData : !libraryQuotes) return false;
+  const entry = fund ? fundEntry(fundsData, symbol) : instEntry(libraryQuotes, symbol, currency || 'PLN', MARKET.fx);
   if (!entry) return false;
   MARKET.assets ??= {};
   MARKET.assets[symbol] = { name: name || symbol, ...entry, library: true };
@@ -76,7 +86,8 @@ function addLibraryAsset(symbol, name, currency) {
 async function ensureLibraryAssets() {
   const lots = fin.accounts.flatMap((a) => a.lots ?? []).filter((l) => l.asset && l.asset !== 'manual' && !MARKET.assets?.[l.asset]);
   if (!lots.length) return false;
-  libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+  if (lots.some((l) => !l.asset.startsWith(FUND_PREFIX))) libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+  if (lots.some((l) => l.asset.startsWith(FUND_PREFIX))) fundsData = fundsData ?? (await instLoadFunds());
   let added = false;
   for (const l of lots) added = addLibraryAsset(l.asset, l.name, l.currency) || added;
   return added;
@@ -528,11 +539,30 @@ function periodControls() {
   return `<div class="period">${seg}<div class="pswitch"><button class="icon-btn" data-shift="-1" aria-label="Wcześniej">‹</button><b>${esc(periodLabel())}</b><button class="icon-btn" data-shift="1" aria-label="Później">›</button></div>${away ? '<div class="back-today"><button class="link small" data-act="period-today">wróć do dziś</button></div>' : ''}</div>`;
 }
 
+// Zysk z inwestycji na kontach wliczanych do majątku (otwarte pozycje, wycena na dziś).
+function investTotals() {
+  const at = valuationDate();
+  const out = { cost: 0, value: 0, gain: 0, gainPct: null, positions: 0 };
+  for (const a of activeAccounts()) {
+    if (a.excludeFromTotal || !a.lots?.length) continue;
+    const s = investSummary(MARKET, a, at);
+    if (!s?.positions) continue;
+    out.cost += s.cost;
+    out.value += s.value;
+    out.positions += s.positions;
+  }
+  out.gain = out.value - out.cost;
+  out.gainPct = out.cost > 0 ? out.value / out.cost - 1 : null;
+  return out;
+}
+
 function heroBalance() {
   if (!activeAccounts().length) return '';
   const nw = netWorth(fin, MARKET);
+  const inv = investTotals();
   const lines = [];
   if (nw.investments > 0.004) lines.push(`w tym inwestycje: <b>${esc(zl(nw.investments))}</b>`);
+  if (inv.positions) lines.push(`zysk z inwestycji: <b class="${gainClass(inv.gain)}">${esc(gainText(inv.gain, inv.gainPct))}</b>`);
   if (nw.debt > 0.004) lines.push(`zadłużenie: <b class="neg">−${esc(zl(nw.debt))}</b>`);
   if (nw.missing.length) lines.push(`bez kursu: ${esc(nw.missing.join(', '))}`);
   return `<button class="card hero-bal" data-view="konta"><span class="hb-main"><span class="muted small">Majątek – wszystkie konta</span><span class="hb-val ${nw.total < -0.004 ? 'neg' : ''}">${esc(zl(nw.total))}</span>${lines.length ? `<span class="small muted">${lines.join(' · ')}</span>` : ''}</span><span class="hb-chev" aria-hidden="true">›</span></button>`;
@@ -733,18 +763,28 @@ function viewTransactions() {
 const WORTH_RANGES = [[6, '6 mies.'], [12, '1 rok'], [36, '3 lata'], [0, 'Wszystko']];
 
 function lotLabel(l) {
-  return l.asset === 'manual' ? l.name || 'Aktywo' : l.asset;
+  if (l.asset === 'manual') return l.name || 'Aktywo';
+  if (isFundLot(l)) return `${l.name || 'Fundusz'} (kat. ${fundCategoryOf(l.asset)})`;
+  return l.asset;
 }
 
 function investmentLines(a, cash) {
   const at = valuationDate();
+  const sum = investSummary(MARKET, a, at);
   const lines = (a.lots ?? []).filter((l) => !l.until).map((l) => {
-    const v = lotValuePLN(MARKET, l, at);
-    const change = l.asset !== 'manual' && l.price > 0 ? lotPrice(MARKET, l, at) / l.price - 1 : null;
+    const r = lotResult(MARKET, l, at);
     const approx = MARKET.assets?.[l.asset]?.source === 'proxy' ? '≈ ' : '';
-    return `<div class="inv-line"><span>${esc(lotLabel(l))} · ${esc(fmtQty(l.qty))} szt.${change !== null && Math.abs(change) >= 0.0005 ? ` <span class="${change >= 0 ? 'pos' : 'neg'}">${change >= 0 ? '+' : '−'}${pct(Math.abs(change))}</span>` : ''}</span><b>${v === null ? 'brak kursu' : esc(approx + zl(v))}</b></div>`;
+    const unit = isFundLot(l) ? 'j.u.' : 'szt.';
+    const detail = r && lotActive(l, at)
+      ? `<small>zainwestowano ${esc(zl(r.costPLN))} · <span class="${gainClass(r.gain)}">${esc(gainText(r.gain, r.gainPct))}</span>${r.currency !== 'PLN' && r.priceChange !== null ? ` · cena w ${esc(r.currency)} ${r.priceChange < 0 ? '−' : '+'}${esc(pct1(r.priceChange))}` : ''}</small>`
+      : '';
+    return `<div class="inv-line inv-pos"><span>${esc(lotLabel(l))} · ${esc(fmtQty(l.qty))} ${unit}${detail}</span><b>${r === null ? 'brak kursu' : esc(approx + zl(r.value))}</b></div>`;
   });
-  return `${lines.join('')}<div class="inv-line"><span>Wolna gotówka</span><b>${esc(money(cash, a.currency))}</b></div>`;
+  const head = sum?.positions
+    ? `<div class="inv-sum"><div><span>Zainwestowano</span><b>${esc(zl(sum.cost))}</b></div><div><span>Wartość aktywów</span><b>${esc(zl(sum.value))}</b></div><div><span>Zysk</span><b class="${gainClass(sum.gain)}">${esc(gainText(sum.gain, sum.gainPct))}</b></div></div>`
+    : '';
+  const realized = sum?.realized !== null && sum?.realized !== undefined && Math.abs(sum.realized) >= 0.01 ? `<div class="inv-line"><span>Zysk zrealizowany (sprzedane pozycje)</span><b class="${gainClass(sum.realized)}">${esc(signed(sum.realized))}</b></div>` : '';
+  return `${head}${lines.join('')}${realized}<div class="inv-line"><span>Wolna gotówka</span><b>${esc(money(cash, a.currency))}</b></div>`;
 }
 
 function accountItem(a, b) {
@@ -768,13 +808,14 @@ function accountItem(a, b) {
 function viewAccounts() {
   const bal = balances(fin);
   const nw = netWorth(fin, MARKET);
+  const inv = investTotals();
   const active = activeAccounts();
   const hidden = fin.accounts.filter((a) => a.archived);
   const points = active.length ? worthHistory(fin, MARKET, { today: today(), months: ui.worthRange }) : [];
   const worth = active.length
     ? `<section class="card"><div class="card-head"><h2>Majątek</h2><div class="seg small">${WORTH_RANGES.map(([m, l]) => `<button data-worth-range="${m}" class="${ui.worthRange === m ? 'on' : ''}">${l}</button>`).join('')}</div></div>
       <div class="worth-top"><b class="hb-val ${nw.total < -0.004 ? 'neg' : ''}">${esc(zl(nw.total))}</b></div>
-      <div class="sum3"><div><span>Na kontach</span><b class="pos">${esc(zl(nw.assets - nw.investments))}</b></div><div><span>Inwestycje</span><b>${esc(zl(nw.investments))}</b></div><div><span>Zadłużenie</span><b class="${nw.debt > 0.004 ? 'neg' : ''}">${nw.debt > 0.004 ? '−' : ''}${esc(zl(nw.debt))}</b></div></div>
+      <div class="sum3"><div><span>Na kontach</span><b class="pos">${esc(zl(nw.assets - nw.investments))}</b></div><div><span>Inwestycje</span><b>${esc(zl(nw.investments))}</b>${inv.positions ? `<small class="${gainClass(inv.gain)}">zysk ${esc(gainText(inv.gain, inv.gainPct))}</small>` : ''}</div><div><span>Zadłużenie</span><b class="${nw.debt > 0.004 ? 'neg' : ''}">${nw.debt > 0.004 ? '−' : ''}${esc(zl(nw.debt))}</b></div></div>
       ${worthChart(points)}${worthStats(points)}
       ${nw.missing.length ? `<p class="small warn">Bez kursu waluty (poza majątkiem): ${esc(nw.missing.join(', '))}.</p>` : ''}
       <p class="small muted">${esc(marketNote())}</p></section>`
@@ -944,8 +985,27 @@ function settingsBackup() {
   return `<section class="card"><h2>Kopia zapasowa</h2><p class="small muted">Dane są tylko w tej przeglądarce (${liveTx(fin).length} operacji, ${fin.accounts.length} kont, ${docs} dokumentów, ok. ${size} KB bez dokumentów). Rób kopię co jakiś czas i zapisuj ją w Plikach. Usunięcie danych witryny w ustawieniach Safari usunie też dziennik.</p>
     ${docs ? '<label class="check small"><input type="checkbox" id="bk-docs" checked> Dołącz dokumenty (plik będzie większy)</label>' : ''}
     <div class="row-btns"><button class="btn primary" data-act="backup">Eksportuj kopię (JSON)</button><button class="btn" data-act="restore">Wczytaj kopię…</button></div><input type="file" id="restore-file" accept="application/json,.json" hidden>
-    <details class="danger"><summary>Usuń wszystkie dane dziennika</summary><p class="small">Tej operacji nie można cofnąć po zamknięciu powiadomienia. Najpierw wyeksportuj kopię.</p><button class="btn danger" data-act="wipe">Usuń dziennik…</button></details></section>`;
+    <details class="danger"><summary>Usuń wszystkie dane dziennika</summary><p class="small">Tej operacji nie można cofnąć po zamknięciu powiadomienia. Najpierw wyeksportuj kopię.</p><button class="btn danger" data-act="wipe">Usuń dziennik…</button></details></section>
+    <section class="card"><h2>Aplikacja</h2><label class="field">Strona startowa (po otwarciu aplikacji z ekranu początkowego)<select id="start-page">${[['gem', 'GEM – sygnał'], ['finanse', 'Finanse – ten dziennik'], ['rynki', 'Rynki – przegląd']].map(([v, l]) => `<option value="${v}" ${startPageSetting() === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label></section>`;
 }
+
+// Strona startowa aplikacji – wspólne ustawienie z panelem GEM (index.html przekierowuje do dziennika).
+function startPageSetting() {
+  try {
+    return localStorage.getItem('gem.start') || 'gem';
+  } catch {
+    return 'gem';
+  }
+}
+document.addEventListener('change', (ev) => {
+  if (ev.target?.id !== 'start-page') return;
+  try {
+    localStorage.setItem('gem.start', ev.target.value);
+    toast('Zapisano stronę startową.');
+  } catch {
+    toast('Nie udało się zapisać ustawienia w tej przeglądarce.');
+  }
+});
 
 function viewSettings() {
   const seg = `<div class="seg small set-seg" style="margin-top:12px">${SET_TABS.map(([k, l]) => `<button data-set-tab="${k}" class="${ui.setTab === k ? 'on' : ''}">${l}</button>`).join('')}</div>`;
@@ -1901,28 +1961,38 @@ function openLots(accountId) {
     accountId,
     lots: (a.lots ?? []).filter((l) => !l.until).map((l) => ({ ...l, value: l.asset === 'manual' ? latestMark(l) : undefined })),
     before: holdingsPLN(MARKET, a, valuationDate()) ?? 0,
+    fundCategory: a.fundCategory ?? '',
   };
   $('#ld-title').textContent = `Aktywa: ${a.name}`;
-  $('#ld-info').textContent = `${marketNote()} Akcje i ETF-y z GPW wyceniam po kursie zamknięcia z giełdy, popularne ETF-y UCITS – od ceny zakupu według zmiany indeksu, który śledzą (wycena przybliżona, oznaczona „≈”). Dokładną cenę zawsze sprawdzisz w XTB.`;
+  $('#ld-info').textContent = `${marketNote()} Akcje i ETF-y z GPW wyceniam po kursie zamknięcia z giełdy, fundusze ING TFI (np. w PPE) – po wycenie jednostki z ING TFI, a popularne ETF-y UCITS – od ceny zakupu według zmiany indeksu, który śledzą (wycena przybliżona, oznaczona „≈”).`;
   if (!$('#ld-picker').firstChild) $('#ld-picker').append(lotPicker);
   $('#ld-picker').hidden = true;
+  $('#ld-fund').hidden = true;
   lotPicker.reset();
   lotsForm.elements.settle.checked = true;
   $('#ld-errors').textContent = '';
   renderLots();
   openDialog(LOTS);
+  const refresh = () => lotsState?.accountId === accountId && lotsState.lots.some((l) => l.asset !== 'manual' && !MARKET.assets?.[l.asset] && addLibraryAsset(l.asset, l.name, l.currency)) && renderLots();
   instLoadQuotes().then((data) => {
     libraryQuotes = libraryQuotes ?? data;
-    if (lotsState?.accountId === accountId && lotsState.lots.some((l) => l.asset !== 'manual' && !MARKET.assets?.[l.asset] && addLibraryAsset(l.asset, l.name, l.currency))) renderLots();
+    refresh();
   });
+  if (lotsState.lots.some(isFundLot) || /ppe|ppk|ing tfi/i.test(a.name)) {
+    instLoadFunds().then((data) => {
+      fundsData = fundsData ?? data;
+      refresh();
+    });
+  }
 }
 
-// Opis źródła ceny pozycji (GEM, GPW, USA, indeks albo cena zakupu).
+// Opis źródła ceny pozycji (GEM, GPW, USA, fundusz ING TFI, indeks albo cena zakupu).
 function lotSource(l) {
   const a = MARKET.assets?.[l.asset];
   if (a && !a.library) return 'ETF strategii GEM – cena z codziennej aktualizacji';
   if (a) return instSourceLabel(a, libraryQuotes);
-  if (l.asset?.endsWith('.US')) return 'Brak notowań – wycena według ceny zakupu. Dopisz symbol do obserwowanych (Portfel → Instrumenty XTB), aby pobierać kurs.';
+  if (isFundLot(l)) return 'Wycena jednostki z ING TFI pojawi się po najbliższej aktualizacji aplikacji.';
+  if (l.asset?.endsWith('.US')) return 'Brak notowań – wycena według ceny zakupu. Dopisz symbol do obserwowanych (Rynki → Instrumenty), aby pobierać kurs.';
   if (l.asset?.endsWith('.PL')) return 'Kurs z GPW pojawi się po najbliższej aktualizacji aplikacji.';
   return 'Brak notowań – wycena według ceny zakupu.';
 }
@@ -1930,12 +2000,12 @@ function lotSource(l) {
 function lotSummary(l) {
   const at = valuationDate();
   const lot = l.asset === 'manual' ? { ...l, marks: [[l.date, l.value]] } : l;
-  if (!(l.qty > 0) || !((l.asset === 'manual' ? l.value : l.price) > 0)) return 'Uzupełnij ilość i cenę.';
+  if (!(l.qty > 0) || !((l.asset === 'manual' ? l.value : l.price) > 0)) return isFundLot(l) ? 'Uzupełnij liczbę jednostek i kwotę wpłat (albo średnią cenę).' : 'Uzupełnij ilość i cenę.';
   const v = lotValuePLN(MARKET, lot, at);
   if (v === null) return 'Brak kursu waluty.';
   if (l.asset === 'manual') return `Wartość: ${zl(v)}`;
-  const change = lotPrice(MARKET, l, at) / l.price - 1;
-  return `Wartość dziś: ${zl(v)} (${change >= 0 ? '+' : '−'}${pct(Math.abs(change))} od zakupu)`;
+  const r = lotResult(MARKET, { ...l, since: undefined, until: undefined }, at);
+  return r ? `Wartość dziś: ${zl(r.value)} · zysk ${gainText(r.gain, r.gainPct)}` : `Wartość dziś: ${zl(v)}`;
 }
 
 function renderLots() {
@@ -1943,7 +2013,11 @@ function renderLots() {
     ? lotsState.lots
         .map((l, i) => {
           const cur = lotCurrency(MARKET, l);
-          const pence = l.asset !== 'manual' ? instPenceHint({ market: l.asset.slice(l.asset.lastIndexOf('.') + 1), currency: cur, name: l.name ?? '' }) : '';
+          const fund = isFundLot(l);
+          const pence = l.asset !== 'manual' && !fund ? instPenceHint({ market: l.asset.slice(l.asset.lastIndexOf('.') + 1), currency: cur, name: l.name ?? '' }) : '';
+          const head = fund
+            ? `<b>${esc(l.name ?? 'Fundusz')}</b> <span class="tag">kat. ${esc(fundCategoryOf(l.asset))}</span>`
+            : `<b>${esc(l.asset)}</b> ${esc(l.name ?? MARKET.assets?.[l.asset]?.name ?? '')}`;
           const body =
             l.asset === 'manual'
               ? `<label class="field full">Nazwa aktywa<input data-lf="name" value="${esc(l.name ?? '')}" placeholder="np. Obligacje skarbowe EDO"></label>
@@ -1951,16 +2025,80 @@ function renderLots() {
                  <label class="field">Ilość<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
                  <label class="field">Wartość za sztukę dziś (${esc(curLabel(cur))})<input data-lf="value" inputmode="decimal" value="${esc(fmtInput(l.value))}"></label>
                  <label class="field">Od kiedy<input type="date" data-lf="date" value="${esc(l.date)}"></label>`
-              : `<div class="full lot-inst"><b>${esc(l.asset)}</b> ${esc(l.name ?? MARKET.assets?.[l.asset]?.name ?? '')}<div class="small muted">${esc(lotSource(l))}</div>${l.hint ? `<div class="small muted">${esc(l.hint)}</div>` : ''}${pence ? `<div class="small warn">${esc(pence)}</div>` : ''}</div>
-                 <label class="field">Ilość (szt.)<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
-                 <label class="field">Cena zakupu za szt. (${esc(curLabel(cur))})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}"></label>
-                 <label class="field">Data zakupu<input type="date" data-lf="date" value="${esc(l.date)}"></label>`;
+              : `<div class="full lot-inst">${head}<div class="small muted">${esc(lotSource(l))}</div>${l.hint ? `<div class="small muted">${esc(l.hint)}</div>` : ''}${pence ? `<div class="small warn">${esc(pence)}</div>` : ''}</div>
+                 <label class="field">${fund ? 'Liczba jednostek' : 'Ilość (szt.)'}<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
+                 <label class="field">${fund ? 'Średnia cena jednostki' : 'Cena zakupu za szt.'} (${esc(curLabel(cur))})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}"></label>
+                 <label class="field">${fund ? 'Suma wpłat' : 'Zainwestowano'} (${esc(curLabel(cur))})<input data-lf="cost" inputmode="decimal" value="${esc(fmtInput(l.qty * l.price))}" placeholder="ilość × cena"></label>
+                 <label class="field">${fund ? 'Data pierwszej wpłaty' : 'Data zakupu'}<input type="date" data-lf="date" value="${esc(l.date)}"></label>`;
           return `<div class="lot-row" data-lot="${i}">${body}<div class="lot-foot full"><span class="small muted" data-lot-val="${i}">${esc(lotSummary(l))}</span><button type="button" class="link small danger-text" data-lot-del="${i}">Usuń</button></div></div>`;
         })
         .join('')
-    : '<p class="muted small">Brak aktywów. Dodaj instrument z oferty XTB (wyszukaj po nazwie, symbolu albo ISIN) albo inne aktywo z wyceną ręczną, np. obligacje skarbowe.</p>';
+    : '<p class="muted small">Brak aktywów. Dodaj instrument z oferty XTB (wyszukaj po nazwie, symbolu albo ISIN), fundusz ING TFI (np. z PPE) albo inne aktywo z wyceną ręczną, np. obligacje skarbowe.</p>';
   updateLotsSum();
 }
+
+// Panel wyboru funduszu ING TFI i kategorii jednostek (w PPE zwykle E, F, S, T albo W – zależy od umowy pracodawcy).
+function fillFundPanel() {
+  const fSel = $('#ldf-fund');
+  const cSel = $('#ldf-cat');
+  if (!fundsData?.funds?.length) {
+    fSel.innerHTML = '<option value="">Brak danych – pojawią się po najbliższej aktualizacji aplikacji</option>';
+    cSel.innerHTML = '';
+    $('#ldf-info').textContent = '';
+    $('#ldf-ok').disabled = true;
+    return;
+  }
+  $('#ldf-ok').disabled = false;
+  if (!fSel.options.length || !fSel.value) {
+    const groups = new Map();
+    for (const f of [...fundsData.funds].sort((x, y) => FUND_TYPE_ORDER.indexOf(x.type) - FUND_TYPE_ORDER.indexOf(y.type) || x.name.localeCompare(y.name, 'pl'))) {
+      if (!groups.has(f.type)) groups.set(f.type, []);
+      groups.get(f.type).push(f);
+    }
+    fSel.innerHTML = [...groups].map(([type, list]) => `<optgroup label="${esc(cap(type))}">${list.map((f) => `<option value="${f.id}">${esc(f.name)}${f.cats.some((c) => FUND_PPE_CATEGORIES.includes(c)) ? '' : ' (bez kategorii PPE)'}</option>`).join('')}</optgroup>`).join('');
+  }
+  updateFundCats();
+}
+function updateFundCats() {
+  const fund = fundsData?.funds?.find((f) => f.id === Number($('#ldf-fund').value));
+  const cSel = $('#ldf-cat');
+  if (!fund) return;
+  const keep = cSel.value && fund.cats.includes(cSel.value) ? cSel.value : fundDefaultCategory(fund, lotsState?.fundCategory);
+  cSel.innerHTML = fund.cats.map((c) => `<option value="${esc(c)}" ${c === keep ? 'selected' : ''}>${esc(c)} – ${esc(fundsData.categories?.[c] ?? '')}</option>`).join('');
+  updateFundInfo();
+}
+function updateFundInfo() {
+  const fund = fundsData?.funds?.find((f) => f.id === Number($('#ldf-fund').value));
+  const cat = $('#ldf-cat').value;
+  if (!fund || !cat) return;
+  const last = fundQuotes(fundsData, fundSymbol(fund.id, cat)).at(-1);
+  const ret = fund.ret?.[cat] ?? {};
+  const r = (k, l) => (Number.isFinite(ret[k]) ? `${l} ${ret[k] < 0 ? '−' : '+'}${pct1(ret[k])}` : '');
+  $('#ldf-info').innerHTML = `${last ? `Wycena jednostki: <b>${esc(NF2.format(last[1]))} ${esc(curLabel(fund.currency))}</b> (${esc(shortDate(last[0], true))}). ` : ''}${esc([r('12M', '12 mies.:'), r('YTD', 'od początku roku:'), r('60M', '5 lat:')].filter(Boolean).join(' · '))}<br><span class="muted">${esc(fund.umbrella)} · ryzyko ${esc(fund.risk ?? '–')}/7${fund.url ? ` · <a href="${esc(fund.url)}" target="_blank" rel="noopener">karta funduszu</a>` : ''}</span>`;
+}
+$('#ldf-fund').addEventListener('change', updateFundCats);
+$('#ldf-cat').addEventListener('change', updateFundInfo);
+$('#ld-add-fund').addEventListener('click', async () => {
+  const box = $('#ld-fund');
+  box.hidden = !box.hidden;
+  $('#ld-picker').hidden = true;
+  if (box.hidden) return;
+  fundsData = fundsData ?? (await instLoadFunds());
+  fillFundPanel();
+});
+$('#ldf-ok').addEventListener('click', () => {
+  const fund = fundsData?.funds?.find((f) => f.id === Number($('#ldf-fund').value));
+  const cat = $('#ldf-cat').value;
+  if (!fund || !cat) return;
+  const symbol = fundSymbol(fund.id, cat);
+  addLibraryAsset(symbol, fund.name, fund.currency);
+  const last = fundQuotes(fundsData, symbol).at(-1);
+  lotsState.fundCategory = cat;
+  lotsState.lots.push({ id: newId(), asset: symbol, name: fund.name, currency: fund.currency, qty: 0, price: 0, date: today(), hint: last ? `Ostatnia wycena jednostki: ${fmtInput(last[1])} ${curLabel(fund.currency)} (${shortDate(last[0], true)}). Liczbę jednostek i sumę wpłat znajdziesz w serwisie ING TFI24.` : '' });
+  $('#ld-fund').hidden = true;
+  renderLots();
+  $('#ld-rows').lastElementChild?.querySelector('[data-lf="qty"]')?.focus();
+});
 
 function workingValue() {
   const at = valuationDate();
@@ -1985,8 +2123,25 @@ lotsForm.addEventListener('input', (ev) => {
   if (!row || !el.dataset.lf) return;
   const l = lotsState.lots[Number(row.dataset.lot)];
   const k = el.dataset.lf;
-  if (k === 'qty' || k === 'price' || k === 'value') l[k] = Math.abs(parseAmount(el.value)) || 0;
-  else l[k] = el.value;
+  const num = () => Math.abs(parseAmount(el.value)) || 0;
+  const setField = (name, v) => {
+    const input = $(`[data-lf="${name}"]`, row);
+    if (input && input !== el) input.value = fmtInput(v);
+  };
+  // „Zainwestowano” i cena za sztukę są powiązane: kwota = ilość × cena. Ostatnio wpisane pole decyduje przy zmianie ilości.
+  if (k === 'cost') {
+    l.cost = num();
+    l.costMode = true;
+    l.price = l.qty > 0 ? l.cost / l.qty : 0;
+    setField('price', l.price);
+  } else if (k === 'qty' || k === 'price' || k === 'value') {
+    l[k] = num();
+    if (k === 'price') l.costMode = false;
+    if (k === 'qty' && l.costMode) {
+      l.price = l.qty > 0 ? (l.cost ?? 0) / l.qty : 0;
+      setField('price', l.price);
+    } else if (k !== 'value') setField('cost', l.qty * l.price);
+  } else l[k] = el.value;
   if (k === 'asset' || k === 'currency') return renderLots();
   $(`[data-lot-val="${row.dataset.lot}"]`).textContent = lotSummary(l);
   updateLotsSum();
@@ -2001,6 +2156,7 @@ $('#ld-rows').addEventListener('click', (ev) => {
 $('#ld-add').addEventListener('click', () => {
   const box = $('#ld-picker');
   box.hidden = !box.hidden;
+  $('#ld-fund').hidden = true;
   if (!box.hidden) lotPicker.focusInput();
 });
 $('#ld-add-manual').addEventListener('click', () => {
@@ -2013,8 +2169,8 @@ lotsForm.addEventListener('submit', (ev) => {
   const errors = [];
   lotsState.lots.forEach((l, i) => {
     const n = i + 1;
-    if (!(l.qty > 0)) errors.push(`Pozycja ${n}: podaj ilość.`);
-    if (l.asset === 'manual' ? !(l.value > 0) : !(l.price > 0)) errors.push(`Pozycja ${n}: podaj ${l.asset === 'manual' ? 'wartość' : 'cenę zakupu'}.`);
+    if (!(l.qty > 0)) errors.push(`Pozycja ${n}: podaj ${isFundLot(l) ? 'liczbę jednostek' : 'ilość'}.`);
+    if (l.asset === 'manual' ? !(l.value > 0) : !(l.price > 0)) errors.push(`Pozycja ${n}: podaj ${l.asset === 'manual' ? 'wartość' : isFundLot(l) ? 'sumę wpłat albo średnią cenę jednostki' : 'cenę zakupu albo kwotę'}.`);
     if (l.asset === 'manual' && !String(l.name ?? '').trim()) errors.push(`Pozycja ${n}: podaj nazwę.`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(l.date ?? '')) errors.push(`Pozycja ${n}: podaj datę.`);
   });
@@ -2054,6 +2210,7 @@ lotsForm.addEventListener('submit', (ev) => {
     const all = [...closed, ...sold, ...lots];
     if (all.length) target.lots = all;
     else delete target.lots;
+    if (lotsState.fundCategory) target.fundCategory = lotsState.fundCategory;
     if (!settleCash) return;
     const delta = round2((holdingsPLN(MARKET, target, t) ?? before) - before);
     if (Math.abs(delta) < 0.01) return;

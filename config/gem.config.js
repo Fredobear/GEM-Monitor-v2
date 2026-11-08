@@ -158,7 +158,7 @@ export default {
   // Rynki pokazywane w rankingu na panelu (niezależnie od wariantu).
   tracked: ['US', 'EXUS', 'DEVX', 'EM', 'BONDS', 'TBILLS'],
 
-  // Instrumenty do wyceny portfela (zakładka Portfel). Wycena = Twoja cena transakcyjna przesunięta o zmianę
+  // Instrumenty do wyceny portfela (zakładka GEM → Mój portfel GEM). Wycena = Twoja cena transakcyjna przesunięta o zmianę
   // indeksu-proxy (ETF z USA z rynku `proxy`, przeliczony na walutę instrumentu kursami NBP).
   // `av` – symbol w Alpha Vantage: jeśli działa, używane są rzeczywiste ceny zamknięcia.
   portfolio: {
@@ -197,6 +197,9 @@ export default {
     maxWebSearches: 5,
     // 'sygnal_i_tydzien' – przy sygnale miesięcznym i w cotygodniowym podsumowaniu; 'codziennie' – przy każdym uruchomieniu.
     frequency: 'sygnal_i_tydzien',
+    // Codzienna notatka rynkowa (zakładka Rynki → Przegląd): streszczenie wydarzeń, wpływ na rynki i scenariusze.
+    // Sonnet wystarcza do streszczania wiadomości i kosztuje ok. połowę mniej niż Opus (orientacyjnie 3–4 USD miesięcznie).
+    marketNote: { enabled: true, model: 'claude-sonnet-5-5', effort: 'medium', maxWebSearches: 4 },
   },
 
   // Monitor przepisów podatkowych w Polsce (zakładka Rynki → Podatki).
@@ -226,6 +229,11 @@ export default {
       { name: 'Fed', url: 'https://www.federalreserve.gov/feeds/press_all.xml' },
       { name: 'EBC', url: 'https://www.ecb.europa.eu/rss/press.html' },
       { name: 'Bankier.pl', url: 'https://www.bankier.pl/rss/wiadomosci.xml' },
+      { name: 'Bankier.pl Giełda', url: 'https://www.bankier.pl/rss/gielda.xml' },
+      { name: 'Parkiet', url: 'https://www.parkiet.com/rss_main' },
+      { name: 'Puls Biznesu', url: 'https://www.pb.pl/rss/najnowsze.xml' },
+      { name: 'CNBC', url: 'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114' },
+      { name: 'MarketWatch Market Pulse', url: 'https://feeds.content.dowjones.io/public/rss/mw_marketpulse' },
       {
         name: 'Google News',
         url: 'https://news.google.com/rss/search?q=(stocks+OR+markets)+(geopolitics+OR+war+OR+sanctions+OR+tariffs+OR+election)+when:3d&hl=en-US&gl=US&ceid=US:en',

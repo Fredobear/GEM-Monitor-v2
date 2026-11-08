@@ -1,4 +1,5 @@
-// Aplikacja WWW (GitHub Pages): jeden plik HTML z czterema zakładkami – Sygnał, Portfel, Podatki, Rynki.
+// Aplikacja WWW (GitHub Pages): jeden plik HTML z częściami GEM (Sygnał, Mój portfel GEM) i Rynki (Przegląd,
+// Instrumenty, Podatki) oraz osobna strona dziennika finansowego (finanse.html, offline).
 // Treści statyczne renderuje serwer (GitHub Actions); Portfel i kalkulatory działają w przeglądarce (src/client/*).
 import { mkdir, writeFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
@@ -8,6 +9,7 @@ import { appIcon } from './lib/png.js';
 import { monthNamePL, monthGenitivePL, datePL } from './lib/dates.js';
 import { fmtPct } from './explain.js';
 import { writeLibrary } from './instruments.js';
+import { writeFunds } from './funds.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -31,21 +33,35 @@ const ICONS = {
 };
 export const icon = (name) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]}</svg>`;
 
-// Podatki są podkartą zakładki Rynki (adres #podatki nadal działa, także w powiadomieniach).
+// Menu ma trzy części: GEM (sygnał i portfel strategii), Finanse (dziennik – osobna strona offline)
+// i Rynki (przegląd rynku, instrumenty, podatki). Podkarty mają własne adresy (#sygnal, #portfel, #rynki,
+// #instrumenty, #podatki) – działają też w linkach z powiadomień.
 const TABS = [
-  ['sygnal', 'Sygnał'],
-  ['portfel', 'Portfel'],
+  ['gem', 'GEM', 'sygnal'],
   ['finanse', 'Finanse'],
-  ['rynki', 'Rynki'],
+  ['rynki', 'Rynki', 'rynki'],
 ];
+export const SUBTABS = {
+  gem: [
+    ['sygnal', 'Sygnał'],
+    ['portfel', 'Mój portfel GEM'],
+  ],
+  rynki: [
+    ['rynki', 'Przegląd'],
+    ['instrumenty', 'Instrumenty'],
+    ['podatki', 'Podatki'],
+  ],
+};
 
 // Nawigacja wspólna dla index.html (zakładki w jednej stronie) i finanse.html (osobna strona offline).
 export function navHtml(page) {
-  return `<nav class="tabs" aria-label="Sekcje">${TABS.map(([id, label]) => {
+  return `<nav class="tabs" aria-label="Sekcje">${TABS.map(([id, label, first]) => {
     if (id === 'finanse') return `<a href="finanse.html" data-page="finanse" ${page === 'finanse' ? 'aria-current="page"' : ''}>${icon(id)}<span>${label}</span></a>`;
-    return `<a href="${page === 'finanse' ? 'index.html' : ''}#${id}" ${page === 'finanse' ? '' : `data-tab="${id}"`}>${icon(id)}<span>${label}</span></a>`;
+    return `<a href="${page === 'finanse' ? 'index.html' : ''}#${first}" data-group="${id}" ${page === 'finanse' ? '' : `data-tab="${id}"`}>${icon(id === 'gem' ? 'sygnal' : id)}<span>${label}</span></a>`;
   }).join('')}</nav>`;
 }
+
+const subnavHtml = (group, label) => `<nav class="seg subnav" data-group="${group}" aria-label="${esc(label)}" hidden>${SUBTABS[group].map(([id, l]) => `<a href="#${id}" data-sub="${id}">${esc(l)}</a>`).join('')}</nav>`;
 
 export const HEAD_COMMON = `<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex"><meta name="theme-color" content="#112040">
@@ -73,7 +89,7 @@ nav.tabs a{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radiu
 nav.tabs a[aria-current=page]{background:var(--accent-soft);color:var(--accent)}
 main{max-width:960px;margin:0 auto;padding:6px 16px 48px}
 @media (max-width:760px){
- nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:6px 4px calc(env(safe-area-inset-bottom,0px) + 6px);display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--surface);border-top:1px solid var(--line)}
+ nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:6px 4px calc(env(safe-area-inset-bottom,0px) + 6px);display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--surface);border-top:1px solid var(--line)}
  nav.tabs a{flex-direction:column;gap:2px;padding:6px 0;font-size:11px}
  main{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
  .updated .long{display:none}
@@ -132,6 +148,26 @@ footer{color:var(--muted);font-size:12px;margin:24px 0}
 .subnav[hidden]{display:none}
 .subnav a{flex:1;text-align:center;text-decoration:none;color:var(--muted);font-weight:600;padding:8px 6px;border-radius:9px}
 .subnav a[aria-current=page]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.note h4{margin:16px 0 6px;font-size:14.5px}.note p{margin:6px 0;line-height:1.5}
+.stance{margin:0 0 12px;padding:10px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line)}
+.stance p{margin:8px 0 2px}
+.gauge{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}
+.gauge span{text-align:center;font-size:12px;font-weight:600;padding:6px 2px;border-radius:9px;background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+.gauge span.on.pos{background:var(--pos-soft);color:var(--pos);border-color:var(--pos)}.gauge span.on.mid{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.gauge span.on.warn{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}.gauge span.on.neg{background:var(--neg-soft);color:var(--neg);border-color:var(--neg)}
+.factors li{margin:6px 0;font-size:13.5px}.fs{display:inline-block;min-width:26px;text-align:center;font-weight:700;border-radius:6px;background:var(--surface);border:1px solid var(--line);font-size:12px}
+.dots li{position:relative;padding-left:14px;margin:6px 0;line-height:1.45}.dots li::before{content:'';position:absolute;left:2px;top:.6em;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.disclaimer{margin-top:14px}
+ul.plain.dots,ul.plain.events,ul.plain.factors{list-style:none;padding-left:0}
+table.mkt td,table.mkt th{padding:7px 5px}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.grp td{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:14px;background:transparent}
+.trend{font-size:13px}
+@media (max-width:560px){.opt{display:none}table.mkt{font-size:13px}}
+.events li{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}.events li:last-child{border-bottom:0}
+.ev-date{flex:none;width:76px;font-weight:700;font-size:13px;color:var(--accent)}.events small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.ev-gem .ev-date{color:var(--gem)}.ev-dane .ev-date{color:var(--muted)}
+.fund-tbl td:first-child{min-width:150px}
 .seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;padding:7px 12px;border-radius:9px;cursor:pointer;white-space:nowrap}
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
 .seg.small button{padding:5px 10px;font-size:13px}
@@ -385,23 +421,131 @@ function podatkiTab({ podatki, research, taxMonitor, now }) {
   return parts.join('\n');
 }
 
-function rynkiTab({ macro, news, ai }) {
-  const parts = [];
-  if (macro?.indicators?.length) {
-    const fx = macro.usdpln ? `<div class="ind t0"><div class="meta">Kurs USD/PLN (NBP)</div><div class="v">${macro.usdpln.rate.toFixed(4).replace('.', ',')}</div><div class="meta">12 mies.: ${fmtPct(macro.usdpln.change12m)}. ${macro.usdpln.change12m >= 0 ? 'Słabszy złoty podnosi wynik w PLN.' : 'Mocniejszy złoty obniża wynik w PLN.'}</div></div>` : '';
-    parts.push(`<section class="card"><h2>Ryzyko rynkowe</h2><p>${esc(macro.summary)}</p><div class="grid">${macro.indicators
-      .map((i) => `<div class="ind t${i.tier}"><div class="meta">${esc(i.name)}</div><div class="v">${esc(i.value)}</div><div class="meta">${esc(i.comment)} · ${esc(i.date)}</div></div>`)
-      .join('')}${fx}</div><p class="meta">Wskaźniki są kontekstem. Nie zmieniają mechanicznego sygnału GEM (por. ANALIZA_GEM.md, rozdz. 7).</p></section>`);
-  }
-  if (ai?.text) {
-    parts.push(`<section class="card ai"><h2>Kontekst polityczny i geopolityczny (AI)</h2>${renderAi(ai.text)}${ai.sources?.length ? `<details><summary>Źródła (${ai.sources.length})</summary><ul class="plain">${ai.sources.map((s) => `<li><a href="${esc(s.url)}" rel="noopener" target="_blank">${esc(s.title)}</a></li>`).join('')}</ul></details>` : ''}<p class="meta">Wygenerowano: ${esc(ai.generatedAt?.slice(0, 16).replace('T', ' '))} UTC · ${esc(ai.model)}</p></section>`);
-  } else if (ai?.error) parts.push(`<div class="banner info">${esc(ai.error)}</div>`);
-  if (news?.items?.length) {
-    parts.push(`<section class="card news"><h2>Wiadomości polityczne i gospodarcze</h2><ul class="plain">${news.items
-      .map((n) => `<li><a href="${esc(n.link)}" rel="noopener" target="_blank">${esc(n.title)}</a><div class="src">${esc(n.source)} · ${esc(n.date?.slice(0, 16).replace('T', ' '))} UTC</div>${[...n.regions, ...n.themes].map((t) => `<span class="ntag">${esc(t)}</span>`).join('')}</li>`)
-      .join('')}</ul><p class="meta">Wybrane automatycznie z ${news.fetched} nagłówków (RSS) według tematów: konflikty, sankcje i cła, banki centralne, wybory, energia, inflacja.</p></section>`);
-  }
-  return parts.join('\n') || '<section class="card"><p class="muted">Brak danych.</p></section>';
+const sourcesHtml = (sources) => (sources?.length ? `<details><summary>Źródła (${sources.length})</summary><ul class="plain">${sources.map((s) => `<li><a href="${esc(s.url)}" rel="noopener" target="_blank">${esc(s.title)}</a></li>`).join('')}</ul></details>` : '');
+
+// Komentarz AI do sygnału GEM (zakładka Sygnał).
+function aiGemCard(ai) {
+  if (ai?.text) return `<section class="card ai"><h2>Kontekst sygnału (AI)</h2>${renderAi(ai.text)}${sourcesHtml(ai.sources)}<p class="meta">Wygenerowano: ${esc(ai.generatedAt?.slice(0, 16).replace('T', ' '))} UTC · ${esc(ai.model)}</p></section>`;
+  return ai?.error ? `<div class="banner info">${esc(ai.error)}</div>` : '';
+}
+
+// ---------- Rynki → Przegląd ----------
+const NFX = (d) => new Intl.NumberFormat('pl-PL', { minimumFractionDigits: d, maximumFractionDigits: d });
+const sPct = (x, d = 1) => (x === null || x === undefined || !Number.isFinite(x) ? '–' : `${x < 0 ? '−' : '+'}${NFX(d).format(Math.abs(x * 100))}%`);
+const sPp = (x) => (x === null || x === undefined || !Number.isFinite(x) ? '–' : `${x < 0 ? '−' : '+'}${NFX(2).format(Math.abs(x))} pp`);
+const toneOf = (x) => (x === null || x === undefined || !Number.isFinite(x) || Math.abs(x) < 0.00005 ? '' : x > 0 ? 'pos' : 'neg');
+const DOW_PL = ['niedz.', 'pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.'];
+const MON_PL = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
+const evDate = (iso) => `${DOW_PL[new Date(`${iso}T12:00:00Z`).getUTCDay()]} ${Number(iso.slice(8, 10))} ${MON_PL[Number(iso.slice(5, 7)) - 1]}`;
+const STANCE_ORDER = [
+  ['defensywne', 'defensywne'],
+  ['ostrozne', 'ostrożne'],
+  ['neutralne', 'neutralne'],
+  ['sprzyjajace', 'sprzyjające'],
+];
+
+function worldValue(r) {
+  if (r.kind === 'yield') return `${NFX(2).format(r.last)}%`;
+  if (r.kind === 'fx') return NFX(4).format(r.last);
+  if (r.kind === 'etf') return `${NFX(2).format(r.last)} USD`;
+  return NFX(r.last >= 1000 ? 0 : 2).format(r.last);
+}
+const worldChange = (r, k) => (r.kind === 'yield' ? sPp(r[k]) : sPct(r[k]));
+// Dla rentowności wzrost to spadek cen obligacji, a dla kursu złotego – osłabienie złotego: bez kolorów.
+const worldTone = (r, k) => (r.kind === 'yield' || r.kind === 'fx' ? '' : toneOf(r[k]));
+
+function stanceGauge(stance) {
+  if (!stance) return '';
+  return `<div class="gauge" role="img" aria-label="Nastawienie rynku: ${esc(stance.label)}">${STANCE_ORDER.map(([id, label]) => `<span class="${id === stance.id ? `on ${esc(stance.tone)}` : ''}">${label}</span>`).join('')}</div>`;
+}
+
+function noteCard(rynek) {
+  const note = rynek?.note;
+  if (!note) return '';
+  const stance = rynek.stance;
+  const factors = stance?.factors?.length ? `<details><summary>Skąd ta ocena? (${stance.factors.length} wskaźników, wynik ${stance.score > 0 ? '+' : ''}${stance.score})</summary><ul class="plain factors">${stance.factors.map((f) => `<li><span class="fs ${f.score > 0 ? 'pos' : f.score < 0 ? 'neg' : ''}">${f.score > 0 ? '+' : ''}${f.score}</span> <b>${esc(f.label)}</b> – ${esc(f.detail)}</li>`).join('')}</ul><p class="meta">Każdy wskaźnik daje od −2 do +1 punktu. Suma ≥ 3: sprzyjające, 0…2: neutralne, −3…−1: ostrożne, poniżej −3: defensywne.</p></details>` : '';
+  const ruleNote = `${note.summary.map((s) => `<p>${esc(s)}</p>`).join('')}${note.sections.map((s) => `<h4>${esc(s.title)}</h4><ul class="plain dots">${s.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`).join('')}`;
+  const ai = rynek.ai;
+  const aiFresh = ai?.text && ai.date && Math.abs(Date.parse(note.date) - Date.parse(ai.date)) <= 3 * 86400000;
+  const body = aiFresh
+    ? `<div class="ai">${renderAi(ai.text)}</div>${sourcesHtml(ai.sources)}<p class="meta">Notatka AI (${esc(ai.model)}) z ${esc(ai.generatedAt?.slice(0, 16).replace('T', ' '))} UTC – na podstawie danych aplikacji i wyszukiwania w sieci.</p><details><summary>Notatka z danych (bez AI)</summary>${ruleNote}</details>`
+    : `${ruleNote}${ai?.error ? `<p class="meta">${esc(ai.error)}</p>` : '<p class="meta">Notatka z reguł aplikacji. Szerszy komentarz z wyszukiwaniem najnowszych wiadomości i scenariuszami na kolejne dni napisze AI, jeśli dodasz klucz ANTHROPIC_API_KEY (README → „Notatka rynkowa AI”).</p>'}`;
+  return `<section class="card note"><div class="card-head"><h2>Notatka rynkowa</h2><span class="muted small">${esc(datePL(note.date))}</span></div>
+  ${stance ? `<div class="stance"><span class="muted small">Nastawienie rynku</span>${stanceGauge(stance)}<p class="small">${esc(stance.text)}</p>${factors}</div>` : ''}
+  ${body}
+  <p class="meta disclaimer">${esc(note.disclaimer)}</p></section>`;
+}
+
+function worldCard(rynek) {
+  const rows = rynek.world ?? [];
+  if (!rows.length) return '';
+  const groups = [...new Set(rows.map((r) => r.group))];
+  const body = groups
+    .map((g) => `<tr class="grp"><td colspan="6">${esc(g)}</td></tr>${rows
+      .filter((r) => r.group === g)
+      .map((r) => {
+        const trend = r.trend ? `<span class="trend ${r.trend === 'up' ? 'pos' : 'neg'}" title="${esc(`Trend ${r.trend === 'up' ? 'wzrostowy' : 'spadkowy'} (${r.trendBasis})`)}" aria-label="${r.trend === 'up' ? 'trend wzrostowy' : 'trend spadkowy'}">${r.trend === 'up' ? '▲' : '▼'}</span> ` : '';
+        const sub = r.fromHigh !== null && r.fromHigh !== undefined && r.fromHigh < -0.0005 ? `<div class="small muted">${sPct(r.fromHigh)} od szczytu 52 tyg.</div>` : r.fromHigh !== null && r.fromHigh !== undefined ? '<div class="small muted">przy szczycie 52 tyg.</div>' : '';
+        return `<tr><td>${trend}${esc(r.name)}${sub}</td><td class="num">${esc(worldValue(r))}</td><td class="num opt ${worldTone(r, 'd1')}">${esc(worldChange(r, 'd1'))}</td><td class="num ${worldTone(r, 'w1')}">${esc(worldChange(r, 'w1'))}</td><td class="num opt ${worldTone(r, 'm1')}">${esc(worldChange(r, 'm1'))}</td><td class="num ${worldTone(r, 'ytd')}">${esc(worldChange(r, 'ytd'))}</td></tr>`;
+      })
+      .join('')}`)
+    .join('');
+  return `<section class="card"><div class="card-head"><h2>Rynki świata</h2><span class="muted small">notowania do ${esc(rynek.asOf ? datePL(rynek.asOf) : '–')}</span></div>
+  <div class="tbl-wrap"><table class="mkt"><thead><tr><th>Rynek</th><th class="num">Wartość</th><th class="num opt">1 dzień</th><th class="num">Tydzień</th><th class="num opt">Miesiąc</th><th class="num">Od 1.01</th></tr></thead><tbody>${body}</tbody></table></div>
+  <p class="meta"><span class="pos">▲</span> trend wzrostowy, <span class="neg">▼</span> spadkowy: cena powyżej albo poniżej średniej z 200 sesji (dla indeksów GPW na początku: z 10 miesięcy). ETF-y z USA pokazują rynki w dolarach. Rentowności zmieniają się w punktach procentowych (pp); wzrost rentowności to spadek cen obligacji. Źródła: FRED, Tiingo, GPW, NBP.</p></section>`;
+}
+
+function statsCard(rynek) {
+  const st = rynek.stats;
+  const rg = rynek.regime;
+  if (!st?.current || !rg) return '';
+  const label = { up: 'trend wzrostowy', down: 'trend spadkowy', low: 'spokojny rynek', mid: 'umiarkowana zmienność', high: 'wysoka zmienność' };
+  const rows = [
+    [5, 'Tydzień'],
+    [21, 'Miesiąc'],
+    [63, '3 miesiące'],
+  ]
+    .filter(([h]) => st.current[h])
+    .map(([h, l]) => {
+      const c = st.current[h];
+      const a = st.all?.[h];
+      return `<tr><td>${l}</td><td class="num">${Math.round(c.up * 100)}%${a ? `<div class="small muted">zwykle ${Math.round(a.up * 100)}%</div>` : ''}</td><td class="num ${toneOf(c.median)}">${sPct(c.median)}</td><td class="num">${sPct(c.p10)} … ${sPct(c.p90)}</td></tr>`;
+    })
+    .join('');
+  return `<section class="card"><h2>Co zwykle działo się dalej</h2>
+  <p>S&amp;P 500 jest teraz w reżimie: <b>${label[rg.trend]}</b>, <b>${label[rg.vol]}</b> (zmienność ${NFX(0).format((rg.volValue ?? 0) * 100)}% rocznie). Tak zachowywał się indeks w podobnych warunkach od ${esc(st.since?.slice(0, 4) ?? '')} r.:</p>
+  <div class="tbl-wrap"><table><thead><tr><th>Horyzont</th><th class="num">Wzrost w</th><th class="num">Mediana</th><th class="num">Typowy zakres (80% przypadków)</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="meta">To statystyka z przeszłości (ETF SPY z dywidendami), a nie prognoza. „Zwykle” – odsetek wzrostów we wszystkich dniach. Rynek w krótkim terminie jest w dużej mierze nieprzewidywalny – dlatego GEM podejmuje decyzje raz w miesiącu według reguł.</p></section>`;
+}
+
+function eventsCard(rynek) {
+  const ev = rynek.events ?? [];
+  const warn = (rynek.warnings ?? []).find((w) => /kalendarz/i.test(w));
+  if (!ev.length && !warn) return '';
+  return `<section class="card"><h2>Najbliższe wydarzenia</h2>
+  ${ev.length ? `<ul class="plain events">${ev.map((e) => `<li class="ev-${esc(e.kind)}"><span class="ev-date">${esc(evDate(e.date))}</span><span><b>${esc(e.title)}</b>${e.note ? `<small>${esc(e.note)}</small>` : ''}</span></li>`).join('')}</ul>` : ''}
+  ${warn ? `<p class="small warn">${esc(warn)}</p>` : ''}
+  <p class="meta">Decyzje banków centralnych według oficjalnych terminarzy (plik config/kalendarz.js). Dane cykliczne – terminy orientacyjne.</p></section>`;
+}
+
+function macroCard(macro) {
+  if (!macro?.indicators?.length) return '';
+  const fx = macro.usdpln ? `<div class="ind t0"><div class="meta">Kurs USD/PLN (NBP)</div><div class="v">${macro.usdpln.rate.toFixed(4).replace('.', ',')}</div><div class="meta">12 mies.: ${fmtPct(macro.usdpln.change12m)}. ${macro.usdpln.change12m >= 0 ? 'Słabszy złoty podnosi wynik w PLN.' : 'Mocniejszy złoty obniża wynik w PLN.'}</div></div>` : '';
+  return `<section class="card"><h2>Wskaźniki ryzyka</h2><p>${esc(macro.summary)}</p><div class="grid">${macro.indicators
+    .map((i) => `<div class="ind t${i.tier}"><div class="meta">${esc(i.name)}</div><div class="v">${esc(i.value)}</div><div class="meta">${esc(i.comment)} · ${esc(i.date)}</div></div>`)
+    .join('')}${fx}</div><p class="meta">Wskaźniki są kontekstem. Nie zmieniają mechanicznego sygnału GEM (por. ANALIZA_GEM.md, rozdz. 7).</p></section>`;
+}
+
+function newsCard(news) {
+  if (!news?.items?.length) return '';
+  return `<section class="card news"><h2>Wiadomości ze świata i z rynków</h2><ul class="plain">${news.items
+    .map((n) => `<li><a href="${esc(n.link)}" rel="noopener" target="_blank">${esc(n.title)}</a><div class="src">${esc(n.source)} · ${esc(n.date?.slice(0, 16).replace('T', ' '))} UTC</div>${[...n.regions, ...n.themes].map((t) => `<span class="ntag">${esc(t)}</span>`).join('')}</li>`)
+    .join('')}</ul><p class="meta">Wybrane automatycznie z ${news.fetched} nagłówków (RSS) według tematów: konflikty, sankcje i cła, banki centralne, wybory, energia, inflacja, nastroje na giełdach i wyniki spółek.</p></section>`;
+}
+
+function rynkiTab({ macro, news, rynek }) {
+  const parts = [noteCard(rynek), rynek ? worldCard(rynek) : '', rynek ? eventsCard(rynek) : '', rynek ? statsCard(rynek) : '', macroCard(macro), newsCard(news)].filter(Boolean);
+  return parts.join('\n') || '<section class="card"><p class="muted">Brak danych – przegląd rynku pojawi się po najbliższej aktualizacji.</p></section>';
 }
 
 const TX_DIALOG = `<dialog id="tx-dialog"><form method="dialog" novalidate>
@@ -425,6 +569,7 @@ const SETTINGS_DIALOG = (podatki) => `<dialog id="settings-dialog"><form method=
 <label class="field">Forma opodatkowania dochodów (do ulgi IKZE)<select name="taxForm">${Object.entries(podatki.taxForms).map(([k, f]) => `<option value="${k}">${esc(f.label)}</option>`).join('')}</select></label>
 <label class="field" id="ryczalt-row" hidden>Stawka ryczałtu (%)<input name="ryczaltRate" inputmode="decimal" placeholder="12"></label>
 <label class="check"><input type="checkbox" name="selfEmployed"> Prowadzę działalność gospodarczą (limit IKZE ×1,8)</label>
+<label class="field">Strona startowa aplikacji<select name="startPage"><option value="gem">GEM – sygnał</option><option value="finanse">Finanse – dziennik</option><option value="rynki">Rynki – przegląd</option></select></label>
 <div class="two"><label class="field">Domyślny rachunek<select name="defaultAccount"><option value="IKE">IKE</option><option value="IKZE">IKZE</option><option value="OKI">OKI</option><option value="ZWYKLE">Konto zwykłe</option></select></label>
 <label class="field">Wygląd<select name="theme"><option value="auto">Jak w systemie</option><option value="light">Jasny</option><option value="dark">Ciemny</option></select></label></div>
 <details><summary>Synchronizacja między urządzeniami (GitHub)</summary>
@@ -464,7 +609,7 @@ function clientData({ signals, explanation, config, prices, podatki, research, l
 }
 
 export function renderDashboard(payload) {
-  const { signals, explanation, macro, news, ai, research, config, podatki, taxMonitor, meta } = payload;
+  const { signals, explanation, macro, news, ai, research, config, podatki, taxMonitor, meta, rynek } = payload;
   const now = new Date(meta.generatedAt);
   const banners = [];
   if (meta.demo) banners.push(`<div class="banner warn"><b>Tryb demonstracyjny.</b> ${esc(meta.demo)}</div>`);
@@ -477,17 +622,20 @@ export function renderDashboard(payload) {
   return `<!doctype html><html lang="pl"><head>${HEAD_COMMON}
 <meta http-equiv="Content-Security-Policy" content="${csp}">
 <title>GEM Monitor</title>
+<script>try{if(!location.hash&&localStorage.getItem('gem.start')==='finanse')location.replace('finanse.html')}catch(e){}</script>
 <style>${CSS}</style></head><body>
 <header class="topbar"><div class="brand"><img src="icon-192.png" alt="">GEM Monitor <span>· XTB</span></div><div class="updated"><span class="long">aktualizacja ${esc(updated)}${signals ? `<br>notowania do ${esc(datePL(signals.lastDataDate))}` : ''}</span><span class="short">${signals ? `dane z ${esc(signals.lastDataDate.split('-').reverse().join('.'))}` : ''}</span></div><button class="icon-btn" id="btn-settings" aria-label="Ustawienia">${icon('settings')}</button></header>
 ${navHtml('index')}
 <main>
 ${banners.join('\n')}
-<section id="tab-sygnal" class="tabpanel">${signalTab({ signals, explanation, config, research })}</section>
+${subnavHtml('gem', 'GEM')}
+<section id="tab-sygnal" class="tabpanel">${signalTab({ signals, explanation, config, research })}${aiGemCard(ai)}</section>
 <section id="tab-portfel" class="tabpanel"><div id="portfel-root"><p class="muted">Ładowanie portfela…</p></div><noscript><p>Portfel wymaga włączonej obsługi JavaScript.</p></noscript></section>
-<nav class="seg subnav" id="rynki-subnav" aria-label="Rynki i podatki" hidden><a href="#rynki" data-sub="rynki">Rynki i wiadomości</a><a href="#podatki" data-sub="podatki">Podatki, IKE i IKZE</a></nav>
-<section id="tab-rynki" class="tabpanel">${rynkiTab({ macro, news, ai })}</section>
+${subnavHtml('rynki', 'Rynki')}
+<section id="tab-rynki" class="tabpanel">${rynkiTab({ macro, news, rynek })}</section>
+<section id="tab-instrumenty" class="tabpanel"><div id="instrumenty-root"><p class="muted">Ładowanie…</p></div><noscript><p>Wyszukiwarka wymaga włączonej obsługi JavaScript.</p></noscript></section>
 <section id="tab-podatki" class="tabpanel">${podatkiTab({ podatki, research, taxMonitor, now })}</section>
-<footer><p><b>To nie jest porada inwestycyjna ani podatkowa.</b> Narzędzie mechanicznie realizuje opublikowaną strategię GEM (G. Antonacci, „Dual Momentum Investing”, 2014) i opisuje obowiązujące przepisy. Decyzje i ich skutki podatkowe należą do Ciebie.</p><p>Źródła danych: ${esc(meta.dataSource ?? '–')}; FRED; NBP; kanały RSS. Instrumenty sprawdzone w ofercie XTB (xtb.com/pl) w listopadzie 2026 r.</p></footer>
+<footer><p><b>To nie jest porada inwestycyjna ani podatkowa.</b> Narzędzie mechanicznie realizuje opublikowaną strategię GEM (G. Antonacci, „Dual Momentum Investing”, 2014), opisuje rynki i obowiązujące przepisy. Notatki i statystyki rynkowe mają charakter edukacyjny i nie są rekomendacją inwestycyjną. Decyzje i ich skutki należą do Ciebie.</p><p>Źródła danych: ${esc(meta.dataSource ?? '–')}; FRED; NBP; GPW; ING TFI; kanały RSS. Instrumenty sprawdzone w ofercie XTB (xtb.com/pl) w listopadzie 2026 r.</p></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
 ${TX_DIALOG}
@@ -502,6 +650,7 @@ export async function writeDashboard(dir, payload) {
   await writeFile(path.join(dir, 'index.html'), renderDashboard(payload));
   const { config, research, podatki, prices, library, ...rest } = payload;
   await writeLibrary(dir, library ?? {});
+  await writeFunds(dir, library?.funds);
   await writeFile(path.join(dir, 'data', 'latest.json'), JSON.stringify(rest, null, 1));
   if (prices) await writeFile(path.join(dir, 'data', 'prices.json'), JSON.stringify(prices));
   await writeFile(

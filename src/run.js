@@ -7,9 +7,11 @@ import { loadMarketData } from './data.js';
 import { explainSignal } from './explain.js';
 import { loadMacro } from './macro.js';
 import { loadNews } from './news.js';
-import { aiCommentary } from './ai.js';
+import { aiCommentary, aiMarketNote } from './ai.js';
 import { buildPrices } from './prices.js';
 import { buildQuotes, loadCatalog, loadWatchlist, readNotowania } from './instruments.js';
+import { buildFunds, readFunds } from './funds.js';
+import { buildMarketOverview } from './markets.js';
 import { loadTaxNews, dueReminders, upcoming, aiTaxReport, compareWithConfig } from './taxmonitor.js';
 import { writeDashboard } from './dashboard.js';
 import { send, channels, signalMessage, previewFlipMessage, digestMessage, errorMessage, reminderMessage, taxNewsMessage, stripTags } from './notify.js';
@@ -22,6 +24,14 @@ export async function loadConfig(root) {
 
 export async function loadPodatki(root) {
   return (await import(pathToFileURL(path.join(root, 'config', 'podatki.js')).href)).default;
+}
+
+export async function loadCalendar(root) {
+  try {
+    return (await import(pathToFileURL(path.join(root, 'config', 'kalendarz.js')).href)).default;
+  } catch {
+    return {};
+  }
 }
 
 // Link do edycji listy obserwowanych instrumentów w repozytorium (GitHub Actions podaje nazwę repozytorium i gałęzi).
@@ -106,6 +116,23 @@ export async function run({ flags = new Set(), root, env = process.env, now = ne
     priceWarnings.push(`Biblioteka instrumentów nie została odświeżona: ${err.message}`);
   }
 
+  // Fundusze ING TFI (np. w PPE): wyceny jednostek wszystkich funduszy i kategorii jednostek.
+  try {
+    library.funds = await buildFunds({ previous: await readFunds(docsDir), now });
+    priceWarnings.push(...library.funds.warnings.map((w) => `Fundusze ING TFI – ${w}`));
+  } catch (err) {
+    priceWarnings.push(`Fundusze ING TFI nie zostały odświeżone: ${err.message}`);
+  }
+
+  // Przegląd rynków: notowania świata i GPW, termometr nastroju, statystyka, kalendarz i notatka rynkowa.
+  let rynek = null;
+  try {
+    rynek = await buildMarketOverview({ root, now, env, macro, news, signals, explanation, config, calendar: await loadCalendar(root), notowania: library.notowania, prices, market });
+    priceWarnings.push(...rynek.warnings.map((w) => `Przegląd rynku – ${w}`));
+  } catch (err) {
+    priceWarnings.push(`Przegląd rynku nie został odświeżony: ${err.message}`);
+  }
+
   const isNewOfficial = state.official?.forMonth !== official.forMonth;
   const notifiedPreviewAsset = state.previewNotified?.forMonth === official.forMonth ? state.previewNotified.asset : official.decision.asset;
   const previewChanged = Boolean(preview) && !isNewOfficial && config.notifications.notifyPreviewFlip && preview.decision.asset !== notifiedPreviewAsset;
@@ -128,6 +155,21 @@ export async function run({ flags = new Set(), root, env = process.env, now = ne
     }
   }
 
+  // Notatka rynkowa AI: raz dziennie (w dni robocze), gdy ustawiono ANTHROPIC_API_KEY. Bez klucza – notatka z reguł.
+  let marketAi = state.marketAi?.result ?? null;
+  if (rynek && env.ANTHROPIC_API_KEY && config.ai.marketNote?.enabled && (flags.has('--ai') || state.marketAi?.key !== today)) {
+    log('Generuję notatkę rynkową AI...');
+    const fresh = await aiMarketNote({ overview: rynek, macro, news, explanation, config, env, now });
+    if (fresh?.text) {
+      marketAi = fresh;
+      state.marketAi = { key: today, result: fresh };
+    } else if (fresh?.error) {
+      log(fresh.error);
+      marketAi = marketAi ?? fresh;
+    }
+  }
+  if (rynek) rynek.ai = marketAi;
+
   // Raport podatkowy AI raz w miesiącu: sprawdza limity, OKI i opłaty brokerów względem config/podatki.js.
   const taxKey = today.slice(0, 7);
   let taxAi = state.taxAi?.result ?? null;
@@ -146,7 +188,7 @@ export async function run({ flags = new Set(), root, env = process.env, now = ne
 
   const warnings = [...market.warnings, ...priceWarnings, ...(macro.errors ?? []).map((e) => `Wskaźniki: ${e}`), ...(news.errors ?? []).map((e) => `Wiadomości: ${e}`), ...(taxNews.errors ?? []).map((e) => `Podatki: ${e}`)];
   const meta = { generatedAt: now.toISOString(), dataSource: `${market.source}${market.check ? ` (kontrola: ${market.check.source})` : ''}`, warnings: market.warnings, crossCheck: market.check };
-  await writeDashboard(docsDir, { signals, explanation, macro, news, ai, research, config, podatki, prices, taxMonitor, meta, library });
+  await writeDashboard(docsDir, { signals, explanation, macro, news, ai, research, config, podatki, prices, taxMonitor, meta, library, rynek });
 
   log(`Sygnał na ${official.forMonth}: ${explanation.action.text} (${explanation.stabilityText})`);
   if (preview) log(`Podgląd (${preview.asOf}): ${config.assets[preview.decision.asset].xtb.ticker}${preview.differsFromOfficial ? ' – RÓŻNI SIĘ' : ''}`);

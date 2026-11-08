@@ -9,7 +9,7 @@ import { addDays } from './lib/dates.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
-// Kursy NBP i ceny instrumentów dla dziennika (z danych pobieranych przez GitHub Actions do zakładki Portfel):
+// Kursy NBP i ceny instrumentów dla dziennika (z danych pobieranych przez GitHub Actions do portfela GEM):
 // ostatnie 100 dni dzień po dniu, wcześniej ostatni dzień każdego miesiąca. Trafiają do strony jako dane,
 // więc dziennik nie musi niczego pobierać z sieci.
 export function marketSnapshot(prices, config) {
@@ -67,7 +67,11 @@ label.check{display:flex}
 .pop-x{border:0;background:transparent;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
 .pop-list{max-height:min(52vh,420px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 .pop-list .ftx:first-child{border-top:0}
-#ld-picker{border:1px solid var(--line);border-radius:14px;padding:8px 10px;margin:8px 0;background:var(--surface)}
+#ld-picker,.ld-fund{border:1px solid var(--line);border-radius:14px;padding:8px 10px;margin:8px 0;background:var(--surface)}
+.inv-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:2px 0 8px;padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.inv-sum>div{display:flex;flex-direction:column;min-width:0}.inv-sum span{font-size:11.5px;color:var(--muted)}.inv-sum b{font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inv-pos{align-items:flex-start}.inv-pos>span{display:flex;flex-direction:column;white-space:normal!important}.inv-pos small{color:var(--muted);font-size:11.5px;white-space:normal}
+@media (max-width:420px){.inv-sum b{font-size:12.5px}}
 .lot-row .full{grid-column:1/-1}.lot-foot{display:flex;justify-content:space-between;gap:10px;align-items:center}
 .doc-row{display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .doc-ico{font-size:22px;line-height:1}.doc-main b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.doc-main small{color:var(--muted);font-size:12.5px}
@@ -292,8 +296,15 @@ const LOTS_DIALOG = `<dialog id="lots-dialog"><form method="dialog" novalidate>
 <h3 id="ld-title">Aktywa na koncie</h3>
 <p class="small muted" id="ld-info"></p>
 <div id="ld-rows"></div>
-<div class="row-btns"><button type="button" class="btn small" id="ld-add">+ Instrument z XTB</button><button type="button" class="btn small ghost" id="ld-add-manual">+ Inne aktywo (wycena ręczna)</button></div>
+<div class="row-btns"><button type="button" class="btn small" id="ld-add">+ Instrument z XTB</button><button type="button" class="btn small" id="ld-add-fund">+ Fundusz ING TFI (PPE)</button><button type="button" class="btn small ghost" id="ld-add-manual">+ Inne aktywo (wycena ręczna)</button></div>
 <div id="ld-picker" hidden></div>
+<div id="ld-fund" class="ld-fund" hidden>
+<label class="field">Fundusz<select id="ldf-fund"></select></label>
+<label class="field">Kategoria jednostek<select id="ldf-cat"></select></label>
+<p class="small" id="ldf-info"></p>
+<p class="small muted">Kategorię jednostek znajdziesz w serwisie ING TFI24 przy nazwie funduszu albo w umowie PPE pracodawcy (w PPE zwykle E, F, S, T lub W). Każda kategoria ma inną cenę jednostki, więc wybierz właściwą.</p>
+<div class="row-btns"><button type="button" class="btn small primary" id="ldf-ok">Dodaj fundusz</button></div>
+</div>
 <label class="check small"><input type="checkbox" name="settle"> <span>Rozlicz zmianę z wolną gotówką na koncie (kupno ją zmniejsza, sprzedaż zwiększa)</span></label>
 <p class="dlg-hint" id="ld-sum"></p>
 <div class="errors" id="ld-errors" role="alert"></div>
@@ -329,7 +340,7 @@ ${navHtml('finanse')}
 <main>
 <nav class="fin-tabs" id="fin-nav" aria-label="Dziennik">${TABS.map(([k, l]) => `<button data-view="${k}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg><span>${l}</span></button>`).join('')}</nav>
 <div id="fin-root"><p class="muted">Ładowanie…</p></div>
-<footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów strategii są dołączane do strony przy każdej aktualizacji aplikacji, a ceny pozostałych akcji i ETF-ów z oferty XTB strona wczytuje z pliku aplikacji (data/notowania.js) – to tylko pobranie gotowego pliku, bez wysyłania jakichkolwiek danych. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
+<footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów strategii są dołączane do strony przy każdej aktualizacji aplikacji, a ceny pozostałych akcji i ETF-ów z oferty XTB oraz wyceny funduszy ING TFI strona wczytuje z plików aplikacji (data/notowania.js, data/fundusze.js) – to tylko pobranie gotowego pliku, bez wysyłania jakichkolwiek danych. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
 ${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}${LOTS_DIALOG}${CONFIRM_DIALOG}${DOC_DIALOG}

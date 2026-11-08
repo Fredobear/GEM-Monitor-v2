@@ -56,12 +56,14 @@ export const THEMES = {
   'Wybory i polityka': ['election*', 'vote', 'votes', 'voting', 'parliament*', 'shutdown', 'prime minister', 'coalition', 'wybor*', 'głosowa*', 'sejm*', 'rząd', 'rządu', 'rządem', 'koalicj*', 'prezydent*'],
   'Energia i surowce': ['oil', 'crude', 'natural gas', 'lng', 'opec*', 'energy', 'brent', 'wti', 'ropa', 'ropy', 'ropę', 'gaz', 'gazu', 'energi*', 'paliw*'],
   'Inflacja i recesja': ['inflation*', 'recession*', 'cpi', 'gdp', 'jobs report', 'payroll*', 'unemployment', 'slowdown', 'stagflation', 'inflacj*', 'recesj*', 'pkb', 'bezroboci*', 'spowolnieni*', 'stagflacj*'],
+  'Nastroje na giełdach': ['sell-off', 'selloff', 'rally', 'rallies', 'record high', 'all-time high', 'correction', 'bear market', 'bull market', 'volatility', 'wyprzedaż*', 'rekord* na giełd*', 'rekord* wszech czasów', 'hossa', 'hossy', 'hossie', 'bessa', 'bessy', 'bessie', 'korekt* na giełd*', 'zmienność', 'zmienności'],
+  'Spółki i wyniki': ['earnings', 'quarterly results', 'profit warning', 'guidance', 'revenue', 'ipo', 'buyback*', 'wyniki kwartalne', 'wyniki finansowe', 'zysk netto', 'przychody', 'dywidend*', 'debiut*'],
 };
 
-const THEME_WEIGHT = { 'Konflikty i wojny': 3, 'Sankcje i cła': 3, 'Banki centralne i stopy': 2, 'Wybory i polityka': 2, 'Energia i surowce': 2, 'Inflacja i recesja': 2 };
+const THEME_WEIGHT = { 'Konflikty i wojny': 3, 'Sankcje i cła': 3, 'Banki centralne i stopy': 2, 'Wybory i polityka': 2, 'Energia i surowce': 2, 'Inflacja i recesja': 2, 'Nastroje na giełdach': 1, 'Spółki i wyniki': 1 };
 
 // Tematy z natury rynkowe; pozostałe (konflikty, polityka) wymagają dodatkowo słowa związanego z rynkami.
-const ECONOMIC_THEMES = new Set(['Banki centralne i stopy', 'Sankcje i cła', 'Energia i surowce', 'Inflacja i recesja']);
+const ECONOMIC_THEMES = new Set(['Banki centralne i stopy', 'Sankcje i cła', 'Energia i surowce', 'Inflacja i recesja', 'Nastroje na giełdach', 'Spółki i wyniki']);
 const MARKET_WORDS = ['market*', 'stock*', 'shares', 'equit*', 'investor*', 'econom*', 'bond*', 'yield*', 'currenc*', 'dollar*', 'price*', 'trade', 'export*', 'supply', 'giełd*', 'rynk*', 'rynek', 'inwestor*', 'akcj*', 'obligacj*', 'walut*', 'gospodar*', 'cena', 'ceny', 'cen', 'cenach', 'handl*', 'eksport*', 'dolar*', 'notowa*'];
 
 const compile = compileKeywords;
@@ -111,5 +113,5 @@ export async function loadNews(config, now = new Date()) {
 
   const themeCounts = Object.fromEntries(Object.keys(THEMES).map((t) => [t, relevant.filter((i) => i.themes.includes(t)).length]));
   const regionCounts = Object.fromEntries(Object.keys(REGIONS).map((r) => [r, relevant.filter((i) => i.regions.includes(r)).length]));
-  return { fetched: all.length, items: relevant.slice(0, 15), themeCounts, regionCounts, errors };
+  return { fetched: all.length, items: relevant.slice(0, 20), themeCounts, regionCounts, errors };
 }

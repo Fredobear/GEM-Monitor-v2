@@ -109,7 +109,7 @@ export default {
       commissionNote: 'ok. 0,05% z minimum na giełdach europejskich (taryfa zależna od rynku)',
       status: { fx: 'do weryfikacji', commission: 'do weryfikacji', ikeUsd: '–' },
       pros: ['bardzo tanie przewalutowanie', 'dostęp do niemal wszystkich giełd'],
-      cons: ['brak IKE, IKZE i OKI', 'brak PIT-8C – zysk rozliczasz sam (Portfel liczy go wg kursów NBP z dnia poprzedniego)'],
+      cons: ['brak IKE, IKZE i OKI', 'brak PIT-8C – zysk rozliczasz sam (portfel GEM w aplikacji liczy go wg kursów NBP z dnia poprzedniego)'],
       sources: ['https://www.interactivebrokers.com/pl/pricing/commissions-home.php'],
     },
   ],

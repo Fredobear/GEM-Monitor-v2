@@ -24,6 +24,40 @@ export function instLoadScript(src, globalName) {
 export const instLoadCatalog = () => instLoadScript('data/katalog.js', 'GEM_KATALOG');
 export const instLoadQuotes = () => instLoadScript('data/notowania.js', 'GEM_NOTOWANIA');
 
+// ---------- Fundusze ING TFI (PPE, PPK, IKE) – wyceny jednostek z pliku data/fundusze.js ----------
+// Symbol pozycji: INGTFI:<id funduszu>:<kategoria jednostek>, np. INGTFI:1:E (ING Akcji, kategoria E dla PPE).
+export const FUND_PREFIX = 'INGTFI:';
+export const FUND_PPE_CATEGORIES = ['E', 'F', 'S', 'T', 'W'];
+export const FUND_TYPE_ORDER = ['akcji', 'mieszany', 'obligacji', 'krótkoterminowy dłużny', 'cyklu życia', 'alternatywny', 'Emerytura (PPK)'];
+export const instLoadFunds = () => instLoadScript('data/fundusze.js', 'GEM_FUNDUSZE');
+export const fundSymbol = (id, cat) => `${FUND_PREFIX}${id}:${cat}`;
+export const fundIdOf = (symbol) => Number(String(symbol ?? '').split(':')[1]);
+export const fundCategoryOf = (symbol) => String(symbol ?? '').split(':')[2] ?? '';
+export const fundInfo = (data, symbol) => data?.funds?.find((f) => f.id === fundIdOf(symbol)) ?? null;
+
+/** Wyceny jednostki [[data, wartość], …] dla symbolu funduszu. */
+export function fundQuotes(data, symbol) {
+  const vals = data?.values?.[symbol];
+  if (!vals) return [];
+  const out = [];
+  for (let i = 0; i < data.dates.length; i++) if (vals[i] !== null && vals[i] !== undefined) out.push([data.dates[i], vals[i]]);
+  return out;
+}
+
+/** Wpis do wyceny (jak instEntry) dla funduszu albo null, gdy brak wycen. */
+export function fundEntry(data, symbol) {
+  const quotes = fundQuotes(data, symbol);
+  if (!quotes.length) return null;
+  return { currency: fundInfo(data, symbol)?.currency ?? 'PLN', quotes, series: [], source: 'tfi', proxy: null };
+}
+
+/** Domyślna kategoria jednostek: zapamiętana, potem pierwsza z kategorii PPE, potem A. */
+export function fundDefaultCategory(fund, preferred = '') {
+  const cats = fund?.cats ?? [];
+  if (preferred && cats.includes(preferred)) return preferred;
+  return FUND_PPE_CATEGORIES.find((c) => cats.includes(c)) ?? (cats.includes('A') ? 'A' : cats[0] ?? '');
+}
+
 const instEsc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const instFold = (s) =>
   String(s ?? '')
@@ -142,6 +176,7 @@ export function instSourceLabel(entry, data) {
   if (entry.source === 'gpw') return `kurs zamknięcia z GPW${last ? ` (${instDate(last)})` : ''}`;
   if (entry.source === 'nc') return `kurs z NewConnect${last ? ` (${instDate(last)})` : ''}`;
   if (entry.source === 'tiingo') return `kurs zamknięcia z giełdy w USA${last ? ` (${instDate(last)})` : ''}`;
+  if (entry.source === 'tfi') return `wycena jednostki z ING TFI${last ? ` (${instDate(last)})` : ''}`;
   const [code, hedged] = String(entry.proxy ?? '').split(':');
   return `wycena przybliżona: od ceny zakupu według zmiany indeksu ${data?.proxyNames?.[code] ?? code} (ETF ${code})${hedged ? ', klasa zabezpieczona walutowo' : ''}`;
 }

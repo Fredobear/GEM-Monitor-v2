@@ -91,6 +91,11 @@ test('cały cykl: sygnał miesięczny raz, ostrzeżenie o zmianie podglądu, pod
   assert.match(html, /CSPX\.UK/);
   assert.match(html, /id="tab-portfel"/);
   assert.match(html, /Strategia podatkowa dla GEM/);
+  // Nowy układ: GEM (Sygnał, Mój portfel GEM) i Rynki (Przegląd z notatką, Instrumenty, Podatki).
+  assert.match(html, /data-group="gem"[^>]*>.*Mój portfel GEM/s);
+  assert.match(html, /id="tab-instrumenty"/);
+  assert.match(html, /Notatka rynkowa/);
+  assert.match(html, /Rynki świata/);
   // Ceny do wyceny portfela: kursy NBP i indeksy instrumentów zapisane do kolejnego uruchomienia.
   const prices = JSON.parse(await readFile(path.join(tmp, 'docs', 'data', 'prices.json'), 'utf8'));
   assert.ok(prices.fx.USD.length > 0);

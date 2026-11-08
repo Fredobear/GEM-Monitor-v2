@@ -85,26 +85,46 @@ function applyTheme() {
 }
 
 // ---------- Zakładki ----------
-const TABS = ['sygnal', 'portfel', 'podatki', 'rynki'];
-// Podatki to podkarta zakładki Rynki: w menu podświetlone są Rynki, a nad treścią jest przełącznik.
-const NAV_OF = { podatki: 'rynki' };
+// Menu: GEM (Sygnał, Mój portfel GEM), Finanse (osobna strona) i Rynki (Przegląd, Instrumenty, Podatki).
+// Każda podkarta ma własny adres (#sygnal, #portfel, #rynki, #instrumenty, #podatki).
+const TABS = ['sygnal', 'portfel', 'rynki', 'instrumenty', 'podatki'];
+const NAV_OF = { sygnal: 'gem', portfel: 'gem', rynki: 'rynki', instrumenty: 'rynki', podatki: 'rynki' };
+// Ostatnio otwarta podkarta w każdej części – menu wraca do niej (np. GEM → Mój portfel GEM).
+const lastSub = {};
 function showTab(id, scroll = true) {
   if (!TABS.includes(id)) id = 'sygnal';
-  const nav = NAV_OF[id] ?? id;
-  for (const t of TABS) {
-    $(`#tab-${t}`).hidden = t !== id;
-    for (const a of $$(`[data-tab="${t}"]`)) a.setAttribute('aria-current', t === nav ? 'page' : 'false');
-  }
-  const sub = $('#rynki-subnav');
-  if (sub) {
-    sub.hidden = nav !== 'rynki';
+  const nav = NAV_OF[id];
+  lastSub[nav] = id;
+  for (const t of TABS) $(`#tab-${t}`).hidden = t !== id;
+  for (const a of $$('[data-tab]')) a.setAttribute('aria-current', a.dataset.tab === nav ? 'page' : 'false');
+  for (const sub of $$('.subnav[data-group]')) {
+    sub.hidden = sub.dataset.group !== nav;
     for (const a of $$('[data-sub]', sub)) a.setAttribute('aria-current', a.dataset.sub === id ? 'page' : 'false');
   }
   if (id === 'portfel') renderPortfolio();
+  if (id === 'instrumenty') renderInstruments();
   if (id === 'podatki') renderTaxTools();
   if (scroll) window.scrollTo({ top: 0 });
 }
 window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
+for (const a of $$('nav.tabs [data-tab]')) {
+  a.addEventListener('click', (ev) => {
+    const target = lastSub[a.dataset.tab];
+    if (!target || location.hash.slice(1) === target) return;
+    ev.preventDefault();
+    location.hash = target;
+  });
+}
+
+// Strona startowa aplikacji (wspólne ustawienie z dziennikiem finansowym).
+const START_KEY = 'gem.start';
+const startPage = () => {
+  try {
+    return localStorage.getItem(START_KEY) || 'gem';
+  } catch {
+    return 'gem';
+  }
+};
 
 // ---------- Zapisywanie transakcji ----------
 function saveTxs(txs, { sync = true } = {}) {
@@ -314,8 +334,7 @@ function renderPortfolio() {
   const root = $('#portfel-root');
   const active = activeTx(state.txs);
   if (!active.some((t) => t.type === 'kupno' || t.type === 'sprzedaz')) {
-    root.innerHTML = emptyPortfolio() + contributionsCard() + libraryCard() + dataCard();
-    mountLibrary(root);
+    root.innerHTML = emptyPortfolio() + contributionsCard() + dataCard();
     bindPortfolio(root);
     return;
   }
@@ -360,9 +379,7 @@ function renderPortfolio() {
   ${acc === 'ALL' || acc === 'ZWYKLE' ? taxCard() : ''}
   ${contributionsCard()}
   ${transactionsCard(acc)}
-  ${libraryCard()}
   ${dataCard()}`;
-  mountLibrary(root);
 
   const chartEl = $('#chart', root);
   const lines = [];
@@ -464,11 +481,82 @@ function transactionsCard(acc) {
   </section>`;
 }
 
+// ---------- Rynki → Instrumenty ----------
+// Wyszukiwarka akcji i ETF-ów z oferty XTB (cena i źródło wyceny) oraz porównanie funduszy ING TFI (np. z PPE).
+let instrumentsMounted = false;
+function renderInstruments() {
+  const root = $('#instrumenty-root');
+  if (!root || instrumentsMounted) return;
+  instrumentsMounted = true;
+  root.innerHTML = libraryCard() + fundsCard();
+  mountLibrary(root);
+  mountFunds(root);
+  root.addEventListener('click', (ev) => {
+    const b = ev.target.closest('[data-act="lib-add"]');
+    if (!b) return;
+    const known = Boolean(D.instruments[b.dataset.sym]);
+    location.hash = 'portfel';
+    openTxDialog(null, { ticker: b.dataset.sym, currency: b.dataset.cur, name: known ? undefined : b.dataset.name });
+  });
+}
+
+function fundsCard() {
+  return `<section class="card" id="funds-card"><div class="card-head"><h2>Fundusze ING TFI (PPE, PPK, IKE)</h2><label class="small">Kategoria jednostek <select id="fund-cat"></select></label></div>
+  <div id="funds-body"><p class="muted small">Ładowanie wycen…</p></div>
+  <p class="meta">Wyceny jednostek z ING TFI, aktualizowane w dni robocze. W PPE kategoria jednostek zależy od umowy pracodawcy (zwykle E, F, S, T lub W) – sprawdzisz ją w serwisie ING TFI24. Swoje fundusze z PPE dodasz w Finansach: konto inwestycyjne → Aktywa → „+ Fundusz ING TFI (PPE)”. Wyniki z przeszłości nie gwarantują przyszłych.</p></section>`;
+}
+
+const FUND_CAT_KEY = 'gem.fundCategory';
+async function mountFunds(root) {
+  const body = $('#funds-body', root);
+  const sel = $('#fund-cat', root);
+  const data = await instLoadFunds();
+  if (!data?.funds?.length) {
+    body.innerHTML = '<p class="muted small">Wyceny funduszy pojawią się po najbliższej aktualizacji aplikacji.</p>';
+    sel.hidden = true;
+    return;
+  }
+  const order = [...FUND_PPE_CATEGORIES, 'A', 'K', 'I'];
+  const cats = [...new Set(data.funds.flatMap((f) => f.cats))].sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99) || a.localeCompare(b));
+  let saved = 'E';
+  try {
+    saved = localStorage.getItem(FUND_CAT_KEY) || 'E';
+  } catch {
+    // brak dostępu do pamięci przeglądarki – zostaje kategoria E
+  }
+  sel.innerHTML = cats.map((c) => `<option value="${esc(c)}" ${c === saved ? 'selected' : ''}>${esc(c)} – ${esc(data.categories?.[c] ?? '')}</option>`).join('');
+  const draw = () => {
+    const c = sel.value;
+    const list = data.funds.filter((f) => f.cats.includes(c)).sort((x, y) => FUND_TYPE_ORDER.indexOf(x.type) - FUND_TYPE_ORDER.indexOf(y.type) || x.name.localeCompare(y.name, 'pl'));
+    const types = [...new Set(list.map((f) => f.type))];
+    const cell = (x) => `<td class="num ${Number.isFinite(x) ? (x >= 0 ? 'pos' : 'neg') : ''}">${Number.isFinite(x) ? pct(x) : '–'}</td>`;
+    body.innerHTML = `<div class="tbl-wrap"><table class="fund-tbl"><thead><tr><th>Fundusz</th><th class="num">Jednostka</th><th class="num opt">1 mies.</th><th class="num">12 mies.</th><th class="num opt">Od 1.01</th><th class="num">5 lat</th></tr></thead><tbody>${types
+      .map((t) => `<tr class="grp"><td colspan="6">${esc(t.charAt(0).toUpperCase() + t.slice(1))}</td></tr>${list
+        .filter((f) => f.type === t)
+        .map((f) => {
+          const last = fundQuotes(data, fundSymbol(f.id, c)).at(-1);
+          const r = f.ret?.[c] ?? {};
+          return `<tr><td>${f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>` : esc(f.name)}<div class="small muted">${esc(f.umbrella)} · ryzyko ${esc(f.risk ?? '–')}/7</div></td><td class="num">${last ? NF2.format(last[1]) : '–'}</td>${cell(r['1M']).replace('<td class="num', '<td class="num opt')}${cell(r['12M'])}${cell(r.YTD).replace('<td class="num', '<td class="num opt')}${cell(r['60M'])}</tr>`;
+        })
+        .join('')}`)
+      .join('')}</tbody></table></div><p class="small muted">Wyceny z ${data.asOf ? dShort(data.asOf) : '–'} (${list.length} ${list.length === 1 ? 'fundusz' : list.length % 10 >= 2 && list.length % 10 <= 4 && (list.length % 100 < 12 || list.length % 100 > 14) ? 'fundusze' : 'funduszy'} w kategorii ${esc(c)}).</p>`;
+  };
+  sel.addEventListener('change', () => {
+    try {
+      localStorage.setItem(FUND_CAT_KEY, sel.value);
+    } catch {
+      // ustawienie tylko na tę sesję
+    }
+    draw();
+  });
+  draw();
+}
+
 // Karta wyszukiwarki: dowolna akcja lub ETF z oferty XTB, ostatni kurs i źródło wyceny, lista obserwowanych.
 function libraryCard() {
   const edit = D.library?.editUrl;
   return `<section class="card" id="lib-card"><h2>Instrumenty XTB</h2>
-  <p class="small muted">Wyszukaj dowolną akcję lub ETF z oferty XTB i sprawdź, skąd aplikacja weźmie jego cenę. Akcje i ETF-y z GPW mają kurs zamknięcia z giełdy (dni robocze), popularne ETF-y UCITS – wycenę według indeksu, a akcje z USA – kurs po dopisaniu do listy obserwowanych.</p>
+  <p class="small muted">Wyszukaj dowolną akcję lub ETF z oferty XTB i sprawdź, skąd aplikacja weźmie jego cenę. Akcje i ETF-y z GPW mają kurs zamknięcia z giełdy (dni robocze), popularne ETF-y UCITS – wycenę według indeksu, a akcje z USA – kurs po dopisaniu do listy obserwowanych. Instrument dodasz do portfela GEM albo – w Finansach – do konta inwestycyjnego (Aktywa).</p>
   <div id="lib-picker"></div><div id="lib-detail"></div>
   <div id="lib-watch" class="small"></div>
   <p class="small">${edit ? `<a href="${esc(edit)}" target="_blank" rel="noopener">Edytuj listę obserwowanych na GitHubie</a> (plik config/obserwowane.txt, ceny od następnej aktualizacji).` : 'Lista obserwowanych: plik config/obserwowane.txt w repozytorium.'}</p>
@@ -504,7 +592,7 @@ async function showLibDetail(it) {
   el.innerHTML = `<div class="inst-picked"><b>${esc(it.symbol)}</b> ${esc(it.name)}<br><span class="muted">${esc([it.isin, it.marketName, it.currency, it.type === 'E' ? 'ETF/ETC' : it.type === 'A' ? 'akcje' : ''].filter(Boolean).join(' · '))}${it.closeOnly ? ' · tylko zamknięcie pozycji' : ''}</span>
   ${last ? `<br>Ostatni kurs: <b>${NF2.format(last[1])} ${esc(it.currency)}</b> (${dShort(last[0])})` : ''}
   <br><span class="muted">Wycena: ${esc(source)}</span>${pence ? `<br><span class="warn">${esc(pence)}</span>` : ''}
-  <div class="row-btns" style="margin-top:8px"><button class="btn small" type="button" data-act="lib-add" data-sym="${esc(it.symbol)}" data-cur="${esc(it.currency)}" data-name="${esc(it.name)}">Dodaj transakcję</button></div></div>`;
+  <div class="row-btns" style="margin-top:8px"><button class="btn small" type="button" data-act="lib-add" data-sym="${esc(it.symbol)}" data-cur="${esc(it.currency)}" data-name="${esc(it.name)}">Dodaj do portfela GEM</button></div></div>`;
 }
 
 function dataCard() {
@@ -545,10 +633,6 @@ function bindPortfolio(root) {
     if (b.dataset.edit) return openTxDialog(state.txs.find((t) => t.id === b.dataset.edit));
     const act = b.dataset.act;
     if (act === 'add') openTxDialog(null);
-    else if (act === 'lib-add') {
-      const known = Boolean(D.instruments[b.dataset.sym]);
-      openTxDialog(null, { ticker: b.dataset.sym, currency: b.dataset.cur, name: known ? undefined : b.dataset.name });
-    }
     else if (act === 'demo') loadDemo();
     else if (act === 'clear-demo') {
       saveTxs(state.txs.map((t) => (t.demo ? { ...t, deleted: true, updatedAt: Date.now() } : t)));
@@ -836,6 +920,7 @@ function openSettings() {
   f.elements.selfEmployed.checked = Boolean(state.settings.selfEmployed);
   f.elements.defaultAccount.value = state.settings.defaultAccount;
   f.elements.theme.value = state.settings.theme;
+  f.elements.startPage.value = startPage();
   f.elements.repo.value = state.sync?.repo ?? '';
   f.elements.path.value = state.sync?.path ?? 'portfel.json';
   f.elements.token.value = state.sync?.token ?? '';
@@ -859,6 +944,11 @@ function bindSettings() {
       theme: f.elements.theme.value,
     };
     store.set(KEYS.settings, state.settings);
+    try {
+      localStorage.setItem(START_KEY, f.elements.startPage.value);
+    } catch {
+      // bez pamięci przeglądarki strona startowa zostaje domyślna
+    }
     applyTheme();
     const repo = f.elements.repo.value.trim();
     const token = f.elements.token.value.trim();
@@ -1008,7 +1098,7 @@ function renderSignalCheck() {
   if (!el || !D.signal) return;
   const list = holdings(state.txs, D.prices, DATA_DAY);
   if (!list.length) {
-    el.innerHTML = '<a class="link" href="#portfel">Dodaj swoje transakcje w zakładce Portfel, a sprawdzę, czy portfel jest zgodny z sygnałem.</a>';
+    el.innerHTML = '<a class="link" href="#portfel">Dodaj swoje transakcje w zakładce Mój portfel GEM, a sprawdzę, czy portfel jest zgodny z sygnałem.</a>';
     return;
   }
   const wrong = list.filter((h) => !matchesSignal(h.ticker));
@@ -1043,7 +1133,7 @@ window.addEventListener('resize', () => {
   resizeTimer = setTimeout(() => !$('#tab-portfel').hidden && renderPortfolio.onResize?.(), 150);
 });
 document.documentElement.classList.add('js');
-showTab(location.hash.slice(1) || 'sygnal', false);
+showTab(location.hash.slice(1) || (startPage() === 'rynki' ? 'rynki' : 'sygnal'), false);
 renderSignalCheck();
 refreshLibraryPrices();
 if (state.sync?.token) syncNow(false);

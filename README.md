@@ -10,31 +10,35 @@ Narzędzie, które codziennie analizuje rynki według strategii **Global Equity 
 
 ## Co dostajesz
 
-- **Sygnał miesięczny:** pierwszego dnia sesyjnego miesiąca rano, np. „BEZ ZMIAN: trzymaj CSPX.UK” albo „ZMIANA: sprzedaj CSPX.UK, kup IUAA.UK”. Do tego nazwa ETF-u, ISIN, giełda, waluta i uzasadnienie oparte na liczbach.
-- **Podgląd w trakcie miesiąca:** ostrzeżenie, gdy wstępny sygnał zaczyna wskazywać inny rynek, żeby nic Cię nie zaskoczyło.
-- **Panel na telefonie:**
-  - sygnał i jego stabilność;
-  - ranking rynków;
-  - historia sygnałów;
-  - wskaźniki ryzyka (VIX, spready kredytowe, krzywa rentowności, niepewność polityczna, dolar, ropa, USD/PLN);
-  - wiadomości polityczne i geopolityczne;
-  - wyniki strategii od 1991 r.
-- **Komentarz AI (opcjonalnie):** Claude z wyszukiwaniem w sieci opisuje kontekst polityczny i geopolityczny sygnału oraz ryzyka do obserwowania.
-- **Portfel:**
+Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej portfel, **Finanse** – Twoje pieniądze (konta, wydatki, inwestycje, PPE), **Rynki** – co się dzieje na świecie, wyszukiwarka instrumentów i podatki. Stronę, która otwiera się na starcie, wybierzesz w Ustawieniach (koło zębate) albo w Finansach (Więcej → Kopia → Aplikacja).
+
+- **GEM → Sygnał:**
+  - sygnał miesięczny pierwszego dnia sesyjnego miesiąca, np. „BEZ ZMIAN: trzymaj CSPX.UK” albo „ZMIANA: sprzedaj CSPX.UK, kup IUAA.UK”, z nazwą ETF-u, ISIN, giełdą, walutą i uzasadnieniem opartym na liczbach;
+  - podgląd w trakcie miesiąca: ostrzeżenie, gdy wstępny sygnał zaczyna wskazywać inny rynek;
+  - ranking rynków, historia sygnałów i wyniki strategii od 1991 r.;
+  - waluta zakupu: na IKE/IKZE w XTB (rachunek tylko w PLN) i na koncie zwykłym (np. SXR8.DE w EUR zamiast CSPX.UK w USD, żeby uniknąć przewalutowania);
+  - komentarz AI (opcjonalnie): Claude z wyszukiwaniem w sieci opisuje kontekst sygnału i ryzyka do obserwowania.
+- **GEM → Mój portfel GEM:**
   - dziennik wpłat, zakupów, sprzedaży i wycen dla kont IKE, IKZE, OKI i zwykłego;
   - wycena w PLN po kursach NBP;
   - wykres zwrotu z dowolnym zakresem dat (przyciski, daty od–do albo przeciągnięcie palcem), porównanie z modelem GEM i S&P 500;
   - zysk do PIT-38 liczony według przepisów i podpowiedzi realizacji strat;
-  - limity IKE i IKZE oraz eksport danych do pliku;
-  - **biblioteka instrumentów XTB**: wyszukiwarka wszystkich ok. 9 000 akcji i ETF/ETN/ETC z oferty XTB (nazwa, symbol albo ISIN) z automatyczną wyceną – zob. [Biblioteka instrumentów XTB](#biblioteka-instrumentów-xtb).
-- **Podatki** (podkarta zakładki Rynki):
+  - limity IKE i IKZE oraz eksport danych do pliku.
+- **Rynki → Przegląd** – zob. [Przegląd rynku i notatka](#przegląd-rynku-i-notatka):
+  - codzienna **notatka rynkowa**: co się dzieje na świecie, jak to zwykle wpływa na rynki, najbliższe dni i co z tego wynika dla inwestora długoterminowego (z reguł aplikacji, a z kluczem `ANTHROPIC_API_KEY` – pisana przez AI z wyszukiwaniem najnowszych wiadomości i scenariuszami);
+  - **termometr nastroju** (defensywne – ostrożne – neutralne – sprzyjające) z wyjaśnieniem, które wskaźniki o nim decydują;
+  - **rynki świata**: S&P 500, Nasdaq, Europa, Japonia, rynki wschodzące, WIG20, WIG, mWIG40, sWIG80, obligacje (USA i Polska), złoto, ropa, bitcoin, kursy złotego – zmiana dzienna, tygodniowa, miesięczna, od początku roku i trend;
+  - **najbliższe wydarzenia**: decyzje Fed, EBC i RPP, dane z rynku pracy w USA, inflacja w Polsce, nowy sygnał GEM;
+  - **statystyka**: co zwykle działo się z S&P 500 w kolejnym tygodniu, miesiącu i kwartale w podobnych warunkach od 1993 r.;
+  - wskaźniki ryzyka (VIX, spready kredytowe, krzywa rentowności, niepewność polityczna, dolar, ropa, USD/PLN) i wiadomości z kilkunastu źródeł.
+- **Rynki → Instrumenty:**
+  - **biblioteka instrumentów XTB**: wyszukiwarka wszystkich ok. 9 000 akcji i ETF/ETN/ETC z oferty XTB (nazwa, symbol albo ISIN) z automatyczną wyceną – zob. [Biblioteka instrumentów XTB](#biblioteka-instrumentów-xtb);
+  - **fundusze ING TFI** (PPE, PPK, IKE): porównanie wycen i stóp zwrotu w wybranej kategorii jednostek – zob. [Fundusze ING TFI (PPE)](#fundusze-ing-tfi-ppe).
+- **Rynki → Podatki:**
   - plan wpłat (IKZE → IKE → OKI → konto zwykłe) ze zwrotem z IKZE;
   - porównanie kosztów brokerów;
   - kalendarz i przypomnienia;
   - monitor zmian w przepisach (wiadomości oraz comiesięczny raport AI).
-- **Waluta zakupu:** przy każdym sygnale aplikacja podpowiada, w jakiej walucie kupić ETF:
-  - na IKE/IKZE w XTB (rachunek tylko w PLN);
-  - na koncie zwykłym, zależnie od tego, jaką walutę masz po sprzedaży, np. SXR8.DE w EUR zamiast CSPX.UK w USD, żeby uniknąć przewalutowania.
 - **Finanse (offline):**
   - dziennik wydatków i przychodów: konta, własne kategorie, budżety, reguły;
   - przegląd jak w aplikacji Money Manager: dzień, tydzień, miesiąc, rok albo dowolny okres, wykres kategorii;
@@ -42,7 +46,8 @@ Narzędzie, które codziennie analizuje rynki według strategii **Global Equity 
   - stałe przelewy i dochody (pensja, czynsz, subskrypcje), zapisywane automatycznie albo po zatwierdzeniu;
   - karty kredytowe: zadłużenie jako saldo ujemne, limit, termin i spłata z wybranego konta;
   - konta w złotych, euro, dolarach, funtach i frankach – przeliczane na złote po kursie średnim NBP;
-  - konto inwestycyjne z aktywami: dowolny instrument z oferty XTB (wycena automatyczna, gdy jest darmowe źródło notowań) albo inne aktywo z wyceną ręczną;
+  - konto inwestycyjne z aktywami: dowolny instrument z oferty XTB (wycena automatyczna, gdy jest darmowe źródło notowań), fundusz ING TFI z PPE (wycena jednostki z ING TFI) albo inne aktywo z wyceną ręczną;
+  - przy każdym koncie inwestycyjnym i każdej pozycji: **ile zainwestowano, ile to jest warte i jaki jest zysk** (w złotych i procentach, z efektem kursu walut), a w podsumowaniu majątku – łączny zysk z inwestycji;
   - tabela porównania kategorii z poprzednim miesiącem: dotknięcie kwoty pokazuje dymek z wydatkami, z których się składa;
   - wykres majątku i dochodów miesiąc po miesiącu;
   - dokumenty offline (paski płacowe, paragony, umowy) przy operacjach i w osobnej zakładce;
@@ -52,7 +57,7 @@ Narzędzie, które codziennie analizuje rynki według strategii **Global Equity 
 - **Bezpieczniki:**
   - bez kompletnych i aktualnych danych sygnał nie powstaje, a Ty dostajesz komunikat o problemie;
   - dwa niezależne źródła danych są ze sobą porównywane;
-  - 86 testów automatycznych.
+  - 99 testów automatycznych.
 
 | Rola | ETF w XTB | Waluta |
 |---|---|---|
@@ -96,7 +101,7 @@ W repozytorium otwórz **Settings → Secrets and variables → Actions → New 
 | `ALPHAVANTAGE_API_KEY` | klucz Alpha Vantage | nie, ale zalecane do kontroli danych |
 | `NTFY_TOPIC` | nazwa tematu z kroku 3A | jeden z kanałów |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | z kroku 3B | jeden z kanałów |
-| `ANTHROPIC_API_KEY` | klucz z [console.anthropic.com](https://console.anthropic.com) | nie, tylko dla komentarza AI |
+| `ANTHROPIC_API_KEY` | klucz z [console.anthropic.com](https://console.anthropic.com) | nie – tylko dla notatki rynkowej AI i komentarza AI |
 
 ### Krok 5. Panel WWW (GitHub Pages)
 
@@ -127,7 +132,7 @@ Dziennik transakcji zapisuje się w przeglądarce, w której go prowadzisz. Aby 
    - Permissions: *Contents → Read and write*.
 3. W aplikacji stuknij ⚙️ → *Synchronizacja między urządzeniami*. Wpisz `login/gem-dane` i token, a potem zapisz. Zrób to samo na drugim urządzeniu.
 
-Token zostaje tylko w przeglądarce i daje dostęp wyłącznie do tego jednego repozytorium. Bez synchronizacji rób czasem kopię: *Portfel → Twoje dane → Eksportuj kopię*.
+Token zostaje tylko w przeglądarce i daje dostęp wyłącznie do tego jednego repozytorium. Bez synchronizacji rób czasem kopię: *GEM → Mój portfel GEM → Twoje dane → Eksportuj kopię*.
 
 ## Jak czytać powiadomienia
 
@@ -157,7 +162,7 @@ Parametry podatkowe (limity, OKI, opłaty brokerów, kalendarz) są w [config/po
 
 ## Biblioteka instrumentów XTB
 
-Katalog [config/xtb-instrumenty.json](config/xtb-instrumenty.json) zawiera wszystkie akcje oraz ETF-y, ETN i ETC z oferty XTB (ok. 7 000 akcji i 2 000 funduszy z 18 giełd), przepisane z oficjalnej tabeli specyfikacji instrumentów XTB. Wyszukasz je w Portfelu (karta **Instrumenty XTB** i okno transakcji) oraz w Finansach (konto inwestycyjne → **Aktywa** → **+ Instrument z XTB**) – po nazwie, symbolu albo ISIN.
+Katalog [config/xtb-instrumenty.json](config/xtb-instrumenty.json) zawiera wszystkie akcje oraz ETF-y, ETN i ETC z oferty XTB (ok. 7 000 akcji i 2 000 funduszy z 18 giełd), przepisane z oficjalnej tabeli specyfikacji instrumentów XTB. Wyszukasz je w zakładce **Rynki → Instrumenty**, w oknie transakcji portfela GEM oraz w Finansach (konto inwestycyjne → **Aktywa** → **+ Instrument z XTB**) – po nazwie, symbolu albo ISIN.
 
 Skąd aplikacja bierze ceny (aktualizacja w każdy dzień roboczy razem z sygnałem):
 
@@ -173,9 +178,45 @@ Skąd aplikacja bierze ceny (aktualizacja w każdy dzień roboczy razem z sygna�
 - **Odświeżenie katalogu**, gdy XTB opublikuje nową tabelę (kilka razy w roku): pobierz PDF ze strony XTB i uruchom `node tools/xtb-katalog.mjs <plik.pdf> <data obowiązywania>` (instrukcja w nagłówku pliku). Codzienna aktualizacja nie potrzebuje do tego żadnych dodatkowych pakietów.
 - Strona Finanse wczytuje ceny z pliku aplikacji `data/notowania.js` (to zwykłe pobranie pliku z tej samej strony), więc blokada sieci i prywatność dziennika zostają bez zmian.
 
-## Komentarz AI (opcjonalnie)
+## Fundusze ING TFI (PPE)
 
-Gdy dodasz `ANTHROPIC_API_KEY`, przy sygnale miesięcznym i raz w tygodniu model Claude (`claude-opus-5-5`) przeszuka sieć i napisze krótki komentarz po polsku:
+Pracownicze programy emerytalne w ING prowadzi **ING TFI** (dawniej NN Investment Partners i Goldman Sachs TFI). W PPE dostępnych jest 29 funduszy (akcji, mieszanych, obligacji, cyklu życia „Perspektywa” i innych) w kategoriach jednostek dla PPE: **E, F, S, T albo W** – kategorię wyznacza umowa Twojego pracodawcy i widać ją w serwisie ING TFI24 przy nazwie funduszu. Każda kategoria ma inną cenę jednostki (inne opłaty), dlatego aplikacja zapisuje wszystkie.
+
+- **Skąd dane:** codziennie (w dni robocze) aplikacja odwiedza publiczną stronę notowań [ingtfi.pl/notowania-funduszy](https://www.ingtfi.pl/notowania-funduszy) – tak jak przeglądarka – i pobiera z niej wyceny wszystkich funduszy (46) we wszystkich kategoriach. Za pierwszym razem uzupełnia historię z końców miesięcy z ostatnich 3 lat. Wynik trafia do pliku `data/fundusze.js`. Jeśli ING TFI zmieni zasady strony, aplikacja zostawi ostatnie wyceny i pokaże ostrzeżenie w logu Actions.
+- **Śledzenie zysku z PPE:** Finanse → konto inwestycyjne (np. „PPE ING”) → **Aktywa** → **+ Fundusz ING TFI (PPE)** → wybierz fundusz i kategorię, wpisz **liczbę jednostek** i **sumę wpłat** (obie liczby są w ING TFI24). Aplikacja pokaże wartość według najnowszej wyceny jednostki i zysk w złotych i procentach.
+- **Porównanie funduszy:** Rynki → Instrumenty → **Fundusze ING TFI** – wycena jednostki i stopy zwrotu (miesiąc, 12 miesięcy, od początku roku, 5 lat) w wybranej kategorii.
+
+## Przegląd rynku i notatka
+
+Zakładka **Rynki → Przegląd** zbiera dane ze świata w każdy dzień roboczy (przed otwarciem giełd w Europie):
+
+| Co | Źródło |
+|---|---|
+| S&P 500, Nasdaq, rentowności obligacji USA (2 i 10 lat), ropa Brent, EUR/USD | FRED (Bank Rezerwy Federalnej w St. Louis) |
+| Europa, Japonia, rynki wschodzące, akcje świata, małe spółki USA, obligacje USA 20+, złoto, bitcoin | ETF-y z USA (Tiingo – ten sam klucz co dla GEM) |
+| WIG20, WIG, mWIG40, sWIG80, indeks obligacji skarbowych TBSP | archiwum notowań GPW |
+| EUR/PLN, USD/PLN | NBP |
+| Wiadomości | kanały RSS: BBC, CNBC, MarketWatch, Al Jazeera, Fed, EBC, Bankier.pl, Parkiet, Puls Biznesu, Google News |
+| Decyzje banków centralnych | [config/kalendarz.js](config/kalendarz.js) – terminy Fed, EBC i RPP z oficjalnych terminarzy (uzupełnij kolejny rok, gdy banki je opublikują; aplikacja przypomni) |
+
+Z tych danych powstają:
+- **Notatka rynkowa** – podsumowanie tygodnia, najważniejsze tematy z wiadomości z wyjaśnieniem, jak zwykle wpływają na rynki, największe zmiany, najbliższe wydarzenia i wnioski: co mówi sygnał GEM, czy utrzymać regularne wpłaty, kiedy rozłożyć większą kwotę na raty, rola poduszki finansowej.
+- **Termometr nastroju** – suma punktów za: trend S&P 500 (średnia 200 sesji), szerokość rynku (ile rynków akcji jest w trendzie wzrostowym), obsunięcie od szczytu, VIX, stres kredytowy, niepewność polityczną, krzywą rentowności i sygnał GEM. Wynik: defensywne, ostrożne, neutralne albo sprzyjające.
+- **Co zwykle działo się dalej** – statystyka S&P 500 od 1993 r.: w podobnych warunkach (trend i zmienność jak dziś) jak często indeks rósł w ciągu tygodnia, miesiąca i 3 miesięcy, mediana i typowy zakres. To uczciwsza „prognoza” niż zgadywanie kursu: pokazuje szanse i rozrzut, a nie jedną liczbę.
+
+Nikt nie przewiduje rynku w krótkim terminie. Notatka i statystyka to kontekst edukacyjny, a nie rekomendacja inwestycyjna – decyzje w portfelu GEM nadal podejmuje sygnał na koniec miesiąca.
+
+### Notatka rynkowa AI
+
+Bez klucza notatka powstaje z reguł aplikacji (liczby i tematy wiadomości). Gdy dodasz sekret `ANTHROPIC_API_KEY` (krok 4), codziennie rano model Claude (`claude-sonnet-5-5`) dostaje te same dane, sprawdza w wyszukiwarce najnowsze wydarzenia i kalendarz na 7 dni i pisze notatkę po polsku: **W skrócie**, **Co się dzieje na świecie**, **Wpływ na rynki** (USA, Europa i rynki wschodzące, Polska i złoty, obligacje, surowce), **Najbliższe dni** (wydarzenia z datami i trzy scenariusze – bazowy, pozytywny, negatywny – z orientacyjnym prawdopodobieństwem) i **Co z tym zrobić** (ogólnie, bez osobistych rekomendacji). Źródła są pod notatką.
+
+- Klucz założysz na [console.anthropic.com](https://console.anthropic.com) → API Keys (potrzebne doładowanie konta, np. 10 USD). W konsoli ustaw też miesięczny limit wydatków.
+- Koszt: orientacyjnie 3–5 USD miesięcznie za notatkę (22 dni robocze, do 4 wyszukiwań dziennie) plus 1–2 USD za komentarz do sygnału GEM.
+- Model, poziom wysiłku i liczbę wyszukiwań zmienisz w [config/gem.config.js](config/gem.config.js) (`ai.marketNote`); `enabled: false` wyłącza notatkę AI.
+
+## Komentarz AI do sygnału (opcjonalnie)
+
+Gdy dodasz `ANTHROPIC_API_KEY`, przy sygnale miesięcznym i raz w tygodniu model Claude (`claude-opus-5-5`) przeszuka sieć i napisze krótki komentarz po polsku (zakładka GEM → Sygnał):
 - dlaczego teraz ten rynek;
 - kontekst polityczny i geopolityczny;
 - ryzyka do obserwowania.
@@ -198,8 +239,8 @@ node src/cli.js demo
 node scripts/serve.js
 ```
 
-- `npm test` uruchamia 86 testów.
-- `node src/cli.js demo` buduje aplikację demonstracyjną bez kluczy API. Sygnał pochodzi z danych historycznych, a w zakładce Portfel możesz wczytać przykładowe transakcje.
+- `npm test` uruchamia 99 testów.
+- `node src/cli.js demo` buduje aplikację demonstracyjną bez kluczy API. Sygnał pochodzi z danych historycznych, a w zakładce GEM → Mój portfel GEM możesz wczytać przykładowe transakcje.
 - `node scripts/serve.js` udostępnia panel pod adresem http://localhost:8080.
 
 Z kluczami: skopiuj `.env.example` jako `.env`, uzupełnij i uruchom `node src/cli.js run --dry` (bez wysyłania powiadomień) albo `npm run research` (backtest od 1991 r.).
@@ -209,23 +250,26 @@ Z kluczami: skopiuj `.env.example` jako `.env`, uzupełnij i uruchom `node src/c
 ```
 config/gem.config.js      ustawienia strategii, mapowanie ETF-ów XTB, instrumenty portfela
 config/podatki.js         limity IKE/IKZE, OKI, brokerzy, kalendarz (ze źródłami)
+config/kalendarz.js       terminy decyzji Fed, EBC i RPP (przegląd rynku)
 src/strategy.js           reguły GEM (czyste funkcje)
 src/engine.js             sygnał miesięczny, podgląd, historia
 src/data.js, providers/   dane: Tiingo, Alpha Vantage, FRED, Ken French
 src/validate.js           kontrola jakości danych i porównanie źródeł
 src/explain.js            uzasadnienie po polsku
 src/macro.js, news.js     wskaźniki ryzyka i wiadomości
+src/markets.js            przegląd rynku: rynki świata i GPW, termometr, statystyka, kalendarz, notatka
+src/funds.js              fundusze ING TFI (PPE): wyceny jednostek wszystkich kategorii
 src/prices.js             kursy NBP i historia cen do wyceny portfela
 src/instruments.js        biblioteka instrumentów XTB: katalog, kursy GPW/NewConnect, Tiingo, wycena przez indeks
 src/xls.js                czytnik plików Excel (.xls) z archiwum notowań GPW, bez zależności
-src/client/instruments.js wyszukiwarka instrumentów i wycena w przeglądarce (Portfel i Finanse)
+src/client/instruments.js wyszukiwarka instrumentów, fundusze ING TFI i wycena w przeglądarce
 config/xtb-instrumenty.json  katalog akcji i ETF-ów z oferty XTB (z tabeli specyfikacji XTB)
 config/obserwowane.txt    obserwowane instrumenty z USA (ceny z Tiingo)
 tools/xtb-katalog.mjs     odświeżenie katalogu z nowej tabeli XTB (PDF)
 src/taxmonitor.js         monitor przepisów, przypomnienia, raport podatkowy AI
-src/ai.js                 komentarz AI (opcjonalny)
+src/ai.js                 notatka rynkowa i komentarz AI (opcjonalne)
 src/notify.js             Telegram i ntfy
-src/dashboard.js          aplikacja WWW (docs/) – zakładki Sygnał, Portfel, Finanse, Rynki (z podkartą Podatki)
+src/dashboard.js          aplikacja WWW (docs/) – GEM (Sygnał, Mój portfel GEM), Finanse, Rynki (Przegląd, Instrumenty, Podatki)
 src/client/core.js        obliczenia portfela i podatków (przeglądarka + testy)
 src/client/ui.js          interfejs: dziennik, wykres, kalkulatory, synchronizacja
 src/client/finance-*.js   dziennik finansowy offline (obliczenia, import, raporty, interfejs)

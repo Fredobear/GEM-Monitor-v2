@@ -528,7 +528,7 @@ export function convert(market, amount, from, to, date) {
 
 // Pozycje na koncie inwestycyjnym („partie”): { asset: ticker albo 'manual', qty, price (za sztukę, w walucie aktywa), date }.
 // Cena aktywa z rynku: notowanie, jeśli świeże, albo cena zakupu przesunięta o zmianę indeksu od dnia zakupu
-// (tak samo jak w zakładce Portfel). Aktywo z wyceną ręczną ma historię wycen w polu marks.
+// (tak samo jak w portfelu GEM). Aktywo z wyceną ręczną ma historię wycen w polu marks.
 // Instrument z katalogu XTB ma walutę zapisaną przy pozycji – wycena działa także bez notowań.
 export const lotCurrency = (market, lot) => (lot.asset && lot.asset !== 'manual' ? market?.assets?.[lot.asset]?.currency ?? lot.currency : lot.currency) || 'PLN';
 
@@ -565,6 +565,51 @@ export function holdingsPLN(market, account, date) {
     sum += v;
   }
   return sum;
+}
+
+// Ile zainwestowano w pozycję: ilość × cena zakupu, w walucie aktywa i w złotych po kursie NBP z dnia zakupu.
+export function lotCost(market, lot) {
+  const currency = lotCurrency(market, lot);
+  const cost = lot.qty * lot.price;
+  const r = rateOn(market, currency, lot.date);
+  return { cost, currency, costPLN: r === null ? null : cost * r };
+}
+
+// Wynik otwartej pozycji na dany dzień: wartość, koszt i zysk w złotych (z efektem kursu walutowego)
+// oraz zmiana samej ceny w walucie aktywa.
+export function lotResult(market, lot, date) {
+  const value = lotValuePLN(market, lot, date);
+  const { costPLN, currency } = lotCost(market, lot);
+  if (value === null || costPLN === null) return null;
+  return { value, costPLN, gain: value - costPLN, gainPct: costPLN > 0 ? value / costPLN - 1 : null, priceChange: lot.price > 0 ? lotPrice(market, lot, date) / lot.price - 1 : null, currency };
+}
+
+// Podsumowanie konta inwestycyjnego: ile zainwestowano w otwarte pozycje, ile są dziś warte i jaki jest zysk.
+// Pozycje sprzedane (until) dają zysk zrealizowany: wartość w dniu sprzedaży minus koszt zakupu.
+export function investSummary(market, account, date) {
+  const out = { cost: 0, value: 0, gain: 0, gainPct: null, positions: 0, missing: 0, realized: null };
+  for (const lot of account.lots ?? []) {
+    if (lot.until) {
+      if (lot.until > date) continue;
+      const r = rateOn(market, lotCurrency(market, lot), lot.until);
+      const { costPLN } = lotCost(market, lot);
+      if (r === null || costPLN === null) continue;
+      out.realized = (out.realized ?? 0) + lot.qty * lotPrice(market, lot, lot.until) * r - costPLN;
+      continue;
+    }
+    if (!lotActive(lot, date)) continue;
+    const res = lotResult(market, lot, date);
+    if (!res) {
+      out.missing++;
+      continue;
+    }
+    out.cost += res.costPLN;
+    out.value += res.value;
+    out.positions++;
+  }
+  out.gain = out.value - out.cost;
+  out.gainPct = out.cost > 0 ? out.value / out.cost - 1 : null;
+  return out.positions || out.realized !== null ? out : null;
 }
 
 // Wartość konta w złotych: saldo (gotówka, w walucie konta) po kursie z dnia + wartość pozycji inwestycyjnych.

@@ -13,7 +13,7 @@ Zakładka **Finanse** to osobna strona aplikacji (`finanse.html`) do śledzenia 
 
 ## Prywatność: dlaczego dane nie wychodzą do sieci
 
-- **Dane są tylko na Twoim urządzeniu**, w pamięci przeglądarki (localStorage). Nie trafiają na GitHub, do mnie ani do nikogo innego. Synchronizacja z zakładki Portfel ich nie obejmuje.
+- **Dane są tylko na Twoim urządzeniu**, w pamięci przeglądarki (localStorage). Nie trafiają na GitHub, do mnie ani do nikogo innego. Synchronizacja portfela GEM (GEM → Mój portfel GEM) ich nie obejmuje.
 - **Strona ma zablokowaną sieć.** W nagłówku ma politykę bezpieczeństwa `Content-Security-Policy: connect-src 'none'`. Przeglądarka odrzuci każdą próbę połączenia z tej strony, także wysłanie danych w tle. Sprawdziłem to: wszystkie próby połączeń zostały zablokowane.
 - **Import też działa bez sieci.** Pliki .mmbackup i CSV są odczytywane w telefonie, w przeglądarce.
 - **Dokumenty** (paski płacowe, paragony, umowy) są zapisywane w pamięci przeglądarki na urządzeniu (IndexedDB), tak samo bez sieci.
@@ -86,25 +86,31 @@ Inne:
 
 ## Konto inwestycyjne
 
-Rodzaj konta **Konto inwestycyjne** (np. XTB, IKE, IKZE). Jego wartość to **wolna gotówka** (saldo konta) **+ aktywa** wyceniane po bieżących cenach.
+Rodzaj konta **Konto inwestycyjne** (np. XTB, IKE, IKZE, PPE). Jego wartość to **wolna gotówka** (saldo konta) **+ aktywa** wyceniane po bieżących cenach.
+
+**Zysk z inwestycji.** Przy każdym koncie inwestycyjnym z aktywami widać trzy liczby: **Zainwestowano** (ilość × cena zakupu, w złotych po kursie NBP z dnia zakupu), **Wartość aktywów** (po bieżących cenach i kursach) i **Zysk** w złotych i procentach. Pod spodem każda pozycja ma swój wynik, np. „zainwestowano 7 447,42 zł · +2 085,47 zł (+28,0%)”; przy instrumentach w obcej walucie dodatkowo zmiana samej ceny (np. „cena w USD +12,3%”), bo zysk w złotych obejmuje też zmianę kursu waluty. Sprzedane pozycje dają **zysk zrealizowany**. Łączny zysk z inwestycji (kont wliczanych do majątku) widać w karcie Majątek i na Przeglądzie.
 
 1. *Konta → przy koncie inwestycyjnym → **Aktywa***.
-2. **+ Instrument z XTB**: wyszukaj dowolną akcję albo ETF z oferty XTB – po nazwie (np. „all world”), symbolu (np. „CDR”, „VWCE”) albo ISIN. Zanim cokolwiek wpiszesz, lista podpowiada ETF-y strategii GEM. Wpisz ilość, cenę zakupu za sztukę i datę zakupu. Każdy zakup dodawaj jako osobną pozycję. Przy instrumencie widać, skąd pochodzi jego cena.
-3. **+ Inne aktywo (wycena ręczna)**: np. obligacje skarbowe, lokata, złoto. Wpisujesz wartość, a gdy się zmieni – nową wartość (aplikacja zapamięta historię wycen do wykresu). Instrument z XTB bez darmowych notowań (np. akcja z Frankfurtu) aplikacja sama doda w tym trybie, z nazwą i walutą z katalogu.
-4. Opcja **Rozlicz zmianę z wolną gotówką na koncie** (domyślnie włączona):
+2. **+ Instrument z XTB**: wyszukaj dowolną akcję albo ETF z oferty XTB – po nazwie (np. „all world”), symbolu (np. „CDR”, „VWCE”) albo ISIN. Zanim cokolwiek wpiszesz, lista podpowiada ETF-y strategii GEM. Wpisz ilość i cenę zakupu za sztukę (albo od razu kwotę **Zainwestowano** – cenę aplikacja wyliczy) oraz datę zakupu. Każdy zakup możesz dodać jako osobną pozycję albo jedną pozycję ze średnią ceną. Przy instrumencie widać, skąd pochodzi jego cena.
+3. **+ Fundusz ING TFI (PPE)**: wybierz fundusz i **kategorię jednostek** (w PPE zwykle E, F, S, T albo W – sprawdzisz ją w serwisie ING TFI24 przy nazwie funduszu albo w umowie PPE pracodawcy; każda kategoria ma inną cenę jednostki). Wpisz **liczbę jednostek** i **sumę wpłat** – obie liczby pokazuje ING TFI24. Aplikacja zapamięta kategorię dla tego konta i przy kolejnym funduszu podpowie ją sama. Wycena jednostek przychodzi z ING TFI w każdy dzień roboczy.
+4. **+ Inne aktywo (wycena ręczna)**: np. obligacje skarbowe, lokata, złoto. Wpisujesz wartość, a gdy się zmieni – nową wartość (aplikacja zapamięta historię wycen do wykresu). Instrument z XTB bez darmowych notowań (np. akcja z Frankfurtu) aplikacja sama doda w tym trybie, z nazwą i walutą z katalogu.
+5. Opcja **Rozlicz zmianę z wolną gotówką na koncie** (domyślnie włączona):
    - nowa pozycja zmniejsza wolną gotówkę o swoją wartość – tak jest, gdy kupujesz ETF za pieniądze z rachunku albo gdy saldo konta (np. z Money Managera) obejmowało już wartość ETF-ów;
    - usunięcie pozycji to sprzedaż: jej wartość wraca do gotówki, a w historii pozycja zostaje do dnia sprzedaży.
 
    Wyłącz tę opcję, gdy saldo konta to tylko gotówka, a aktywa dopisujesz osobno.
 
-**Jak liczona jest cena** (odświeżana w każdy dzień roboczy, ten sam sposób co w zakładce Portfel):
+**PPE w ING – przykład.** Konto „PPE ING” (zaznacz „nie wliczaj do salda łącznego”, jeśli nie chcesz liczyć PPE do majątku) → Aktywa → + Fundusz ING TFI (PPE) → „ING Akcji”, kategoria E → 12,3456 jednostki, suma wpłat 12 100 zł → Zapisz. Przy włączonym rozliczeniu z gotówką wartość funduszu zmniejszy wolną gotówkę konta, więc jeśli saldo PPE było wpisane jako gotówka, po dodaniu funduszy zostanie ono zastąpione wyceną funduszy. Gdy dopłacasz co miesiąc, raz na jakiś czas popraw liczbę jednostek i sumę wpłat (albo dodaj nową pozycję).
+
+**Jak liczona jest cena** (odświeżana w każdy dzień roboczy, ten sam sposób co w portfelu GEM):
 - **akcje, ETF-y, ETC i ETN z GPW i NewConnect** – kurs zamknięcia z ostatniej sesji, prosto z giełdy;
+- **fundusze ING TFI** (PPE, PPK, IKE) – wycena jednostki z ING TFI dla wybranej kategorii;
 - **ETF-y strategii GEM** – notowania z codziennej aktualizacji, a między nimi zmiana indeksu, który ETF śledzi;
 - **ETF-y UCITS na popularne indeksy** (np. VWCE, IWDA, SXR8, CNDX) – od ceny zakupu według zmiany amerykańskiego ETF-u na ten sam indeks, przeliczonej na walutę funduszu. To wycena przybliżona, oznaczona „≈” (może się różnić np. o koszty funduszu i dywidendy w funduszach dystrybuujących);
-- **akcje i ETF-y z USA** – kurs zamknięcia, gdy symbol jest na liście obserwowanych (*Portfel → Instrumenty XTB → Edytuj listę obserwowanych*); bez tego – cena zakupu;
-- dokładną cenę zawsze widzisz w XTB.
+- **akcje i ETF-y z USA** – kurs zamknięcia, gdy symbol jest na liście obserwowanych (*Rynki → Instrumenty → Edytuj listę obserwowanych*); bez tego – cena zakupu;
+- dokładną cenę zawsze widzisz w XTB albo w ING TFI24.
 
-Ceny instrumentów spoza strategii strona wczytuje z pliku aplikacji (`data/notowania.js`). To zwykłe pobranie gotowego pliku z tej samej strony – nic nie jest wysyłane, a blokada połączeń sieciowych (`connect-src 'none'`) działa jak dotąd.
+Ceny instrumentów spoza strategii strona wczytuje z plików aplikacji (`data/notowania.js`, a wyceny funduszy – `data/fundusze.js`). To zwykłe pobranie gotowego pliku z tej samej strony – nic nie jest wysyłane, a blokada połączeń sieciowych (`connect-src 'none'`) działa jak dotąd.
 
 ## Wykres majątku i dochodów
 

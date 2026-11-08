@@ -12,6 +12,7 @@ const EMPTY = {
   lastDigest: null,
   lastErrorNotified: null,
   ai: null, // { key, result }
+  marketAi: null, // { key: 'RRRR-MM-DD', result } – codzienna notatka rynkowa AI
   taxAi: null, // { key: 'YYYY-MM', result } – miesięczny raport podatkowy AI
   remindersSent: [], // klucze 'RRRR-MM-DD' wysłanych przypomnień
   taxSeen: [], // linki już zgłoszonych ważnych wiadomości podatkowych
