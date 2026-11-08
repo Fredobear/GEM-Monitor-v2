@@ -25,7 +25,7 @@ nav.tabs a{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radiu
 nav.tabs a[aria-current=page]{background:var(--accent-soft);color:var(--accent)}
 main{max-width:960px;margin:0 auto;padding:6px 16px 48px}
 @media (max-width:760px){
- nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:6px 4px calc(env(safe-area-inset-bottom,0px) + 6px);display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--surface);border-top:1px solid var(--line)}
+ nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:6px 4px calc(env(safe-area-inset-bottom,0px) + 6px);display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--surface);border-top:1px solid var(--line)}
  nav.tabs a{flex-direction:column;gap:2px;padding:6px 0;font-size:11px}
  main{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
  .updated .long{display:none}
@@ -84,6 +84,26 @@ footer{color:var(--muted);font-size:12px;margin:24px 0}
 .subnav[hidden]{display:none}
 .subnav a{flex:1;text-align:center;text-decoration:none;color:var(--muted);font-weight:600;padding:8px 6px;border-radius:9px}
 .subnav a[aria-current=page]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.note h4{margin:16px 0 6px;font-size:14.5px}.note p{margin:6px 0;line-height:1.5}
+.stance{margin:0 0 12px;padding:10px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line)}
+.stance p{margin:8px 0 2px}
+.gauge{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}
+.gauge span{text-align:center;font-size:12px;font-weight:600;padding:6px 2px;border-radius:9px;background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+.gauge span.on.pos{background:var(--pos-soft);color:var(--pos);border-color:var(--pos)}.gauge span.on.mid{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.gauge span.on.warn{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}.gauge span.on.neg{background:var(--neg-soft);color:var(--neg);border-color:var(--neg)}
+.factors li{margin:6px 0;font-size:13.5px}.fs{display:inline-block;min-width:26px;text-align:center;font-weight:700;border-radius:6px;background:var(--surface);border:1px solid var(--line);font-size:12px}
+.dots li{position:relative;padding-left:14px;margin:6px 0;line-height:1.45}.dots li::before{content:'';position:absolute;left:2px;top:.6em;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.disclaimer{margin-top:14px}
+ul.plain.dots,ul.plain.events,ul.plain.factors{list-style:none;padding-left:0}
+table.mkt td,table.mkt th{padding:7px 5px}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.grp td{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:14px;background:transparent}
+.trend{font-size:13px}
+@media (max-width:560px){.opt{display:none}table.mkt{font-size:13px}}
+.events li{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}.events li:last-child{border-bottom:0}
+.ev-date{flex:none;width:76px;font-weight:700;font-size:13px;color:var(--accent)}.events small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.ev-gem .ev-date{color:var(--gem)}.ev-dane .ev-date{color:var(--muted)}
+.fund-tbl td:first-child{min-width:150px}
 .seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;padding:7px 12px;border-radius:9px;cursor:pointer;white-space:nowrap}
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
 .seg.small button{padding:5px 10px;font-size:13px}
@@ -211,7 +231,11 @@ label.check{display:flex}
 .pop-x{border:0;background:transparent;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
 .pop-list{max-height:min(52vh,420px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 .pop-list .ftx:first-child{border-top:0}
-#ld-picker{border:1px solid var(--line);border-radius:14px;padding:8px 10px;margin:8px 0;background:var(--surface)}
+#ld-picker,.ld-fund{border:1px solid var(--line);border-radius:14px;padding:8px 10px;margin:8px 0;background:var(--surface)}
+.inv-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:2px 0 8px;padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.inv-sum>div{display:flex;flex-direction:column;min-width:0}.inv-sum span{font-size:11.5px;color:var(--muted)}.inv-sum b{font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inv-pos{align-items:flex-start}.inv-pos>span{display:flex;flex-direction:column;white-space:normal!important}.inv-pos small{color:var(--muted);font-size:11.5px;white-space:normal}
+@media (max-width:420px){.inv-sum b{font-size:12.5px}}
 .lot-row .full{grid-column:1/-1}.lot-foot{display:flex;justify-content:space-between;gap:10px;align-items:center}
 .doc-row{display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .doc-ico{font-size:22px;line-height:1}.doc-main b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.doc-main small{color:var(--muted);font-size:12.5px}
@@ -350,11 +374,11 @@ form[data-type=wydatek] .amount-input{color:var(--neg)}form[data-type=przychod] 
 .field small{font-size:12px;color:var(--muted)}
 </style></head><body>
 <header class="topbar"><div class="brand"><img src="icon-192.png" alt="">Finanse <span>· offline</span></div><div class="updated"><span class="offline-badge">🔒 tylko na tym urządzeniu</span></div></header>
-<nav class="tabs" aria-label="Sekcje"><a href="index.html#sygnal" ><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Sygnał</span></a><a href="index.html#portfel" ><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M16 13h2M3 10h18M7 6V4h10v2"/></svg><span>Portfel</span></a><a href="finanse.html" data-page="finanse" aria-current="page"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg><span>Finanse</span></a><a href="index.html#rynki" ><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg><span>Rynki</span></a></nav>
+<nav class="tabs" aria-label="Sekcje"><a href="index.html#sygnal" data-group="gem" ><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>GEM</span></a><a href="finanse.html" data-page="finanse" aria-current="page"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg><span>Finanse</span></a><a href="index.html#rynki" data-group="rynki" ><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg><span>Rynki</span></a></nav>
 <main>
 <nav class="fin-tabs" id="fin-nav" aria-label="Dziennik"><button data-view="przeglad"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3.6a8.5 8.5 0 1 0 9.4 9.4H11z"/><path d="M14 3.2a7.6 7.6 0 0 1 6.8 6.8H14z"/></svg><span>Przegląd</span></button><button data-view="kalendarz"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17.5h2"/></svg><span>Kalendarz</span></button><button data-view="operacje"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><path d="M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01" stroke-width="2.8"/></svg><span>Operacje</span></button><button data-view="konta"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5v-.7a2.3 2.3 0 0 1 2.3-2.3H17"/><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M16 13.5h1.5"/></svg><span>Konta</span></button><button data-view="stale"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2.5l3 3-3 3"/><path d="M4 11v-1.5a4 4 0 0 1 4-4h12"/><path d="M7 21.5l-3-3 3-3"/><path d="M20 13v1.5a4 4 0 0 1-4 4H4"/></svg><span>Stałe</span></button><button data-view="ustawienia"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span>Więcej</span></button></nav>
 <div id="fin-root"><p class="muted">Ładowanie…</p></div>
-<footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów strategii są dołączane do strony przy każdej aktualizacji aplikacji, a ceny pozostałych akcji i ETF-ów z oferty XTB strona wczytuje z pliku aplikacji (data/notowania.js) – to tylko pobranie gotowego pliku, bez wysyłania jakichkolwiek danych. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
+<footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów strategii są dołączane do strony przy każdej aktualizacji aplikacji, a ceny pozostałych akcji i ETF-ów z oferty XTB oraz wyceny funduszy ING TFI strona wczytuje z plików aplikacji (data/notowania.js, data/fundusze.js) – to tylko pobranie gotowego pliku, bez wysyłania jakichkolwiek danych. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
 <dialog id="fin-dialog"><form method="dialog" novalidate>
@@ -418,8 +442,15 @@ form[data-type=wydatek] .amount-input{color:var(--neg)}form[data-type=przychod] 
 <h3 id="ld-title">Aktywa na koncie</h3>
 <p class="small muted" id="ld-info"></p>
 <div id="ld-rows"></div>
-<div class="row-btns"><button type="button" class="btn small" id="ld-add">+ Instrument z XTB</button><button type="button" class="btn small ghost" id="ld-add-manual">+ Inne aktywo (wycena ręczna)</button></div>
+<div class="row-btns"><button type="button" class="btn small" id="ld-add">+ Instrument z XTB</button><button type="button" class="btn small" id="ld-add-fund">+ Fundusz ING TFI (PPE)</button><button type="button" class="btn small ghost" id="ld-add-manual">+ Inne aktywo (wycena ręczna)</button></div>
 <div id="ld-picker" hidden></div>
+<div id="ld-fund" class="ld-fund" hidden>
+<label class="field">Fundusz<select id="ldf-fund"></select></label>
+<label class="field">Kategoria jednostek<select id="ldf-cat"></select></label>
+<p class="small" id="ldf-info"></p>
+<p class="small muted">Kategorię jednostek znajdziesz w serwisie ING TFI24 przy nazwie funduszu albo w umowie PPE pracodawcy (w PPE zwykle E, F, S, T lub W). Każda kategoria ma inną cenę jednostki, więc wybierz właściwą.</p>
+<div class="row-btns"><button type="button" class="btn small primary" id="ldf-ok">Dodaj fundusz</button></div>
+</div>
 <label class="check small"><input type="checkbox" name="settle"> <span>Rozlicz zmianę z wolną gotówką na koncie (kupno ją zmniejsza, sprzedaż zwiększa)</span></label>
 <p class="dlg-hint" id="ld-sum"></p>
 <div class="errors" id="ld-errors" role="alert"></div>
@@ -967,7 +998,7 @@ function convert(market, amount, from, to, date) {
 
 // Pozycje na koncie inwestycyjnym („partie”): { asset: ticker albo 'manual', qty, price (za sztukę, w walucie aktywa), date }.
 // Cena aktywa z rynku: notowanie, jeśli świeże, albo cena zakupu przesunięta o zmianę indeksu od dnia zakupu
-// (tak samo jak w zakładce Portfel). Aktywo z wyceną ręczną ma historię wycen w polu marks.
+// (tak samo jak w portfelu GEM). Aktywo z wyceną ręczną ma historię wycen w polu marks.
 // Instrument z katalogu XTB ma walutę zapisaną przy pozycji – wycena działa także bez notowań.
 const lotCurrency = (market, lot) => (lot.asset && lot.asset !== 'manual' ? market?.assets?.[lot.asset]?.currency ?? lot.currency : lot.currency) || 'PLN';
 
@@ -1004,6 +1035,51 @@ function holdingsPLN(market, account, date) {
     sum += v;
   }
   return sum;
+}
+
+// Ile zainwestowano w pozycję: ilość × cena zakupu, w walucie aktywa i w złotych po kursie NBP z dnia zakupu.
+function lotCost(market, lot) {
+  const currency = lotCurrency(market, lot);
+  const cost = lot.qty * lot.price;
+  const r = rateOn(market, currency, lot.date);
+  return { cost, currency, costPLN: r === null ? null : cost * r };
+}
+
+// Wynik otwartej pozycji na dany dzień: wartość, koszt i zysk w złotych (z efektem kursu walutowego)
+// oraz zmiana samej ceny w walucie aktywa.
+function lotResult(market, lot, date) {
+  const value = lotValuePLN(market, lot, date);
+  const { costPLN, currency } = lotCost(market, lot);
+  if (value === null || costPLN === null) return null;
+  return { value, costPLN, gain: value - costPLN, gainPct: costPLN > 0 ? value / costPLN - 1 : null, priceChange: lot.price > 0 ? lotPrice(market, lot, date) / lot.price - 1 : null, currency };
+}
+
+// Podsumowanie konta inwestycyjnego: ile zainwestowano w otwarte pozycje, ile są dziś warte i jaki jest zysk.
+// Pozycje sprzedane (until) dają zysk zrealizowany: wartość w dniu sprzedaży minus koszt zakupu.
+function investSummary(market, account, date) {
+  const out = { cost: 0, value: 0, gain: 0, gainPct: null, positions: 0, missing: 0, realized: null };
+  for (const lot of account.lots ?? []) {
+    if (lot.until) {
+      if (lot.until > date) continue;
+      const r = rateOn(market, lotCurrency(market, lot), lot.until);
+      const { costPLN } = lotCost(market, lot);
+      if (r === null || costPLN === null) continue;
+      out.realized = (out.realized ?? 0) + lot.qty * lotPrice(market, lot, lot.until) * r - costPLN;
+      continue;
+    }
+    if (!lotActive(lot, date)) continue;
+    const res = lotResult(market, lot, date);
+    if (!res) {
+      out.missing++;
+      continue;
+    }
+    out.cost += res.costPLN;
+    out.value += res.value;
+    out.positions++;
+  }
+  out.gain = out.value - out.cost;
+  out.gainPct = out.cost > 0 ? out.value / out.cost - 1 : null;
+  return out.positions || out.realized !== null ? out : null;
 }
 
 // Wartość konta w złotych: saldo (gotówka, w walucie konta) po kursie z dnia + wartość pozycji inwestycyjnych.
@@ -1318,6 +1394,40 @@ function instLoadScript(src, globalName) {
 const instLoadCatalog = () => instLoadScript('data/katalog.js', 'GEM_KATALOG');
 const instLoadQuotes = () => instLoadScript('data/notowania.js', 'GEM_NOTOWANIA');
 
+// ---------- Fundusze ING TFI (PPE, PPK, IKE) – wyceny jednostek z pliku data/fundusze.js ----------
+// Symbol pozycji: INGTFI:<id funduszu>:<kategoria jednostek>, np. INGTFI:1:E (ING Akcji, kategoria E dla PPE).
+const FUND_PREFIX = 'INGTFI:';
+const FUND_PPE_CATEGORIES = ['E', 'F', 'S', 'T', 'W'];
+const FUND_TYPE_ORDER = ['akcji', 'mieszany', 'obligacji', 'krótkoterminowy dłużny', 'cyklu życia', 'alternatywny', 'Emerytura (PPK)'];
+const instLoadFunds = () => instLoadScript('data/fundusze.js', 'GEM_FUNDUSZE');
+const fundSymbol = (id, cat) => `${FUND_PREFIX}${id}:${cat}`;
+const fundIdOf = (symbol) => Number(String(symbol ?? '').split(':')[1]);
+const fundCategoryOf = (symbol) => String(symbol ?? '').split(':')[2] ?? '';
+const fundInfo = (data, symbol) => data?.funds?.find((f) => f.id === fundIdOf(symbol)) ?? null;
+
+/** Wyceny jednostki [[data, wartość], …] dla symbolu funduszu. */
+function fundQuotes(data, symbol) {
+  const vals = data?.values?.[symbol];
+  if (!vals) return [];
+  const out = [];
+  for (let i = 0; i < data.dates.length; i++) if (vals[i] !== null && vals[i] !== undefined) out.push([data.dates[i], vals[i]]);
+  return out;
+}
+
+/** Wpis do wyceny (jak instEntry) dla funduszu albo null, gdy brak wycen. */
+function fundEntry(data, symbol) {
+  const quotes = fundQuotes(data, symbol);
+  if (!quotes.length) return null;
+  return { currency: fundInfo(data, symbol)?.currency ?? 'PLN', quotes, series: [], source: 'tfi', proxy: null };
+}
+
+/** Domyślna kategoria jednostek: zapamiętana, potem pierwsza z kategorii PPE, potem A. */
+function fundDefaultCategory(fund, preferred = '') {
+  const cats = fund?.cats ?? [];
+  if (preferred && cats.includes(preferred)) return preferred;
+  return FUND_PPE_CATEGORIES.find((c) => cats.includes(c)) ?? (cats.includes('A') ? 'A' : cats[0] ?? '');
+}
+
 const instEsc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const instFold = (s) =>
   String(s ?? '')
@@ -1436,6 +1546,7 @@ function instSourceLabel(entry, data) {
   if (entry.source === 'gpw') return `kurs zamknięcia z GPW${last ? ` (${instDate(last)})` : ''}`;
   if (entry.source === 'nc') return `kurs z NewConnect${last ? ` (${instDate(last)})` : ''}`;
   if (entry.source === 'tiingo') return `kurs zamknięcia z giełdy w USA${last ? ` (${instDate(last)})` : ''}`;
+  if (entry.source === 'tfi') return `wycena jednostki z ING TFI${last ? ` (${instDate(last)})` : ''}`;
   const [code, hedged] = String(entry.proxy ?? '').split(':');
   return `wycena przybliżona: od ceny zakupu według zmiany indeksu ${data?.proxyNames?.[code] ?? code} (ETF ${code})${hedged ? ', klasa zabezpieczona walutowo' : ''}`;
 }
@@ -2302,6 +2413,7 @@ const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const NF0 = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 0 });
 const NF2 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const NF1 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const NF4 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 const tidy = (x) => (Math.abs(x) < 0.005 ? 0 : x);
 const zl = (x) => `${NF2.format(tidy(x))} zł`;
@@ -2309,6 +2421,11 @@ const zl0 = (x) => `${NF0.format(Math.round(tidy(x)))} zł`;
 const money = (x, cur) => (!cur || cur === 'PLN' ? zl(x) : `${NF2.format(tidy(x))} ${cur}`);
 const signed = (x) => `${x < -0.004 ? '−' : '+'}${zl(Math.abs(x))}`;
 const pct = (x) => (x === null || !Number.isFinite(x) ? '–' : `${Math.round(x * 100)}%`);
+const pct1 = (x) => `${NF1.format(Math.abs(x * 100))}%`;
+// Zysk lub strata z procentem, np. „+2 085,79 zł (+28,0%)”.
+const gainText = (gain, gainPct) => `${signed(gain)}${gainPct === null || !Number.isFinite(gainPct) ? '' : ` (${gainPct < -0.00005 ? '−' : '+'}${pct1(gainPct)})`}`;
+const gainClass = (x) => (x > 0.004 ? 'pos' : x < -0.004 ? 'neg' : '');
+const isFundLot = (l) => typeof l?.asset === 'string' && l.asset.startsWith(FUND_PREFIX);
 const compact = (x) => (x >= 10000 ? `${NF0.format(Math.round(x / 1000))} tys.` : NF0.format(Math.round(x)));
 const fmtInput = (x) => (Number.isFinite(x) && Math.abs(x) >= 0.005 ? String(round2(x)).replace('.', ',') : '');
 const fmtQty = (q) => (Number.isFinite(q) && q ? String(Number(q.toFixed(6))).replace('.', ',') : '');
@@ -2359,9 +2476,13 @@ const valuationDate = () => today();
 // Instrumenty z biblioteki XTB (akcje i ETF-y z GPW, obserwowane z USA, ETF-y UCITS wyceniane według indeksu):
 // notowania z pliku aplikacji data/notowania.js (zwykły skrypt z tej samej strony – nic nie jest wysyłane).
 let libraryQuotes = null;
+// Fundusze ING TFI (np. w PPE): wyceny jednostek z pliku data/fundusze.js.
+let fundsData = null;
 function addLibraryAsset(symbol, name, currency) {
-  if (!libraryQuotes || !symbol || (MARKET.assets?.[symbol] && !MARKET.assets[symbol].library)) return false;
-  const entry = instEntry(libraryQuotes, symbol, currency || 'PLN', MARKET.fx);
+  if (!symbol || (MARKET.assets?.[symbol] && !MARKET.assets[symbol].library)) return false;
+  const fund = symbol.startsWith(FUND_PREFIX);
+  if (fund ? !fundsData : !libraryQuotes) return false;
+  const entry = fund ? fundEntry(fundsData, symbol) : instEntry(libraryQuotes, symbol, currency || 'PLN', MARKET.fx);
   if (!entry) return false;
   MARKET.assets ??= {};
   MARKET.assets[symbol] = { name: name || symbol, ...entry, library: true };
@@ -2370,7 +2491,8 @@ function addLibraryAsset(symbol, name, currency) {
 async function ensureLibraryAssets() {
   const lots = fin.accounts.flatMap((a) => a.lots ?? []).filter((l) => l.asset && l.asset !== 'manual' && !MARKET.assets?.[l.asset]);
   if (!lots.length) return false;
-  libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+  if (lots.some((l) => !l.asset.startsWith(FUND_PREFIX))) libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+  if (lots.some((l) => l.asset.startsWith(FUND_PREFIX))) fundsData = fundsData ?? (await instLoadFunds());
   let added = false;
   for (const l of lots) added = addLibraryAsset(l.asset, l.name, l.currency) || added;
   return added;
@@ -2822,11 +2944,30 @@ function periodControls() {
   return `<div class="period">${seg}<div class="pswitch"><button class="icon-btn" data-shift="-1" aria-label="Wcześniej">‹</button><b>${esc(periodLabel())}</b><button class="icon-btn" data-shift="1" aria-label="Później">›</button></div>${away ? '<div class="back-today"><button class="link small" data-act="period-today">wróć do dziś</button></div>' : ''}</div>`;
 }
 
+// Zysk z inwestycji na kontach wliczanych do majątku (otwarte pozycje, wycena na dziś).
+function investTotals() {
+  const at = valuationDate();
+  const out = { cost: 0, value: 0, gain: 0, gainPct: null, positions: 0 };
+  for (const a of activeAccounts()) {
+    if (a.excludeFromTotal || !a.lots?.length) continue;
+    const s = investSummary(MARKET, a, at);
+    if (!s?.positions) continue;
+    out.cost += s.cost;
+    out.value += s.value;
+    out.positions += s.positions;
+  }
+  out.gain = out.value - out.cost;
+  out.gainPct = out.cost > 0 ? out.value / out.cost - 1 : null;
+  return out;
+}
+
 function heroBalance() {
   if (!activeAccounts().length) return '';
   const nw = netWorth(fin, MARKET);
+  const inv = investTotals();
   const lines = [];
   if (nw.investments > 0.004) lines.push(`w tym inwestycje: <b>${esc(zl(nw.investments))}</b>`);
+  if (inv.positions) lines.push(`zysk z inwestycji: <b class="${gainClass(inv.gain)}">${esc(gainText(inv.gain, inv.gainPct))}</b>`);
   if (nw.debt > 0.004) lines.push(`zadłużenie: <b class="neg">−${esc(zl(nw.debt))}</b>`);
   if (nw.missing.length) lines.push(`bez kursu: ${esc(nw.missing.join(', '))}`);
   return `<button class="card hero-bal" data-view="konta"><span class="hb-main"><span class="muted small">Majątek – wszystkie konta</span><span class="hb-val ${nw.total < -0.004 ? 'neg' : ''}">${esc(zl(nw.total))}</span>${lines.length ? `<span class="small muted">${lines.join(' · ')}</span>` : ''}</span><span class="hb-chev" aria-hidden="true">›</span></button>`;
@@ -3027,18 +3168,28 @@ function viewTransactions() {
 const WORTH_RANGES = [[6, '6 mies.'], [12, '1 rok'], [36, '3 lata'], [0, 'Wszystko']];
 
 function lotLabel(l) {
-  return l.asset === 'manual' ? l.name || 'Aktywo' : l.asset;
+  if (l.asset === 'manual') return l.name || 'Aktywo';
+  if (isFundLot(l)) return `${l.name || 'Fundusz'} (kat. ${fundCategoryOf(l.asset)})`;
+  return l.asset;
 }
 
 function investmentLines(a, cash) {
   const at = valuationDate();
+  const sum = investSummary(MARKET, a, at);
   const lines = (a.lots ?? []).filter((l) => !l.until).map((l) => {
-    const v = lotValuePLN(MARKET, l, at);
-    const change = l.asset !== 'manual' && l.price > 0 ? lotPrice(MARKET, l, at) / l.price - 1 : null;
+    const r = lotResult(MARKET, l, at);
     const approx = MARKET.assets?.[l.asset]?.source === 'proxy' ? '≈ ' : '';
-    return `<div class="inv-line"><span>${esc(lotLabel(l))} · ${esc(fmtQty(l.qty))} szt.${change !== null && Math.abs(change) >= 0.0005 ? ` <span class="${change >= 0 ? 'pos' : 'neg'}">${change >= 0 ? '+' : '−'}${pct(Math.abs(change))}</span>` : ''}</span><b>${v === null ? 'brak kursu' : esc(approx + zl(v))}</b></div>`;
+    const unit = isFundLot(l) ? 'j.u.' : 'szt.';
+    const detail = r && lotActive(l, at)
+      ? `<small>zainwestowano ${esc(zl(r.costPLN))} · <span class="${gainClass(r.gain)}">${esc(gainText(r.gain, r.gainPct))}</span>${r.currency !== 'PLN' && r.priceChange !== null ? ` · cena w ${esc(r.currency)} ${r.priceChange < 0 ? '−' : '+'}${esc(pct1(r.priceChange))}` : ''}</small>`
+      : '';
+    return `<div class="inv-line inv-pos"><span>${esc(lotLabel(l))} · ${esc(fmtQty(l.qty))} ${unit}${detail}</span><b>${r === null ? 'brak kursu' : esc(approx + zl(r.value))}</b></div>`;
   });
-  return `${lines.join('')}<div class="inv-line"><span>Wolna gotówka</span><b>${esc(money(cash, a.currency))}</b></div>`;
+  const head = sum?.positions
+    ? `<div class="inv-sum"><div><span>Zainwestowano</span><b>${esc(zl(sum.cost))}</b></div><div><span>Wartość aktywów</span><b>${esc(zl(sum.value))}</b></div><div><span>Zysk</span><b class="${gainClass(sum.gain)}">${esc(gainText(sum.gain, sum.gainPct))}</b></div></div>`
+    : '';
+  const realized = sum?.realized !== null && sum?.realized !== undefined && Math.abs(sum.realized) >= 0.01 ? `<div class="inv-line"><span>Zysk zrealizowany (sprzedane pozycje)</span><b class="${gainClass(sum.realized)}">${esc(signed(sum.realized))}</b></div>` : '';
+  return `${head}${lines.join('')}${realized}<div class="inv-line"><span>Wolna gotówka</span><b>${esc(money(cash, a.currency))}</b></div>`;
 }
 
 function accountItem(a, b) {
@@ -3062,13 +3213,14 @@ function accountItem(a, b) {
 function viewAccounts() {
   const bal = balances(fin);
   const nw = netWorth(fin, MARKET);
+  const inv = investTotals();
   const active = activeAccounts();
   const hidden = fin.accounts.filter((a) => a.archived);
   const points = active.length ? worthHistory(fin, MARKET, { today: today(), months: ui.worthRange }) : [];
   const worth = active.length
     ? `<section class="card"><div class="card-head"><h2>Majątek</h2><div class="seg small">${WORTH_RANGES.map(([m, l]) => `<button data-worth-range="${m}" class="${ui.worthRange === m ? 'on' : ''}">${l}</button>`).join('')}</div></div>
       <div class="worth-top"><b class="hb-val ${nw.total < -0.004 ? 'neg' : ''}">${esc(zl(nw.total))}</b></div>
-      <div class="sum3"><div><span>Na kontach</span><b class="pos">${esc(zl(nw.assets - nw.investments))}</b></div><div><span>Inwestycje</span><b>${esc(zl(nw.investments))}</b></div><div><span>Zadłużenie</span><b class="${nw.debt > 0.004 ? 'neg' : ''}">${nw.debt > 0.004 ? '−' : ''}${esc(zl(nw.debt))}</b></div></div>
+      <div class="sum3"><div><span>Na kontach</span><b class="pos">${esc(zl(nw.assets - nw.investments))}</b></div><div><span>Inwestycje</span><b>${esc(zl(nw.investments))}</b>${inv.positions ? `<small class="${gainClass(inv.gain)}">zysk ${esc(gainText(inv.gain, inv.gainPct))}</small>` : ''}</div><div><span>Zadłużenie</span><b class="${nw.debt > 0.004 ? 'neg' : ''}">${nw.debt > 0.004 ? '−' : ''}${esc(zl(nw.debt))}</b></div></div>
       ${worthChart(points)}${worthStats(points)}
       ${nw.missing.length ? `<p class="small warn">Bez kursu waluty (poza majątkiem): ${esc(nw.missing.join(', '))}.</p>` : ''}
       <p class="small muted">${esc(marketNote())}</p></section>`
@@ -3238,8 +3390,27 @@ function settingsBackup() {
   return `<section class="card"><h2>Kopia zapasowa</h2><p class="small muted">Dane są tylko w tej przeglądarce (${liveTx(fin).length} operacji, ${fin.accounts.length} kont, ${docs} dokumentów, ok. ${size} KB bez dokumentów). Rób kopię co jakiś czas i zapisuj ją w Plikach. Usunięcie danych witryny w ustawieniach Safari usunie też dziennik.</p>
     ${docs ? '<label class="check small"><input type="checkbox" id="bk-docs" checked> Dołącz dokumenty (plik będzie większy)</label>' : ''}
     <div class="row-btns"><button class="btn primary" data-act="backup">Eksportuj kopię (JSON)</button><button class="btn" data-act="restore">Wczytaj kopię…</button></div><input type="file" id="restore-file" accept="application/json,.json" hidden>
-    <details class="danger"><summary>Usuń wszystkie dane dziennika</summary><p class="small">Tej operacji nie można cofnąć po zamknięciu powiadomienia. Najpierw wyeksportuj kopię.</p><button class="btn danger" data-act="wipe">Usuń dziennik…</button></details></section>`;
+    <details class="danger"><summary>Usuń wszystkie dane dziennika</summary><p class="small">Tej operacji nie można cofnąć po zamknięciu powiadomienia. Najpierw wyeksportuj kopię.</p><button class="btn danger" data-act="wipe">Usuń dziennik…</button></details></section>
+    <section class="card"><h2>Aplikacja</h2><label class="field">Strona startowa (po otwarciu aplikacji z ekranu początkowego)<select id="start-page">${[['gem', 'GEM – sygnał'], ['finanse', 'Finanse – ten dziennik'], ['rynki', 'Rynki – przegląd']].map(([v, l]) => `<option value="${v}" ${startPageSetting() === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label></section>`;
 }
+
+// Strona startowa aplikacji – wspólne ustawienie z panelem GEM (index.html przekierowuje do dziennika).
+function startPageSetting() {
+  try {
+    return localStorage.getItem('gem.start') || 'gem';
+  } catch {
+    return 'gem';
+  }
+}
+document.addEventListener('change', (ev) => {
+  if (ev.target?.id !== 'start-page') return;
+  try {
+    localStorage.setItem('gem.start', ev.target.value);
+    toast('Zapisano stronę startową.');
+  } catch {
+    toast('Nie udało się zapisać ustawienia w tej przeglądarce.');
+  }
+});
 
 function viewSettings() {
   const seg = `<div class="seg small set-seg" style="margin-top:12px">${SET_TABS.map(([k, l]) => `<button data-set-tab="${k}" class="${ui.setTab === k ? 'on' : ''}">${l}</button>`).join('')}</div>`;
@@ -4195,28 +4366,38 @@ function openLots(accountId) {
     accountId,
     lots: (a.lots ?? []).filter((l) => !l.until).map((l) => ({ ...l, value: l.asset === 'manual' ? latestMark(l) : undefined })),
     before: holdingsPLN(MARKET, a, valuationDate()) ?? 0,
+    fundCategory: a.fundCategory ?? '',
   };
   $('#ld-title').textContent = `Aktywa: ${a.name}`;
-  $('#ld-info').textContent = `${marketNote()} Akcje i ETF-y z GPW wyceniam po kursie zamknięcia z giełdy, popularne ETF-y UCITS – od ceny zakupu według zmiany indeksu, który śledzą (wycena przybliżona, oznaczona „≈”). Dokładną cenę zawsze sprawdzisz w XTB.`;
+  $('#ld-info').textContent = `${marketNote()} Akcje i ETF-y z GPW wyceniam po kursie zamknięcia z giełdy, fundusze ING TFI (np. w PPE) – po wycenie jednostki z ING TFI, a popularne ETF-y UCITS – od ceny zakupu według zmiany indeksu, który śledzą (wycena przybliżona, oznaczona „≈”).`;
   if (!$('#ld-picker').firstChild) $('#ld-picker').append(lotPicker);
   $('#ld-picker').hidden = true;
+  $('#ld-fund').hidden = true;
   lotPicker.reset();
   lotsForm.elements.settle.checked = true;
   $('#ld-errors').textContent = '';
   renderLots();
   openDialog(LOTS);
+  const refresh = () => lotsState?.accountId === accountId && lotsState.lots.some((l) => l.asset !== 'manual' && !MARKET.assets?.[l.asset] && addLibraryAsset(l.asset, l.name, l.currency)) && renderLots();
   instLoadQuotes().then((data) => {
     libraryQuotes = libraryQuotes ?? data;
-    if (lotsState?.accountId === accountId && lotsState.lots.some((l) => l.asset !== 'manual' && !MARKET.assets?.[l.asset] && addLibraryAsset(l.asset, l.name, l.currency))) renderLots();
+    refresh();
   });
+  if (lotsState.lots.some(isFundLot) || /ppe|ppk|ing tfi/i.test(a.name)) {
+    instLoadFunds().then((data) => {
+      fundsData = fundsData ?? data;
+      refresh();
+    });
+  }
 }
 
-// Opis źródła ceny pozycji (GEM, GPW, USA, indeks albo cena zakupu).
+// Opis źródła ceny pozycji (GEM, GPW, USA, fundusz ING TFI, indeks albo cena zakupu).
 function lotSource(l) {
   const a = MARKET.assets?.[l.asset];
   if (a && !a.library) return 'ETF strategii GEM – cena z codziennej aktualizacji';
   if (a) return instSourceLabel(a, libraryQuotes);
-  if (l.asset?.endsWith('.US')) return 'Brak notowań – wycena według ceny zakupu. Dopisz symbol do obserwowanych (Portfel → Instrumenty XTB), aby pobierać kurs.';
+  if (isFundLot(l)) return 'Wycena jednostki z ING TFI pojawi się po najbliższej aktualizacji aplikacji.';
+  if (l.asset?.endsWith('.US')) return 'Brak notowań – wycena według ceny zakupu. Dopisz symbol do obserwowanych (Rynki → Instrumenty), aby pobierać kurs.';
   if (l.asset?.endsWith('.PL')) return 'Kurs z GPW pojawi się po najbliższej aktualizacji aplikacji.';
   return 'Brak notowań – wycena według ceny zakupu.';
 }
@@ -4224,12 +4405,12 @@ function lotSource(l) {
 function lotSummary(l) {
   const at = valuationDate();
   const lot = l.asset === 'manual' ? { ...l, marks: [[l.date, l.value]] } : l;
-  if (!(l.qty > 0) || !((l.asset === 'manual' ? l.value : l.price) > 0)) return 'Uzupełnij ilość i cenę.';
+  if (!(l.qty > 0) || !((l.asset === 'manual' ? l.value : l.price) > 0)) return isFundLot(l) ? 'Uzupełnij liczbę jednostek i kwotę wpłat (albo średnią cenę).' : 'Uzupełnij ilość i cenę.';
   const v = lotValuePLN(MARKET, lot, at);
   if (v === null) return 'Brak kursu waluty.';
   if (l.asset === 'manual') return `Wartość: ${zl(v)}`;
-  const change = lotPrice(MARKET, l, at) / l.price - 1;
-  return `Wartość dziś: ${zl(v)} (${change >= 0 ? '+' : '−'}${pct(Math.abs(change))} od zakupu)`;
+  const r = lotResult(MARKET, { ...l, since: undefined, until: undefined }, at);
+  return r ? `Wartość dziś: ${zl(r.value)} · zysk ${gainText(r.gain, r.gainPct)}` : `Wartość dziś: ${zl(v)}`;
 }
 
 function renderLots() {
@@ -4237,7 +4418,11 @@ function renderLots() {
     ? lotsState.lots
         .map((l, i) => {
           const cur = lotCurrency(MARKET, l);
-          const pence = l.asset !== 'manual' ? instPenceHint({ market: l.asset.slice(l.asset.lastIndexOf('.') + 1), currency: cur, name: l.name ?? '' }) : '';
+          const fund = isFundLot(l);
+          const pence = l.asset !== 'manual' && !fund ? instPenceHint({ market: l.asset.slice(l.asset.lastIndexOf('.') + 1), currency: cur, name: l.name ?? '' }) : '';
+          const head = fund
+            ? `<b>${esc(l.name ?? 'Fundusz')}</b> <span class="tag">kat. ${esc(fundCategoryOf(l.asset))}</span>`
+            : `<b>${esc(l.asset)}</b> ${esc(l.name ?? MARKET.assets?.[l.asset]?.name ?? '')}`;
           const body =
             l.asset === 'manual'
               ? `<label class="field full">Nazwa aktywa<input data-lf="name" value="${esc(l.name ?? '')}" placeholder="np. Obligacje skarbowe EDO"></label>
@@ -4245,16 +4430,80 @@ function renderLots() {
                  <label class="field">Ilość<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
                  <label class="field">Wartość za sztukę dziś (${esc(curLabel(cur))})<input data-lf="value" inputmode="decimal" value="${esc(fmtInput(l.value))}"></label>
                  <label class="field">Od kiedy<input type="date" data-lf="date" value="${esc(l.date)}"></label>`
-              : `<div class="full lot-inst"><b>${esc(l.asset)}</b> ${esc(l.name ?? MARKET.assets?.[l.asset]?.name ?? '')}<div class="small muted">${esc(lotSource(l))}</div>${l.hint ? `<div class="small muted">${esc(l.hint)}</div>` : ''}${pence ? `<div class="small warn">${esc(pence)}</div>` : ''}</div>
-                 <label class="field">Ilość (szt.)<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
-                 <label class="field">Cena zakupu za szt. (${esc(curLabel(cur))})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}"></label>
-                 <label class="field">Data zakupu<input type="date" data-lf="date" value="${esc(l.date)}"></label>`;
+              : `<div class="full lot-inst">${head}<div class="small muted">${esc(lotSource(l))}</div>${l.hint ? `<div class="small muted">${esc(l.hint)}</div>` : ''}${pence ? `<div class="small warn">${esc(pence)}</div>` : ''}</div>
+                 <label class="field">${fund ? 'Liczba jednostek' : 'Ilość (szt.)'}<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
+                 <label class="field">${fund ? 'Średnia cena jednostki' : 'Cena zakupu za szt.'} (${esc(curLabel(cur))})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}"></label>
+                 <label class="field">${fund ? 'Suma wpłat' : 'Zainwestowano'} (${esc(curLabel(cur))})<input data-lf="cost" inputmode="decimal" value="${esc(fmtInput(l.qty * l.price))}" placeholder="ilość × cena"></label>
+                 <label class="field">${fund ? 'Data pierwszej wpłaty' : 'Data zakupu'}<input type="date" data-lf="date" value="${esc(l.date)}"></label>`;
           return `<div class="lot-row" data-lot="${i}">${body}<div class="lot-foot full"><span class="small muted" data-lot-val="${i}">${esc(lotSummary(l))}</span><button type="button" class="link small danger-text" data-lot-del="${i}">Usuń</button></div></div>`;
         })
         .join('')
-    : '<p class="muted small">Brak aktywów. Dodaj instrument z oferty XTB (wyszukaj po nazwie, symbolu albo ISIN) albo inne aktywo z wyceną ręczną, np. obligacje skarbowe.</p>';
+    : '<p class="muted small">Brak aktywów. Dodaj instrument z oferty XTB (wyszukaj po nazwie, symbolu albo ISIN), fundusz ING TFI (np. z PPE) albo inne aktywo z wyceną ręczną, np. obligacje skarbowe.</p>';
   updateLotsSum();
 }
+
+// Panel wyboru funduszu ING TFI i kategorii jednostek (w PPE zwykle E, F, S, T albo W – zależy od umowy pracodawcy).
+function fillFundPanel() {
+  const fSel = $('#ldf-fund');
+  const cSel = $('#ldf-cat');
+  if (!fundsData?.funds?.length) {
+    fSel.innerHTML = '<option value="">Brak danych – pojawią się po najbliższej aktualizacji aplikacji</option>';
+    cSel.innerHTML = '';
+    $('#ldf-info').textContent = '';
+    $('#ldf-ok').disabled = true;
+    return;
+  }
+  $('#ldf-ok').disabled = false;
+  if (!fSel.options.length || !fSel.value) {
+    const groups = new Map();
+    for (const f of [...fundsData.funds].sort((x, y) => FUND_TYPE_ORDER.indexOf(x.type) - FUND_TYPE_ORDER.indexOf(y.type) || x.name.localeCompare(y.name, 'pl'))) {
+      if (!groups.has(f.type)) groups.set(f.type, []);
+      groups.get(f.type).push(f);
+    }
+    fSel.innerHTML = [...groups].map(([type, list]) => `<optgroup label="${esc(cap(type))}">${list.map((f) => `<option value="${f.id}">${esc(f.name)}${f.cats.some((c) => FUND_PPE_CATEGORIES.includes(c)) ? '' : ' (bez kategorii PPE)'}</option>`).join('')}</optgroup>`).join('');
+  }
+  updateFundCats();
+}
+function updateFundCats() {
+  const fund = fundsData?.funds?.find((f) => f.id === Number($('#ldf-fund').value));
+  const cSel = $('#ldf-cat');
+  if (!fund) return;
+  const keep = cSel.value && fund.cats.includes(cSel.value) ? cSel.value : fundDefaultCategory(fund, lotsState?.fundCategory);
+  cSel.innerHTML = fund.cats.map((c) => `<option value="${esc(c)}" ${c === keep ? 'selected' : ''}>${esc(c)} – ${esc(fundsData.categories?.[c] ?? '')}</option>`).join('');
+  updateFundInfo();
+}
+function updateFundInfo() {
+  const fund = fundsData?.funds?.find((f) => f.id === Number($('#ldf-fund').value));
+  const cat = $('#ldf-cat').value;
+  if (!fund || !cat) return;
+  const last = fundQuotes(fundsData, fundSymbol(fund.id, cat)).at(-1);
+  const ret = fund.ret?.[cat] ?? {};
+  const r = (k, l) => (Number.isFinite(ret[k]) ? `${l} ${ret[k] < 0 ? '−' : '+'}${pct1(ret[k])}` : '');
+  $('#ldf-info').innerHTML = `${last ? `Wycena jednostki: <b>${esc(NF2.format(last[1]))} ${esc(curLabel(fund.currency))}</b> (${esc(shortDate(last[0], true))}). ` : ''}${esc([r('12M', '12 mies.:'), r('YTD', 'od początku roku:'), r('60M', '5 lat:')].filter(Boolean).join(' · '))}<br><span class="muted">${esc(fund.umbrella)} · ryzyko ${esc(fund.risk ?? '–')}/7${fund.url ? ` · <a href="${esc(fund.url)}" target="_blank" rel="noopener">karta funduszu</a>` : ''}</span>`;
+}
+$('#ldf-fund').addEventListener('change', updateFundCats);
+$('#ldf-cat').addEventListener('change', updateFundInfo);
+$('#ld-add-fund').addEventListener('click', async () => {
+  const box = $('#ld-fund');
+  box.hidden = !box.hidden;
+  $('#ld-picker').hidden = true;
+  if (box.hidden) return;
+  fundsData = fundsData ?? (await instLoadFunds());
+  fillFundPanel();
+});
+$('#ldf-ok').addEventListener('click', () => {
+  const fund = fundsData?.funds?.find((f) => f.id === Number($('#ldf-fund').value));
+  const cat = $('#ldf-cat').value;
+  if (!fund || !cat) return;
+  const symbol = fundSymbol(fund.id, cat);
+  addLibraryAsset(symbol, fund.name, fund.currency);
+  const last = fundQuotes(fundsData, symbol).at(-1);
+  lotsState.fundCategory = cat;
+  lotsState.lots.push({ id: newId(), asset: symbol, name: fund.name, currency: fund.currency, qty: 0, price: 0, date: today(), hint: last ? `Ostatnia wycena jednostki: ${fmtInput(last[1])} ${curLabel(fund.currency)} (${shortDate(last[0], true)}). Liczbę jednostek i sumę wpłat znajdziesz w serwisie ING TFI24.` : '' });
+  $('#ld-fund').hidden = true;
+  renderLots();
+  $('#ld-rows').lastElementChild?.querySelector('[data-lf="qty"]')?.focus();
+});
 
 function workingValue() {
   const at = valuationDate();
@@ -4279,8 +4528,25 @@ lotsForm.addEventListener('input', (ev) => {
   if (!row || !el.dataset.lf) return;
   const l = lotsState.lots[Number(row.dataset.lot)];
   const k = el.dataset.lf;
-  if (k === 'qty' || k === 'price' || k === 'value') l[k] = Math.abs(parseAmount(el.value)) || 0;
-  else l[k] = el.value;
+  const num = () => Math.abs(parseAmount(el.value)) || 0;
+  const setField = (name, v) => {
+    const input = $(`[data-lf="${name}"]`, row);
+    if (input && input !== el) input.value = fmtInput(v);
+  };
+  // „Zainwestowano” i cena za sztukę są powiązane: kwota = ilość × cena. Ostatnio wpisane pole decyduje przy zmianie ilości.
+  if (k === 'cost') {
+    l.cost = num();
+    l.costMode = true;
+    l.price = l.qty > 0 ? l.cost / l.qty : 0;
+    setField('price', l.price);
+  } else if (k === 'qty' || k === 'price' || k === 'value') {
+    l[k] = num();
+    if (k === 'price') l.costMode = false;
+    if (k === 'qty' && l.costMode) {
+      l.price = l.qty > 0 ? (l.cost ?? 0) / l.qty : 0;
+      setField('price', l.price);
+    } else if (k !== 'value') setField('cost', l.qty * l.price);
+  } else l[k] = el.value;
   if (k === 'asset' || k === 'currency') return renderLots();
   $(`[data-lot-val="${row.dataset.lot}"]`).textContent = lotSummary(l);
   updateLotsSum();
@@ -4295,6 +4561,7 @@ $('#ld-rows').addEventListener('click', (ev) => {
 $('#ld-add').addEventListener('click', () => {
   const box = $('#ld-picker');
   box.hidden = !box.hidden;
+  $('#ld-fund').hidden = true;
   if (!box.hidden) lotPicker.focusInput();
 });
 $('#ld-add-manual').addEventListener('click', () => {
@@ -4307,8 +4574,8 @@ lotsForm.addEventListener('submit', (ev) => {
   const errors = [];
   lotsState.lots.forEach((l, i) => {
     const n = i + 1;
-    if (!(l.qty > 0)) errors.push(`Pozycja ${n}: podaj ilość.`);
-    if (l.asset === 'manual' ? !(l.value > 0) : !(l.price > 0)) errors.push(`Pozycja ${n}: podaj ${l.asset === 'manual' ? 'wartość' : 'cenę zakupu'}.`);
+    if (!(l.qty > 0)) errors.push(`Pozycja ${n}: podaj ${isFundLot(l) ? 'liczbę jednostek' : 'ilość'}.`);
+    if (l.asset === 'manual' ? !(l.value > 0) : !(l.price > 0)) errors.push(`Pozycja ${n}: podaj ${l.asset === 'manual' ? 'wartość' : isFundLot(l) ? 'sumę wpłat albo średnią cenę jednostki' : 'cenę zakupu albo kwotę'}.`);
     if (l.asset === 'manual' && !String(l.name ?? '').trim()) errors.push(`Pozycja ${n}: podaj nazwę.`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(l.date ?? '')) errors.push(`Pozycja ${n}: podaj datę.`);
   });
@@ -4348,6 +4615,7 @@ lotsForm.addEventListener('submit', (ev) => {
     const all = [...closed, ...sold, ...lots];
     if (all.length) target.lots = all;
     else delete target.lots;
+    if (lotsState.fundCategory) target.fundCategory = lotsState.fundCategory;
     if (!settleCash) return;
     const delta = round2((holdingsPLN(MARKET, target, t) ?? before) - before);
     if (Math.abs(delta) < 0.01) return;

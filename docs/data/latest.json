@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-08T09:46:01.829Z",
+  "generatedAt": "2026-11-08T14:08:55.615Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -817,7 +817,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 294,
+  "fetched": 434,
   "items": [
    {
     "title": "Bullion may remain under pressure as markets track US-Iran war, inflation - Business Standard",
@@ -837,6 +837,92 @@
     "score": 9
    },
    {
+    "title": "Zmiana kierunku notowań ropy. Wraca nadzieja na zakończenie wojny na Bliskim Wschodzie",
+    "link": "https://www.pb.pl/zmiana-kierunku-notowan-ropy-wraca-nadzieja-na-zakonczenie-wojny-na-bliskim-wschodzie-1270062",
+    "date": "2026-11-06T10:35:00.000Z",
+    "summary": "Kurs ropy rósł w piątek wyraźnie, m.in. z powodu obawy eskalacji konfliktu USA z Iranem. Obecnie cena surowca spada dzięki doniesieniom o zaangażowaniu USA w działania na rzecz zintensyfikowania negocjacji na Bliskim Wschodzie, informuje Bloomberg.",
+    "source": "Puls Biznesu",
+    "regions": [
+     "USA",
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
+    "title": "Złoto traci na wartości. Droższa ropa zwiększa obawy o inflację",
+    "link": "https://www.pb.pl/zloto-traci-na-wartosci-drozsza-ropa-zwieksza-obawy-o-inflacje-1270048",
+    "date": "2026-11-06T07:28:30.000Z",
+    "summary": "Ceny złota spadły w piątek o ponad 1 proc. pod wpływem odbicia notowań ropy naftowej i obaw, że Rezerwa Federalna będzie dłużej utrzymywać restrykcyjną politykę pieniężną. Inwestorzy czekają na dane z amerykańskiego rynku pracy, które mogą wpłynąć na oczekiwania dotyczące stóp procentowych.",
+    "source": "Puls Biznesu",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
+     "Energia i surowce",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
+    "title": "USA wyceniają spowolnienie inwestycji w AI. Kapitał może skierować się do Europy i na GPW",
+    "link": "https://www.pb.pl/usa-wyceniaja-spowolnienie-inwestycji-w-ai-kapital-moze-skierowac-sie-do-europy-i-na-gpw-1270130",
+    "date": "2026-11-08T12:00:00.000Z",
+    "summary": "Kiedy emocje opadną, a podejście demokratów do AI stanie sią bardziej przewidywalne, inwestorzy znów skupią się na tym, co stanowiło fundament hossy – uważa Michał Skowroński, zarządzający funduszami Velo Funds TFI.",
+    "source": "Puls Biznesu",
+    "regions": [
+     "USA",
+     "Europa",
+     "Polska"
+    ],
+    "themes": [
+     "Inflacja i recesja",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "These five stock groups could rally after Democrats' midterms sweep, analysts say",
+    "link": "https://www.cnbc.com/2026/11/07/these-five-stock-types-could-rally-after-us-midterms-analysts-say.html",
+    "date": "2026-11-07T12:54:47.000Z",
+    "summary": "Clean energy firms, specialty REITs and airline companies and others may be beneficiaries of the 2026 U.S. midterm elections, per Wall Street analysts.",
+    "source": "CNBC",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka",
+     "Energia i surowce",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Panika i zaskoczenie na rynkach, a świat wraca do podwyżek stóp",
+    "link": "https://www.bankier.pl/wiadomosc/Panika-i-zaskoczenie-na-rynkach-a-swiat-wraca-do-podwyzek-stop-9223540.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Gielda",
+    "date": "2026-11-07T05:00:00.000Z",
+    "summary": "W tym tygodniu rynki dostały kilka mocnych sygnałów ostrzegawczych. Polityczne trzęsienie ziemi w USA wywołało panikę wśród inwestorów, inflacja ponownie przyspiesza, a banki centralne na świecie coraz śmielej sięgają po podwyżki stóp procentowych. Podczas gdy RPP pozostaje niewzruszona, Polska gosp",
+    "source": "Bankier.pl Giełda",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
     "title": "Tym będą żyły rynki: inflacyjny test dla USA i prawda o polskim PKB",
     "link": "https://www.bankier.pl/wiadomosc/Tym-beda-zyly-rynki-inflacyjny-test-dla-USA-i-prawda-o-polskim-PKB-9224737.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
     "date": "2026-11-06T09:00:00.000Z",
@@ -852,6 +938,104 @@
     ],
     "relevant": true,
     "score": 8
+   },
+   {
+    "title": "Projekcja NBP: Inflacja mocno w górę w 2027 r. Wdrożenie ETS2 grozi jej skokiem",
+    "link": "https://www.parkiet.com/gospodarka-krajowa/art45457251-projekcja-nbp-inflacja-mocno-w-gore-w-2027-r-wdrozenie-ets2-grozi-jej-skokiem",
+    "date": "2026-11-06T16:23:21.000Z",
+    "summary": "Listopadowa projekcja NBP przynosi wyraźną górną rewizję prognoz inflacji: w 2027 r. ma ona sięgnąć średnio 4,2 proc., napędzana drożejącą energią i żywnością. Powrót do celu nastąpi dopiero w 2028 r., podczas gdy wzrost PKB czeka wyhamowanie.",
+    "source": "Parkiet",
+    "regions": [
+     "Polska"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
+     "Energia i surowce",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Dobry raport o zatrudnieniu w USA, ale rynki się nie cieszą",
+    "link": "https://www.parkiet.com/gospodarka-swiatowa/art45456701-dobry-raport-o-zatrudnieniu-w-usa-ale-rynki-sie-nie-ciesza",
+    "date": "2026-11-06T14:40:59.000Z",
+    "summary": "Liczba nowych etatów w gospodarce amerykańskiej okazała się w październiku wyższa od prognoz. Spadła za to stopa bezrobocia. Inwestorzy się jednak z tego nie cieszą, bo to zwiększa szanse na podwyżkę stóp procentowych przez Fed.",
+    "source": "Parkiet",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Kolejne zawiadomienia o atakach na systemy chłodnicze w Polsce",
+    "link": "https://www.pb.pl/kolejne-zawiadomienia-o-atakach-na-systemy-chlodnicze-w-polsce-1270070",
+    "date": "2026-11-06T12:07:06.000Z",
+    "summary": "W Polsce doszło już do kilku ataków na systemy chłodnicze, poinformowała PAP st. asp. Monika Przestrzelska, rzeczniczka Centralnego Biura Zwalczania Cyberprzestępczości. Od połowy października takich ataków doświadczają sieci handlu detalicznego w wielu krajach Europy. Duńska Agencja ds. Bezpieczeńs",
+    "source": "Puls Biznesu",
+    "regions": [
+     "Europa",
+     "Polska"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Dolar utrzymuje wzrostowe perspektywy mimo politycznych zmian w USA. To zasługa przewagi amerykańskiej gospodarki",
+    "link": "https://www.pb.pl/dolar-utrzymuje-wzrostowe-perspektywy-mimo-politycznych-zmian-w-usa-to-zasluga-przewagi-amerykanskiej-gospodarki-1270066",
+    "date": "2026-11-06T11:28:49.000Z",
+    "summary": "Wyniki wyborów uzupełniających w USA nie zmieniły zasadniczo optymistycznych prognoz dla dolara. Amerykańska waluta nadal korzysta z odporności krajowej gospodarki i oczekiwań dotyczących polityki Fed. Inwestorzy dostrzegają jednak ryzyko związane z politycznym impasem w Waszyngtonie oraz spadkami n",
+    "source": "Puls Biznesu",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "NBP podnosi prognozę inflacji: w 2027 r. średnio 4,2 proc. Wzrost PKB wyhamuje do 2,8 proc.",
+    "link": "https://www.pb.pl/nbp-podnosi-prognoze-inflacji-w-2027-r-srednio-42-proc-wzrost-pkb-wyhamuje-do-28-proc-1270057",
+    "date": "2026-11-06T09:50:51.000Z",
+    "summary": "Narodowy Bank Polski w listopadowej projekcji inflacji i PKB wyraźnie zrewidował w górę ścieżkę cen. Oczekuje, że średnioroczna inflacja CPI wyniesie 3,1 proc. w 2026 r., 4,2 proc. w 2027 r. i 2,8 proc. w 2028 r. W projekcji lipcowej szacował ją odpowiednio na 2,9 proc., 2,7 proc. i 2,2 proc. Najwię",
+    "source": "Puls Biznesu",
+    "regions": [
+     "Polska"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Inwestor Wojtek: Czy to już koniec hossy? Ja też zadaję sobie to pytanie",
+    "link": "https://www.pb.pl/inwestor-wojtek-czy-to-juz-koniec-hossy-ja-tez-zadaje-sobie-to-pytanie-1270053",
+    "date": "2026-11-06T08:46:35.000Z",
+    "summary": "Spadki na amerykańskich giełdach wywołały niepokój wśród inwestorów. Czy to początek pękania bańki AI i koniec hossy na polskim rynku? Rosnący kurs USD/PLN oraz drożejąca ropa stawiają GPW pod znakiem zapytania. Zapraszam na analizę techniczną spółek z mojego portfela.",
+    "source": "Puls Biznesu",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Energia i surowce",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 7
    },
    {
     "title": "Największy tygodniowy spadek cen ropy od 2020 roku. W tle wybory w USA i negocjacje - Bankier.pl",
@@ -886,16 +1070,64 @@
     "score": 7
    },
    {
-    "title": "3 New Zealand Export Stocks Less Exposed To US Tariffs - Simply Wall St",
-    "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOSndLOUc1RXprTXBWZ2ZOQUNPTGJYcEcwajZ0bWZWdzh4SUlkenlTNFlPcnd0aEotaFpfZTgyY3ZlcnpkOG51RThyNFZ4WW9OZzhsanZkRXZFOWd5VjV3Nl82REZ6NmxHZXNPb1pqdWhzMDVRZFRvT05JTG5CeWpSQ0NqakQ1VlVDRUF6Sjd6YkVxdHRpSGR0V0xlbDhvTzRKQ3ViWnJuOV9xb2Jhb2paLTA0Y2wtZWNsMnphMGFuVHLSAcYBQVVfeXFMTms4amU1VDl0dmZtNl9LZUJYb0hhaEJhNTFiUEdxUGFTZzI3V3NzX09UekpRdHE1QWpzS0lCa3JuenZlNDlsNjJNaVZWUVdHZlZWRjg1YmhVWmJyRHVjWXJFVGYzZXNuVFVSSHhJQ3dzTjkzWC1TRml5TTd6M0M5VHA1RXQ4YXFvOXRHeHdhVWRXa2JmZzRQT1h3N3JOM1NScjYzWW5SQWJSVnNhT3JCNjJsd1pLVVZtREF6SzAwYTZKMXJqYjhB?oc=5",
-    "date": "2026-11-08T07:16:46.000Z",
-    "summary": "3 New Zealand Export Stocks Less Exposed To US Tariffs Simply Wall St",
-    "source": "Google News",
+    "title": "Russian strikes on Ukraine leave hundreds of thousands without electricity",
+    "link": "https://www.aljazeera.com/news/2026/11/8/russian-strikes-on-ukraine-leave-hundreds-of-thousands-without-electricity?traffic_source=rss",
+    "date": "2026-11-08T12:20:17.000Z",
+    "summary": "About 850,000 people lose power after Russian attacks on energy infrastructure in Ukraine's Dnipropetrovsk and Kharkiv.",
+    "source": "Al Jazeera",
     "regions": [
-     "USA"
+     "Rosja/Ukraina"
     ],
     "themes": [
-     "Sankcje i cła"
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Saudi Aramco building in Riyadh damaged after attempted attack",
+    "link": "https://www.cnbc.com/2026/11/08/saudi-aramco-riyadh-building-attack.html",
+    "date": "2026-11-08T09:56:23.000Z",
+    "summary": "A Saudi Aramco building in Riyadh was damaged by falling debris after an attempted attack, Saudi Arabia's Energy Ministry said.",
+    "source": "CNBC",
+    "regions": [
+     "Rynki wschodzące"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Rosyjskie pieniądze uciekają za granicę. Nowy sposób ochrony przed Putinem",
+    "link": "https://www.parkiet.com/biura-maklerskie/art45458861-rosyjskie-pieniadze-uciekaja-za-granice-nowy-sposob-ochrony-przed-putinem",
+    "date": "2026-11-08T09:43:08.000Z",
+    "summary": "Obywatele Rosji znaleźli nowy sposób ochrony przed zakusami Kremla, by wykorzystywać ich oszczędności na rozpętaną wojnę. W ciągu jednego miesiąca wpłacili blisko miliard dolarów na zagraniczne rachunki maklerskie. To historyczny rekord.",
+    "source": "Parkiet",
+    "regions": [
+     "Rosja/Ukraina"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Saudi Aramco building in Riyadh damaged in ‘attempted’ attack",
+    "link": "https://www.aljazeera.com/news/2026/11/8/saudi-arabia-intercepts-houthi-missiles-targeting-riyadh-eastern-province?traffic_source=rss",
+    "date": "2026-11-08T07:40:07.000Z",
+    "summary": "Saudi Arabia's Energy Ministry says building in the capital was damaged by falling shrapnel.",
+    "source": "Al Jazeera",
+    "regions": [
+     "Rynki wschodzące"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
     ],
     "relevant": true,
     "score": 6
@@ -915,156 +1147,26 @@
     ],
     "relevant": true,
     "score": 6
-   },
-   {
-    "title": "European stocks plunge after US midterm election results shock markets - France 24",
-    "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOVzBFYkRISnp6Q01vdDZFckppcEduSWlrdTIwRHVxa2NJT0ViQ2ItZl9TUEVmcE1yRzFQNTRkeWVDQm0yaExGdUR1Q2NVUTR1a3FYYmlwSWw5YWw0Rl9Vcmd0VE44LXZPdHR0aVdPY3dINmZVUHB5SzRoSkJJVWd5OVBBNGl5elAyMlVRMUVwUnhoZlF5bFlWV1RSVmhoOWxmN29hM1o0bDB1ZHBEMXd1M2QzWmdDRlpPRU1aRUh3?oc=5",
-    "date": "2026-11-06T09:37:30.000Z",
-    "summary": "European stocks plunge after US midterm election results shock markets France 24",
-    "source": "Google News",
-    "regions": [
-     "USA",
-     "Europa"
-    ],
-    "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Dollar little changed as oil prices bounce, payrolls eyed - Reuters",
-    "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOS3ZvRzF1aTlTZE9WT0NxYkU4TWFHTi04YnhEVXd1VTJRTXdibGtPdGZtTWkwZEVBLU0xNmtZaEc4R2lWZWVSdGJtY1FSdzhIazR5a2YwdDJoRzFFTHN1Z2FNb2l5b2x5SllyTE9sTTZTNkxFODFJVkhxOGhlblRTXzNiLTZpc3FKcXBqRzZUMjYtY3VXOHlnR0hPOFFYTldZaXpzSGNTbzlPNlhUdHF1amJTcFp1dw?oc=5",
-    "date": "2026-11-05T20:43:47.000Z",
-    "summary": "Dollar little changed as oil prices bounce, payrolls eyed Reuters",
-    "source": "Google News",
-    "regions": [],
-    "themes": [
-     "Energia i surowce",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Gas Prices Could Fall Below $4 as Election Results Rattle Oil Markets - KITV",
-    "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxNeWxNLWNMR0t0dWJTSjVJQkNDWllDSHRPQ1ZTcnFiTlNabjVHVFVrckJoODl2QjlLQjcxeGVtWDVydGcwdS0yRlpGQlJaUWlpel9ta3lDN0hETjZRMmxBeEtTM1VycTZsM1k5bVd1THdPdXB2X1QyZ1ZUMGZ4c0I1ZDZQZUhnWnZUdk93enVPanZOOWptaDBxYXJGeVd5cmtxekpVWUNKeUd0YVhhSVJJQVFwLXp3cnJxNW9YRXd5V09uYTZUZnB5T2JKSERsb1lZdmdESEZmOW9DWlE?oc=5",
-    "date": "2026-11-05T14:17:00.000Z",
-    "summary": "Gas Prices Could Fall Below $4 as Election Results Rattle Oil Markets KITV",
-    "source": "Google News",
-    "regions": [],
-    "themes": [
-     "Wybory i polityka",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Bohaterowie walczą o życie w szpitalu. „Powstrzymali mordercę własnym ciałem”",
-    "link": "https://www.bankier.pl/wiadomosc/Bohaterowie-walcza-o-zycie-w-szpitalu-Powstrzymali-morderce-wlasnym-cialem-9225667.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-08T07:44:00.000Z",
-    "summary": "Stan jednego policjanta rannego w sobotnim ataku w Krakowie jest stabilny; drugiego jest ciężki, ale stabilny – poinformowała PAP w niedzielę rano rzeczniczka MSWiA Karolina Gałecka. Dodała, że stan sprawcy ataku na Rynku Głównym w Krakowie jest ciężki, lecz stabilny.",
-    "source": "Bankier.pl",
-    "regions": [],
-    "themes": [
-     "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 5
-   },
-   {
-    "title": "Wall Street’s Stunning Post-Election Rebound Puts Bitcoin and Crypto Markets in Focus - ZyCrypto",
-    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQM2RBanVfeGtWUFB1dVpvRklJTWNkcFZoOVNLbjRJOVFXTE12QzYyYjJjSnhtQ2ttU3F0OWFQM1NtVkRjUWV2NnEzTFh3U09wNk82a252U0xJYUNqeVczaTJGNlJpXzBCSF83SFM5TUNDX1BfdFI2SGVrZk82ZzZSOEh0OGlfS0Y0T0R5anBKZTNDYW5UNEFjT0RCM1c5NDYtQXNiVWVfYV80QdIBrwFBVV95cUxPcUJkYmxCbUVwbDZOdThveDFTSDNvRlB6TTlhekxFWkJHYlczTG9zLVdtWGVNbnpDYzZpMWw1Yy0zT2hhVXNRMG1ud2g4aGxjc0YtcFdBbFJUUWhPbmxLUmFJU2JHckJCWWptMGtMOTV3bWtFbE1jQ2hqYjhpajN3S0dLOXlWWEtLeklZRThhbEFIWUlDSVR2QjBkWVBhbHNTXzUzTnZ5UUZFOTV0UU1J?oc=5",
-    "date": "2026-11-07T18:50:19.000Z",
-    "summary": "Wall Street’s Stunning Post-Election Rebound Puts Bitcoin and Crypto Markets in Focus ZyCrypto",
-    "source": "Google News",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 5
-   },
-   {
-    "title": "Wybory w USA a giełda. Co wynik oznacza dla akcji i dolara - Bezprawnik",
-    "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE1ZaUVxQ1ZubVZUQTFBMzhReEU0cXlKcmpYMnVyTFh2MGR1UHNwMktXand0NWJRSGFKekxlY3FpYlJiaXBrR2Q3NXdkSkNDcUVpcWowQQ?oc=5",
-    "date": "2026-11-07T10:03:54.000Z",
-    "summary": "Wybory w USA a giełda. Co wynik oznacza dla akcji i dolara Bezprawnik",
-    "source": "Google News PL",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 5
-   },
-   {
-    "title": "Zbyt wierny Trumpowi? Vance może zapłacić za polityczne uzależnienie od prezydenta",
-    "link": "https://www.bankier.pl/wiadomosc/Zbyt-wierny-Trumpowi-Vance-moze-zaplacic-za-polityczne-uzaleznienie-od-prezydenta-9225324.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-07T07:00:00.000Z",
-    "summary": "J.D. Vance liczy na sukcesję po Donaldzie Trumpie, ale jego szanse maleją - zauważa w piątek „New York Times\". Inne media zwracają uwagę na spadek popularności wiceprezydenta USA w sondażach i gorsze notowania w zakładach bukmacherskich.",
-    "source": "Bankier.pl",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 5
-   },
-   {
-    "title": "Wybory połówkowe w USA. Nie było apokalipsy na rynkach finansowych - Gazeta Prawna",
-    "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQZ1lKV0dHQ2FhcjJsZWJqNEUyZ0JKQ0VNUHowaDBocHhyYXZHQm1xekg0VVcwLVdoclU4OFVNLUZpVEJiRTZkUF9YMzVUTGx5YjZQa2gyVnlXWWh1eGFXWFlOTWlDcVFuVGdfR2QxVDF0Y2xhNlpSbGRiNHhYWDRVU1VCb19oTnI0cDREaHQtZ2hGOTBhdTVod1JvSE9odFplbnFCZzMtejBhbkRRd0EwQlZZcnlTQ0hvcnBBQg?oc=5",
-    "date": "2026-11-07T05:00:35.000Z",
-    "summary": "Wybory połówkowe w USA. Nie było apokalipsy na rynkach finansowych Gazeta Prawna",
-    "source": "Google News PL",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 5
-   },
-   {
-    "title": "US stock markets recovering after post-election drop & other stories | Searched - Modern Ghana",
-    "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE4zdm5FOTUzR3lJaWZqSEpqNnlaeFRRYWYzdVNxdFlFS0NwVm5ISnBreXRKUjFKLWxFRjN5aTlqTGNrTmZoNkRjUmtYWXFuS1pNXzVkUmp4OVk5QkpURTlR0gFcQVVfeXFMT0FwRDU1WWljTEZJcmo5NFhrSmFaaGFsNnRpdWsxS3JfUHcwRi0zSlZIandEaDlzUkFST0dUbVhjTXdDZ21yd1Q4TWtXWFpJMlpqNy1OZC16aWxURDA?oc=5",
-    "date": "2026-11-07T00:10:00.000Z",
-    "summary": "US stock markets recovering after post-election drop & other stories | Searched Modern Ghana",
-    "source": "Google News",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 5
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 2,
+   "Konflikty i wojny": 9,
    "Sankcje i cła": 2,
-   "Banki centralne i stopy": 10,
-   "Wybory i polityka": 67,
-   "Energia i surowce": 4,
-   "Inflacja i recesja": 5
+   "Banki centralne i stopy": 19,
+   "Wybory i polityka": 70,
+   "Energia i surowce": 17,
+   "Inflacja i recesja": 14,
+   "Nastroje na giełdach": 28,
+   "Spółki i wyniki": 8
   },
   "regionCounts": {
-   "USA": 25,
-   "Europa": 3,
-   "Azja": 1,
-   "Rynki wschodzące": 1,
-   "Polska": 2,
-   "Bliski Wschód": 1,
-   "Rosja/Ukraina": 0
+   "USA": 49,
+   "Europa": 5,
+   "Azja": 4,
+   "Rynki wschodzące": 2,
+   "Polska": 23,
+   "Bliski Wschód": 3,
+   "Rosja/Ukraina": 3
   },
   "errors": []
  },
@@ -1330,9 +1432,642 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-08T09:46:01.829Z",
+  "generatedAt": "2026-11-08T14:08:55.615Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
+ },
+ "rynek": {
+  "asOf": "2026-11-06",
+  "world": [
+   {
+    "key": "SPX",
+    "name": "S&P 500",
+    "short": "S&P 500",
+    "group": "Akcje USA",
+    "kind": "index",
+    "src": "fred",
+    "bond": false,
+    "date": "2026-11-05",
+    "last": 7353.73,
+    "d1": -0.043557,
+    "w1": -0.047492,
+    "m1": -0.059497,
+    "ytd": 0.074243,
+    "y1": 0.082021,
+    "high52": 7818.93,
+    "low52": 6343.72,
+    "fromHigh": -0.059497,
+    "trend": "up",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "NDQ",
+    "name": "Nasdaq Composite",
+    "short": "Nasdaq",
+    "group": "Akcje USA",
+    "kind": "index",
+    "src": "fred",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 24579.42,
+    "d1": 0.010875,
+    "w1": -0.033714,
+    "m1": -0.107459,
+    "ytd": 0.057544,
+    "y1": 0.066168,
+    "high52": 27599.89,
+    "low52": 20794.64,
+    "fromHigh": -0.109438,
+    "trend": "down",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "RUT",
+    "name": "Małe spółki USA (Russell 2000, ETF IWM)",
+    "short": "małe spółki USA",
+    "group": "Akcje USA",
+    "kind": "etf",
+    "src": "proxy",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 273.67,
+    "d1": 0.009927,
+    "w1": -0.020263,
+    "m1": -0.014512,
+    "ytd": 0.119287,
+    "y1": 0.150209,
+    "high52": 304.2892,
+    "low52": 226.8039,
+    "fromHigh": -0.100625,
+    "trend": "down",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "ACWI",
+    "name": "Akcje świata (MSCI ACWI, ETF VT)",
+    "short": "akcje świata",
+    "group": "Akcje świat",
+    "kind": "etf",
+    "src": "proxy",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 151.73,
+    "d1": 0.002312,
+    "w1": -0.023176,
+    "m1": -0.049549,
+    "ytd": 0.084859,
+    "y1": 0.113681,
+    "high52": 161.9728,
+    "low52": 132.5333,
+    "fromHigh": -0.063238,
+    "trend": "down",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "EUR",
+    "name": "Europa (MSCI Europe, ETF IEUR)",
+    "short": "Europa",
+    "group": "Akcje świat",
+    "kind": "etf",
+    "src": "proxy",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 74.16,
+    "d1": -0.010936,
+    "w1": -0.003226,
+    "m1": 0.020083,
+    "ytd": 0.066263,
+    "y1": 0.127353,
+    "high52": 78.77,
+    "low52": 64.3787,
+    "fromHigh": -0.058525,
+    "trend": "up",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "JPN",
+    "name": "Japonia (MSCI Japan, ETF EWJ)",
+    "short": "Japonia",
+    "group": "Akcje świat",
+    "kind": "etf",
+    "src": "proxy",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 88.26,
+    "d1": 0,
+    "w1": -0.050048,
+    "m1": -0.102319,
+    "ytd": 0.098961,
+    "y1": 0.110051,
+    "high52": 99.32,
+    "low52": 76.1842,
+    "fromHigh": -0.111357,
+    "trend": "down",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "EM",
+    "name": "Rynki wschodzące (MSCI EM, ETF EEM)",
+    "short": "rynki wschodzące",
+    "group": "Akcje świat",
+    "kind": "etf",
+    "src": "proxy",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 59.33,
+    "d1": 0.02205,
+    "w1": -0.028014,
+    "m1": -0.119341,
+    "ytd": 0.089899,
+    "y1": 0.105601,
+    "high52": 71.21,
+    "low52": 52.0839,
+    "fromHigh": -0.166831,
+    "trend": "down",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "WIG20",
+    "name": "WIG20",
+    "short": "WIG20",
+    "group": "Polska",
+    "kind": "index",
+    "src": "gpw",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 4131.37,
+    "d1": null,
+    "w1": -0.011842,
+    "m1": -0.012066,
+    "ytd": 0.297533,
+    "y1": 0.382964,
+    "high52": null,
+    "low52": null,
+    "fromHigh": null,
+    "trend": "up",
+    "trendBasis": "średnia 10 miesięcy"
+   },
+   {
+    "key": "WIG",
+    "name": "WIG (cały rynek)",
+    "short": "WIG",
+    "group": "Polska",
+    "kind": "index",
+    "src": "gpw",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 156043.3,
+    "d1": null,
+    "w1": -0.010356,
+    "m1": -0.008525,
+    "ytd": 0.33097,
+    "y1": 0.399654,
+    "high52": null,
+    "low52": null,
+    "fromHigh": null,
+    "trend": "up",
+    "trendBasis": "średnia 10 miesięcy"
+   },
+   {
+    "key": "MWIG40",
+    "name": "mWIG40 (średnie spółki)",
+    "short": "mWIG40",
+    "group": "Polska",
+    "kind": "index",
+    "src": "gpw",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 10594.92,
+    "d1": null,
+    "w1": -0.007711,
+    "m1": 0.001691,
+    "ytd": 0.294896,
+    "y1": 0.319817,
+    "high52": null,
+    "low52": null,
+    "fromHigh": null,
+    "trend": "up",
+    "trendBasis": "średnia 10 miesięcy"
+   },
+   {
+    "key": "SWIG80",
+    "name": "sWIG80 (małe spółki)",
+    "short": "sWIG80",
+    "group": "Polska",
+    "kind": "index",
+    "src": "gpw",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 29016.68,
+    "d1": null,
+    "w1": -0.019994,
+    "m1": -0.052252,
+    "ytd": -0.01938,
+    "y1": -0.022693,
+    "high52": null,
+    "low52": null,
+    "fromHigh": null,
+    "trend": "down",
+    "trendBasis": "średnia 10 miesięcy"
+   },
+   {
+    "key": "TBSP",
+    "name": "Obligacje skarbowe PL (indeks TBSP)",
+    "short": "polskie obligacje",
+    "group": "Polska",
+    "kind": "index",
+    "src": "gpw",
+    "bond": true,
+    "date": "2026-11-06",
+    "last": 2247.05,
+    "d1": null,
+    "w1": 0.007325,
+    "m1": 0.015519,
+    "ytd": 0.009815,
+    "y1": 0.025765,
+    "high52": null,
+    "low52": null,
+    "fromHigh": null,
+    "trend": "up",
+    "trendBasis": "średnia 10 miesięcy"
+   },
+   {
+    "key": "US10",
+    "name": "Rentowność obligacji USA 10 lat",
+    "short": "rentowność 10-letnich obligacji USA",
+    "group": "Stopy i obligacje",
+    "kind": "yield",
+    "src": "fred",
+    "bond": false,
+    "date": "2026-11-05",
+    "last": 4.84,
+    "d1": -0.06,
+    "w1": -0.14,
+    "m1": -0.43,
+    "ytd": 0.66,
+    "y1": 0.67,
+    "high52": 5.31,
+    "low52": 3.97,
+    "fromHigh": null,
+    "trend": null,
+    "trendBasis": null
+   },
+   {
+    "key": "US2",
+    "name": "Rentowność obligacji USA 2 lata",
+    "short": "rentowność 2-letnich obligacji USA",
+    "group": "Stopy i obligacje",
+    "kind": "yield",
+    "src": "fred",
+    "bond": false,
+    "date": "2026-11-05",
+    "last": 4.46,
+    "d1": -0.12,
+    "w1": -0.15,
+    "m1": -0.33,
+    "ytd": 0.99,
+    "y1": 0.83,
+    "high52": 4.92,
+    "low52": 3.38,
+    "fromHigh": null,
+    "trend": null,
+    "trendBasis": null
+   },
+   {
+    "key": "TLT",
+    "name": "Obligacje USA 20+ lat (ETF TLT)",
+    "short": "długie obligacje USA",
+    "group": "Stopy i obligacje",
+    "kind": "etf",
+    "src": "proxy",
+    "bond": true,
+    "date": "2026-11-06",
+    "last": 81.92,
+    "d1": -0.000122,
+    "w1": 0.005181,
+    "m1": 0.066355,
+    "ytd": -0.023213,
+    "y1": -0.044357,
+    "high52": 87.7236,
+    "low52": 76.7876,
+    "fromHigh": -0.066158,
+    "trend": "down",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "GOLD",
+    "name": "Złoto (ETF GLD)",
+    "short": "złoto",
+    "group": "Surowce i krypto",
+    "kind": "etf",
+    "src": "proxy",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 372.52,
+    "d1": -0.00791,
+    "w1": 0.047052,
+    "m1": -0.008939,
+    "ytd": -0.060029,
+    "y1": 0.01762,
+    "high52": 495.9,
+    "low52": 355.78,
+    "fromHigh": -0.2488,
+    "trend": "down",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "BRENT",
+    "name": "Ropa Brent (USD za baryłkę)",
+    "short": "ropa Brent",
+    "group": "Surowce i krypto",
+    "kind": "price",
+    "src": "fred",
+    "bond": false,
+    "date": "2026-11-03",
+    "last": 107.03,
+    "d1": -0.003352,
+    "w1": -0.130544,
+    "m1": -0.210169,
+    "ytd": 0.74458,
+    "y1": 0.626843,
+    "high52": 138.21,
+    "low52": 59.93,
+    "fromHigh": -0.225599,
+    "trend": "up",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "BTC",
+    "name": "Bitcoin (ETF IBIT)",
+    "short": "bitcoin",
+    "group": "Surowce i krypto",
+    "kind": "etf",
+    "src": "proxy",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 42.88,
+    "d1": -0.003486,
+    "w1": -0.01107,
+    "m1": -0.091718,
+    "ytd": -0.136354,
+    "y1": -0.251135,
+    "high52": 60.19,
+    "low52": 33.29,
+    "fromHigh": -0.287589,
+    "trend": "up",
+    "trendBasis": "średnia 200 sesji"
+   },
+   {
+    "key": "EURPLN",
+    "name": "EUR/PLN",
+    "short": "EUR/PLN",
+    "group": "Waluty",
+    "kind": "fx",
+    "src": "nbp",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 4.3925,
+    "d1": 0.000205,
+    "w1": -0.000683,
+    "m1": 0.002923,
+    "ytd": 0.039227,
+    "y1": 0.031927,
+    "high52": 4.4233,
+    "low52": 4.2009,
+    "fromHigh": null,
+    "trend": null,
+    "trendBasis": null
+   },
+   {
+    "key": "USDPLN",
+    "name": "USD/PLN",
+    "short": "USD/PLN",
+    "group": "Waluty",
+    "kind": "fx",
+    "src": "nbp",
+    "bond": false,
+    "date": "2026-11-06",
+    "last": 3.9321,
+    "d1": 0.005626,
+    "w1": 0.001783,
+    "m1": 0.005369,
+    "ytd": 0.091765,
+    "y1": 0.063563,
+    "high52": 3.9624,
+    "low52": 3.5045,
+    "fromHigh": null,
+    "trend": null,
+    "trendBasis": null
+   },
+   {
+    "key": "EURUSD",
+    "name": "EUR/USD",
+    "short": "EUR/USD",
+    "group": "Waluty",
+    "kind": "fx",
+    "src": "fred",
+    "bond": false,
+    "date": "2026-10-30",
+    "last": 1.1163,
+    "d1": -0.000179,
+    "w1": -0.003215,
+    "m1": -0.016042,
+    "ytd": -0.048824,
+    "y1": -0.034677,
+    "high52": 1.198,
+    "low52": 1.1123,
+    "fromHigh": null,
+    "trend": null,
+    "trendBasis": null
+   }
+  ],
+  "stance": {
+   "id": "neutralne",
+   "label": "neutralne",
+   "tone": "mid",
+   "text": "Sygnały są mieszane: część wskaźników zachęca, część ostrzega.",
+   "score": 1,
+   "factors": [
+    {
+     "label": "Trend S&P 500",
+     "score": 1,
+     "detail": "powyżej średnia 200 sesji"
+    },
+    {
+     "label": "Szerokość rynku",
+     "score": 0,
+     "detail": "5 z 11 rynków akcji w trendzie wzrostowym"
+    },
+    {
+     "label": "Obsunięcie S&P 500",
+     "score": 0,
+     "detail": "−5,9% od szczytu z 52 tygodni"
+    },
+    {
+     "label": "Zmienność (VIX)",
+     "score": -1,
+     "detail": "28,2 – podwyższony strach"
+    },
+    {
+     "label": "Stres kredytowy",
+     "score": 0,
+     "detail": "3,48 pp – niski stres kredytowy"
+    },
+    {
+     "label": "Niepewność polityczna USA",
+     "score": 0,
+     "detail": "podwyższona (percentyl 73 z 5 lat, średnia 30 dni)"
+    },
+    {
+     "label": "Momentum (sygnał GEM)",
+     "score": 1,
+     "detail": "akcje mają przewagę nad bonami (Akcje poza USA)"
+    }
+   ]
+  },
+  "regime": {
+   "key": "up|mid",
+   "trend": "up",
+   "vol": "mid",
+   "volValue": 0.1971,
+   "date": "2026-11-06"
+  },
+  "stats": {
+   "since": "1993-01-29",
+   "until": "2026-11-06",
+   "current": {
+    "5": {
+     "n": 1543,
+     "up": 0.6066,
+     "median": 0.00627,
+     "p10": -0.02555,
+     "p90": 0.03144
+    },
+    "21": {
+     "n": 1543,
+     "up": 0.7168,
+     "median": 0.02255,
+     "p10": -0.04112,
+     "p90": 0.06589
+    },
+    "63": {
+     "n": 1543,
+     "up": 0.7855,
+     "median": 0.05367,
+     "p10": -0.04339,
+     "p90": 0.12017
+    }
+   },
+   "all": {
+    "5": {
+     "n": 8298,
+     "up": 0.586,
+     "median": 0.00376,
+     "p10": -0.0251,
+     "p90": 0.02733
+    },
+    "21": {
+     "n": 8282,
+     "up": 0.6565,
+     "median": 0.01459,
+     "p10": -0.04527,
+     "p90": 0.05679
+    },
+    "63": {
+     "n": 8240,
+     "up": 0.7149,
+     "median": 0.03855,
+     "p10": -0.06692,
+     "p90": 0.10669
+    }
+   }
+  },
+  "events": [
+   {
+    "date": "2026-11-30",
+    "title": "Szybki szacunek inflacji w Polsce (GUS)",
+    "kind": "dane",
+    "note": "Zwykle ostatni dzień roboczy miesiąca o 10:00 – termin orientacyjny.",
+    "approx": true
+   },
+   {
+    "date": "2026-12-01",
+    "title": "Nowy sygnał GEM (po zamknięciu miesiąca)",
+    "kind": "gem",
+    "note": "Aplikacja sprawdzi sygnał i powiadomi, jeśli trzeba zmienić ETF.",
+    "approx": false
+   },
+   {
+    "date": "2026-12-02",
+    "title": "Decyzja RPP w sprawie stóp procentowych (Polska)",
+    "kind": "bank",
+    "note": "Komunikat po posiedzeniu; zwykle dzień później konferencja prezesa NBP.",
+    "approx": false
+   },
+   {
+    "date": "2026-12-04",
+    "title": "Raport z rynku pracy w USA (zatrudnienie, bezrobocie)",
+    "kind": "dane",
+    "note": "Zwykle pierwszy piątek miesiąca o 14:30 – termin orientacyjny.",
+    "approx": true
+   },
+   {
+    "date": "2026-12-09",
+    "title": "Decyzja Fed w sprawie stóp procentowych (USA)",
+    "kind": "bank",
+    "note": "Ogłoszenie ok. 20:00 czasu polskiego, potem konferencja prezesa Fed.",
+    "approx": false
+   }
+  ],
+  "note": {
+   "date": "2026-11-08",
+   "stance": {
+    "id": "neutralne",
+    "label": "neutralne",
+    "tone": "mid"
+   },
+   "summary": [
+    "Akcje w ostatnim tygodniu: S&P 500 −4,7%, Europa −0,3%, rynki wschodzące −2,8%, WIG20 −1,2% (S&P 500 od początku roku +7,4%).",
+    "Rentowność 10-letnich obligacji USA 4,84% (−0,14 pp w tydzień), złoto +4,7%, ropa Brent 107,0 USD (−13,1%).",
+    "Złoty: EUR/PLN 4,3925 (−0,1% w tydzień), USD/PLN 3,9321 (+0,2% w tydzień)."
+   ],
+   "sections": [
+    {
+     "title": "Co się dzieje na świecie",
+     "items": [
+      "Wybory i polityka (70 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „These five stock groups could rally after Democrats' midterms sweep, analysts say” (CNBC).",
+      "Nastroje na giełdach (28 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „USA wyceniają spowolnienie inwestycji w AI. Kapitał może skierować się do Europy i na GPW” (Puls Biznesu).",
+      "Banki centralne i stopy (19 wiadomości): decyzje o stopach zmieniają koszt pieniądza: obniżki zwykle wspierają akcje i obligacje, a podwyżki lub zapowiedzi dłużej wysokich stóp szkodzą wycenom; dla złotego ważna jest różnica stóp NBP i Fed/EBC. Przykład: „Złoto traci na wartości. Droższa ropa zwiększa obawy o inflację” (Puls Biznesu)."
+     ]
+    },
+    {
+     "title": "Największe zmiany w tygodniu",
+     "items": [
+      "Najmocniej: złoto +4,7%, polskie obligacje +0,7%.",
+      "Najsłabiej: ropa Brent −13,1%, Japonia −5,0%."
+     ]
+    },
+    {
+     "title": "Najbliższe dni",
+     "items": [
+      "30.11 – Szybki szacunek inflacji w Polsce (GUS) (termin orientacyjny).",
+      "1.12 – Nowy sygnał GEM (po zamknięciu miesiąca).",
+      "Statystyka: w podobnych warunkach jak dziś (trend wzrostowy, umiarkowana zmienność) S&P 500 rósł w ciągu kolejnego miesiąca w 72% przypadków od 1993 r. (mediana +2,3%). To historia, nie prognoza – szczegóły niżej."
+     ]
+    },
+    {
+     "title": "Co z tym zrobić",
+     "items": [
+      "Strategia GEM – BEZ ZMIAN: trzymaj EXUS.DE. Kolejną decyzję podejmie sygnał po zamknięciu miesiąca – wiadomości nie zmieniają sygnału.",
+      "Sygnały są mieszane. Regularne wpłaty – bez zmian; nagłe ruchy całym portfelem zwykle szkodzą bardziej, niż pomagają.",
+      "Poduszka finansowa (3–6 miesięcy wydatków) powinna być na koncie oszczędnościowym, a nie w akcjach – wtedy spadki na giełdzie nie zmuszą Cię do sprzedaży w złym momencie."
+     ]
+    }
+   ],
+   "disclaimer": "Notatka powstaje automatycznie z danych rynkowych i nagłówków wiadomości. To materiał edukacyjny, a nie rekomendacja inwestycyjna – nikt nie przewiduje rynku w krótkim terminie."
+  },
+  "warnings": [],
+  "ai": null
  }
 }
