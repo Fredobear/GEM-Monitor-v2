@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-09T07:32:01.483Z",
+  "generatedAt": "2026-11-09T16:12:07.022Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -769,8 +769,8 @@
    {
     "id": "BAMLH0A0HYM2",
     "name": "Spread obligacji śmieciowych (USA)",
-    "date": "2026-11-05",
-    "value": "3,48 pp",
+    "date": "2026-11-06",
+    "value": "3,42 pp",
     "tier": 0,
     "comment": "niski stres kredytowy"
    },
@@ -785,10 +785,10 @@
    {
     "id": "USEPUINDXD",
     "name": "Niepewność polityki gospodarczej USA (EPU)",
-    "date": "2026-11-05",
-    "value": "274",
+    "date": "2026-11-08",
+    "value": "284",
     "tier": 1,
-    "comment": "podwyższona (percentyl 73 z 5 lat, średnia 30 dni)"
+    "comment": "podwyższona (percentyl 74 z 5 lat, średnia 30 dni)"
    },
    {
     "id": "DTWEXBGS",
@@ -808,25 +808,73 @@
    }
   ],
   "usdpln": {
-   "date": "2026-11-06",
-   "rate": 3.9321,
-   "change12m": 0.06218428374618434
+   "date": "2026-11-09",
+   "rate": 3.9199,
+   "change12m": 0.05683319403628917
   },
   "stress": 1,
   "summary": "Jeden wskaźnik ryzyka podwyższony – warto obserwować.",
   "errors": []
  },
  "news": {
-  "fetched": 418,
+  "fetched": 403,
   "items": [
    {
-    "title": "Zmiana kierunku notowań ropy. Wraca nadzieja na zakończenie wojny na Bliskim Wschodzie",
-    "link": "https://www.pb.pl/zmiana-kierunku-notowan-ropy-wraca-nadzieja-na-zakonczenie-wojny-na-bliskim-wschodzie-1270062",
-    "date": "2026-11-06T10:35:00.000Z",
-    "summary": "Kurs ropy rósł w piątek wyraźnie, m.in. z powodu obawy eskalacji konfliktu USA z Iranem. Obecnie cena surowca spada dzięki doniesieniom o zaangażowaniu USA w działania na rzecz zintensyfikowania negocjacji na Bliskim Wschodzie, informuje Bloomberg.",
-    "source": "Puls Biznesu",
+    "title": "As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360",
+    "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE5oWXFTNXNrRkhJSzRtMHR2MVBrUERJb0xGeW4zbzJNSWx5RnNBbVI3eHZuV0RLNGJsMmpwYTJtMnIyWm1ud2NENmU5dXFlV2VKVkVkdWI0SnB2OThPa2NiWEJZVQ?oc=5",
+    "date": "2026-11-09T15:48:19.000Z",
+    "summary": "As War Roils Energy Markets, China Sees Its Emissions Drop Yale E360",
+    "source": "Google News",
     "regions": [
-     "USA",
+     "Azja"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Bez przekonania",
+    "link": "https://www.parkiet.com/gielda/art45464951-bez-przekonania",
+    "date": "2026-11-09T11:41:26.000Z",
+    "summary": "Po silnej wyprzedaży spółek technologicznych, do której doszło w minionym tygodniu po wyborach uzupełniających do amerykańskiego Kongresu, rynek akcyjny próbuje odrabiać straty. Wsparciem dla ryzykownych aktywów jest dalszy spadek notowań ropy naftowej, choć już zdecydowanie łagodniejszy niż w ubieg",
+    "source": "Parkiet",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka",
+     "Energia i surowce",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "How Could Ukraine's Strike on Russia's Biggest Oil Refineries Affect the War and Energy Markets? - Modern Diplomacy",
+    "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxORHhrRVktNHFJd2k2MmxWd0VaS1hvOG4xT2Vmc1o2WHVEUFpJYzlQczhhWEdtSUVVbVRWdnZHeVFJVzNLMnpKRjdmYVZPTGgxWEs1LW9xOWZoUzlLcllTTjJpNzJXVnBTSHR3QkI4d0l3ZVVaS3VrZmNwUEdYRmVPWmhDSEwtVDF1TUh0N0ZIWTBaZlZIc1pEX3F5dGFOd0JCSmU4UFBoU3ZXV0J1cEU0UndDb2Y1UnBMbXZlZmFkUVhyM2RiWngwUG5hZng?oc=5",
+    "date": "2026-11-09T09:38:55.000Z",
+    "summary": "How Could Ukraine's Strike on Russia's Biggest Oil Refineries Affect the War and Energy Markets? Modern Diplomacy",
+    "source": "Google News",
+    "regions": [
+     "Rosja/Ukraina"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso - EnergyNow",
+    "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQSUM3X1VmZFpNZTZuYlpmTElibk1aVG1wdEt5N3RvU0IySkZ6Tllkc1hudDB4ZVJOc2VmWmZZSUxXZnI4RHdUQlcyMGNSSUNGX3NzLWVIZWhQTmc4djJZdzFFT0M1a0dMNUp2SzVRZTNacThTOEczZDNkUXJtV1otU2lkdTVRUnNCYXJYWDJhb1VLdjFLQ1JKTGFsNTZYeE9TNUxCZUJZWm5zTUtoVExzSg?oc=5",
+    "date": "2026-11-09T08:16:08.000Z",
+    "summary": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso EnergyNow",
+    "source": "Google News",
+    "regions": [
      "Bliski Wschód"
     ],
     "themes": [
@@ -834,7 +882,23 @@
      "Energia i surowce"
     ],
     "relevant": true,
-    "score": 9
+    "score": 8
+   },
+   {
+    "title": "Cena ropy Brent spadła o 12,5%, ale były doradca Bidena ostrzega, że wojna z Iranem może powrócić - BeInCrypto",
+    "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTE1hem1NbWRPalFUaktrcVEzT0pITGhpakVlR19nME15SUdzVHdxa1VoUEhaRV9YcmtDdHp3dzJXM01Rc2NxXzZ0Tm80R3pmT2ZibDktNWYzRFdrWTJEcDlRNXJVOVh4STE2VTgtR05iNWxNTWtzeUt0Skpn?oc=5",
+    "date": "2026-11-09T02:07:00.000Z",
+    "summary": "Cena ropy Brent spadła o 12,5%, ale były doradca Bidena ostrzega, że wojna z Iranem może powrócić BeInCrypto",
+    "source": "Google News PL",
+    "regions": [
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 8
    },
    {
     "title": "USA wyceniają spowolnienie inwestycji w AI. Kapitał może skierować się do Europy i na GPW",
@@ -855,38 +919,20 @@
     "score": 8
    },
    {
-    "title": "These five stock groups could rally after Democrats' midterms sweep, analysts say",
-    "link": "https://www.cnbc.com/2026/11/07/these-five-stock-types-could-rally-after-us-midterms-analysts-say.html",
-    "date": "2026-11-07T12:54:47.000Z",
-    "summary": "Clean energy firms, specialty REITs and airline companies and others may be beneficiaries of the 2026 U.S. midterm elections, per Wall Street analysts.",
-    "source": "CNBC",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka",
-     "Energia i surowce",
-     "Nastroje na giełdach"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Panika i zaskoczenie na rynkach, a świat wraca do podwyżek stóp",
-    "link": "https://www.bankier.pl/wiadomosc/Panika-i-zaskoczenie-na-rynkach-a-swiat-wraca-do-podwyzek-stop-9223540.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Gielda",
-    "date": "2026-11-07T05:00:00.000Z",
-    "summary": "W tym tygodniu rynki dostały kilka mocnych sygnałów ostrzegawczych. Polityczne trzęsienie ziemi w USA wywołało panikę wśród inwestorów, inflacja ponownie przyspiesza, a banki centralne na świecie coraz śmielej sięgają po podwyżki stóp procentowych. Podczas gdy RPP pozostaje niewzruszona, Polska gosp",
-    "source": "Bankier.pl Giełda",
+    "title": "Chiny przedłużają rozejm handlowy z USA. Zawieszenie dodatkowych ceł",
+    "link": "https://www.bankier.pl/wiadomosc/Chiny-przedluzaja-rozejm-handlowy-z-USA-Zawieszenie-dodatkowych-cel-9225952.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-09T08:41:00.000Z",
+    "summary": "Rada Państwa i resort transportu w Pekinie poinformowały w poniedziałek o przedłużeniu o dwa miesiące zawieszenia dodatkowych 24-proc. ceł na import z USA oraz specjalnych opłat portowych. W mocy pozostanie 10-proc. stawka celna. W ubiegłym tygodniu przedłużenie ulg taryfowych ogłosiła administracja",
+    "source": "Bankier.pl",
     "regions": [
      "USA",
-     "Polska"
+     "Azja"
     ],
     "themes": [
-     "Banki centralne i stopy",
-     "Inflacja i recesja"
+     "Sankcje i cła"
     ],
     "relevant": true,
-    "score": 8
+    "score": 7
    },
    {
     "title": "Inflacja producencka w Chinach najwyższa od 4,5 roku. Droga energia podbija koszty. CPI jednak spowalnia",
@@ -905,114 +951,33 @@
     "score": 7
    },
    {
-    "title": "Polityczna podwyżka zmienności na rynkach finansowych",
-    "link": "https://www.parkiet.com/byki-i-niedzwiedzie-tygodnia/art45462371-polityczna-podwyzka-zmiennosci-na-rynkach-finansowych",
-    "date": "2026-11-09T05:00:00.000Z",
-    "summary": "Nerwowo zaczął się listopad na warszawskiej giełdzie i globalnych rynkach. WIG, WIG20 i mWIG40 zeszły poniżej średniej z 50 sesji, a sWIG80 wyznaczył nowy dołek trwającej od czerwca korekty. Silna wyprzedaż dotknęła też amerykańskie big techy i ropę.",
-    "source": "Parkiet",
+    "title": "Dow rallies 900 points, Nasdaq jumps 2% as stocks climb out of postelection slump: Live updates",
+    "link": "https://www.cnbc.com/2026/11/08/stock-market-today-live-updates.html",
+    "date": "2026-11-09T16:00:17.000Z",
+    "summary": "Stocks surged on Monday, boosted by a decline in oil prices, as traders kept a close eye on technology shares after last week's volatility.",
+    "source": "CNBC",
     "regions": [
-     "USA",
-     "Polska"
+     "USA"
     ],
     "themes": [
      "Energia i surowce",
      "Nastroje na giełdach"
     ],
     "relevant": true,
-    "score": 7
+    "score": 6
    },
    {
-    "title": "US dollar holds onto payrolls gains, NZ dollar rises after election - The Economic Times",
-    "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNYUlZZ3daek9LaVExU2lha0ZSUFZMOWVDc1BEVW1fVk5lX0ZTdldXdW4tYTRRT1VLZ1BUU3UzM21RazNRclVsUWlzU2xoS2JUOW0zUWljY1VBTXhDSlVraHJ1cGVXY2FJSHNEa1Noa0hZbTBBczQzTU9fQTFCdkxTa3JXTk1QUXhoR3VyeWUxYmFic1dZQ0J2d1V3NzRXSUNCMVFaV0FWcVd0QjRfT0Fuc3c5UmRmQjJuZEhkNTNkSmVsRXBRSGVUd2FXVWUyOWk4cU44VFJ3eWtISEpycEHSAeMBQVVfeXFMT1h0aVg5OGxGZ3BwMTRrbW5lb2Z4bzZmbXRDdk9jTmFTTll0Yi12QkQyOEk0V19uaG1xVjdvUmpFQTFXMTJXNWNOUzRad2gxSXNqZ1hFX0MyX1ZXZll6TDcxdUdvTWZZMFN0dTFDaGw5Y0N2TFgzQWUxaHNUeVg3YXBHNWE2bGN0cFJzNG9tUE9qUzVFa3lhUm90SG9lRGJBVU1XVWdFVF94WFRZRUpNUE5VT2VURWlRY1ZOdV9WRzVzbFNWSFJTSXFLeURpQVdZU0dKOEhubTI1Q2N4bkFsbUZfd2s?oc=5",
-    "date": "2026-11-09T01:27:32.000Z",
-    "summary": "US dollar holds onto payrolls gains, NZ dollar rises after election The Economic Times",
-    "source": "Google News",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Kolejne zawiadomienia o atakach na systemy chłodnicze w Polsce",
-    "link": "https://www.pb.pl/kolejne-zawiadomienia-o-atakach-na-systemy-chlodnicze-w-polsce-1270070",
-    "date": "2026-11-06T12:07:06.000Z",
-    "summary": "W Polsce doszło już do kilku ataków na systemy chłodnicze, poinformowała PAP st. asp. Monika Przestrzelska, rzeczniczka Centralnego Biura Zwalczania Cyberprzestępczości. Od połowy października takich ataków doświadczają sieci handlu detalicznego w wielu krajach Europy. Duńska Agencja ds. Bezpieczeńs",
-    "source": "Puls Biznesu",
-    "regions": [
-     "Europa",
-     "Polska"
-    ],
-    "themes": [
-     "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Dolar utrzymuje wzrostowe perspektywy mimo politycznych zmian w USA. To zasługa przewagi amerykańskiej gospodarki",
-    "link": "https://www.pb.pl/dolar-utrzymuje-wzrostowe-perspektywy-mimo-politycznych-zmian-w-usa-to-zasluga-przewagi-amerykanskiej-gospodarki-1270066",
-    "date": "2026-11-06T11:28:49.000Z",
-    "summary": "Wyniki wyborów uzupełniających w USA nie zmieniły zasadniczo optymistycznych prognoz dla dolara. Amerykańska waluta nadal korzysta z odporności krajowej gospodarki i oczekiwań dotyczących polityki Fed. Inwestorzy dostrzegają jednak ryzyko związane z politycznym impasem w Waszyngtonie oraz spadkami n",
-    "source": "Puls Biznesu",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Banki centralne i stopy",
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "NBP podnosi prognozę inflacji: w 2027 r. średnio 4,2 proc. Wzrost PKB wyhamuje do 2,8 proc.",
-    "link": "https://www.pb.pl/nbp-podnosi-prognoze-inflacji-w-2027-r-srednio-42-proc-wzrost-pkb-wyhamuje-do-28-proc-1270057",
-    "date": "2026-11-06T09:50:51.000Z",
-    "summary": "Narodowy Bank Polski w listopadowej projekcji inflacji i PKB wyraźnie zrewidował w górę ścieżkę cen. Oczekuje, że średnioroczna inflacja CPI wyniesie 3,1 proc. w 2026 r., 4,2 proc. w 2027 r. i 2,8 proc. w 2028 r. W projekcji lipcowej szacował ją odpowiednio na 2,9 proc., 2,7 proc. i 2,2 proc. Najwię",
-    "source": "Puls Biznesu",
-    "regions": [
-     "Polska"
-    ],
-    "themes": [
-     "Banki centralne i stopy",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Największy tygodniowy spadek cen ropy od 2020 roku. W tle wybory w USA i negocjacje - Bankier.pl",
-    "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQNXJpa0R3d3plazRIQTFGSEdhM3FOMk12a2IwaFZnX3NfZjlGUkZNa01ITXNRbnY4N1NkbktBODZVWTgtcE1MWlZ4VnBXb3F2MlAyV0xteXJiZVA0NFFyeDRzQmlCb3puNC1zQUR1clNzR3NRRnJTUl90N2pKNTVJZjJrRkdIUEMxTGx2NTN3YjdkYjdWbklPcTRsMGV0WXcxZmV3R3VhbjdhM2NaQnRfancwMm8zX3RWZWhXanhENVIzdW1CSHhF?oc=5",
-    "date": "2026-11-06T07:55:00.000Z",
-    "summary": "Największy tygodniowy spadek cen ropy od 2020 roku. W tle wybory w USA i negocjacje Bankier.pl",
+    "title": "Echa wyborów połówkowych w USA: rynki finansowe i gospodarki Europy i USA czekają na impuls - Forsal.pl",
+    "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOd1dkS3RsVE9pTENLVFBtX0xIUU5kNEUzU2JJVV9FM2thV2VZbm5UQ1VYcEplSWxBVVdUX0pkRzl0aHl3ZlRRNFMtczdLRVZ0a1VnMmNmbGVhMEVYWlNOTF9UQXBHRm92WEcwUzJNYzVIQmRRLW54NWRYWXVYblpHZDRmZnRpTDJRbUdkM0xKU2NrTVJ6OWI2aUhrdWJhcGpWQlhqXy1rTTVqRi1TTW9jdmZoSkRaUjZPX0NxZ0h5YzBCdWNBNlRiaQ?oc=5",
+    "date": "2026-11-09T13:19:49.000Z",
+    "summary": "Echa wyborów połówkowych w USA: rynki finansowe i gospodarki Europy i USA czekają na impuls Forsal.pl",
     "source": "Google News PL",
     "regions": [
-     "USA"
+     "USA",
+     "Europa"
     ],
     "themes": [
-     "Wybory i polityka",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Hossa AI pozostanie aktualna (Komentarz tygodniowy)",
-    "link": "https://www.parkiet.com/gielda/art45463151-hossa-ai-pozostanie-aktualna-komentarz-tygodniowy",
-    "date": "2026-11-09T07:09:31.000Z",
-    "summary": "Zakończony tydzień na globalnych rynkach akcji przyniósł skokowe podniesienie zmienności, którego centralnym punktem były wybory uzupełniające do amerykańskiego Kongresu.",
-    "source": "Parkiet",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Wybory i polityka",
-     "Nastroje na giełdach"
+     "Wybory i polityka"
     ],
     "relevant": true,
     "score": 6
@@ -1020,7 +985,7 @@
    {
     "title": "Treasury Rally Gets New Boost as Election Hammers the AI Trade - Bloomberg.com",
     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPelZPY0tQazFGWWxNRjFac00xRWFpVE1vdVpHenVSMDNVS3c0WFpZMXk4Rkk5d2xFYU9wUVdtcGZIYWlvVU41eFZaV1RGdDU4bGE3Z1ppeVlMdTZleU13RVRRbDNVS0pDQzdQbjB5TkFjOWF0NDRxNXA3azY0UGRtM2M5SFU2cDFkUHhZMVVpSVpRM2JjeldzMzU1QnMxZDNCd1ZVcnV1eE5ROWtwZjF2Y1E1UQ?oc=5",
-    "date": "2026-11-08T20:00:00.000Z",
+    "date": "2026-11-09T10:02:11.000Z",
     "summary": "Treasury Rally Gets New Boost as Election Hammers the AI Trade Bloomberg.com",
     "source": "Google News",
     "regions": [
@@ -1034,47 +999,48 @@
     "score": 6
    },
    {
-    "title": "Atak rakietowy Huti na Saudi Aramco. Odłamki uderzyły w wieżowiec naftowego giganta",
-    "link": "https://www.bankier.pl/wiadomosc/Atak-rakietowy-Huti-na-Saudi-Aramco-Odlamki-uderzyly-w-wiezowiec-naftowego-giganta-9225694.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-08T16:00:00.000Z",
-    "summary": "Budynek państwowego koncernu naftowego Saudi Aramco w Rijadzie został w niedzielę uszkodzony przez odłamki pocisków po ataku rakietowym – poinformowało ministerstwo energii Arabii Saudyjskiej. Obrona przeciwlotnicza przechwyciła rakiety wystrzelone przez jemeńskich rebeliantów Huti.",
-    "source": "Bankier.pl",
+    "title": "Chinese car export growth to slow in 2027 as tariffs, quotas spread - Automotive News",
+    "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQQ2dZTF9EWlhpQzVWUHM1azhGLW0waXJJdXFIaWlMVGZUdXp1X2hEWTRhcVhvTXpiei1HeXNhcUFqZkJUaDkxSnVQYmlPT0lHNUNkQ1dpcTVjRFp0X0dNMkdTZlhQdF9KbTlLTGdsZ2MtUHA2Tk96R2xhUnRhUmF1MTJfUQ?oc=5",
+    "date": "2026-11-09T10:01:00.000Z",
+    "summary": "Chinese car export growth to slow in 2027 as tariffs, quotas spread Automotive News",
+    "source": "Google News",
     "regions": [
-     "Rynki wschodzące"
+     "Azja"
     ],
     "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
+     "Sankcje i cła"
     ],
     "relevant": true,
     "score": 6
    },
    {
-    "title": "Rosyjskie pieniądze uciekają za granicę. Nowy sposób ochrony przed Putinem",
-    "link": "https://www.parkiet.com/biura-maklerskie/art45458861-rosyjskie-pieniadze-uciekaja-za-granice-nowy-sposob-ochrony-przed-putinem",
-    "date": "2026-11-08T09:43:08.000Z",
-    "summary": "Obywatele Rosji znaleźli nowy sposób ochrony przed zakusami Kremla, by wykorzystywać ich oszczędności na rozpętaną wojnę. W ciągu jednego miesiąca wpłacili blisko miliard dolarów na zagraniczne rachunki maklerskie. To historyczny rekord.",
+    "title": "Komentarz PLN 9 listopada - złoty wykorzystuje globalną sytuację",
+    "link": "https://www.parkiet.com/waluty/art45463841-komentarz-pln-9-listopada-zloty-wykorzystuje-globalna-sytuacje",
+    "date": "2026-11-09T09:26:00.000Z",
+    "summary": "Poniedziałkowy handel na rynkach globalnych zaczynamy od korekty piątkowego umocnienia dolara na szerokim rynku po tym jak bardzo dobre dane Departamentu Pracy USA (w październiku NFP wyniósł 165 tys. etatów, a stopa bezrobocia spadła do 4,1 proc.). podbiły oczekiwania, co do grudniowej podwyżki stó",
     "source": "Parkiet",
     "regions": [
-     "Rosja/Ukraina"
+     "USA",
+     "Polska"
     ],
     "themes": [
-     "Konflikty i wojny"
+     "Inflacja i recesja"
     ],
     "relevant": true,
     "score": 6
    },
    {
-    "title": "Złoto znika z moskiewskiej giełdy. Rekordowy popyt na metale szlachetne",
-    "link": "https://www.parkiet.com/inwestycje/art45458701-zloto-znika-z-gieldy-rosja",
-    "date": "2026-11-07T09:48:23.000Z",
-    "summary": "Rosjanie uciekają na moskiewski parkiet, by kupować to, co w czasie wojny Putina daje im większe poczucie bezpieczeństwa - złoto i inne szlachetne kruszce. Popyt jest największy w historii.",
+    "title": "Hossa AI pozostanie aktualna (Komentarz tygodniowy)",
+    "link": "https://www.parkiet.com/gielda/art45463151-hossa-ai-pozostanie-aktualna-komentarz-tygodniowy",
+    "date": "2026-11-09T07:09:31.000Z",
+    "summary": "Zakończony tydzień na globalnych rynkach akcji przyniósł skokowe podniesienie zmienności, którego centralnym punktem były wybory uzupełniające do amerykańskiego Kongresu.",
     "source": "Parkiet",
     "regions": [
-     "Rosja/Ukraina"
+     "USA"
     ],
     "themes": [
-     "Konflikty i wojny"
+     "Wybory i polityka",
+     "Nastroje na giełdach"
     ],
     "relevant": true,
     "score": 6
@@ -1111,6 +1077,22 @@
     "score": 6
    },
    {
+    "title": "Tech Billionaires Gain As Stocks Partially Recover From Post-Election Selloff - Forbes Middle East",
+    "link": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxNTWJLVEN4QnhvcS1DbWpiaDZfdTVpYU41dGNhUW9EQ3k0WVMyOWM3bGlXbHNic0ZIVTZxbnI2ckhjR1hsdFNaTUJUVzc0ZXBqUlJTejVQU0g1eTdfUmJGdDJNM09EbkJQTXRnWktUQUN2TWNfN05PS2JlWEhqbGF2YklVeWt1cXhHVXFmNk9IMC1UM2J5Vl9LNXAwNlFVak1FSmRPLTcyQnpzcUljc1d6ckpxNjB2V0dUaFJHU3NUd0ZKOUFlQ0VGMmo2ckN6RkstLUY4dVQ2MzFvQQ?oc=5",
+    "date": "2026-11-06T20:28:09.000Z",
+    "summary": "Tech Billionaires Gain As Stocks Partially Recover From Post-Election Selloff Forbes Middle East",
+    "source": "Google News",
+    "regions": [
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Wybory i polityka",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
     "title": "Cena maksymalna gazu dla gospodarstw domowych od 2027 r. Jest projekt ustawy",
     "link": "https://www.pb.pl/cena-maksymalna-gazu-dla-gospodarstw-domowych-od-2027-r-jest-projekt-ustawy-1270093",
     "date": "2026-11-06T18:39:13.000Z",
@@ -1140,25 +1122,41 @@
     ],
     "relevant": true,
     "score": 6
+   },
+   {
+    "title": "Na rynku obligacji ulga po klęsce republikanów",
+    "link": "https://www.pb.pl/na-rynku-obligacji-ulga-po-klesce-republikanow-1270081",
+    "date": "2026-11-06T16:12:09.000Z",
+    "summary": "Rynek obligacji skarbowych z wyraźną ulgą przyjął klęskę republikanów w połówkowych wyborach do Kongresu, przy czym reakcja w Polsce była silniejsza niż na rynkach bazowych. Jednak nawet rentowność dziesięciolatek najniższa od dwóch miesięcy nie jest rynkowym przełomem.",
+    "source": "Puls Biznesu",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 10,
-   "Sankcje i cła": 3,
-   "Banki centralne i stopy": 14,
-   "Wybory i polityka": 50,
-   "Energia i surowce": 13,
-   "Inflacja i recesja": 13,
-   "Nastroje na giełdach": 19,
-   "Spółki i wyniki": 6
+   "Konflikty i wojny": 8,
+   "Sankcje i cła": 4,
+   "Banki centralne i stopy": 5,
+   "Wybory i polityka": 31,
+   "Energia i surowce": 20,
+   "Inflacja i recesja": 6,
+   "Nastroje na giełdach": 18,
+   "Spółki i wyniki": 7
   },
   "regionCounts": {
-   "USA": 36,
-   "Europa": 8,
-   "Azja": 3,
+   "USA": 25,
+   "Europa": 5,
+   "Azja": 5,
    "Rynki wschodzące": 1,
-   "Polska": 21,
-   "Bliski Wschód": 3,
+   "Polska": 13,
+   "Bliski Wschód": 6,
    "Rosja/Ukraina": 2
   },
   "errors": []
@@ -1167,6 +1165,34 @@
  "taxMonitor": {
   "news": {
    "items": [
+    {
+     "title": "Limity IKE, IKZE i OIPE na 2027 rok. Ponad 72 tys. zł bez podatku Belki - forexclub.pl",
+     "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNal96WXl4WXh4OGFjU2RZX0hKeTBBNnVjdm03VnYzaE5zUTlFTHpSQUVKWG5yeEJDZnI4VU01cTRHRXZvdlFNZ1U2MDVIRlVvbnExRF9mVWxZU2Y3SFNkdFFEYm5aSkNIb0Q2aC0yTVdiRVAwTS1BdmdLZG9aY20tLXJUbG90LXFydUVwdnVwNEFyZ0xh?oc=5",
+     "date": "2026-11-09T10:16:28.000Z",
+     "summary": "Limity IKE, IKZE i OIPE na 2027 rok. Ponad 72 tys. zł bez podatku Belki forexclub.pl",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "Podatek Belki",
+      "PPK i emerytury"
+     ],
+     "important": true,
+     "score": 10
+    },
+    {
+     "title": "Znamy limity IKE, IKZE i OIPE 2027. Ponad 72 tys. zł rocznie bez podatku Belki - Wykop",
+     "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOdjlYbjh6Ym40eU84YzdNUXRIZTRPOUVsdWp5X1F0Nmg1V0lWcDEzWU5iSHp5ZW5ROUtPNzl1RHB4ajJkS3QzNU1Ka2NoLVJaSFd4TGliVUVJakVRYUdQR1VpTEQ1d0JhMk01SUlTX2JKdEd0aEhVemdHSzB6WEI0eUgwX3ItX3BpRVJrU2h1NkZHRkVBNUtJMm5DdHJsZG8zTmUxMjVTU2E?oc=5",
+     "date": "2026-11-09T08:39:20.000Z",
+     "summary": "Znamy limity IKE, IKZE i OIPE 2027. Ponad 72 tys. zł rocznie bez podatku Belki Wykop",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "Podatek Belki",
+      "PPK i emerytury"
+     ],
+     "important": true,
+     "score": 10
+    },
     {
      "title": "Podano limity IKE, IKZE, OIPE na 2027 rok. Ponad 72 tys. zł bez podatku Belki - Bankier.pl",
      "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNWm5qa25yNEZGY2ZlX3FOWDY5NFRvTjlRdXZRTmJMa005amQ2X3RqMXlac240LXFoU2MwdzR1cktDek9Dc2EwcUs1MGNoTmhXWWhsOUt6T0s3UVkxT185YmZjeDVieWo1S1A2eGxBZkNvVURsZ1luMndlMmdFZ1k5S2trV0lMbUp2aE1qUGVxZGplbm80aFJxQlZORzk0SjcyYkxXa3AzNjY3elRZQzlOSWlmcTI4ckJnMlpB?oc=5",
@@ -1217,19 +1243,6 @@
      "topics": [
       "IKE/IKZE",
       "Brokerzy i opłaty"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
-     "title": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? - Rankia Polska",
-     "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQSldqcWpJeXlnUy05MUFTaEZmQmhMTThnMzV4RHRrN0lxY3RYVE43ZG9UZ0JKRGQ2RFg5Vk5QNVBSY014a25JMTdkbE50TEJPOUJDaWFINmdrQTFoZ3NObDFHTWRzZU5WaXhsUGl4ekg1MWRqMi1va25FRDhTeXNYX1pmNUdlRno5aGFSbg?oc=5",
-     "date": "2026-11-02T09:18:57.000Z",
-     "summary": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? Rankia Polska",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "PIT i rozliczenia"
      ],
      "important": true,
      "score": 8
@@ -1311,21 +1324,37 @@
      ],
      "important": true,
      "score": 6
-    },
-    {
-     "title": "Limit wpłat na IKE w 2027 r. wyniesie 30 099 zł - Inforlex",
-     "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQNHc4WWZ4dkQzSVJPRWFkbVlMWmFNS0dMTE1tSnpzSkNNbVRUa2s3UkQ4RXZtM1hWbzZremJ1RVNQQXEyTksxM3d4Y0RlYTRzb25Pa0l1ZkpyLXN5T2xxd1l5ZmxLdmU2QWN4ZDA3b2dVYXhLUnB2eTdwMmVUOGFmQjRVZldES3Jxd0FuRzdGX1NjdTgwQUJNdHJFUHJ0Z1poWUxDTkhRb1FQR2pk?oc=5",
-     "date": "2026-11-07T02:41:45.000Z",
-     "summary": "Limit wpłat na IKE w 2027 r. wyniesie 30 099 zł Inforlex",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE"
-     ],
-     "important": true,
-     "score": 6
     }
    ],
    "important": [
+    {
+     "title": "Limity IKE, IKZE i OIPE na 2027 rok. Ponad 72 tys. zł bez podatku Belki - forexclub.pl",
+     "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNal96WXl4WXh4OGFjU2RZX0hKeTBBNnVjdm03VnYzaE5zUTlFTHpSQUVKWG5yeEJDZnI4VU01cTRHRXZvdlFNZ1U2MDVIRlVvbnExRF9mVWxZU2Y3SFNkdFFEYm5aSkNIb0Q2aC0yTVdiRVAwTS1BdmdLZG9aY20tLXJUbG90LXFydUVwdnVwNEFyZ0xh?oc=5",
+     "date": "2026-11-09T10:16:28.000Z",
+     "summary": "Limity IKE, IKZE i OIPE na 2027 rok. Ponad 72 tys. zł bez podatku Belki forexclub.pl",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "Podatek Belki",
+      "PPK i emerytury"
+     ],
+     "important": true,
+     "score": 10
+    },
+    {
+     "title": "Znamy limity IKE, IKZE i OIPE 2027. Ponad 72 tys. zł rocznie bez podatku Belki - Wykop",
+     "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOdjlYbjh6Ym40eU84YzdNUXRIZTRPOUVsdWp5X1F0Nmg1V0lWcDEzWU5iSHp5ZW5ROUtPNzl1RHB4ajJkS3QzNU1Ka2NoLVJaSFd4TGliVUVJakVRYUdQR1VpTEQ1d0JhMk01SUlTX2JKdEd0aEhVemdHSzB6WEI0eUgwX3ItX3BpRVJrU2h1NkZHRkVBNUtJMm5DdHJsZG8zTmUxMjVTU2E?oc=5",
+     "date": "2026-11-09T08:39:20.000Z",
+     "summary": "Znamy limity IKE, IKZE i OIPE 2027. Ponad 72 tys. zł rocznie bez podatku Belki Wykop",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "Podatek Belki",
+      "PPK i emerytury"
+     ],
+     "important": true,
+     "score": 10
+    },
     {
      "title": "Podano limity IKE, IKZE, OIPE na 2027 rok. Ponad 72 tys. zł bez podatku Belki - Bankier.pl",
      "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNWm5qa25yNEZGY2ZlX3FOWDY5NFRvTjlRdXZRTmJMa005amQ2X3RqMXlac240LXFoU2MwdzR1cktDek9Dc2EwcUs1MGNoTmhXWWhsOUt6T0s3UVkxT185YmZjeDVieWo1S1A2eGxBZkNvVURsZ1luMndlMmdFZ1k5S2trV0lMbUp2aE1qUGVxZGplbm80aFJxQlZORzk0SjcyYkxXa3AzNjY3elRZQzlOSWlmcTI4ckJnMlpB?oc=5",
@@ -1362,32 +1391,6 @@
      "topics": [
       "IKE/IKZE",
       "Brokerzy i opłaty"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
-     "title": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? - Rankia Polska",
-     "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQSldqcWpJeXlnUy05MUFTaEZmQmhMTThnMzV4RHRrN0lxY3RYVE43ZG9UZ0JKRGQ2RFg5Vk5QNVBSY014a25JMTdkbE50TEJPOUJDaWFINmdrQTFoZ3NObDFHTWRzZU5WaXhsUGl4ekg1MWRqMi1va25FRDhTeXNYX1pmNUdlRno5aGFSbg?oc=5",
-     "date": "2026-11-02T09:18:57.000Z",
-     "summary": "Oficjalnie: limit IKZE w 2027 r. to 12 039,60 zł. Ile odzyskasz z PIT? Rankia Polska",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "PIT i rozliczenia"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
-     "title": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPUllpdktGODBNTTBYb0Q1SGNpcTQtbkZ0dnl3Mmp3Q05LQ3JNTHdDWlRMYk9qTGJCckc0b3FDS2pTZEdLTmQxc3huOHJvaXZudlgwLUdCUlpfMlltOUI2cEFXZGl3SE84ZTBnQWRjenJqZGFUOHl3UG5vOTBJbm5VNTh4akk0NDZ2b3VtY2swYkxrRGFjWHBTZA?oc=5",
-     "date": "2026-11-02T07:00:36.000Z",
-     "summary": "IKE i IKZE 2026. Zasady, limity wpłat i ulgi podatkowe Analizy.pl",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "PIT i rozliczenia"
      ],
      "important": true,
      "score": 8
@@ -1429,13 +1432,13 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-09T07:32:01.483Z",
+  "generatedAt": "2026-11-09T16:12:07.022Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
  },
  "rynek": {
-  "asOf": "2026-11-06",
+  "asOf": "2026-11-09",
   "world": [
    {
     "key": "SPX",
@@ -1823,13 +1826,13 @@
     "kind": "fx",
     "src": "nbp",
     "bond": false,
-    "date": "2026-11-06",
-    "last": 4.3925,
-    "d1": 0.000205,
-    "w1": -0.000683,
-    "m1": 0.002923,
-    "ytd": 0.039227,
-    "y1": 0.031927,
+    "date": "2026-11-09",
+    "last": 4.3873,
+    "d1": -0.001184,
+    "w1": -0.007061,
+    "m1": 0.002239,
+    "ytd": 0.037997,
+    "y1": 0.032719,
     "high52": 4.4233,
     "low52": 4.2009,
     "fromHigh": null,
@@ -1844,13 +1847,13 @@
     "kind": "fx",
     "src": "nbp",
     "bond": false,
-    "date": "2026-11-06",
-    "last": 3.9321,
-    "d1": 0.005626,
-    "w1": 0.001783,
-    "m1": 0.005369,
-    "ytd": 0.091765,
-    "y1": 0.063563,
+    "date": "2026-11-09",
+    "last": 3.9199,
+    "d1": -0.003103,
+    "w1": -0.004824,
+    "m1": 0.004536,
+    "ytd": 0.088377,
+    "y1": 0.064669,
     "high52": 3.9624,
     "low52": 3.5045,
     "fromHigh": null,
@@ -1909,12 +1912,12 @@
     {
      "label": "Stres kredytowy",
      "score": 0,
-     "detail": "3,48 pp – niski stres kredytowy"
+     "detail": "3,42 pp – niski stres kredytowy"
     },
     {
      "label": "Niepewność polityczna USA",
      "score": 0,
-     "detail": "podwyższona (percentyl 73 z 5 lat, średnia 30 dni)"
+     "detail": "podwyższona (percentyl 74 z 5 lat, średnia 30 dni)"
     },
     {
      "label": "Momentum (sygnał GEM)",
@@ -2027,15 +2030,15 @@
    "summary": [
     "Akcje w ostatnim tygodniu: S&P 500 −4,7%, Europa −0,3%, rynki wschodzące −2,8%, WIG20 −1,2% (S&P 500 od początku roku +7,4%).",
     "Rentowność 10-letnich obligacji USA 4,84% (−0,14 pp w tydzień), złoto +4,7%, ropa Brent 107,0 USD (−13,1%).",
-    "Złoty: EUR/PLN 4,3925 (−0,1% w tydzień), USD/PLN 3,9321 (+0,2% w tydzień)."
+    "Złoty: EUR/PLN 4,3873 (−0,7% w tydzień), USD/PLN 3,9199 (−0,5% w tydzień)."
    ],
    "sections": [
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (50 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „These five stock groups could rally after Democrats' midterms sweep, analysts say” (CNBC).",
-      "Nastroje na giełdach (19 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „USA wyceniają spowolnienie inwestycji w AI. Kapitał może skierować się do Europy i na GPW” (Puls Biznesu).",
-      "Banki centralne i stopy (14 wiadomości): decyzje o stopach zmieniają koszt pieniądza: obniżki zwykle wspierają akcje i obligacje, a podwyżki lub zapowiedzi dłużej wysokich stóp szkodzą wycenom; dla złotego ważna jest różnica stóp NBP i Fed/EBC. Przykład: „Panika i zaskoczenie na rynkach, a świat wraca do podwyżek stóp” (Bankier.pl Giełda)."
+      "Wybory i polityka (31 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Bez przekonania” (Parkiet).",
+      "Energia i surowce (20 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360” (Google News).",
+      "Nastroje na giełdach (18 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „Bez przekonania” (Parkiet)."
      ]
     },
     {
