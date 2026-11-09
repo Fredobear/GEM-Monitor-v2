@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-09T16:12:07.022Z",
+  "generatedAt": "2026-11-09T16:17:07.651Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -817,7 +817,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 403,
+  "fetched": 404,
   "items": [
    {
     "title": "As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360",
@@ -953,7 +953,7 @@
    {
     "title": "Dow rallies 900 points, Nasdaq jumps 2% as stocks climb out of postelection slump: Live updates",
     "link": "https://www.cnbc.com/2026/11/08/stock-market-today-live-updates.html",
-    "date": "2026-11-09T16:00:17.000Z",
+    "date": "2026-11-09T16:16:55.000Z",
     "summary": "Stocks surged on Monday, boosted by a decline in oil prices, as traders kept a close eye on technology shares after last week's volatility.",
     "source": "CNBC",
     "regions": [
@@ -1124,38 +1124,37 @@
     "score": 6
    },
    {
-    "title": "Na rynku obligacji ulga po klęsce republikanów",
-    "link": "https://www.pb.pl/na-rynku-obligacji-ulga-po-klesce-republikanow-1270081",
-    "date": "2026-11-06T16:12:09.000Z",
-    "summary": "Rynek obligacji skarbowych z wyraźną ulgą przyjął klęskę republikanów w połówkowych wyborach do Kongresu, przy czym reakcja w Polsce była silniejsza niż na rynkach bazowych. Jednak nawet rentowność dziesięciolatek najniższa od dwóch miesięcy nie jest rynkowym przełomem.",
+    "title": "HSBC radzi korzystać z przeceny i kupować akcje. Znów stawia na segment technologiczny",
+    "link": "https://www.pb.pl/hsbc-radzi-korzystac-z-przeceny-i-kupowac-akcje-1270177",
+    "date": "2026-11-09T15:51:10.000Z",
+    "summary": "Analitycy HSBC uważają, że korekta na rynkach akcji, do której doszło po wyborach w USA, jest okazją do kupowania. Ich zdaniem należy z niej skorzystać choćby z przyczyn taktycznych, informuje Reuters.",
     "source": "Puls Biznesu",
     "regions": [
-     "USA",
-     "Polska"
+     "USA"
     ],
     "themes": [
      "Wybory i polityka"
     ],
     "relevant": true,
-    "score": 6
+    "score": 5
    }
   ],
   "themeCounts": {
    "Konflikty i wojny": 8,
    "Sankcje i cła": 4,
    "Banki centralne i stopy": 5,
-   "Wybory i polityka": 31,
+   "Wybory i polityka": 30,
    "Energia i surowce": 20,
    "Inflacja i recesja": 6,
    "Nastroje na giełdach": 18,
    "Spółki i wyniki": 7
   },
   "regionCounts": {
-   "USA": 25,
+   "USA": 24,
    "Europa": 5,
    "Azja": 5,
    "Rynki wschodzące": 1,
-   "Polska": 13,
+   "Polska": 12,
    "Bliski Wschód": 6,
    "Rosja/Ukraina": 2
   },
@@ -1432,7 +1431,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-09T16:12:07.022Z",
+  "generatedAt": "2026-11-09T16:17:07.651Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -2036,7 +2035,7 @@
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (31 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Bez przekonania” (Parkiet).",
+      "Wybory i polityka (30 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Bez przekonania” (Parkiet).",
       "Energia i surowce (20 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360” (Google News).",
       "Nastroje na giełdach (18 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „Bez przekonania” (Parkiet)."
      ]
