@@ -1,5 +1,5 @@
-// Wygenerowano automatycznie (2026-11-09T17:02:34.020Z).
-const CACHE = 'gem-20261109T170234020Z';
+// Wygenerowano automatycznie (2026-11-09T21:48:58.176Z).
+const CACHE = 'gem-20261109T214858176Z';
 const CORE = ['./', './index.html', './finanse.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting())));
 self.addEventListener('activate', (e) =>
