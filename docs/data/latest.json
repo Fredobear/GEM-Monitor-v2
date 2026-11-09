@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-09T16:17:07.651Z",
+  "generatedAt": "2026-11-09T16:23:26.373Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -817,7 +817,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 404,
+  "fetched": 405,
   "items": [
    {
     "title": "As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360",
@@ -1431,7 +1431,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-09T16:17:07.651Z",
+  "generatedAt": "2026-11-09T16:23:26.373Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
