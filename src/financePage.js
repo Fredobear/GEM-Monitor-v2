@@ -184,6 +184,9 @@ dialog{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .sched-wrap{max-height:340px;overflow:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px}
 .rate-list{list-style:none;padding:0;margin:6px 0}.rate-list li{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:3px 0}
 .ike-line{font-size:13px;margin:6px 0}
+.plan-line{border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:8px 0;background:var(--surface-2)}.plan-line .acc-actions{margin-top:6px}
+.plan-item{display:grid;grid-template-columns:minmax(0,1fr) 84px auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}.plan-item input{width:100%}.plan-item span{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:13.5px}
+.pp-tbl input{width:92px;padding:6px 8px}
 .acc-head{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;margin:4px 0 12px}
 .pend-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .pend-row:first-of-type{border-top:0}
@@ -354,9 +357,19 @@ const LOTS_DIALOG = `<dialog id="lots-dialog"><form method="dialog" novalidate>
 <div class="row-btns"><button type="button" class="btn small primary" id="ldf-ok">Dodaj fundusz</button></div>
 </div>
 <label class="check small"><input type="checkbox" name="settle"> <span>Rozlicz zmianę z wolną gotówką na koncie (kupno ją zmniejsza, sprzedaż zwiększa)</span></label>
+<label class="field">Wolna gotówka na rachunku teraz (opcjonalnie)<input name="cash" inputmode="decimal" placeholder="np. 0,00" autocomplete="off"><small>Kwota „Wolne środki” z XTB. Wpisz ją, jeśli saldo konta zawierało dotąd też wartość ETF-ów (np. po imporcie albo wpisaniu średnich cen) – wtedy różnica nie jest gotówką, tylko zyskiem pokazanym przy aktywach.</small></label>
 <p class="dlg-hint" id="ld-sum"></p>
 <div class="errors" id="ld-errors" role="alert"></div>
 ${actions()}
+</form></dialog>`;
+
+// Plan inwestycyjny: instrumenty z udziałami procentowymi, wpłata cykliczna; tryb „wpłata do planu” (treść z finance-ui.js).
+const PLAN_DIALOG = `<dialog id="plan-dialog"><form method="dialog" novalidate>
+<h3 id="pl-title">Plan inwestycyjny</h3>
+<div id="pl-body"></div>
+<div id="pl-picker" hidden></div>
+<div class="errors" id="pl-errors" role="alert"></div>
+<div class="dlg-actions"><button type="button" class="btn danger" id="pl-delete" hidden>Usuń plan…</button><span style="flex:1"></span><button type="button" class="btn ghost" data-close>Anuluj</button><button type="submit" class="btn primary" id="pl-ok">Zapisz</button></div>
 </form></dialog>`;
 
 // Szczegóły kredytu: podsumowanie, koszty, oprocentowanie, nadpłata, symulacje i harmonogram (treść z finance-ui.js).
@@ -399,7 +412,7 @@ ${navHtml('finanse')}
 <footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów strategii są dołączane do strony przy każdej aktualizacji aplikacji, a ceny pozostałych akcji i ETF-ów z oferty XTB oraz wyceny funduszy ING TFI strona wczytuje z plików aplikacji (data/notowania.js, data/fundusze.js) – to tylko pobranie gotowego pliku, bez wysyłania jakichkolwiek danych. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
-${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}${LOTS_DIALOG}${LOAN_DIALOG}${CONFIRM_DIALOG}${DOC_DIALOG}
+${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}${LOTS_DIALOG}${PLAN_DIALOG}${LOAN_DIALOG}${CONFIRM_DIALOG}${DOC_DIALOG}
 <noscript><p>Dziennik wymaga włączonej obsługi JavaScript.</p></noscript>
 <script type="application/json" id="fin-market">${market}</script>
 <script type="module">${read('finance-core.js')}\n${read('instruments.js')}\n${read('mmbackup.js')}\n${read('finance-ui.js')}</script>

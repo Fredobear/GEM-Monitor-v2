@@ -60,11 +60,13 @@ export function parseAmount(raw) {
     const dec = lastComma > lastDot ? ',' : '.';
     s = s.split(dec === ',' ? '.' : ',').join('').replace(dec, '.');
   } else if (lastComma > -1) {
+    // Jeden przecinek to zawsze część dziesiętna (także „43,606” – cena z trzema miejscami po przecinku);
+    // kilka przecinków („1,234,567”) to separatory tysięcy.
     const parts = s.split(',');
-    s = parts.length === 2 && parts[1].length !== 3 ? parts.join('.') : parts.join('');
+    s = parts.length === 2 ? parts.join('.') : parts.join('');
   } else if (lastDot > -1) {
     const parts = s.split('.');
-    if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3)) s = parts.join('');
+    if (parts.length > 2) s = parts.join('');
   }
   const v = Number(s);
   return Number.isFinite(v) ? (negative ? -v : v) : NaN;
@@ -532,19 +534,168 @@ export function convert(market, amount, from, to, date) {
 // Instrument z katalogu XTB ma walutę zapisaną przy pozycji – wycena działa także bez notowań.
 export const lotCurrency = (market, lot) => (lot.asset && lot.asset !== 'manual' ? market?.assets?.[lot.asset]?.currency ?? lot.currency : lot.currency) || 'PLN';
 
+// lot.mark = [data, kurs]: znana cena rynkowa (np. „kurs teraz” przepisany z XTB albo cena kupna w planie). Pozycja
+// wpisana ze średnią ceną zakupu dostaje w ten sposób od razu prawdziwą wycenę i zysk, a dalej śledzi zmiany indeksu.
 export function lotPrice(market, lot, date) {
   if (!lot.asset || lot.asset === 'manual') return pairAt(lot.marks?.length ? lot.marks : [[lot.date, lot.price]], date)[1];
   const a = market?.assets?.[lot.asset];
-  if (!a) return lot.price;
+  const mark = Array.isArray(lot.mark) && lot.mark[0] <= date && lot.mark[1] > 0 ? lot.mark : null;
+  if (!a) return mark ? mark[1] : lot.price;
   const q = a.quotes?.length ? pairAt(a.quotes, date) : null;
   const quote = q && q[0] <= date ? q : null;
   if (quote && daysBetween(quote[0], date) <= 7) return quote[1];
-  // Najnowsza znana cena – notowanie (jeśli późniejsze niż zakup) albo cena zakupu – przesunięta o zmianę indeksu.
-  const base = quote && quote[0] > lot.date ? quote : [lot.date, lot.price];
+  // Najnowsza znana cena – notowanie, kurs z XTB albo cena zakupu – przesunięta o zmianę indeksu.
+  let base = [lot.date, lot.price];
+  if (mark && mark[0] >= base[0]) base = mark;
+  if (quote && quote[0] > base[0]) base = quote;
   if (!a.series?.length) return base[1];
   const s0 = pairAt(a.series, base[0]);
   const s1 = pairAt(a.series, date);
   return s0 && s1 && s0[1] > 0 ? (base[1] * s1[1]) / s0[1] : base[1];
+}
+
+/** Cena instrumentu w dniu (w jego walucie): świeże notowanie, a bez niego – wycena pozycji, którą masz na koncie. */
+export function marketPriceAt(market, account, asset, date) {
+  const a = market?.assets?.[asset];
+  if (a?.quotes?.length) {
+    const q = pairAt(a.quotes, date);
+    if (q && q[0] <= date && daysBetween(q[0], date) <= 10) return q[1];
+  }
+  // Pozycja z najświeższą znaną ceną: najpierw późniejsza data, przy równej – ta z kursem rynkowym (mark).
+  const anchor = (l) => `${l.mark?.[0] && l.mark[0] >= l.date ? l.mark[0] : l.date}|${l.mark ? 1 : 0}`;
+  const lot = (account?.lots ?? []).filter((l) => l.asset === asset && !l.until).sort((x, y) => (anchor(y) > anchor(x) ? 1 : anchor(y) < anchor(x) ? -1 : 0))[0];
+  if (lot) return lotPrice(market, lot, date);
+  return a?.quotes?.length ? pairAt(a.quotes, date)[1] : null;
+}
+
+// ---------- Plany inwestycyjne (jak „plany inwestycyjne” w XTB albo podział wpłat na fundusze w PPE) ----------
+// account.plans = [{ id, name, items: [{ asset, name, currency, pct }], recurring: null | { amount, day, fromId, auto, nextDate },
+//   log: [{ id, date, amount, fromId, buys: [{ asset, qty, price }], lotIds, txIds }] }].
+// Kwota wpłaty jest w walucie konta. Każda wpłata to osobne pozycje (dokładna historia i koszt), na liście kont
+// pozycje tego samego instrumentu są pokazywane razem.
+export const PLAN_EXTERNAL = 'zewnatrz'; // wpłata spoza aplikacji, np. składka pracodawcy do PPE
+
+export function validatePlan(plan, fin = null) {
+  const errors = [];
+  const items = plan.items ?? [];
+  if (!String(plan.name ?? '').trim()) errors.push('Podaj nazwę planu.');
+  if (!items.length) errors.push('Dodaj co najmniej jeden instrument.');
+  if (new Set(items.map((i) => i.asset)).size !== items.length) errors.push('Każdy instrument może być w planie tylko raz.');
+  if (items.some((i) => !(i.pct > 0))) errors.push('Każdy instrument musi mieć udział większy od zera.');
+  const sum = round2(items.reduce((s, i) => s + (Number(i.pct) || 0), 0));
+  if (items.length && Math.abs(sum - 100) > 0.011) errors.push(`Udziały muszą dawać razem 100% (teraz ${String(sum).replace('.', ',')}%).`);
+  const r = plan.recurring;
+  if (r) {
+    if (!(r.amount > 0)) errors.push('Podaj kwotę wpłaty cyklicznej.');
+    if (!(r.day >= 1 && r.day <= 31)) errors.push('Dzień wpłaty to liczba od 1 do 31.');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(r.nextDate ?? '')) errors.push('Podaj termin najbliższej wpłaty.');
+    if (fin && r.fromId && r.fromId !== PLAN_EXTERNAL && !fin.accounts.some((a) => a.id === r.fromId)) errors.push('Konto, z którego idą wpłaty, nie istnieje.');
+  }
+  return errors;
+}
+
+/** Podział kwoty według udziałów (grosze się zgadzają: ostatnia pozycja dostaje resztę). */
+export function planSplit(plan, amount) {
+  let left = round2(amount);
+  return plan.items.map((it, i) => {
+    const part = i === plan.items.length - 1 ? left : round2((amount * it.pct) / 100);
+    left = round2(left - part);
+    return { ...it, amount: part };
+  });
+}
+
+export const nextPlanDate = (date, day) => shiftMonthsKeepDay(date, 1, day);
+
+/**
+ * Wpłata do planu: kupno jednostek po cenach z dnia wpłaty (prices: { aktywo: cena w walucie aktywa }).
+ * fromId: inne konto (przelew), to samo konto (z wolnej gotówki) albo PLAN_EXTERNAL / null (spoza aplikacji).
+ */
+export function planDeposit(fin, accountId, planId, { date, amount, prices, fromId = null, market = null, newId, now = Date.now() }) {
+  const account = fin.accounts.find((a) => a.id === accountId);
+  const plan = account?.plans?.find((p) => p.id === planId);
+  if (!account || !plan) return { fin, error: 'Nie znaleziono planu.' };
+  if (!(amount > 0)) return { fin, error: 'Podaj kwotę wpłaty.' };
+  const accCur = account.currency || 'PLN';
+  const buys = [];
+  for (const part of planSplit(plan, amount)) {
+    const price = Number(prices?.[part.asset]);
+    const cur = part.currency || 'PLN';
+    const amtAsset = convert(market, part.amount, accCur, cur, date);
+    if (!(price > 0)) return { fin, error: `Brak ceny dla ${part.name || part.asset} – wpisz ją ręcznie.` };
+    if (amtAsset === null) return { fin, error: `Brak kursu ${cur} z dnia wpłaty.` };
+    buys.push({ asset: part.asset, name: part.name, currency: cur, qty: Math.round((amtAsset / price) * 1e6) / 1e6, price: Math.round(price * 1e6) / 1e6, amount: part.amount });
+  }
+  const lotIds = [];
+  const newLots = buys.map((b) => {
+    const id = newId();
+    lotIds.push(id);
+    return { id, asset: b.asset, name: b.name, currency: b.currency, qty: b.qty, price: b.price, date, mark: [date, b.price], planId: plan.id };
+  });
+  const txIds = [];
+  const txs = [];
+  const pln = convert(market, amount, accCur, 'PLN', date);
+  if (fromId && fromId !== PLAN_EXTERNAL && pln !== null) {
+    if (fromId !== account.id) {
+      const fromCur = accountCurrency(fin, fromId);
+      const t = { id: newId(), type: 'przelew', amount: pln, date, accountId: fromId, toAccountId: account.id, merchant: `Wpłata do planu „${plan.name}”`, source: 'plan', planId: plan.id, createdAt: now, updatedAt: now };
+      if (fromCur !== 'PLN') t.accountAmount = convert(market, amount, accCur, fromCur, date) ?? amount;
+      if (accCur !== fromCur) t.toAmount = amount;
+      txs.push(t);
+    }
+    const k = { id: newId(), type: 'korekta', amount: -pln, date, accountId: account.id, merchant: `Kupno w planie „${plan.name}”`, source: 'plan', planId: plan.id, createdAt: now, updatedAt: now };
+    if (accCur !== 'PLN') k.accountAmount = -amount;
+    txs.push(k);
+    txIds.push(...txs.map((t) => t.id));
+  }
+  const entry = { id: newId(), date, amount: round2(amount), fromId: fromId || PLAN_EXTERNAL, buys: buys.map(({ asset, qty, price }) => ({ asset, qty, price })), lotIds, txIds };
+  const accounts = fin.accounts.map((a) =>
+    a.id !== account.id ? a : { ...a, lots: [...(a.lots ?? []), ...newLots], plans: a.plans.map((p) => (p.id !== plan.id ? p : { ...p, log: [...(p.log ?? []), entry] })) },
+  );
+  return { fin: { ...fin, accounts, txs: [...fin.txs, ...txs], updatedAt: now }, buys, entry };
+}
+
+/** Wpłaty cykliczne do planów, których termin minął: [{ accountId, planId, date, plan, account }]. */
+export function duePlanDeposits(fin, today) {
+  const out = [];
+  for (const a of fin.accounts) {
+    if (a.archived) continue;
+    for (const p of a.plans ?? []) {
+      const r = p.recurring;
+      if (r?.nextDate && r.nextDate <= today) out.push({ accountId: a.id, planId: p.id, date: r.nextDate, plan: p, account: a });
+    }
+  }
+  return out;
+}
+
+/** Przesuwa termin wpłaty cyklicznej planu na następny miesiąc. */
+export function advancePlan(fin, accountId, planId, now = Date.now()) {
+  return {
+    ...fin,
+    accounts: fin.accounts.map((a) => (a.id !== accountId ? a : { ...a, plans: (a.plans ?? []).map((p) => (p.id !== planId || !p.recurring ? p : { ...p, recurring: { ...p.recurring, nextDate: nextPlanDate(p.recurring.nextDate, p.recurring.day) } })) })),
+    updatedAt: now,
+  };
+}
+
+/** Zmiana wartości aktywów z kupna i sprzedaży (nowe i usunięte pozycje, zmiany ilości) – bez zmiany samej wyceny. */
+export function holdingsTradeDelta(market, oldLots, newLots, soldLots, date) {
+  const unit = (lot) => {
+    const r = rateOn(market, lotCurrency(market, lot), date);
+    return r === null ? 0 : lotPrice(market, { ...lot, since: undefined, until: undefined }, date) * r;
+  };
+  let delta = 0;
+  for (const l of newLots) {
+    const old = oldLots.find((o) => o.id === l.id);
+    if (!old) delta += l.qty * unit(l);
+    else if (Math.abs(l.qty - old.qty) > 1e-9) delta += (l.qty - old.qty) * unit(l);
+  }
+  for (const o of soldLots) delta -= o.qty * unit(o);
+  return delta;
+}
+
+/** Czy aktywo ma dokładne, świeże notowania (GPW, NewConnect, USA, fundusz) – wtedy kurs z XTB nie jest potrzebny. */
+export function hasExactQuotes(market, asset, date) {
+  const q = market?.assets?.[asset]?.quotes;
+  return Boolean(q?.length && daysBetween(q[q.length - 1][0], date) <= 7);
 }
 
 // Pozycja liczy się od daty zakupu, a gdy jej wartość była wcześniej w saldzie gotówki (rozliczenie przy dodaniu) –

@@ -138,12 +138,36 @@ Rodzaj konta **Konto inwestycyjne** (np. XTB, IKE, IKZE, PPE). Jego wartość to
 3. **+ Fundusz ING TFI (PPE)**: wybierz fundusz i **kategorię jednostek** (w PPE zwykle E, F, S, T albo W – sprawdzisz ją w serwisie ING TFI24 przy nazwie funduszu albo w umowie PPE pracodawcy; każda kategoria ma inną cenę jednostki). Wpisz **liczbę jednostek** i **sumę wpłat** – obie liczby pokazuje ING TFI24. Aplikacja zapamięta kategorię dla tego konta i przy kolejnym funduszu podpowie ją sama. Wycena jednostek przychodzi z ING TFI w każdy dzień roboczy.
 4. **+ Inne aktywo (wycena ręczna)**: np. obligacje skarbowe, lokata, złoto. Wpisujesz wartość, a gdy się zmieni – nową wartość (aplikacja zapamięta historię wycen do wykresu). Instrument z XTB bez darmowych notowań (np. akcja z Frankfurtu) aplikacja sama doda w tym trybie, z nazwą i walutą z katalogu.
 5. Opcja **Rozlicz zmianę z wolną gotówką na koncie** (domyślnie włączona):
-   - nowa pozycja zmniejsza wolną gotówkę o swoją wartość – tak jest, gdy kupujesz ETF za pieniądze z rachunku albo gdy saldo konta (np. z Money Managera) obejmowało już wartość ETF-ów;
-   - usunięcie pozycji to sprzedaż: jej wartość wraca do gotówki, a w historii pozycja zostaje do dnia sprzedaży.
+   - nowa pozycja (albo dokupienie – większa ilość) zmniejsza wolną gotówkę o swoją wartość – tak jest, gdy kupujesz ETF za pieniądze z rachunku albo gdy saldo konta (np. z Money Managera) obejmowało już wartość ETF-ów;
+   - usunięcie pozycji to sprzedaż: jej wartość wraca do gotówki, a w historii pozycja zostaje do dnia sprzedaży;
+   - sama zmiana wyceny (np. wpisanie kursu z XTB) nie rusza gotówki.
 
    Wyłącz tę opcję, gdy saldo konta to tylko gotówka, a aktywa dopisujesz osobno.
+6. **Wolna gotówka na rachunku teraz** (opcjonalnie): wpisz kwotę „Wolne środki” z XTB, a saldo konta ustawi się dokładnie na nią. Przydaje się, gdy saldo zawierało dotąd także wartość ETF-ów – reszta wartości konta to wtedy aktywa i ich zysk, a nie gotówka.
 
-**PPE w ING – przykład.** Konto „PPE ING” (zaznacz „nie wliczaj do salda łącznego”, jeśli nie chcesz liczyć PPE do majątku) → Aktywa → + Fundusz ING TFI (PPE) → „ING Akcji”, kategoria E → 12,3456 jednostki, suma wpłat 12 100 zł → Zapisz. Przy włączonym rozliczeniu z gotówką wartość funduszu zmniejszy wolną gotówkę konta, więc jeśli saldo PPE było wpisane jako gotówka, po dodaniu funduszy zostanie ono zastąpione wyceną funduszy. Gdy dopłacasz co miesiąc, raz na jakiś czas popraw liczbę jednostek i sumę wpłat (albo dodaj nową pozycję).
+**Pozycje ze średnią ceną (bez całej historii transakcji).** Nie musisz wpisywać każdego zakupu z przeszłości. Wpisz **ilość** i **średnią cenę zakupu** z XTB (albo kwotę „Zainwestowano”), datę możesz zostawić dzisiejszą. Dla ETF-ów z Xetry, Paryża czy Londynu aplikacja nie ma bezpłatnego źródła dokładnego kursu, dlatego przy takiej pozycji jest pole **Kurs teraz z XTB**: przepisz aktualną cenę z XTB (pozycja → aktualna cena). Od razu zobaczysz prawdziwą wartość i zysk, a w kolejne dni kurs będzie zmieniał się razem z indeksem, który ETF śledzi. Kurs możesz poprawić w każdej chwili (np. raz na kilka miesięcy). Dla akcji z GPW, funduszy ING TFI i obserwowanych akcji z USA to pole nie jest potrzebne – kurs przychodzi sam.
+
+Przykład (Twoje konto XTB EUR po imporcie): saldo 30 126 EUR obejmowało gotówkę i ETF-y. Po dodaniu VWCE, EUNL, MEUD i IS3N ze średnimi cenami w „wolnej gotówce” zostało 4 538 EUR, czyli zysk. Otwórz **Aktywa**, przy każdym ETF-ie wpisz **Kurs teraz z XTB**, a w polu **Wolna gotówka na rachunku teraz** – kwotę z XTB (np. 0). Zysk pojawi się przy pozycjach, a gotówka będzie prawdziwa.
+
+Na liście kont pozycje tego samego instrumentu (np. kolejne zakupy w planie) pokazują się razem: łączna ilość, koszt, wartość i zysk.
+
+**PPE w ING – przykład.** Konto „PPE ING” (zaznacz „nie wliczaj do salda łącznego”, jeśli nie chcesz liczyć PPE do majątku) → Aktywa → + Fundusz ING TFI (PPE) → „ING Akcji”, kategoria E → 12,3456 jednostki, suma wpłat 12 100 zł → Zapisz. Przy włączonym rozliczeniu z gotówką wartość funduszu zmniejszy wolną gotówkę konta, więc jeśli saldo PPE było wpisane jako gotówka, po dodaniu funduszy zostanie ono zastąpione wyceną funduszy. Kolejne składki dopisuj przez **plan inwestycyjny** (niżej) – podzielą się na fundusze same.
+
+### Plany inwestycyjne (podział wpłaty na kilka ETF-ów albo funduszy)
+
+Tak działają plany inwestycyjne w XTB i alokacja wpłat w PPE: wpłacasz jedną kwotę, a ona dzieli się procentowo na kilka instrumentów.
+
+1. Przy koncie inwestycyjnym: **+ Plan inwestycyjny**. Aplikacja od razu podpowiada instrumenty, które masz na koncie, z udziałami według ich obecnej wartości – popraw je tak, jak w planie w XTB (np. VWCE 70%, EUNL 15%, IS3N 10%, MEUD 5%). Suma musi dawać 100% („rozłóż po równo” dzieli równo).
+2. Instrumenty dodasz też spoza konta: **+ Instrument z XTB** (wyszukiwarka) albo **+ Fundusz ING TFI** (fundusz i kategoria jednostek – dla PPE).
+3. **Wpłata cykliczna** (opcjonalnie): kwota, dzień miesiąca, najbliższy termin i **skąd pieniądze**:
+   - **przelew z konta** (np. mBank) – w dzienniku zapisze się przelew na konto inwestycyjne, a gotówka na nim się nie zmieni (pieniądze od razu idą w ETF-y);
+   - **z wolnej gotówki na tym koncie**;
+   - **spoza aplikacji** – np. składka pracodawcy do PPE (nie zmienia innych kont).
+   
+   Z zaznaczonym **Kupuj automatycznie** wpłata zapisze się sama w dniu terminu (po otwarciu aplikacji). Bez zaznaczenia w Przeglądzie pojawi się prośba „Wpłata do planu – Zapisz wpłatę / Pomiń” – przydaje się, gdy kwota co miesiąc jest inna (np. składka PPE zależna od pensji).
+4. **Wpłać do planu**: kwota i data, a pod spodem podział – ile pójdzie na każdy instrument, po jakiej cenie i ile jednostek kupisz. Ceny funduszy ING TFI i akcji z GPW są z notowań z dnia wpłaty, a ETF-ów z Xetry czy Londynu – szacunek od ostatniego kursu wpisanego z XTB według zmiany indeksu. Możesz je poprawić według potwierdzenia z XTB albo ING.
+
+Każda wpłata zapisuje się jako osobne pozycje z ceną zakupu z tego dnia (dokładny koszt i historia), a na liście kont widać je razem z pozostałymi pozycjami tego instrumentu. Przy planie widać sumę wpłat i liczbę wpłat. Usunięcie planu nie usuwa kupionych aktywów.
 
 **Jak liczona jest cena** (odświeżana w każdy dzień roboczy, ten sam sposób co w portfelu GEM):
 - **akcje, ETF-y, ETC i ETN z GPW i NewConnect** – kurs zamknięcia z ostatniej sesji, prosto z giełdy;

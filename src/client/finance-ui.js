@@ -615,6 +615,12 @@ function alerts() {
   out.push(cardPrompt());
   const due = dueRecurring(fin, today());
   if (due.length) out.push(`<section class="card pend"><h2>Stałe pozycje do zatwierdzenia</h2>${due.map(pendRow).join('')}</section>`);
+  // Wpłaty do planów inwestycyjnych do potwierdzenia (bez automatu albo bez ceny któregoś instrumentu).
+  for (const d of duePlanDeposits(fin, today())) {
+    if (d.plan.recurring.auto && !planBlocked.includes(`${d.accountId}|${d.planId}`)) continue;
+    const key = `${d.accountId}|${d.planId}`;
+    out.push(`<div class="banner info">📋 Wpłata do planu <b>${esc(d.plan.name)}</b> (${esc(d.account.name)}) z ${esc(shortDate(d.date, true))}: ${esc(money(d.plan.recurring.amount, d.account.currency))}${planBlocked.includes(key) ? ' – brakuje ceny któregoś instrumentu, wpisz ją' : ''}. <button class="link" data-plan-pay="${esc(`${key}|${d.date}`)}">Zapisz wpłatę</button> · <button class="link" data-plan-skip="${esc(key)}">Pomiń</button></div>`);
+  }
   const bal = balances(fin);
   for (const a of activeAccounts()) {
     // Kredyt bez automatycznego zapisu rat: przypomnienie o racie na 3 dni przed terminem.
@@ -816,14 +822,42 @@ function lotLabel(l) {
 function investmentLines(a, cash) {
   const at = valuationDate();
   const sum = investSummary(MARKET, a, at);
-  const lines = (a.lots ?? []).filter((l) => !l.until).map((l) => {
-    const r = lotResult(MARKET, l, at);
-    const approx = MARKET.assets?.[l.asset]?.source === 'proxy' ? '≈ ' : '';
-    const unit = isFundLot(l) ? 'j.u.' : 'szt.';
-    const detail = r && lotActive(l, at)
-      ? `<small>zainwestowano ${esc(zl(r.costPLN))} · <span class="${gainClass(r.gain)}">${esc(gainText(r.gain, r.gainPct))}</span>${r.currency !== 'PLN' && r.priceChange !== null ? ` · cena w ${esc(r.currency)} ${r.priceChange < 0 ? '−' : '+'}${esc(pct1(r.priceChange))}` : ''}</small>`
+  // Pozycje tego samego instrumentu (np. kolejne wpłaty w planie) pokazujemy razem: ilość, koszt, wartość i zysk.
+  const groups = new Map();
+  for (const l of (a.lots ?? []).filter((x) => !x.until)) {
+    const key = l.asset === 'manual' ? `manual:${l.id}` : l.asset;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(l);
+  }
+  const lines = [...groups.values()].map((list) => {
+    const l0 = list[0];
+    let value = 0;
+    let cost = 0;
+    let qty = 0;
+    let costCur = 0;
+    let missing = false;
+    for (const l of list) {
+      const r = lotResult(MARKET, l, at);
+      if (!r) missing = true;
+      else if (lotActive(l, at)) {
+        value += r.value;
+        cost += r.costPLN;
+        qty += l.qty;
+        costCur += l.qty * l.price;
+      }
+    }
+    const approx = MARKET.assets?.[l0.asset]?.source === 'proxy' ? '≈ ' : '';
+    const unit = isFundLot(l0) ? 'j.u.' : 'szt.';
+    const cur = lotCurrency(MARKET, l0);
+    const newest = [...list].sort((x, y) => ((y.mark?.[0] ?? y.date) > (x.mark?.[0] ?? x.date) ? 1 : -1))[0];
+    const priceNow = lotPrice(MARKET, newest, at);
+    const priceChange = qty > 0 && costCur > 0 ? priceNow / (costCur / qty) - 1 : null;
+    const gain = value - cost;
+    const noMark = needsMark(l0) && !list.some((l) => l.mark);
+    const detail = qty > 0
+      ? `<small>zainwestowano ${esc(zl(cost))} · <span class="${gainClass(gain)}">${esc(gainText(gain, cost > 0 ? value / cost - 1 : null))}</span>${cur !== 'PLN' && priceChange !== null ? ` · cena w ${esc(cur)} ${priceChange < 0 ? '−' : '+'}${esc(pct1(priceChange))}` : ''}${list.length > 1 ? ` · ${list.length} ${plural(list.length, 'zakup', 'zakupy', 'zakupów')}` : ''}${noMark ? ' · <span class="warn">wpisz kurs z XTB w „Aktywa”, aby zobaczyć zysk</span>' : ''}</small>`
       : '';
-    return `<div class="inv-line inv-pos"><span>${esc(lotLabel(l))} · ${esc(fmtQty(l.qty))} ${unit}${detail}</span><b>${r === null ? 'brak kursu' : esc(approx + zl(r.value))}</b></div>`;
+    return `<div class="inv-line inv-pos"><span>${esc(lotLabel(l0))} · ${esc(fmtQty(Math.round(list.reduce((s, l) => s + l.qty, 0) * 1e6) / 1e6))} ${unit}${detail}</span><b>${missing && !value ? 'brak kursu' : esc(approx + zl(value))}</b></div>`;
   });
   const head = sum?.positions
     ? `<div class="inv-sum"><div><span>Zainwestowano</span><b>${esc(zl(sum.cost))}</b></div><div><span>Wartość aktywów</span><b>${esc(zl(sum.value))}</b></div><div><span>Zysk</span><b class="${gainClass(sum.gain)}">${esc(gainText(sum.gain, sum.gainPct))}</b></div></div>`
@@ -895,6 +929,20 @@ function gemInfo(a, b) {
   return out.join('');
 }
 
+// Plany inwestycyjne konta: udziały, wpłata cykliczna, przyciski wpłaty i edycji.
+const planItemLabel = (i) => (String(i.asset).startsWith(FUND_PREFIX) ? `${i.name || 'fundusz'} (${fundCategoryOf(i.asset)})` : i.asset);
+function plansInfo(a) {
+  const cur = a.currency || 'PLN';
+  return (a.plans ?? [])
+    .map((p) => {
+      const r = p.recurring;
+      const rec = r ? ` · co miesiąc ${money(r.amount, cur)} (${r.day}. dnia, najbliższa ${shortDate(r.nextDate)})${r.auto ? '' : ' – z potwierdzeniem'}` : '';
+      const total = (p.log ?? []).reduce((s, e) => s + (e.amount || 0), 0);
+      return `<div class="plan-line"><div class="small"><b>📋 ${esc(p.name)}</b>: ${esc(p.items.map((i) => `${planItemLabel(i)} ${pctNum(i.pct)}%`).join(' · '))}${esc(rec)}${total ? `<br><span class="muted">Wpłacono w planie: ${esc(money(total, cur))} (${(p.log ?? []).length} ${plural((p.log ?? []).length, 'wpłata', 'wpłaty', 'wpłat')})</span>` : ''}</div><div class="acc-actions"><button class="btn small primary" data-plan-pay="${esc(`${a.id}|${p.id}`)}">Wpłać do planu</button><button class="btn small ghost" data-plan-edit="${esc(`${a.id}|${p.id}`)}">Edytuj plan</button></div></div>`;
+    })
+    .join('');
+}
+
 function accountItem(a, b) {
   const card = isCard(a);
   const loan = isLoan(a);
@@ -911,8 +959,9 @@ function accountItem(a, b) {
     ? `${st.limit ? `<div class="meter" title="Wykorzystany limit"><span style="width:${(st.usedShare * 100).toFixed(1)}%;background:${st.usedShare > 0.8 ? 'var(--neg)' : 'var(--accent)'}"></span></div>` : ''}<div class="small muted">${st.debt > 0.004 ? `Do spłaty <b class="neg">${esc(zl(st.debt))}</b>` : 'Karta spłacona ✓'}${st.limit ? ` · limit ${esc(zl0(st.limit))} · dostępne ${esc(zl(st.available))}` : ''}${due ? ` · termin ${esc(shortDate(due.due))}` : ''}</div>${cardCostLine(a, st.debt)}`
     : '';
   const cards = a.cards?.length ? `<div class="small muted">Apple Pay: ${esc(a.cards.join(', '))}</div>` : '';
-  const details = `${inv && !gemVal ? investmentLines(a, b) : ''}${a.gemAccount ? gemInfo(a, b) : ''}${loan ? loanInfo(a, b) : ''}${cardInfo}${cards}`;
+  const details = `${inv && !gemVal ? investmentLines(a, b) : ''}${inv && !gemVal ? plansInfo(a) : ''}${a.gemAccount ? gemInfo(a, b) : ''}${loan ? loanInfo(a, b) : ''}${cardInfo}${cards}`;
   const buttons = [
+    inv && !gemVal ? `<button class="btn small" data-plan-new="${esc(a.id)}">+ Plan inwestycyjny</button>` : '',
     card && st.debt > 0.004 ? `<button class="btn small primary" data-repay="${esc(a.id)}">Spłać kartę</button>` : '',
     loan ? `<button class="btn small primary" data-loan="${esc(a.id)}">Szczegóły kredytu</button>` : '',
     a.gemAccount ? `<button class="btn small primary" data-gem-pay="${esc(a.id)}">Wpłać na ${esc(a.gemAccount === 'ZWYKLE' ? 'konto' : a.gemAccount)}</button>` : '',
@@ -1442,6 +1491,18 @@ $('#fin-root').addEventListener('click', async (ev) => {
   if (d.repay) return openRepay(d.repay);
   if (d.lots) return openLots(d.lots);
   if (d.loan) return openLoan(d.loan);
+  if (d.planNew) return openPlan(d.planNew, null);
+  if (d.planEdit) return openPlan(...d.planEdit.split('|'));
+  if (d.planPay) {
+    const [accId, planId, due] = d.planPay.split('|');
+    return openPlanPay(accId, planId, due || null);
+  }
+  if (d.planSkip) {
+    const [accId, planId] = d.planSkip.split('|');
+    return undoable('Pominięto wpłatę do planu (termin przesunięty na kolejny miesiąc).', () => {
+      fin = advancePlan(fin, accId, planId);
+    });
+  }
   if (d.loanSync) return syncLoanBalance(d.loanSync);
   if (d.gemPay) {
     const a = acc(d.gemPay);
@@ -2308,6 +2369,7 @@ function openLots(accountId) {
   $('#ld-fund').hidden = true;
   lotPicker.reset();
   lotsForm.elements.settle.checked = true;
+  lotsForm.elements.cash.value = '';
   $('#ld-errors').textContent = '';
   renderLots();
   openDialog(LOTS);
@@ -2342,9 +2404,13 @@ function lotSummary(l) {
   const v = lotValuePLN(MARKET, lot, at);
   if (v === null) return 'Brak kursu waluty.';
   if (l.asset === 'manual') return `Wartość: ${zl(v)}`;
-  const r = lotResult(MARKET, { ...l, since: undefined, until: undefined }, at);
-  return r ? `Wartość dziś: ${zl(r.value)} · zysk ${gainText(r.gain, r.gainPct)}` : `Wartość dziś: ${zl(v)}`;
+  const r = lotResult(MARKET, { ...withMark(l, at), since: undefined, until: undefined }, at);
+  const noPrice = needsMark(l) && !(l.markNew > 0) && !l.mark;
+  return r ? `Wartość dziś: ${zl(r.value)} · zysk ${gainText(r.gain, r.gainPct)}${noPrice ? ' – wpisz kurs teraz z XTB, aby zobaczyć prawdziwy zysk' : ''}` : `Wartość dziś: ${zl(v)}`;
 }
+// Pozycja bez dokładnych notowań (ETF wyceniany według indeksu): przyda się bieżący kurs z XTB.
+const needsMark = (l) => l.asset !== 'manual' && !isFundLot(l) && !hasExactQuotes(MARKET, l.asset, valuationDate());
+const withMark = (l, at) => (l.markNew > 0 ? { ...l, mark: [at, l.markNew] } : l);
 
 function renderLots() {
   $('#ld-rows').innerHTML = lotsState.lots.length
@@ -2367,7 +2433,8 @@ function renderLots() {
                  <label class="field">${fund ? 'Liczba jednostek' : 'Ilość (szt.)'}<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
                  <label class="field">${fund ? 'Średnia cena jednostki' : 'Cena zakupu za szt.'} (${esc(curLabel(cur))})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}"></label>
                  <label class="field">${fund ? 'Suma wpłat' : 'Zainwestowano'} (${esc(curLabel(cur))})<input data-lf="cost" inputmode="decimal" value="${esc(fmtInput(l.qty * l.price))}" placeholder="ilość × cena"></label>
-                 <label class="field">${fund ? 'Data pierwszej wpłaty' : 'Data zakupu'}<input type="date" data-lf="date" value="${esc(l.date)}"></label>`;
+                 <label class="field">${fund ? 'Data pierwszej wpłaty' : 'Data zakupu'}<input type="date" data-lf="date" value="${esc(l.date)}"></label>
+                 ${needsMark(l) ? `<label class="field full">Kurs teraz z XTB (${esc(curLabel(cur))}) – do wyceny i zysku<input data-lf="mark" inputmode="decimal" value="${esc(fmtInput(l.markNew))}" placeholder="${l.price > 0 ? `teraz ok. ${esc(fmtInput(lotPrice(MARKET, l, valuationDate())))}` : 'np. 143,22'}"><small>${l.mark ? `Ostatnio wpisany: ${esc(fmtInput(l.mark[1]))} (${esc(shortDate(l.mark[0], true))}); od tego dnia kurs zmienia się razem z indeksem. ` : ''}Przepisz cenę z XTB (pozycja → aktualna cena). Wystarczy raz – dalej aplikacja śledzi zmiany indeksu, a kurs możesz poprawić w każdej chwili.</small></label>` : ''}`;
           return `<div class="lot-row" data-lot="${i}">${body}<div class="lot-foot full"><span class="small muted" data-lot-val="${i}">${esc(lotSummary(l))}</span><button type="button" class="link small danger-text" data-lot-del="${i}">Usuń</button></div></div>`;
         })
         .join('')
@@ -2443,7 +2510,7 @@ function workingValue() {
   let sum = 0;
   for (const l of lotsState.lots) {
     if (!(l.qty > 0)) continue;
-    const lot = l.asset === 'manual' ? { ...l, marks: [[l.date, l.value ?? 0]] } : l;
+    const lot = l.asset === 'manual' ? { ...l, marks: [[l.date, l.value ?? 0]] } : withMark(l, at);
     sum += lotValuePLN(MARKET, lot, at) ?? 0;
   }
   return sum;
@@ -2467,7 +2534,8 @@ lotsForm.addEventListener('input', (ev) => {
     if (input && input !== el) input.value = fmtInput(v);
   };
   // „Zainwestowano” i cena za sztukę są powiązane: kwota = ilość × cena. Ostatnio wpisane pole decyduje przy zmianie ilości.
-  if (k === 'cost') {
+  if (k === 'mark') l.markNew = num();
+  else if (k === 'cost') {
     l.cost = num();
     l.costMode = true;
     l.price = l.qty > 0 ? l.cost / l.qty : 0;
@@ -2516,9 +2584,21 @@ lotsForm.addEventListener('submit', (ev) => {
     $('#ld-errors').textContent = errors.join(' ');
     return;
   }
+  const cashRaw = lotsForm.elements.cash.value.trim();
+  const cashTarget = cashRaw ? parseAmount(cashRaw) : null;
+  if (cashRaw && !Number.isFinite(cashTarget)) {
+    $('#ld-errors').textContent = 'Nie rozpoznano kwoty wolnej gotówki.';
+    return;
+  }
   const t = valuationDate();
   const lots = lotsState.lots.map((l) => {
-    if (l.asset !== 'manual') return { id: l.id, asset: l.asset, name: l.name, currency: l.currency, qty: l.qty, price: Math.round(l.price * 1e6) / 1e6, date: l.date, since: l.since };
+    if (l.asset !== 'manual') {
+      // Kurs teraz z XTB: znana cena rynkowa od dziś (wycena i zysk od razu, dalej zmiana indeksu).
+      const mark = l.markNew > 0 ? [t, Math.round(l.markNew * 1e6) / 1e6] : l.mark;
+      const out = { id: l.id, asset: l.asset, name: l.name, currency: l.currency, qty: l.qty, price: Math.round(l.price * 1e6) / 1e6, date: l.date, since: l.since };
+      if (mark) out.mark = mark;
+      return out;
+    }
     // Aktywo z wyceną ręczną: każda zmiana wartości to nowy punkt historii (do wykresu majątku).
     const old = (a.lots ?? []).find((x) => x.id === l.id);
     let marks = old?.marks?.map((m) => [...m]) ?? [];
@@ -2531,9 +2611,8 @@ lotsForm.addEventListener('submit', (ev) => {
     return { id: l.id, asset: 'manual', name: l.name.trim(), currency: l.currency || 'PLN', qty: l.qty, price: marks[0][1], date: l.date, since: l.since, marks };
   });
   const settleCash = lotsForm.elements.settle.checked;
-  const before = lotsState.before;
   closeDialog(LOTS);
-  undoable('Zapisano aktywa.', () => {
+  undoable(cashTarget !== null ? 'Zapisano aktywa i wolną gotówkę.' : 'Zapisano aktywa.', () => {
     const target = acc(lotsState.accountId);
     // Rozliczenie z gotówką: nowa pozycja liczy się osobno od dziś (wcześniej jej wartość była w saldzie gotówki),
     // a usunięta to sprzedaż – zostaje w historii do dziś. Bez rozliczenia usunięta pozycja znika całkiem.
@@ -2549,17 +2628,348 @@ lotsForm.addEventListener('submit', (ev) => {
     if (all.length) target.lots = all;
     else delete target.lots;
     if (lotsState.fundCategory) target.fundCategory = lotsState.fundCategory;
-    if (!settleCash) return;
-    const delta = round2((holdingsPLN(MARKET, target, t) ?? before) - before);
-    if (Math.abs(delta) < 0.01) return;
     const cur = target.currency || 'PLN';
-    const cash = cur === 'PLN' ? -delta : convert(MARKET, -delta, 'PLN', cur, t);
-    if (cash === null) return;
-    const tx = { id: newId(), type: 'korekta', amount: -delta, date: t, accountId: target.id, merchant: delta > 0 ? 'Kupno aktywów (z gotówki na koncie)' : 'Sprzedaż aktywów (na gotówkę na koncie)', source: 'reczne', createdAt: Date.now(), updatedAt: Date.now() };
-    if (cur !== 'PLN') tx.accountAmount = cash;
-    fin.txs.push(tx);
+    if (settleCash) {
+      // Gotówka zmienia się tylko o kupno i sprzedaż (nowe, usunięte pozycje i zmiany ilości) – nie o zmianę wyceny.
+      const delta = round2(holdingsTradeDelta(MARKET, oldActive, lots, sold, t));
+      const cash = Math.abs(delta) < 0.01 ? null : cur === 'PLN' ? -delta : convert(MARKET, -delta, 'PLN', cur, t);
+      if (cash !== null) {
+        const tx = { id: newId(), type: 'korekta', amount: -delta, date: t, accountId: target.id, merchant: delta > 0 ? 'Kupno aktywów (z gotówki na koncie)' : 'Sprzedaż aktywów (na gotówkę na koncie)', source: 'reczne', createdAt: Date.now(), updatedAt: Date.now() };
+        if (cur !== 'PLN') tx.accountAmount = cash;
+        fin.txs.push(tx);
+      }
+    }
+    // Wolna gotówka wg XTB: saldo konta ustawione na podaną kwotę (reszta wartości konta to aktywa i ich zysk).
+    if (cashTarget !== null && Math.abs(balances(fin)[target.id] - cashTarget) >= 0.005) adjustBalance(fin, target.id, cashTarget, { date: t, newId, market: MARKET, note: 'Wolna gotówka wg brokera' });
   });
 });
+
+// ---------- Plany inwestycyjne: edycja planu i wpłata do planu ----------
+const PLAN = $('#plan-dialog');
+const planForm = $('form', PLAN);
+let planState = null;
+
+const planPicker = instPicker({
+  placeholder: 'Szukaj ETF-u lub akcji z XTB',
+  extra: () => gemAssets().map(([symbol, a]) => ({ symbol, name: a.name, currency: a.currency })),
+  onPick: async (it) => {
+    libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+    if (!MARKET.assets?.[it.symbol]) addLibraryAsset(it.symbol, it.name, it.currency);
+    addPlanItem({ asset: it.symbol, name: it.name, currency: it.currency });
+    planPicker.reset();
+    $('#pl-picker').hidden = true;
+  },
+});
+
+// Ceny do planu: biblioteka XTB i fundusze ING TFI dla instrumentów, których jeszcze nie ma w wycenie.
+async function ensurePlanAssets(items) {
+  if (items.some((i) => String(i.asset).startsWith(FUND_PREFIX))) fundsData = fundsData ?? (await instLoadFunds());
+  if (items.some((i) => !String(i.asset).startsWith(FUND_PREFIX))) libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+  for (const i of items) if (!MARKET.assets?.[i.asset]) addLibraryAsset(i.asset, i.name, i.currency);
+}
+
+function planFromOptions(a, selected) {
+  const others = fin.accounts.filter((x) => x.id !== a.id && !x.archived && !isLoan(x) && !isCard(x));
+  const opt = (v, l) => `<option value="${esc(v)}" ${v === selected ? 'selected' : ''}>${esc(l)}</option>`;
+  return `${others.map((x) => opt(x.id, `Przelew z konta: ${x.name}`)).join('')}${opt(a.id, 'Z wolnej gotówki na tym koncie')}${opt(PLAN_EXTERNAL, 'Spoza aplikacji (np. składka pracodawcy do PPE)')}`;
+}
+const defaultPlanFrom = (a) => (/ppe|ppk/i.test(a.name) ? PLAN_EXTERNAL : defaultAccount('przelew') || a.id);
+
+function addPlanItem(item) {
+  const d = planState?.draft;
+  if (!d || d.items.some((i) => i.asset === item.asset)) return;
+  const used = d.items.reduce((s, i) => s + (Number(i.pct) || 0), 0);
+  d.items.push({ asset: item.asset, name: item.name, currency: item.currency || 'PLN', pct: Math.max(0, round2(100 - used)) });
+  renderPlanEdit();
+}
+
+function openPlan(accountId, planId) {
+  const a = acc(accountId);
+  if (!a) return;
+  const p = planId ? (a.plans ?? []).find((x) => x.id === planId) : null;
+  // Nowy plan: instrumenty z konta z udziałami według obecnej wartości (do poprawienia).
+  let items = [];
+  if (!p) {
+    const at = valuationDate();
+    const byAsset = new Map();
+    for (const l of (a.lots ?? []).filter((x) => !x.until && x.asset !== 'manual')) byAsset.set(l.asset, { l, v: (byAsset.get(l.asset)?.v ?? 0) + (lotValuePLN(MARKET, l, at) ?? 0) });
+    const total = [...byAsset.values()].reduce((s, x) => s + x.v, 0);
+    let left = 100;
+    items = [...byAsset.values()].map(({ l, v }, k, arr) => {
+      const pct = k === arr.length - 1 ? left : total > 0 ? Math.round((v / total) * 100) : Math.round(100 / arr.length);
+      left -= pct;
+      return { asset: l.asset, name: l.name, currency: lotCurrency(MARKET, l), pct };
+    });
+  }
+  planState = { mode: 'edit', accountId, planId: p?.id ?? null, draft: p ? JSON.parse(JSON.stringify(p)) : { id: newId(), name: /ppe/i.test(a.name) ? 'PPE – podział wpłat' : '', items, recurring: null, log: [] } };
+  $('#pl-title').textContent = p ? `Plan: ${p.name}` : 'Nowy plan inwestycyjny';
+  $('#pl-delete').hidden = !p;
+  $('#pl-ok').textContent = 'Zapisz plan';
+  if (!$('#pl-picker').firstChild) $('#pl-picker').append(planPicker);
+  $('#pl-picker').hidden = true;
+  $('#pl-errors').textContent = '';
+  renderPlanEdit();
+  openDialog(PLAN);
+}
+
+function planSumText() {
+  const sum = round2(planState.draft.items.reduce((x, i) => x + (Number(i.pct) || 0), 0));
+  const el = $('#pl-sum');
+  if (el) {
+    el.textContent = `Suma udziałów: ${pctNum(sum)}%${Math.abs(sum - 100) > 0.011 ? ` – brakuje ${pctNum(round2(100 - sum))}%` : ' ✓'}`;
+    el.className = Math.abs(sum - 100) > 0.011 ? 'warn' : 'pos';
+  }
+}
+
+function renderPlanEdit() {
+  const a = acc(planState.accountId);
+  const d = planState.draft;
+  const cur = a.currency || 'PLN';
+  const r = d.recurring;
+  const held = [...new Map((a.lots ?? []).filter((l) => !l.until && l.asset !== 'manual').map((l) => [l.asset, l])).values()].filter((l) => !d.items.some((i) => i.asset === l.asset));
+  $('#pl-body').innerHTML = `<label class="field">Nazwa planu<input id="pl-name" maxlength="60" value="${esc(d.name)}" placeholder="np. Plan globalny"></label>
+  <div class="ln-sec">Instrumenty i udziały (%)</div>
+  <div id="pl-items">${d.items.map((i, k) => `<div class="plan-item"><span><b>${esc(planItemLabel(i))}</b> <span class="muted">${esc(String(i.asset).startsWith(FUND_PREFIX) ? '' : i.name ?? '')}</span></span><input data-pl-pct="${k}" inputmode="decimal" value="${esc(fmtInput(i.pct))}" aria-label="Udział ${esc(planItemLabel(i))} w procentach"><button type="button" class="link small danger-text" data-pl-del="${k}">usuń</button></div>`).join('') || '<p class="small muted">Dodaj instrumenty poniżej.</p>'}</div>
+  <p class="small"><span id="pl-sum"></span>${d.items.length > 1 ? ' · <button type="button" class="link small" data-pl-even="1">rozłóż po równo</button>' : ''}</p>
+  ${held.length ? `<label class="field">Dodaj z aktywów tego konta<select id="pl-add-held"><option value="">— wybierz —</option>${held.map((l) => `<option value="${esc(l.asset)}">${esc(lotLabel(l))}</option>`).join('')}</select></label>` : ''}
+  <div class="row-btns"><button type="button" class="btn small" data-pl-xtb="1">+ Instrument z XTB</button><button type="button" class="btn small" data-pl-fund="1">+ Fundusz ING TFI</button></div>
+  <div id="pl-fund" class="ld-fund" hidden><label class="field">Fundusz<select id="plf-fund"></select></label><label class="field">Kategoria jednostek<select id="plf-cat"></select></label><button type="button" class="btn small primary" data-plf-ok="1">Dodaj fundusz</button></div>
+  <div class="ln-sec">Wpłata cykliczna</div>
+  <label class="check small"><input type="checkbox" id="pl-rec" ${r ? 'checked' : ''}> <span>Co miesiąc wpłacam stałą kwotę (np. zlecenie stałe do XTB albo składka do PPE)</span></label>
+  <div id="pl-rec-box" ${r ? '' : 'hidden'}>
+    <div class="two"><label class="field">Kwota (${esc(curLabel(cur))})<input id="pl-rec-amount" inputmode="decimal" value="${esc(fmtInput(r?.amount))}"></label><label class="field">Dzień miesiąca<input id="pl-rec-day" inputmode="numeric" value="${esc(r?.day ?? '')}" placeholder="np. 10"></label></div>
+    <label class="field">Najbliższa wpłata<input type="date" id="pl-rec-next" value="${esc(r?.nextDate ?? '')}"></label>
+    <label class="field">Skąd pieniądze<select id="pl-rec-from">${planFromOptions(a, r?.fromId ?? defaultPlanFrom(a))}</select></label>
+    <label class="check small"><input type="checkbox" id="pl-rec-auto" ${!r || r.auto ? 'checked' : ''}> <span>Kupuj automatycznie w dniu wpłaty (po cenach z tego dnia). Bez zaznaczenia aplikacja poprosi o potwierdzenie kwoty.</span></label>
+  </div>
+  <p class="small muted">Wpłata do planu dzieli kwotę według udziałów i kupuje jednostki po cenach z dnia wpłaty. Plan nie zmienia aktywów, które już masz.</p>`;
+  planSumText();
+}
+
+function fillPlanFunds() {
+  const fSel = $('#plf-fund');
+  if (!fundsData?.funds?.length) {
+    fSel.innerHTML = '<option value="">Brak danych – pojawią się po aktualizacji aplikacji</option>';
+    return;
+  }
+  const sorted = [...fundsData.funds].sort((x, y) => FUND_TYPE_ORDER.indexOf(x.type) - FUND_TYPE_ORDER.indexOf(y.type) || x.name.localeCompare(y.name, 'pl'));
+  fSel.innerHTML = sorted.map((f) => `<option value="${f.id}">${esc(f.name)}</option>`).join('');
+  fillPlanCats();
+}
+function fillPlanCats() {
+  const f = fundsData?.funds?.find((x) => x.id === Number($('#plf-fund').value));
+  if (!f) return;
+  const pref = acc(planState.accountId)?.fundCategory;
+  const def = fundDefaultCategory(f, pref);
+  $('#plf-cat').innerHTML = f.cats.map((c) => `<option value="${esc(c)}" ${c === def ? 'selected' : ''}>${esc(c)} – ${esc(fundsData.categories?.[c] ?? '')}</option>`).join('');
+}
+
+async function openPlanPay(accountId, planId, due = null) {
+  const a = acc(accountId);
+  const p = a?.plans?.find((x) => x.id === planId);
+  if (!p) return;
+  await ensurePlanAssets(p.items);
+  const date = due || today();
+  planState = { mode: 'pay', accountId, planId, due, date, amount: p.recurring?.amount ?? 0, fromId: p.recurring?.fromId ?? defaultPlanFrom(a), prices: {}, edited: {} };
+  for (const i of p.items) planState.prices[i.asset] = marketPriceAt(MARKET, a, i.asset, date);
+  $('#pl-title').textContent = `Wpłata do planu „${p.name}”`;
+  $('#pl-delete').hidden = true;
+  $('#pl-ok').textContent = 'Kup według planu';
+  $('#pl-picker').hidden = true;
+  $('#pl-errors').textContent = '';
+  renderPlanPay();
+  openDialog(PLAN);
+}
+
+function renderPlanPay() {
+  const s = planState;
+  const a = acc(s.accountId);
+  const p = a.plans.find((x) => x.id === s.planId);
+  const cur = a.currency || 'PLN';
+  $('#pl-body').innerHTML = `<p class="small">${esc(p.items.map((i) => `${planItemLabel(i)} ${pctNum(i.pct)}%`).join(' · '))}</p>
+  <div class="two"><label class="field">Kwota wpłaty (${esc(curLabel(cur))})<input id="pp-amount" inputmode="decimal" value="${esc(fmtInput(s.amount))}" placeholder="np. 1000"></label><label class="field">Data<input type="date" id="pp-date" value="${esc(s.date)}"></label></div>
+  <label class="field">Skąd pieniądze<select id="pp-from">${planFromOptions(a, s.fromId)}</select></label>
+  <div class="sched-wrap"><table class="sched pp-tbl"><thead><tr><th>Instrument</th><th>Kwota</th><th>Cena</th><th>Jednostki</th></tr></thead><tbody>${p.items.map((i) => `<tr><td>${esc(planItemLabel(i))}<br><span class="muted">${esc(pctNum(i.pct))}%</span></td><td data-pp-amt="${esc(i.asset)}"></td><td><input data-pp-price="${esc(i.asset)}" inputmode="decimal" value="${esc(fmtInput(s.prices[i.asset]))}" placeholder="cena"><br><span class="muted">${esc(curLabel(i.currency))}</span></td><td data-pp-qty="${esc(i.asset)}"></td></tr>`).join('')}</tbody></table></div>
+  <p class="small muted">Ceny z dnia wpłaty: dla funduszy ING TFI i akcji z GPW – z notowań, dla ETF-ów z Xetry czy Londynu – szacunek według indeksu od ostatniego kursu, który wpisałeś. Popraw je według potwierdzenia z XTB albo ING, jeśli się różnią.</p>`;
+  updatePlanPay();
+}
+
+function updatePlanPay() {
+  const s = planState;
+  const a = acc(s.accountId);
+  const p = a.plans.find((x) => x.id === s.planId);
+  const cur = a.currency || 'PLN';
+  for (const part of planSplit(p, s.amount || 0)) {
+    const price = s.prices[part.asset];
+    const amtAsset = convert(MARKET, part.amount, cur, part.currency || 'PLN', s.date);
+    const amtEl = $(`[data-pp-amt="${CSS.escape(part.asset)}"]`, PLAN);
+    const qtyEl = $(`[data-pp-qty="${CSS.escape(part.asset)}"]`, PLAN);
+    if (amtEl) amtEl.textContent = money(part.amount, cur);
+    if (qtyEl) qtyEl.textContent = price > 0 && amtAsset !== null ? fmtQty(Math.round((amtAsset / price) * 1e4) / 1e4) || '0' : '–';
+  }
+}
+
+PLAN.addEventListener('input', (ev) => {
+  const el = ev.target;
+  if (!planState) return;
+  if (planState.mode === 'edit') {
+    if (el.id === 'pl-name') planState.draft.name = el.value;
+    else if (el.dataset.plPct !== undefined) {
+      planState.draft.items[Number(el.dataset.plPct)].pct = Math.abs(parseAmount(el.value)) || 0;
+      planSumText();
+    }
+    return;
+  }
+  if (el.id === 'pp-amount') planState.amount = Math.abs(parseAmount(el.value)) || 0;
+  else if (el.dataset.ppPrice) {
+    planState.prices[el.dataset.ppPrice] = Math.abs(parseAmount(el.value)) || null;
+    planState.edited[el.dataset.ppPrice] = true;
+  } else return;
+  updatePlanPay();
+});
+
+PLAN.addEventListener('change', async (ev) => {
+  const el = ev.target;
+  if (!planState) return;
+  if (planState.mode === 'edit') {
+    if (el.id === 'pl-add-held' && el.value) {
+      const l = (acc(planState.accountId).lots ?? []).find((x) => x.asset === el.value);
+      if (l) addPlanItem({ asset: l.asset, name: l.name, currency: lotCurrency(MARKET, l) });
+    } else if (el.id === 'pl-rec') {
+      $('#pl-rec-box').hidden = !el.checked;
+      if (el.checked && !$('#pl-rec-next').value) {
+        const day = Number($('#pl-rec-day').value) || Number(today().slice(8, 10));
+        const thisMonth = shiftMonthsKeepDay(`${today().slice(0, 8)}01`, 0, day);
+        $('#pl-rec-next').value = thisMonth >= today() ? thisMonth : nextPlanDate(thisMonth, day);
+        if (!$('#pl-rec-day').value) $('#pl-rec-day').value = String(day);
+      }
+    } else if (el.id === 'plf-fund') fillPlanCats();
+    return;
+  }
+  if (el.id === 'pp-date') {
+    planState.date = el.value || today();
+    const a = acc(planState.accountId);
+    for (const i of a.plans.find((x) => x.id === planState.planId).items) {
+      if (planState.edited[i.asset]) continue;
+      planState.prices[i.asset] = marketPriceAt(MARKET, a, i.asset, planState.date);
+      const inp = $(`[data-pp-price="${CSS.escape(i.asset)}"]`, PLAN);
+      if (inp) inp.value = fmtInput(planState.prices[i.asset]);
+    }
+    updatePlanPay();
+  } else if (el.id === 'pp-from') planState.fromId = el.value;
+});
+
+PLAN.addEventListener('click', async (ev) => {
+  const b = ev.target.closest('button');
+  if (!b || !planState || planState.mode !== 'edit') return;
+  const d = planState.draft;
+  if (b.dataset.plDel !== undefined) {
+    d.items.splice(Number(b.dataset.plDel), 1);
+    renderPlanEdit();
+  } else if (b.dataset.plEven) {
+    let left = 100;
+    d.items.forEach((i, k) => {
+      i.pct = k === d.items.length - 1 ? round2(left) : Math.floor((100 / d.items.length) * 100) / 100;
+      left -= i.pct;
+    });
+    renderPlanEdit();
+  } else if (b.dataset.plXtb) {
+    $('#pl-fund').hidden = true;
+    $('#pl-picker').hidden = !$('#pl-picker').hidden;
+    if (!$('#pl-picker').hidden) planPicker.focusInput();
+  } else if (b.dataset.plFund) {
+    $('#pl-picker').hidden = true;
+    const box = $('#pl-fund');
+    box.hidden = !box.hidden;
+    if (!box.hidden) {
+      fundsData = fundsData ?? (await instLoadFunds());
+      fillPlanFunds();
+    }
+  } else if (b.dataset.plfOk) {
+    const f = fundsData?.funds?.find((x) => x.id === Number($('#plf-fund').value));
+    const cat = $('#plf-cat').value;
+    if (!f || !cat) return;
+    const symbol = fundSymbol(f.id, cat);
+    addLibraryAsset(symbol, f.name, f.currency);
+    addPlanItem({ asset: symbol, name: f.name, currency: f.currency });
+  }
+});
+
+$('#pl-delete').addEventListener('click', async () => {
+  const s = planState;
+  const a = acc(s?.accountId);
+  if (!a || !s.planId) return;
+  closeDialog(PLAN);
+  const res = await confirmAction({ title: `Usunąć plan „${s.draft.name}”?`, body: '<p class="small">Aktywa kupione w planie zostaną na koncie – usuwasz tylko plan (udziały i wpłatę cykliczną).</p>', ok: 'Usuń plan' });
+  if (!res) return;
+  undoable('Usunięto plan.', () => {
+    a.plans = (a.plans ?? []).filter((p) => p.id !== s.planId);
+    if (!a.plans.length) delete a.plans;
+  });
+});
+
+planForm.addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const s = planState;
+  const a = acc(s?.accountId);
+  if (!a) return;
+  const err = (list) => ($('#pl-errors').textContent = list.join(' '));
+  if (s.mode === 'edit') {
+    const d = s.draft;
+    d.name = d.name.trim();
+    if ($('#pl-rec').checked) {
+      const nextDate = $('#pl-rec-next').value;
+      d.recurring = { amount: Math.abs(parseAmount($('#pl-rec-amount').value)) || 0, day: Math.round(Number($('#pl-rec-day').value)) || Number(nextDate.slice(8, 10)) || 0, fromId: $('#pl-rec-from').value || null, auto: $('#pl-rec-auto').checked, nextDate };
+    } else d.recurring = null;
+    const errors = validatePlan(d, fin);
+    if (errors.length) return err(errors);
+    closeDialog(PLAN);
+    undoable(s.planId ? 'Zapisano plan.' : `Dodano plan „${d.name}”. Wpłatę zrobisz przyciskiem „Wpłać do planu”.`, () => {
+      a.plans = s.planId ? a.plans.map((p) => (p.id === s.planId ? d : p)) : [...(a.plans ?? []), d];
+    });
+    runPlans();
+    return;
+  }
+  const res = planDeposit(fin, a.id, s.planId, { date: s.date, amount: s.amount, prices: s.prices, fromId: s.fromId, market: MARKET, newId });
+  if (res.error) return err([res.error]);
+  closeDialog(PLAN);
+  const p = a.plans.find((x) => x.id === s.planId);
+  undoable(`Kupiono w planie „${p.name}”: ${res.buys.map((x) => `${planItemLabel(x)} ${fmtQty(Math.round(x.qty * 1e4) / 1e4)}`).join(', ')}.`, () => {
+    fin = res.fin;
+    if (s.due && p.recurring?.nextDate === s.due) fin = advancePlan(fin, a.id, s.planId);
+  });
+});
+
+// Wpłaty cykliczne z automatem: kupno po cenach z dnia wpłaty (gdy brakuje ceny – prośba o wpisanie w Przeglądzie).
+let planBlocked = [];
+async function runPlans() {
+  const due = duePlanDeposits(fin, today()).filter((d) => d.plan.recurring.auto);
+  if (!due.length) return;
+  await ensurePlanAssets(due.flatMap((d) => d.plan.items)).catch(() => {});
+  let posted = 0;
+  planBlocked = [];
+  for (const d of due) {
+    for (let guard = 0; guard < 24; guard++) {
+      const a = acc(d.accountId);
+      const p = a?.plans?.find((x) => x.id === d.planId);
+      const r = p?.recurring;
+      if (!r?.auto || r.nextDate > today()) break;
+      const prices = Object.fromEntries(p.items.map((i) => [i.asset, marketPriceAt(MARKET, a, i.asset, r.nextDate)]));
+      const res = planDeposit(fin, a.id, p.id, { date: r.nextDate, amount: r.amount, prices, fromId: r.fromId, market: MARKET, newId });
+      if (res.error) {
+        planBlocked.push(`${a.id}|${p.id}`);
+        break;
+      }
+      fin = advancePlan(res.fin, a.id, p.id);
+      posted++;
+    }
+  }
+  if (posted) {
+    save();
+    toast(`Zapisano ${posted} ${plural(posted, 'wpłatę', 'wpłaty', 'wpłat')} do planów inwestycyjnych (kupno po cenach z dnia wpłaty).`, 6000);
+  }
+  if (posted || planBlocked.length) render();
+}
 
 // ---------- Szczegóły kredytu: koszty, oprocentowanie, nadpłata, symulacje, harmonogram ----------
 const LOAN = $('#loan-dialog');
@@ -2956,6 +3366,7 @@ document.addEventListener('visibilitychange', () => {
 runRecurring();
 render();
 refreshLibraryAssets();
+runPlans().catch(() => {});
 handleHash();
 scheduleDocCleanup(20000);
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
