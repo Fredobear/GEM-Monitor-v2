@@ -43,10 +43,12 @@ export default {
 
   // Każdy rynek ma: ETF-proxy notowany w USA (z niego liczone jest momentum – długa historia,
   // dywidendy uwzględnione) oraz instrument do kupienia w XTB (UCITS, potwierdzony w ofercie XTB).
+  // `opis` – po ludzku, co obejmuje indeks (tabela momentum na panelu).
   assets: {
     US: {
       name: 'Akcje USA',
       index: 'S&P 500',
+      opis: '500 największych spółek z USA',
       proxy: 'SPY',
       xtb: {
         ticker: 'CSPX.UK',
@@ -66,10 +68,12 @@ export default {
     EXUS: {
       name: 'Akcje poza USA',
       index: 'MSCI ACWI ex USA',
+      opis: 'cały świat bez USA, razem z rynkami wschodzącymi',
       proxy: 'ACWX',
       xtb: {
         ticker: 'EXUS.DE',
         name: 'Xtrackers MSCI World ex USA UCITS ETF 1C',
+        opis: 'kraje rozwinięte bez USA, razem z Kanadą',
         isin: 'IE0006WW1TQ4',
         exchange: 'Xetra (Frankfurt)',
         currency: 'EUR',
@@ -84,14 +88,17 @@ export default {
     DEVX: {
       name: 'Rynki rozwinięte bez USA',
       index: 'MSCI EAFE (Europa, Japonia, Australia i inne)',
+      opis: 'Europa, Japonia, Australia – bez USA i Kanady',
       proxy: 'EFA',
       xtb: {
         ticker: 'EXUS.DE',
         name: 'Xtrackers MSCI World ex USA UCITS ETF 1C',
+        opis: 'kraje rozwinięte bez USA, razem z Kanadą',
         isin: 'IE0006WW1TQ4',
         exchange: 'Xetra (Frankfurt)',
         currency: 'EUR',
         ter: 0.15,
+        note: 'W XTB nie ma ETF-u UCITS na MSCI EAFE. EXUS.DE (MSCI World ex USA) obejmuje te same kraje i dodatkowo Kanadę (ok. 1/10 funduszu).',
       },
       listings: [
         { ticker: 'EXUS.DE', currency: 'EUR', exchange: 'Xetra' },
@@ -101,6 +108,7 @@ export default {
     EM: {
       name: 'Rynki wschodzące',
       index: 'MSCI Emerging Markets IMI',
+      opis: 'm.in. Chiny, Indie, Tajwan, Korea, Brazylia',
       proxy: 'IEMG',
       xtb: {
         ticker: 'EIMI.UK',
@@ -119,6 +127,7 @@ export default {
     BONDS: {
       name: 'Obligacje USA (zagregowane)',
       index: 'Bloomberg US Aggregate',
+      opis: 'obligacje skarbowe i firm z USA',
       proxy: 'AGG',
       xtb: {
         ticker: 'IUAA.UK',
@@ -133,6 +142,7 @@ export default {
     TBILLS: {
       name: 'Bony skarbowe USA (odpowiednik gotówki)',
       index: 'US Treasury Bills 1–3M',
+      opis: 'bony skarbowe USA do 3 miesięcy',
       proxy: 'BIL',
       xtb: {
         ticker: 'IB01.UK',

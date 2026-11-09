@@ -296,20 +296,43 @@ function renderAi(text) {
   return out.join('');
 }
 
+// Tabela momentum: najpierw rynki, które biorą udział w Twoim wariancie strategii, potem pozostałe – tylko dla
+// porównania. Przy każdym: co obejmuje (po ludzku), jaką rolę ma w strategii i co kupujesz w XTB.
 function momentumTable(signals, config, view) {
   const { rules } = signals;
   const r = view.returns;
   const keys = Object.keys(r).sort((a, b) => r[b] - r[a]);
   const scale = Math.max(0.1, ...keys.map((k) => Math.abs(r[k])));
   const decisionKeys = new Set([...rules.equities, rules.hurdle, ...rules.safe]);
-  const rows = keys
-    .map((k) => {
-      const a = config.assets[k];
-      const role = k === rules.hurdle ? 'próg' : rules.equities.includes(k) ? 'akcje' : rules.safe.includes(k) ? 'bezpieczne' : 'info';
-      return `<tr class="${k === view.decision.asset ? 'sel' : ''}"><td>${esc(a.name)}<div class="meta">${esc(a.xtb.ticker)} · ${role}${decisionKeys.has(k) ? '' : ' (poza wariantem)'}</div></td><td class="num">${fmtPct(r[k])}</td><td class="barcell">${bar(r[k], scale)}</td></tr>`;
+  const role = (k) => (k === rules.hurdle ? 'próg filtra trendu' : rules.safe.includes(k) ? 'bezpieczna przystań' : '');
+  const row = (k) => {
+    const a = config.assets[k];
+    const what = [a.opis ?? a.index, role(k)].filter(Boolean).join(' · ');
+    return `<tr class="${k === view.decision.asset ? 'sel' : ''}"><td>${esc(a.name)}<div class="meta">${esc(what)}<br>w XTB: ${esc(a.xtb.ticker)}</div></td><td class="num">${fmtPct(r[k])}</td><td class="barcell">${bar(r[k], scale)}</td></tr>`;
+  };
+  const inVariant = keys.filter((k) => decisionKeys.has(k));
+  const others = keys.filter((k) => !decisionKeys.has(k));
+  const rows = `${inVariant.map(row).join('')}${others.length ? `<tr class="grp"><td colspan="3">Dla porównania – nie biorą udziału w wariancie „${esc(rules.variant)}”</td></tr>${others.map(row).join('')}` : ''}`;
+  return `<div class="tbl-wrap"><table><thead><tr><th>Rynek</th><th class="num">${rules.lookbackMonths} mies.</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>${sameFundNote(config, keys)}`;
+}
+
+// Ten sam fundusz w XTB dla kilku rynków (np. EXUS.DE): różne indeksy, więc różne wyniki – wyjaśnienie pod tabelą.
+function sameFundNote(config, keys) {
+  const byTicker = new Map();
+  for (const k of keys) {
+    const t = config.assets[k].xtb.ticker;
+    byTicker.set(t, [...(byTicker.get(t) ?? []), k]);
+  }
+  return [...byTicker]
+    .filter(([, list]) => list.length > 1)
+    .map(([ticker, list]) => {
+      const assets = list.map((k) => config.assets[k]);
+      const names = assets.map((a) => `„${a.name}” (${a.opis ?? a.index})`);
+      const fund = assets[0].xtb;
+      const split = list.includes('EXUS') && config.assets.EM ? ` Jeśli chcesz wierniej odwzorować „${config.assets.EXUS.name}”, podziel kwotę: ok. 72% ${ticker} i 28% ${config.assets.EM.xtb.ticker}.` : '';
+      return `<p class="meta">Dlaczego ${esc(ticker)} jest ${list.length === 2 ? 'dwa razy' : `${list.length} razy`}: ${esc(names.join(' i '))} to różne indeksy, dlatego mają różne wyniki. W XTB nie ma funduszu dokładnie na żaden z nich, więc ${list.length === 2 ? 'oba' : 'wszystkie'} kupujesz przez najbliższy odpowiednik: ${esc(ticker)}${fund.opis ? ` (${esc(fund.opis)})` : ''}.${esc(split)}</p>`;
     })
     .join('');
-  return `<div class="tbl-wrap"><table><thead><tr><th>Rynek / ETF w XTB</th><th class="num">${rules.lookbackMonths} mies.</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function researchCard(research) {
@@ -345,9 +368,9 @@ function signalTab({ signals, explanation, config, research }) {
   parts.push(`<section class="card"><h2>Dlaczego ten rynek</h2><ul class="plain">${explanation.reasons.map((r) => `<li>${esc(r)}</li>`).join('')}</ul></section>`);
   if (preview) {
     const pa = config.assets[preview.decision.asset];
-    parts.push(`<section class="card"><h2>Podgląd na dziś</h2><div class="banner ${preview.differsFromOfficial ? 'warn' : 'info'}">${esc(explanation.previewNote)}</div>${momentumTable(signals, config, preview)}<p class="meta">Lider w podglądzie: ${esc(pa.name)} (${esc(pa.xtb.ticker)}). Momentum liczone krocząco ${rules.lookbackMonths} mies. wstecz od ${esc(datePL(preview.asOf))}.</p></section>`);
+    parts.push(`<section class="card"><h2>Podgląd na dziś</h2><div class="banner ${preview.differsFromOfficial ? 'warn' : 'info'}">${esc(explanation.previewNote)}</div>${momentumTable(signals, config, preview)}<p class="meta">Gdyby miesiąc skończył się dziś, sygnał wskazałby: ${esc(pa.name)} (${esc(pa.xtb.ticker)}). Wyniki z ostatnich ${rules.lookbackMonths} miesięcy do ${esc(datePL(preview.asOf))}.</p></section>`);
   }
-  parts.push(`<section class="card"><h2>Momentum na koniec ${esc(monthGenitivePL(official.month))}</h2>${momentumTable(signals, config, official)}<p class="meta">Filtr trendu: ${esc(config.assets[official.decision.absAsset].index)} musi pokonać bony skarbowe (${fmtPct(official.returns[rules.hurdle])}), inaczej strategia przechodzi do bezpiecznej przystani. Ceny skorygowane o dywidendy (ETF-y notowane w USA jako źródło danych); w XTB kupujesz odpowiedniki UCITS.</p></section>`);
+  parts.push(`<section class="card"><h2>Momentum na koniec ${esc(monthGenitivePL(official.month))}</h2>${momentumTable(signals, config, official)}<p class="meta">Filtr trendu: jeśli ${esc(config.assets[official.decision.absAsset].index)} zarobi w ciągu ${rules.lookbackMonths} miesięcy mniej niż bony skarbowe (${fmtPct(official.returns[rules.hurdle])}), strategia wychodzi z akcji do bezpiecznej przystani. Wyniki liczymy na funduszach notowanych w USA (najdłuższa historia, razem z dywidendami), a w XTB kupujesz ich europejskie odpowiedniki (UCITS).</p></section>`);
   parts.push(`<section class="card"><h2>Jak wykonać w XTB</h2><ul class="plain">${explanation.execution.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></section>`);
   if (explanation.currency?.length) {
     parts.push(`<section class="card"><h2>W jakiej walucie kupić</h2>
