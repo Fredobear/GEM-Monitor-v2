@@ -1,5 +1,7 @@
 // Rdzeń dziennika finansowego: konta, kategorie, transakcje, import (Apple Pay ze Skrótów, wyciągi CSV) i raporty.
 // Działa wyłącznie lokalnie – bez DOM, bez sieci. Plik jest wklejany do strony finanse.html i testowany w Node.
+// Wycena obligacji skarbowych (wzory z list emisyjnych) jest w assets.js – na stronie to ten sam skrypt.
+import { BOND_PREFIX, BOND_TAX, BOND_TYPES, bondEvents, bondLotPrice, bondMaturity, bondState, isBondLot } from './assets.js';
 
 // Korekta salda: zmiana salda konta (saldo początkowe, wycena konta inwestycyjnego, wyrównanie do banku).
 // Kwota korekty ma znak (+/−) i nie liczy się do wydatków ani przychodów.
@@ -538,6 +540,8 @@ export const lotCurrency = (market, lot) => (lot.asset && lot.asset !== 'manual'
 // wpisana ze średnią ceną zakupu dostaje w ten sposób od razu prawdziwą wycenę i zysk, a dalej śledzi zmiany indeksu.
 export function lotPrice(market, lot, date) {
   if (!lot.asset || lot.asset === 'manual') return pairAt(lot.marks?.length ? lot.marks : [[lot.date, lot.price]], date)[1];
+  // Obligacja skarbowa: nominał z odsetkami narosłymi do dnia (inflacja GUS i stopa NBP z market.bonds).
+  if (isBondLot(lot)) return bondLotPrice(market?.bonds, lot, date);
   const a = market?.assets?.[lot.asset];
   const mark = Array.isArray(lot.mark) && lot.mark[0] <= date && lot.mark[1] > 0 ? lot.mark : null;
   if (!a) return mark ? mark[1] : lot.price;
@@ -702,8 +706,20 @@ export function hasExactQuotes(market, asset, date) {
 }
 
 // Pozycja liczy się od daty zakupu, a gdy jej wartość była wcześniej w saldzie gotówki (rozliczenie przy dodaniu) –
-// od dnia rozliczenia (since). Sprzedana pozycja (until) zostaje w historii do dnia sprzedaży.
-export const lotActive = (lot, date) => (lot.since && lot.since > lot.date ? lot.since : lot.date) <= date && !(lot.until && date >= lot.until);
+// od dnia rozliczenia (since). Sprzedana pozycja (until) zostaje w historii do dnia sprzedaży, a obligacja – do wykupu.
+export const lotEnd = (lot) => lot.until ?? (isBondLot(lot) && lot.bond ? bondMaturity(lot) : null);
+export const lotActive = (lot, date) => {
+  const end = lotEnd(lot);
+  return (lot.since && lot.since > lot.date ? lot.since : lot.date) <= date && !(end && date >= end);
+};
+
+// Odsetki już wypłacone z obligacji (COI, ROR, DOR) do dnia `date`, w złotych – część zysku z pozycji.
+export function lotIncome(market, lot, date) {
+  if (!isBondLot(lot)) return 0;
+  const end = lotEnd(lot);
+  const st = bondState(lot, end && end < date ? end : date, market?.bonds);
+  return st ? st.paid * lot.qty : 0;
+}
 
 export function lotValuePLN(market, lot, date) {
   if (!lotActive(lot, date)) return 0;
@@ -750,20 +766,26 @@ export function lotResult(market, lot, date, cur = 'PLN') {
   const rate = crossRate(market, currency, cur, date);
   if (costIn === null || rate === null || !Number.isFinite(price)) return null;
   const value = lotActive(lot, date) ? lot.qty * price * rate : 0;
-  return { value, cost: costIn, costPLN: cur === 'PLN' ? costIn : lotCost(market, lot).costPLN, gain: value - costIn, gainPct: costIn > 0 ? value / costIn - 1 : null, priceChange: lot.price > 0 ? price / lot.price - 1 : null, currency };
+  // Odsetki wypłacone z obligacji (np. COI co rok) też są zyskiem z tej pozycji.
+  const plnRate = isBondLot(lot) ? crossRate(market, 'PLN', cur, date) : 1;
+  const income = isBondLot(lot) && plnRate !== null ? lotIncome(market, lot, date) * plnRate : 0;
+  return { value, income, cost: costIn, costPLN: cur === 'PLN' ? costIn : lotCost(market, lot).costPLN, gain: value + income - costIn, gainPct: costIn > 0 ? (value + income) / costIn - 1 : null, priceChange: lot.price > 0 ? price / lot.price - 1 : null, currency };
 }
 
 // Podsumowanie konta inwestycyjnego: ile zainwestowano w otwarte pozycje, ile są dziś warte i jaki jest zysk
 // (w walucie cur – zwykle walucie konta). Pozycje sprzedane (until) dają zysk zrealizowany.
 export function investSummary(market, account, date, cur = 'PLN') {
-  const out = { cost: 0, value: 0, gain: 0, gainPct: null, positions: 0, missing: 0, realized: null, currency: cur };
+  const out = { cost: 0, value: 0, income: 0, gain: 0, gainPct: null, positions: 0, missing: 0, realized: null, currency: cur };
   for (const lot of account.lots ?? []) {
-    if (lot.until) {
-      if (lot.until > date) continue;
-      const r = crossRate(market, lotCurrency(market, lot), cur, lot.until);
+    if (lot.until && lot.until > date) continue;
+    // Pozycja zamknięta (sprzedana albo obligacja po wykupie): zysk zrealizowany razem z wypłaconymi odsetkami.
+    const end = lotEnd(lot);
+    if (end && end <= date) {
+      const r = crossRate(market, lotCurrency(market, lot), cur, end);
       const { costIn } = lotCost(market, lot, cur);
       if (r === null || costIn === null) continue;
-      out.realized = (out.realized ?? 0) + lot.qty * lotPrice(market, lot, lot.until) * r - costIn;
+      const plnRate = crossRate(market, 'PLN', cur, end) ?? 0;
+      out.realized = (out.realized ?? 0) + lot.qty * lotPrice(market, lot, end) * r + lotIncome(market, lot, end) * plnRate - costIn;
       continue;
     }
     if (!lotActive(lot, date)) continue;
@@ -774,10 +796,11 @@ export function investSummary(market, account, date, cur = 'PLN') {
     }
     out.cost += res.cost;
     out.value += res.value;
+    out.income += res.income;
     out.positions++;
   }
-  out.gain = out.value - out.cost;
-  out.gainPct = out.cost > 0 ? out.value / out.cost - 1 : null;
+  out.gain = out.value + out.income - out.cost;
+  out.gainPct = out.cost > 0 ? (out.value + out.income) / out.cost - 1 : null;
   return out.positions || out.realized !== null ? out : null;
 }
 
@@ -1279,6 +1302,53 @@ export function processLoans(fin, today, { newId, now = Date.now(), market = nul
   if (!txs.length) return { fin, posted: 0 };
   const categories = fin.categories.some((c) => c.id === LOAN_CATEGORY.id) ? fin.categories : [...fin.categories, { ...LOAN_CATEGORY }];
   return { fin: { ...fin, categories, txs: [...fin.txs, ...txs], updatedAt: now }, posted: new Set(txs.map((t) => `${t.loanId}|${t.loanNo}`)).size };
+}
+
+// ---------- Obligacje skarbowe: wypłaty odsetek i wykup ----------
+// Odsetki z COI (co rok), ROR i DOR (co miesiąc) oraz kwota z wykupu (wartość nominalna + odsetki z kapitalizacji)
+// trafiają na konto wskazane przy obligacjach (domyślnie to samo konto), od dnia dodania obligacji do dziennika.
+// Odsetki pomniejsza podatek 19% (poza IKE/IKZE). Każda wypłata zapisuje się raz – także po usunięciu operacji.
+export const BOND_CATEGORY = { id: 'odsetki', emoji: '📜', name: 'Odsetki z obligacji', kind: 'przychod', color: '#0d9488', budget: null };
+const fmtPLN = (x) => String(round2(x).toFixed(2)).replace('.', ',');
+
+export function processBonds(fin, today, { newId, now = Date.now(), market = null }) {
+  const data = market?.bonds;
+  if (!data) return { fin, posted: 0 };
+  const keys = new Set(fin.txs.filter((t) => t.importKey).map((t) => t.importKey));
+  const txs = [];
+  for (const a of fin.accounts) {
+    if (a.archived) continue;
+    for (const lot of a.lots ?? []) {
+      if (!isBondLot(lot) || !BOND_TYPES[lot.bond?.type] || !(lot.qty > 0)) continue;
+      const payTo = lot.bond.payTo || a.id;
+      const target = fin.accounts.find((x) => x.id === payTo && !x.archived);
+      if (payTo === 'none' || !target) continue;
+      const t0 = BOND_TYPES[lot.bond.type];
+      const series = lot.asset.slice(BOND_PREFIX.length);
+      const cur = target.currency || 'PLN';
+      for (const e of bondEvents(lot, data, lot.bond.trackFrom || lot.date, today)) {
+        if (keys.has(e.key)) continue;
+        const gross = round2(e.perBond * lot.qty);
+        if (!(gross > 0)) continue;
+        const tax = e.kind === 'odsetki' && !lot.bond.ike ? round2(gross * BOND_TAX) : 0;
+        const tx = { id: newId(), date: e.date, accountId: target.id, source: 'obligacje', importKey: e.key, bondLotId: lot.id, createdAt: now, updatedAt: now };
+        if (e.kind === 'odsetki') {
+          const when = !t0.pay ? 'przy wykupie' : t0.step < 12 ? `${e.k}. miesiąc` : `${e.k}. rok`;
+          Object.assign(tx, { type: 'przychod', amount: round2(gross - tax), categoryId: BOND_CATEGORY.id, merchant: `Odsetki: ${series} (${when})`, note: tax ? `Brutto ${fmtPLN(gross)} zł, podatek 19% ${fmtPLN(tax)} zł` : 'Bez podatku (IKE/IKZE)' });
+        } else Object.assign(tx, { type: 'korekta', amount: gross, merchant: `Wykup obligacji ${series} – zwrot wartości nominalnej` });
+        if (cur !== 'PLN') {
+          const v = convert(market, tx.amount, 'PLN', cur, e.date);
+          if (v === null) continue;
+          tx.accountAmount = v;
+        }
+        txs.push(tx);
+        keys.add(e.key);
+      }
+    }
+  }
+  if (!txs.length) return { fin, posted: 0 };
+  const categories = fin.categories.some((c) => c.id === BOND_CATEGORY.id) ? fin.categories : [...fin.categories, { ...BOND_CATEGORY }];
+  return { fin: { ...fin, categories, txs: [...fin.txs, ...txs], updatedAt: now }, posted: txs.length, txs };
 }
 
 /** Sprawdzenie parametrów kredytu z formularza. */

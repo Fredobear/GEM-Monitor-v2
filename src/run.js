@@ -11,6 +11,9 @@ import { aiCommentary, aiMarketNote } from './ai.js';
 import { buildPrices } from './prices.js';
 import { buildQuotes, loadCatalog, loadWatchlist, readNotowania } from './instruments.js';
 import { buildFunds, readFunds } from './funds.js';
+import { buildGold, readGold } from './gold.js';
+import { buildCrypto, readCrypto } from './crypto.js';
+import { buildBonds, readBonds } from './bonds.js';
 import { buildMarketOverview } from './markets.js';
 import { loadTaxNews, dueReminders, upcoming, aiTaxReport, compareWithConfig } from './taxmonitor.js';
 import { writeDashboard } from './dashboard.js';
@@ -122,6 +125,22 @@ export async function run({ flags = new Set(), root, env = process.env, now = ne
     priceWarnings.push(...library.funds.warnings.map((w) => `Fundusze ING TFI – ${w}`));
   } catch (err) {
     priceWarnings.push(`Fundusze ING TFI nie zostały odświeżone: ${err.message}`);
+  }
+
+  // Złoto (NBP), kryptowaluty (CoinGecko) i obligacje skarbowe (inflacja GUS, stopa NBP, oferta) – do wyceny w Finansach.
+  const aktywa = config.aktywa ?? {};
+  const assetSources = [
+    ['gold', 'Złoto', async () => buildGold({ previous: await readGold(docsDir), now })],
+    ['crypto', 'Kryptowaluty', async () => buildCrypto({ previous: await readCrypto(docsDir), now, env, top: aktywa.kryptoTop ?? 100, extra: aktywa.kryptoDodatkowe ?? [] })],
+    ['bonds', 'Obligacje skarbowe', async () => buildBonds({ previous: await readBonds(docsDir), now })],
+  ];
+  for (const [key, label, build] of assetSources) {
+    try {
+      library[key] = await build();
+      priceWarnings.push(...(library[key].warnings ?? []).map((w) => `${label} – ${w}`));
+    } catch (err) {
+      priceWarnings.push(`${label}: dane nie zostały odświeżone (${err.message}).`);
+    }
   }
 
   // Przegląd rynków: notowania świata i GPW, termometr nastroju, statystyka, kalendarz i notatka rynkowa.

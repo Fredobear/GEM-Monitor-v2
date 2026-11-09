@@ -33,7 +33,8 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
   - wskaźniki ryzyka (VIX, spready kredytowe, krzywa rentowności, niepewność polityczna, dolar, ropa, USD/PLN) i wiadomości z kilkunastu źródeł.
 - **Rynki → Instrumenty:**
   - **biblioteka instrumentów XTB**: wyszukiwarka wszystkich ok. 9 000 akcji i ETF/ETN/ETC z oferty XTB (nazwa, symbol albo ISIN) z automatyczną wyceną – zob. [Biblioteka instrumentów XTB](#biblioteka-instrumentów-xtb);
-  - **fundusze ING TFI** (PPE, PPK, IKE): porównanie wycen i stóp zwrotu w wybranej kategorii jednostek – zob. [Fundusze ING TFI (PPE)](#fundusze-ing-tfi-ppe).
+  - **fundusze ING TFI** (PPE, PPK, IKE): porównanie wycen i stóp zwrotu w wybranej kategorii jednostek – zob. [Fundusze ING TFI (PPE)](#fundusze-ing-tfi-ppe);
+  - **obligacje skarbowe**: bieżąca oferta (oprocentowanie w 1. roku, marża, opłaty) z inflacją GUS i stopą referencyjną NBP, **złoto** (cena NBP za gram, monety i sztabki) i **kryptowaluty** (100 największych, kursy w złotych) – zob. [Obligacje skarbowe, złoto i kryptowaluty](#obligacje-skarbowe-złoto-i-kryptowaluty).
 - **Rynki → Podatki:**
   - plan wpłat (IKZE → IKE → OKI → konto zwykłe) ze zwrotem z IKZE;
   - porównanie kosztów brokerów;
@@ -48,9 +49,9 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
   - **kredyty i pożyczki**: oprocentowanie stałe, zmienne (WIBOR/WIRON + marża) albo 0%, raty równe lub malejące, karencja, prowizja, ubezpieczenie, harmonogram, RRSO, całkowity koszt, zmiany oprocentowania, nadpłaty z symulacją (krótszy okres albo niższa rata) i raty zapisywane w dzienniku (kapitał jako przelew, odsetki jako wydatek);
   - **przelew na IKE/IKZE/OKI**: konto powiązane z portfelem GEM – przelew zapisuje się w dzienniku i jako wpłata w portfelu GEM (limit), a konto pokazuje wycenę z portfela;
   - konta w złotych, euro, dolarach, funtach i frankach – przeliczane na złote po kursie średnim NBP;
-  - konto inwestycyjne z aktywami: dowolny instrument z oferty XTB (wycena automatyczna, gdy jest darmowe źródło notowań), fundusz ING TFI z PPE (wycena jednostki z ING TFI) albo inne aktywo z wyceną ręczną;
+  - konto inwestycyjne z aktywami: dowolny instrument z oferty XTB (wycena automatyczna, gdy jest darmowe źródło notowań), fundusz ING TFI z PPE (wycena jednostki z ING TFI), **obligacje skarbowe** (EDO, COI, ROS, ROD, TOS, DOR, ROR, OTS – wartość z odsetkami według list emisyjnych, wypłaty odsetek i wykup zapisywane same, kwota na rękę przy wcześniejszym wykupie), **złoto** (monety i sztabki, cena NBP), **kryptowaluty** (kurs z CoinGecko) albo inne aktywo z wyceną ręczną;
   - przy każdym koncie inwestycyjnym i każdej pozycji: **ile zainwestowano, ile to jest warte i jaki jest zysk** (w złotych i procentach, z efektem kursu walut), a w podsumowaniu majątku – łączny zysk z inwestycji; pozycje można wpisać ze średnią ceną i kursem z XTB (zysk od razu, bez całej historii transakcji);
-  - **plany inwestycyjne**: wpłata dzielona procentowo na kilka ETF-ów albo funduszy (jak plany w XTB i alokacja w PPE), także cyklicznie i automatycznie;
+  - **plany inwestycyjne**: wpłata dzielona procentowo na kilka ETF-ów, funduszy albo kryptowalut (jak plany w XTB i alokacja w PPE), także cyklicznie i automatycznie;
   - tabela porównania kategorii z poprzednim miesiącem: dotknięcie kwoty pokazuje dymek z wydatkami, z których się składa;
   - wykres majątku i dochodów miesiąc po miesiącu;
   - dokumenty offline (paski płacowe, paragony, umowy) przy operacjach i w osobnej zakładce;
@@ -60,7 +61,7 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
 - **Bezpieczniki:**
   - bez kompletnych i aktualnych danych sygnał nie powstaje, a Ty dostajesz komunikat o problemie;
   - dwa niezależne źródła danych są ze sobą porównywane;
-  - 111 testów automatycznych.
+  - 124 testów automatycznych.
 
 | Rola | ETF w XTB | Waluta |
 |---|---|---|
@@ -105,6 +106,7 @@ W repozytorium otwórz **Settings → Secrets and variables → Actions → New 
 | `NTFY_TOPIC` | nazwa tematu z kroku 3A | jeden z kanałów |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | z kroku 3B | jeden z kanałów |
 | `ANTHROPIC_API_KEY` | klucz z [console.anthropic.com](https://console.anthropic.com) | nie – tylko dla notatki rynkowej AI i komentarza AI |
+| `COINGECKO_API_KEY` | darmowy klucz Demo z [coingecko.com/en/api](https://www.coingecko.com/en/api/pricing) | nie – kursy kryptowalut działają też bez niego; z kluczem pobieranie jest stabilniejsze |
 
 ### Krok 5. Panel WWW (GitHub Pages)
 
@@ -189,6 +191,20 @@ Pracownicze programy emerytalne w ING prowadzi **ING TFI** (dawniej NN Investmen
 - **Śledzenie zysku z PPE:** Finanse → konto inwestycyjne (np. „PPE ING”) → **Aktywa** → **+ Fundusz ING TFI (PPE)** → wybierz fundusz i kategorię, wpisz **liczbę jednostek** i **sumę wpłat** (obie liczby są w ING TFI24). Aplikacja pokaże wartość według najnowszej wyceny jednostki i zysk w złotych i procentach.
 - **Porównanie funduszy:** Rynki → Instrumenty → **Fundusze ING TFI** – wycena jednostki i stopy zwrotu (miesiąc, 12 miesięcy, od początku roku, 5 lat) w wybranej kategorii.
 
+## Obligacje skarbowe, złoto i kryptowaluty
+
+Trzy rodzaje inwestycji dostępne dla każdego – obok akcji, ETF-ów i funduszy – z codzienną wyceną w Finansach (konto inwestycyjne → **Aktywa**). Wszystkie dane pobiera GitHub Actions i zapisuje w plikach aplikacji (`data/obligacje.js`, `data/zloto.js`, `data/krypto.js`); strona Finansów tylko je wczytuje – Twoje obligacje, monety czy kryptowaluty nigdzie nie trafiają.
+
+- **Obligacje skarbowe (oszczędnościowe):**
+  - **skąd dane:** inflacja z GUS (plik „Miesięczne wskaźniki cen towarów i usług konsumpcyjnych od 1982 roku”), stopa referencyjna NBP (archiwum i bieżąca tabela stóp) oraz bieżąca oferta z [obligacjeskarbowe.pl](https://www.obligacjeskarbowe.pl/) – oprocentowanie w 1. okresie, marża, opłata za wcześniejszy wykup i cena zamiany. Parametry każdej nowej emisji aplikacja zapisuje sama (od listopada 2026);
+  - **jak liczona jest wartość:** według wzorów z list emisyjnych Ministra Finansów – od 2. roku oprocentowanie COI, ROS, EDO i ROD to inflacja ogłoszona przez GUS w miesiącu przed początkiem okresu + marża (przy deflacji sama marża), a ROR i DOR – stopa referencyjna NBP z 10. dnia roboczego przed początkiem miesiąca + marża. EDO, ROS, ROD i TOS dopisują odsetki co rok, COI wypłaca je co rok, a ROR i DOR co miesiąc. Wynik sprawdzono na przykładzie z obligacjeskarbowe.pl (EDO, wcześniejszy wykup: 101,75 zł co do grosza);
+  - **co widzisz:** wartość z narosłymi odsetkami, oprocentowanie w bieżącym okresie, wypłacone odsetki, najbliższą wypłatę, datę wykupu i **ile dostaniesz na rękę przy wcześniejszym wykupie** (po opłacie i 19% podatku; na IKE/IKZE bez nich);
+  - **wypłaty same w dzienniku:** odsetki z COI, ROR i DOR oraz kwota z wykupu zapisują się na wybranym koncie (np. konto w PKO) jako przychód „Odsetki z obligacji”, po podatku – od dnia dodania obligacji do aplikacji;
+  - **starsze serie:** dla obligacji kupionych przed listopadem 2026 wpisz raz oprocentowanie w 1. roku i marżę (są w serwisie obligacji PKO → Moje obligacje albo w liście emisyjnym).
+- **Złoto:** cena 1 g złota w próbie 1000 z NBP (dni robocze, historia od 2013 r.). Wybierasz wyrób – monetę bulionową 1 oz (Krugerrand, Filharmonik, Maple Leaf, Orzeł Bielik…), 1/2, 1/4, 1/10 oz, sztabkę 1 g – 1 kg albo dowolny wyrób z masą i próbą – liczbę sztuk i cenę zakupu. To cena referencyjna: mennice skupują zwykle kilka procent taniej.
+- **Kryptowaluty:** kursy w złotych 100 największych kryptowalut z CoinGecko (codziennie, z historią z ostatniego roku uzupełnianą stopniowo). Lista jest zawsze ta sama, więc z repozytorium nie wynika, co masz. Kryptowalutę spoza listy dopiszesz w `config/gem.config.js` (`aktywa.kryptoDodatkowe` – ta lista jest widoczna w repozytorium) albo dodasz jako „Inne aktywo”. Darmowy klucz `COINGECKO_API_KEY` jest opcjonalny.
+- **Rynki → Instrumenty** pokazuje bieżącą ofertę obligacji (z szacunkiem oprocentowania od 2. roku przy obecnej inflacji), cenę złota ze zmianami i tabelę kryptowalut.
+
 ## Przegląd rynku i notatka
 
 Zakładka **Rynki → Przegląd** zbiera dane ze świata w każdy dzień roboczy (przed otwarciem giełd w Europie):
@@ -242,7 +258,7 @@ node src/cli.js demo
 node scripts/serve.js
 ```
 
-- `npm test` uruchamia 111 testów.
+- `npm test` uruchamia 124 testów.
 - `node src/cli.js demo` buduje aplikację demonstracyjną bez kluczy API. Sygnał pochodzi z danych historycznych, a w zakładce GEM → Mój portfel GEM możesz wczytać przykładowe transakcje.
 - `node scripts/serve.js` udostępnia panel pod adresem http://localhost:8080.
 
@@ -262,6 +278,9 @@ src/explain.js            uzasadnienie po polsku
 src/macro.js, news.js     wskaźniki ryzyka i wiadomości
 src/markets.js            przegląd rynku: rynki świata i GPW, termometr, statystyka, kalendarz, notatka
 src/funds.js              fundusze ING TFI (PPE): wyceny jednostek wszystkich kategorii
+src/bonds.js              obligacje skarbowe: inflacja GUS, stopa referencyjna NBP, oferta obligacjeskarbowe.pl
+src/gold.js, crypto.js    cena złota z NBP i kursy kryptowalut z CoinGecko
+src/client/assets.js      wycena obligacji (wzory z list emisyjnych), złota i kryptowalut w przeglądarce
 src/prices.js             kursy NBP i historia cen do wyceny portfela
 src/instruments.js        biblioteka instrumentów XTB: katalog, kursy GPW/NewConnect, Tiingo, wycena przez indeks
 src/xls.js                czytnik plików Excel (.xls) z archiwum notowań GPW, bez zależności

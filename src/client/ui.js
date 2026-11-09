@@ -515,9 +515,12 @@ function renderInstruments() {
   const root = $('#instrumenty-root');
   if (!root || instrumentsMounted) return;
   instrumentsMounted = true;
-  root.innerHTML = libraryCard() + fundsCard();
+  root.innerHTML = libraryCard() + bondsCard() + fundsCard() + goldCard() + cryptoCard();
   mountLibrary(root);
+  mountBonds(root);
   mountFunds(root);
+  mountGold(root);
+  mountCrypto(root);
   root.addEventListener('click', (ev) => {
     const b = ev.target.closest('[data-act="lib-add"]');
     if (!b) return;
@@ -576,6 +579,119 @@ async function mountFunds(root) {
     }
     draw();
   });
+  draw();
+}
+
+// ---------- Obligacje skarbowe, złoto i kryptowaluty (dane z data/obligacje.js, data/zloto.js, data/krypto.js) ----------
+const pctPlain = (x) => `${NF2.format(x).replace(/,00$/, '')}%`;
+const signedCell = (x) => `<td class="num ${Number.isFinite(x) ? (x >= 0 ? 'pos' : 'neg') : ''}">${Number.isFinite(x) ? pct(x) : '–'}</td>`;
+
+function bondsCard() {
+  return `<section class="card" id="bonds-card"><h2>Obligacje skarbowe</h2>
+  <div id="bonds-body"><p class="muted small">Ładowanie oferty…</p></div>
+  <p class="meta">Oferta z obligacjeskarbowe.pl zmienia się co miesiąc. Obligacje indeksowane (COI, ROS, EDO, ROD) od 2. roku mają oprocentowanie: inflacja z GUS + marża, a zmiennoprocentowe (ROR, DOR): stopa referencyjna NBP + marża. Swoje obligacje dodasz w Finansach: konto → Aktywa → „+ Obligacje skarbowe” – aplikacja policzy odsetki, wypłaty i kwotę przy wcześniejszym wykupie.</p></section>`;
+}
+
+async function mountBonds(root) {
+  const body = $('#bonds-body', root);
+  const data = await assetLoadBonds();
+  if (!data?.offer?.length) {
+    body.innerHTML = '<p class="muted small">Oferta obligacji pojawi się po najbliższej aktualizacji aplikacji.</p>';
+    return;
+  }
+  const cpi = data.cpi?.at(-1);
+  const ref = data.ref?.at(-1);
+  const order = Object.keys(BOND_TYPES);
+  const rows = data.offer
+    .map((code) => ({ code, s: data.series[code] }))
+    .filter((x) => x.s && BOND_TYPES[x.s.type])
+    .sort((a, b) => order.indexOf(a.s.type) - order.indexOf(b.s.type))
+    .map(({ code, s }) => {
+      const t = BOND_TYPES[s.type];
+      const term = t.months < 12 ? `${t.months} mies.` : t.months === 12 ? '1 rok' : t.months < 60 ? `${t.months / 12} lata` : `${t.months / 12} lat`;
+      const base = t.kind === 'inflacja' ? cpi?.[1] : t.kind === 'nbp' ? ref?.[1] : null;
+      const later = t.kind === 'stale' ? 'stałe' : `${t.kind === 'inflacja' ? 'inflacja' : 'stopa NBP'} + ${pctPlain(s.margin ?? 0)}${Number.isFinite(base) ? `<div class="small muted">dziś ok. ${pctPlain(Math.max(0, base) + (s.margin ?? 0))}</div>` : ''}`;
+      const payout = t.pay ? (t.step === 1 ? 'co miesiąc' : 'co rok') : t.cap ? 'dopisywane co rok, wypłata przy wykupie' : 'przy wykupie';
+      return `<tr><td><b>${esc(code)}</b><div class="small muted">${esc(t.name.split(' – ')[1] ?? t.name)}</div></td><td class="num">${esc(term)}</td><td class="num"><b>${pctPlain(s.rate1)}</b>${t.step === 1 ? '<div class="small muted">1. miesiąc</div>' : ''}</td><td class="num">${later}</td><td class="opt">${esc(payout)}</td><td class="num opt">${s.fee > 0 ? `${NF2.format(s.fee)} zł` : '–'}</td></tr>`;
+    })
+    .join('');
+  body.innerHTML = `<div class="tbl-wrap"><table class="fund-tbl"><thead><tr><th>Seria</th><th class="num">Na ile</th><th class="num">1. rok</th><th class="num">Potem</th><th class="opt">Odsetki</th><th class="num opt">Opłata za wcześniejszy wykup</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="small muted">Oferta na ${esc(data.offerMonth ? `${MONTHS_FULL[Number(data.offerMonth.slice(5, 7)) - 1]} ${data.offerMonth.slice(0, 4)}` : '–')}.${cpi ? ` Inflacja r/r (GUS): ${pctPlain(cpi[1])} za ${esc(`${MONTHS_FULL[Number(cpi[0].slice(5, 7)) - 1]} ${cpi[0].slice(0, 4)}`)}.` : ''}${ref ? ` Stopa referencyjna NBP: ${pctPlain(ref[1])} (od ${dShort(ref[0])}).` : ''} „Dziś ok.” – oprocentowanie od 2. okresu przy obecnej inflacji lub stopie NBP; w Twoim 2. roku zależy od inflacji z tamtego czasu. Obligacje rodzinne (ROS, ROD) są dla osób pobierających 800+.</p>`;
+}
+
+function goldCard() {
+  return `<section class="card" id="gold-card"><h2>Złoto</h2><div id="gold-body"><p class="muted small">Ładowanie…</p></div>
+  <p class="meta">Cena 1 g złota w próbie 1000 wyliczana przez NBP w dni robocze. To cena referencyjna: mennice skupują zwykle kilka procent taniej, a sprzedają drożej. Monety bulionowe 1 oz zawierają 31,1 g czystego złota. Swoje złoto dodasz w Finansach: konto → Aktywa → „+ Złoto”.</p></section>`;
+}
+
+async function mountGold(root) {
+  const body = $('#gold-body', root);
+  const data = await assetLoadGold();
+  const p = data?.prices ?? [];
+  if (!p.length) {
+    body.innerHTML = '<p class="muted small">Cena złota pojawi się po najbliższej aktualizacji aplikacji.</p>';
+    return;
+  }
+  const last = p.at(-1);
+  const at = (iso) => {
+    let found = null;
+    for (const x of p) {
+      if (x[0] <= iso) found = x;
+      else break;
+    }
+    return found;
+  };
+  const back = (months) => {
+    const d = new Date(`${last[0]}T00:00:00Z`);
+    d.setUTCMonth(d.getUTCMonth() - months);
+    return at(d.toISOString().slice(0, 10));
+  };
+  const ch = (x) => (x ? last[1] / x[1] - 1 : null);
+  const ytd = at(`${Number(last[0].slice(0, 4)) - 1}-12-31`);
+  const rows = [
+    ['1 g', 1],
+    ['moneta 1 oz (31,1 g)', OZ_GRAMS],
+    ['sztabka 10 g', 10],
+    ['sztabka 100 g', 100],
+  ];
+  body.innerHTML = `<p>1 g złota: <b>${NF2.format(last[1])} zł</b> <span class="muted">(NBP, ${dShort(last[0])})</span></p>
+  <div class="tbl-wrap"><table class="fund-tbl"><thead><tr><th>Wyrób</th><th class="num">Wartość wg NBP</th></tr></thead><tbody>${rows.map(([n, g]) => `<tr><td>${esc(n)}</td><td class="num">${NF2.format(g * last[1])} zł</td></tr>`).join('')}</tbody></table></div>
+  <div class="tbl-wrap"><table class="fund-tbl"><thead><tr><th class="num">1 mies.</th><th class="num">Od 1.01</th><th class="num">12 mies.</th><th class="num">5 lat</th></tr></thead><tbody><tr>${[ch(back(1)), ch(ytd), ch(back(12)), ch(back(60))].map(signedCell).join('')}</tr></tbody></table></div>`;
+}
+
+function cryptoCard() {
+  return `<section class="card" id="crypto-card"><div class="card-head"><h2>Kryptowaluty</h2><input type="search" id="crypto-q" class="crypto-q" placeholder="Szukaj: BTC, Ethereum…" aria-label="Szukaj kryptowaluty"></div>
+  <div id="crypto-body"><p class="muted small">Ładowanie kursów…</p></div>
+  <p class="meta">Kursy w złotych z CoinGecko, aktualizowane codziennie (100 największych kryptowalut). Kryptowaluty są bardzo zmienne – w skrajnych przypadkach można stracić większość wpłaconych pieniędzy. Swoje kryptowaluty dodasz w Finansach: konto → Aktywa → „+ Kryptowaluta”.</p></section>`;
+}
+
+async function mountCrypto(root) {
+  const body = $('#crypto-body', root);
+  const q = $('#crypto-q', root);
+  const data = await assetLoadCrypto();
+  if (!data?.coins?.length) {
+    body.innerHTML = '<p class="muted small">Kursy kryptowalut pojawią się po najbliższej aktualizacji aplikacji.</p>';
+    q.hidden = true;
+    return;
+  }
+  let all = false;
+  const price = (x) => (x >= 1 ? NF2.format(x) : String(Number(x.toPrecision(3))).replace('.', ','));
+  const draw = () => {
+    const query = q.value.trim();
+    const list = query ? cryptoSearch(data, query, 30) : data.coins.slice(0, all ? data.coins.length : 15);
+    body.innerHTML = `<div class="tbl-wrap"><table class="fund-tbl"><thead><tr><th>Kryptowaluta</th><th class="num">Kurs</th><th class="num">24 h</th><th class="num opt">7 dni</th><th class="num">30 dni</th><th class="num opt">1 rok</th></tr></thead><tbody>${list
+      .map((c) => {
+        const last = cryptoQuotes(data, c.id).at(-1);
+        return `<tr><td><b>${esc(c.symbol)}</b> ${esc(c.name)}<div class="small muted">#${esc(c.rank ?? '–')}</div></td><td class="num">${last ? `${price(last[1])} zł` : '–'}</td>${signedCell(c.ch?.d1)}${signedCell(c.ch?.d7).replace('<td class="num', '<td class="num opt')}${signedCell(c.ch?.d30)}${signedCell(c.ch?.y1).replace('<td class="num', '<td class="num opt')}</tr>`;
+      })
+      .join('') || '<tr><td colspan="6" class="muted">Brak wyników.</td></tr>'}</tbody></table></div>
+    <p class="small muted">Kursy z ${data.asOf ? dShort(data.asOf) : '–'}.${!query && !all && data.coins.length > 15 ? ` <button type="button" class="link small" id="crypto-all">Pokaż wszystkie (${data.coins.length})</button>` : ''}</p>`;
+    $('#crypto-all', body)?.addEventListener('click', () => {
+      all = true;
+      draw();
+    });
+  };
+  q.addEventListener('input', draw);
   draw();
 }
 

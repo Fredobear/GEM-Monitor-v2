@@ -136,14 +136,15 @@ Rodzaj konta **Konto inwestycyjne** (np. XTB, IKE, IKZE, PPE). Jego wartość to
 1. *Konta → przy koncie inwestycyjnym → **Aktywa***.
 2. **+ Instrument z XTB**: wyszukaj dowolną akcję albo ETF z oferty XTB – po nazwie (np. „all world”), symbolu (np. „CDR”, „VWCE”) albo ISIN. Zanim cokolwiek wpiszesz, lista podpowiada ETF-y strategii GEM. Wpisz ilość i cenę zakupu za sztukę (albo od razu kwotę **Zainwestowano** – cenę aplikacja wyliczy) oraz datę zakupu. Każdy zakup możesz dodać jako osobną pozycję albo jedną pozycję ze średnią ceną. Przy instrumencie widać, skąd pochodzi jego cena.
 3. **+ Fundusz ING TFI (PPE)**: wybierz fundusz i **kategorię jednostek** (w PPE zwykle E, F, S, T albo W – sprawdzisz ją w serwisie ING TFI24 przy nazwie funduszu albo w umowie PPE pracodawcy; każda kategoria ma inną cenę jednostki). Wpisz **liczbę jednostek** i **sumę wpłat** – obie liczby pokazuje ING TFI24. Aplikacja zapamięta kategorię dla tego konta i przy kolejnym funduszu podpowie ją sama. Wycena jednostek przychodzi z ING TFI w każdy dzień roboczy.
-4. **+ Inne aktywo (wycena ręczna)**: np. obligacje skarbowe, lokata, złoto. Wpisujesz wartość, a gdy się zmieni – nową wartość (aplikacja zapamięta historię wycen do wykresu). Instrument z XTB bez darmowych notowań (np. akcja z Frankfurtu) aplikacja sama doda w tym trybie, z nazwą i walutą z katalogu.
-5. Opcja **Rozlicz zmianę z wolną gotówką na koncie** (domyślnie włączona):
+4. **+ Obligacje skarbowe**, **+ Złoto**, **+ Kryptowaluta** – zob. [niżej](#obligacje-skarbowe-złoto-i-kryptowaluty).
+5. **+ Inne aktywo (wycena ręczna)**: np. lokata, mieszkanie, kryptowaluta spoza listy. Wpisujesz wartość, a gdy się zmieni – nową wartość (aplikacja zapamięta historię wycen do wykresu). Instrument z XTB bez darmowych notowań (np. akcja z Frankfurtu) aplikacja sama doda w tym trybie, z nazwą i walutą z katalogu.
+6. Opcja **Rozlicz zmianę z wolną gotówką na koncie** (domyślnie włączona):
    - nowa pozycja (albo dokupienie – większa ilość) zmniejsza wolną gotówkę o swoją wartość – tak jest, gdy kupujesz ETF za pieniądze z rachunku albo gdy saldo konta (np. z Money Managera) obejmowało już wartość ETF-ów;
    - usunięcie pozycji to sprzedaż: jej wartość wraca do gotówki, a w historii pozycja zostaje do dnia sprzedaży;
    - sama zmiana wyceny (np. wpisanie kursu z XTB) nie rusza gotówki.
 
    Wyłącz tę opcję, gdy saldo konta to tylko gotówka, a aktywa dopisujesz osobno.
-6. **Wolna gotówka na rachunku teraz** (opcjonalnie): wpisz kwotę „Wolne środki” z XTB, a saldo konta ustawi się dokładnie na nią. Przydaje się, gdy saldo zawierało dotąd także wartość ETF-ów – reszta wartości konta to wtedy aktywa i ich zysk, a nie gotówka.
+7. **Wolna gotówka na rachunku teraz** (opcjonalnie): wpisz kwotę „Wolne środki” z XTB, a saldo konta ustawi się dokładnie na nią. Przydaje się, gdy saldo zawierało dotąd także wartość ETF-ów – reszta wartości konta to wtedy aktywa i ich zysk, a nie gotówka.
 
 **Pozycje ze średnią ceną (bez całej historii transakcji).** Nie musisz wpisywać każdego zakupu z przeszłości. Wpisz **ilość** i **średnią cenę zakupu** z XTB (albo kwotę „Zainwestowano”), datę możesz zostawić dzisiejszą. Dla ETF-ów z Xetry, Paryża czy Londynu aplikacja nie ma bezpłatnego źródła dokładnego kursu, dlatego przy takiej pozycji jest pole **Kurs teraz z XTB**: przepisz aktualną cenę z XTB (pozycja → aktualna cena). Od razu zobaczysz prawdziwą wartość i zysk, a w kolejne dni kurs będzie zmieniał się razem z indeksem, który ETF śledzi. Kurs możesz poprawić w każdej chwili (np. raz na kilka miesięcy). Dla akcji z GPW, funduszy ING TFI i obserwowanych akcji z USA to pole nie jest potrzebne – kurs przychodzi sam.
 
@@ -153,12 +154,29 @@ Na liście kont pozycje tego samego instrumentu (np. kolejne zakupy w planie) po
 
 **PPE w ING – przykład.** Konto „PPE ING” (zaznacz „nie wliczaj do salda łącznego”, jeśli nie chcesz liczyć PPE do majątku) → Aktywa → + Fundusz ING TFI (PPE) → „ING Akcji”, kategoria E → 12,3456 jednostki, suma wpłat 12 100 zł → Zapisz. Przy włączonym rozliczeniu z gotówką wartość funduszu zmniejszy wolną gotówkę konta, więc jeśli saldo PPE było wpisane jako gotówka, po dodaniu funduszy zostanie ono zastąpione wyceną funduszy. Kolejne składki dopisuj przez **plan inwestycyjny** (niżej) – podzielą się na fundusze same.
 
+### Obligacje skarbowe, złoto i kryptowaluty
+
+**Obligacje skarbowe** (EDO, COI, ROS, ROD, TOS, DOR, ROR, OTS): *Aktywa → **+ Obligacje skarbowe***.
+1. Wybierz **rodzaj** i **datę zakupu** – aplikacja wyznaczy serię (np. EDO kupione 9.11.2026 to EDO1136). Dla serii z oferty od listopada 2026 sama uzupełni **oprocentowanie w 1. roku**, **marżę** i **opłatę za wcześniejszy wykup**. Dla starszej serii przepisz je raz z serwisu obligacji PKO (Moje obligacje) albo z listu emisyjnego.
+2. Wpisz **liczbę obligacji** (po 100 zł) i cenę: 100 zł przy zakupie albo 99,90 zł przy zamianie.
+3. Wybierz konto, na które mają się zapisywać **odsetki i kwota z wykupu** (np. konto w PKO), albo „Nie zapisuj w dzienniku”. Zaznacz **IKE/IKZE**, jeśli obligacje są na takim koncie (bez podatku Belki i bez opłaty przy wypłacie z IKE).
+
+Aplikacja liczy wartość według wzorów z list emisyjnych: od 2. roku COI, ROS, EDO i ROD mają inflację z GUS (ogłoszoną w miesiącu przed początkiem okresu, czyli za miesiąc o dwa wcześniejszy) + marżę, a ROR i DOR – stopę referencyjną NBP + marżę. EDO, ROS, ROD i TOS dopisują odsetki co rok, COI wypłaca je co rok, ROR i DOR – co miesiąc. Przy koncie widać: odsetki narosłe, oprocentowanie w bieżącym okresie, wypłacone odsetki, najbliższą wypłatę, datę wykupu i **ile dostaniesz na rękę przy wcześniejszym wykupie** (po opłacie i 19% podatku). Zysk pozycji obejmuje też odsetki już wypłacone.
+
+**Wypłaty zapisują się same:** po terminie (przy otwarciu aplikacji) odsetki z COI, ROR i DOR trafiają na wybrane konto jako przychód w kategorii „Odsetki z obligacji” – po 19% podatku, z kwotą brutto i podatkiem w notatce. Przy wykupie zapisuje się też zwrot wartości nominalnej, a obligacje znikają z aktywów (ich wynik jest w zysku zrealizowanym). Zapisują się wypłaty od dnia dodania obligacji do aplikacji – wcześniejsze masz już na koncie w banku. Usunięta wypłata nie wraca.
+
+Gdy GUS albo NBP nie opublikował jeszcze danych na kolejny okres, wartość jest szacunkiem (ze stałym oprocentowaniem) – aplikacja to zaznacza, a wypłata zapisze się po najbliższej aktualizacji.
+
+**Złoto**: *Aktywa → **+ Złoto*** → wyrób (moneta bulionowa 1 oz, 1/2, 1/4 lub 1/10 oz, sztabka 1 g – 1 kg, złoto w gramach albo inny wyrób z masą i próbą), **liczba sztuk**, **cena zakupu za sztukę** i data. Wycena: gramy czystego złota × cena 1 g z NBP. To cena referencyjna – mennica w skupie zapłaci zwykle kilka procent mniej.
+
+**Kryptowaluty**: *Aktywa → **+ Kryptowaluta*** → wyszukaj (np. „BTC”, „Ethereum”) wśród 100 największych → **ilość** (do 8 miejsc po przecinku) i **średnia cena zakupu** w złotych. Kurs w złotych z CoinGecko, odświeżany codziennie. Kryptowalutę możesz też dodać do **planu inwestycyjnego** (np. co miesiąc 200 zł w BTC).
+
 ### Plany inwestycyjne (podział wpłaty na kilka ETF-ów albo funduszy)
 
 Tak działają plany inwestycyjne w XTB i alokacja wpłat w PPE: wpłacasz jedną kwotę, a ona dzieli się procentowo na kilka instrumentów.
 
 1. Przy koncie inwestycyjnym: **+ Plan inwestycyjny**. Aplikacja od razu podpowiada instrumenty, które masz na koncie, z udziałami według ich obecnej wartości – popraw je tak, jak w planie w XTB (np. VWCE 70%, EUNL 15%, IS3N 10%, MEUD 5%). Suma musi dawać 100% („rozłóż po równo” dzieli równo).
-2. Instrumenty dodasz też spoza konta: **+ Instrument z XTB** (wyszukiwarka) albo **+ Fundusz ING TFI** (fundusz i kategoria jednostek – dla PPE).
+2. Instrumenty dodasz też spoza konta: **+ Instrument z XTB** (wyszukiwarka), **+ Fundusz ING TFI** (fundusz i kategoria jednostek – dla PPE) albo **+ Kryptowaluta**.
 3. **Wpłata cykliczna** (opcjonalnie): kwota, dzień miesiąca, najbliższy termin i **skąd pieniądze**:
    - **przelew z konta** (np. mBank) – w dzienniku zapisze się przelew na konto inwestycyjne, a gotówka na nim się nie zmieni (pieniądze od razu idą w ETF-y);
    - **z wolnej gotówki na tym koncie**;
@@ -175,9 +193,11 @@ Każda wpłata zapisuje się jako osobne pozycje z ceną zakupu z tego dnia (dok
 - **ETF-y strategii GEM** – notowania z codziennej aktualizacji, a między nimi zmiana indeksu, który ETF śledzi;
 - **ETF-y UCITS na popularne indeksy** (np. VWCE, IWDA, SXR8, CNDX) – od ceny zakupu według zmiany amerykańskiego ETF-u na ten sam indeks, przeliczonej na walutę funduszu. To wycena przybliżona, oznaczona „≈” (może się różnić np. o koszty funduszu i dywidendy w funduszach dystrybuujących);
 - **akcje i ETF-y z USA** – kurs zamknięcia, gdy symbol jest na liście obserwowanych (*Rynki → Instrumenty → Edytuj listę obserwowanych*); bez tego – cena zakupu;
+- **obligacje skarbowe** – nominał z odsetkami według list emisyjnych (inflacja GUS, stopa referencyjna NBP);
+- **złoto** – cena 1 g z NBP; **kryptowaluty** – kurs w złotych z CoinGecko;
 - dokładną cenę zawsze widzisz w XTB albo w ING TFI24.
 
-Ceny instrumentów spoza strategii strona wczytuje z plików aplikacji (`data/notowania.js`, a wyceny funduszy – `data/fundusze.js`). To zwykłe pobranie gotowego pliku z tej samej strony – nic nie jest wysyłane, a blokada połączeń sieciowych (`connect-src 'none'`) działa jak dotąd.
+Ceny instrumentów spoza strategii strona wczytuje z plików aplikacji (`data/notowania.js`, wyceny funduszy – `data/fundusze.js`, złoto – `data/zloto.js`, kryptowaluty – `data/krypto.js`, dane obligacji – `data/obligacje.js`). To zwykłe pobranie gotowego pliku z tej samej strony – nic nie jest wysyłane, a blokada połączeń sieciowych (`connect-src 'none'`) działa jak dotąd.
 
 ## Wykres majątku i dochodów
 

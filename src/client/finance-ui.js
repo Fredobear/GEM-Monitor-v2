@@ -23,7 +23,7 @@ const gainClass = (x) => (x > 0.004 ? 'pos' : x < -0.004 ? 'neg' : '');
 const isFundLot = (l) => typeof l?.asset === 'string' && l.asset.startsWith(FUND_PREFIX);
 const compact = (x) => (x >= 10000 ? `${NF0.format(Math.round(x / 1000))} tys.` : NF0.format(Math.round(x)));
 const fmtInput = (x) => (Number.isFinite(x) && Math.abs(x) >= 0.005 ? String(round2(x)).replace('.', ',') : '');
-const fmtQty = (q) => (Number.isFinite(q) && q ? String(Number(q.toFixed(6))).replace('.', ',') : '');
+const fmtQty = (q, dec = 6) => (Number.isFinite(q) && q ? String(Number(q.toFixed(dec))).replace('.', ',') : '');
 const curLabel = (cur) => (!cur || cur === 'PLN' ? 'zł' : cur);
 const plural = (n, one, few, many) => (n === 1 ? one : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? few : many);
 const MONTHS = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'];
@@ -73,22 +73,44 @@ const valuationDate = () => today();
 let libraryQuotes = null;
 // Fundusze ING TFI (np. w PPE): wyceny jednostek z pliku data/fundusze.js.
 let fundsData = null;
+// Złoto (cena NBP za gram), kryptowaluty (CoinGecko) i dane do wyceny obligacji skarbowych (inflacja GUS, stopa NBP,
+// oferta) – z plików data/zloto.js, data/krypto.js i data/obligacje.js.
+let goldData = null;
+let cryptoData = null;
+let bondData = null;
+const isMarketLot = (l) => l.asset && l.asset !== 'manual' && !isBondLot(l);
 function addLibraryAsset(symbol, name, currency) {
   if (!symbol || (MARKET.assets?.[symbol] && !MARKET.assets[symbol].library)) return false;
-  const fund = symbol.startsWith(FUND_PREFIX);
-  if (fund ? !fundsData : !libraryQuotes) return false;
-  const entry = fund ? fundEntry(fundsData, symbol) : instEntry(libraryQuotes, symbol, currency || 'PLN', MARKET.fx);
+  let entry = null;
+  if (symbol === GOLD_ASSET) entry = goldEntry(goldData);
+  else if (symbol.startsWith(CRYPTO_PREFIX)) entry = cryptoEntry(cryptoData, symbol);
+  else if (symbol.startsWith(FUND_PREFIX)) entry = fundsData ? fundEntry(fundsData, symbol) : null;
+  else entry = libraryQuotes ? instEntry(libraryQuotes, symbol, currency || 'PLN', MARKET.fx) : null;
   if (!entry) return false;
   MARKET.assets ??= {};
   MARKET.assets[symbol] = { name: name || symbol, ...entry, library: true };
   return true;
 }
+async function ensureBondData() {
+  if (!bondData) bondData = await assetLoadBonds();
+  if (bondData && MARKET.bonds !== bondData) {
+    MARKET.bonds = bondData;
+    return true;
+  }
+  return false;
+}
 async function ensureLibraryAssets() {
-  const lots = fin.accounts.flatMap((a) => a.lots ?? []).filter((l) => l.asset && l.asset !== 'manual' && !MARKET.assets?.[l.asset]);
-  if (!lots.length) return false;
-  if (lots.some((l) => !l.asset.startsWith(FUND_PREFIX))) libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
-  if (lots.some((l) => l.asset.startsWith(FUND_PREFIX))) fundsData = fundsData ?? (await instLoadFunds());
-  let added = false;
+  const all = fin.accounts.flatMap((a) => a.lots ?? []);
+  const bondsAdded = all.some(isBondLot) ? await ensureBondData() : false;
+  const lots = all.filter((l) => isMarketLot(l) && !MARKET.assets?.[l.asset]);
+  if (!lots.length) return bondsAdded;
+  const kind = (l) => (isGoldLot(l) ? 'gold' : isCryptoLot(l) ? 'crypto' : l.asset.startsWith(FUND_PREFIX) ? 'fund' : 'xtb');
+  const kinds = new Set(lots.map(kind));
+  if (kinds.has('xtb')) libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+  if (kinds.has('fund')) fundsData = fundsData ?? (await instLoadFunds());
+  if (kinds.has('gold')) goldData = goldData ?? (await assetLoadGold());
+  if (kinds.has('crypto')) cryptoData = cryptoData ?? (await assetLoadCrypto());
+  let added = bondsAdded;
   for (const l of lots) added = addLibraryAsset(l.asset, l.name, l.currency) || added;
   return added;
 }
@@ -131,7 +153,11 @@ function gemLimit(gemAccount, year) {
 
 const refreshLibraryAssets = () =>
   ensureLibraryAssets()
-    .then((added) => added && render())
+    .then((added) => {
+      // Dane obligacji wczytane: zapisz wypłaty odsetek i wykupy, których termin minął.
+      if (added && MARKET.bonds) runRecurring();
+      if (added) render();
+    })
     .catch(() => {});
 
 function marketNote() {
@@ -816,7 +842,44 @@ const WORTH_RANGES = [[6, '6 mies.'], [12, '1 rok'], [36, '3 lata'], [0, 'Wszyst
 function lotLabel(l) {
   if (l.asset === 'manual') return l.name || 'Aktywo';
   if (isFundLot(l)) return `${l.name || 'Fundusz'} (kat. ${fundCategoryOf(l.asset)})`;
+  if (isGoldLot(l)) return 'Złoto';
+  if (isCryptoLot(l)) return l.name || cryptoIdOf(l.asset);
+  if (isBondLot(l)) return `Obligacje ${l.asset.slice(BOND_PREFIX.length)}`;
   return l.asset;
+}
+// Ilość: kryptowaluty do 8 miejsc po przecinku, złoto w gramach (2 miejsca), reszta do 6.
+const lotQtyText = (l, q) => (isCryptoLot(l) ? fmtQty(q, 8) : isGoldLot(l) ? `${NF2.format(q)} g` : fmtQty(q));
+const lotUnit = (l) => (isFundLot(l) ? ' j.u.' : isGoldLot(l) || isCryptoLot(l) ? '' : ' szt.');
+
+// Obligacje skarbowe na liście kont: odsetki, oprocentowanie w bieżącym okresie, najbliższa wypłata i ile wypłacisz dziś.
+function bondLines(list, at) {
+  const l0 = list[0];
+  const t = BOND_TYPES[l0.bond?.type];
+  if (!t) return '';
+  let accrued = 0;
+  let paid = 0;
+  let net = 0;
+  let qty = 0;
+  let st0 = null;
+  let estimated = false;
+  for (const l of list) {
+    const st = bondState(l, at, MARKET.bonds);
+    if (!st || st.matured) continue;
+    st0 = st0 ?? st;
+    estimated = estimated || st.estimated;
+    accrued += st.interest * l.qty;
+    paid += st.paid * l.qty;
+    net += (bondRedeem(l, st)?.net ?? 0) * l.qty;
+    qty += l.qty;
+  }
+  if (!st0) return `<small class="muted">Po wykupie (${esc(shortDate(bondMaturity(l0), true))}).</small>`;
+  const next = bondNextPayout(l0, st0);
+  const parts = [`${t.cap ? 'odsetki narosłe (z dopisanymi)' : 'odsetki narosłe w tym okresie'} <b class="pos">+${esc(zl(accrued))}</b>`, `oprocentowanie ${esc(pctNum(st0.rate * 100))}%${t.kind === 'stale' ? '' : ` w ${st0.k}. ${t.step === 12 ? 'roku' : t.step === 1 ? 'miesiącu' : 'okresie'}`}${estimated ? ' <span class="warn">(szacunek – czeka na dane GUS/NBP)</span>' : ''}`];
+  if (paid > 0.004) parts.push(`wypłacone odsetki ${esc(zl(paid))}`);
+  if (next?.gross) parts.push(`najbliższa wypłata ${esc(shortDate(next.date, true))}: ok. ${esc(zl(next.gross * qty))} brutto`);
+  parts.push(`wykup ${esc(shortDate(st0.maturity, true))}`);
+  parts.push(`przy wcześniejszym wykupie dziś ok. <b>${esc(zl(net))}</b> na rękę${l0.bond.ike ? ' (IKE/IKZE – bez opłaty i podatku)' : ' (po opłacie i podatku)'}`);
+  return `<small>${parts.join(' · ')}</small>`;
 }
 
 // Zysk w dowolnej walucie, np. „+4 469,54 EUR (+17,5%)”.
@@ -829,7 +892,8 @@ function investmentLines(a, cash) {
   const sum = investSummary(MARKET, a, at, acur);
   // Pozycje tego samego instrumentu (np. kolejne wpłaty w planie) pokazujemy razem: ilość, koszt, wartość i zysk.
   const groups = new Map();
-  for (const l of (a.lots ?? []).filter((x) => !x.until)) {
+  // Obligacje po wykupie nie są już aktywami (ich wynik jest w zysku zrealizowanym).
+  for (const l of (a.lots ?? []).filter((x) => !x.until && !(isBondLot(x) && lotEnd(x) <= at))) {
     const key = l.asset === 'manual' ? `manual:${l.id}` : l.asset;
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(l);
@@ -838,6 +902,7 @@ function investmentLines(a, cash) {
     const l0 = list[0];
     let value = 0;
     let cost = 0;
+    let income = 0;
     let qty = 0;
     let costCur = 0;
     let missing = false;
@@ -847,23 +912,24 @@ function investmentLines(a, cash) {
       else if (lotActive(l, at)) {
         value += r.value;
         cost += r.cost;
+        income += r.income ?? 0;
         qty += l.qty;
         costCur += l.qty * l.price;
       }
     }
     const approx = MARKET.assets?.[l0.asset]?.source === 'proxy' ? '≈ ' : '';
-    const unit = isFundLot(l0) ? 'j.u.' : 'szt.';
     const cur = lotCurrency(MARKET, l0);
     const newest = [...list].sort((x, y) => ((y.mark?.[0] ?? y.date) > (x.mark?.[0] ?? x.date) ? 1 : -1))[0];
     const priceNow = lotPrice(MARKET, newest, at);
     const priceChange = qty > 0 && costCur > 0 ? priceNow / (costCur / qty) - 1 : null;
-    const gain = value - cost;
+    const gain = value + income - cost;
     const noMark = needsMark(l0) && !list.some((l) => l.mark);
     const avg = qty > 0 ? costCur / qty : 0;
+    const perUnit = isGoldLot(l0) ? ' zł/g' : ` ${curLabel(cur)}`;
     const detail = qty > 0
-      ? `<small>zainwestowano ${esc(money(cost, acur))}${cur === acur && avg ? ` (śr. ${esc(NF2.format(avg))}, teraz ${esc(approx)}${esc(NF2.format(priceNow))} ${esc(curLabel(cur))})` : ''} · <span class="${gainClass(gain)}">${esc(gainMoney(gain, cost > 0 ? value / cost - 1 : null, acur))}</span>${cur !== acur && priceChange !== null ? ` · cena w ${esc(cur)} ${priceChange < 0 ? '−' : '+'}${esc(pct1(priceChange))}` : ''}${list.length > 1 ? ` · ${list.length} ${plural(list.length, 'zakup', 'zakupy', 'zakupów')}` : ''}${noMark ? ' · <span class="warn">wpisz kurs z XTB w „Aktywa”, aby zobaczyć zysk</span>' : ''}</small>`
+      ? `<small>zainwestowano ${esc(money(cost, acur))}${cur === acur && avg && !isBondLot(l0) ? ` (śr. ${esc(NF2.format(avg))}, teraz ${esc(approx)}${esc(NF2.format(priceNow))}${esc(perUnit)})` : ''} · <span class="${gainClass(gain)}">${esc(gainMoney(gain, cost > 0 ? (value + income) / cost - 1 : null, acur))}</span>${cur !== acur && priceChange !== null ? ` · cena w ${esc(cur)} ${priceChange < 0 ? '−' : '+'}${esc(pct1(priceChange))}` : ''}${list.length > 1 ? ` · ${list.length} ${plural(list.length, 'zakup', 'zakupy', 'zakupów')}` : ''}${noMark ? ' · <span class="warn">wpisz kurs z XTB w „Aktywa”, aby zobaczyć zysk</span>' : ''}</small>${isBondLot(l0) ? bondLines(list, at) : ''}`
       : '';
-    return `<div class="inv-line inv-pos"><span>${esc(lotLabel(l0))} · ${esc(fmtQty(Math.round(list.reduce((s, l) => s + l.qty, 0) * 1e6) / 1e6))} ${unit}${detail}</span><b>${missing && !value ? 'brak kursu' : esc(approx + money(value, acur))}</b></div>`;
+    return `<div class="inv-line inv-pos"><span>${esc(lotLabel(l0))} · ${esc(lotQtyText(l0, Math.round(list.reduce((s, l) => s + l.qty, 0) * 1e8) / 1e8))}${lotUnit(l0)}${detail}</span><b>${missing && !value ? 'brak kursu' : esc(approx + money(value, acur))}</b></div>`;
   });
   // Konto w obcej walucie: dla porządku te same liczby w złotych (z efektem kursu walut).
   const pln = acur !== 'PLN' && sum?.positions ? investSummary(MARKET, a, at, 'PLN') : null;
@@ -938,7 +1004,7 @@ function gemInfo(a, b) {
 }
 
 // Plany inwestycyjne konta: udziały, wpłata cykliczna, przyciski wpłaty i edycji.
-const planItemLabel = (i) => (String(i.asset).startsWith(FUND_PREFIX) ? `${i.name || 'fundusz'} (${fundCategoryOf(i.asset)})` : i.asset);
+const planItemLabel = (i) => (String(i.asset).startsWith(FUND_PREFIX) ? `${i.name || 'fundusz'} (${fundCategoryOf(i.asset)})` : String(i.asset).startsWith(CRYPTO_PREFIX) ? i.name || cryptoIdOf(i.asset) : i.asset);
 function plansInfo(a) {
   const cur = a.currency || 'PLN';
   return (a.plans ?? [])
@@ -1307,10 +1373,14 @@ function runRecurring() {
   // Raty kredytów z automatycznym zapisem: kapitał jako przelew na kredyt, odsetki i opłaty jako wydatek.
   const l = processLoans(fin, today(), { newId, market: MARKET });
   fin = l.fin;
-  if (r.posted || l.posted || fin.recurring.map((x) => x.nextDate).join() !== before) save();
+  // Obligacje skarbowe: odsetki (COI, ROR, DOR) i wykup z terminem do dziś – na konto wskazane przy obligacjach.
+  const b = processBonds(fin, today(), { newId, market: MARKET });
+  fin = b.fin;
+  if (r.posted || l.posted || b.posted || fin.recurring.map((x) => x.nextDate).join() !== before) save();
   const parts = [];
   if (r.posted) parts.push(`${r.posted} ${plural(r.posted, 'stałą pozycję', 'stałe pozycje', 'stałych pozycji')}`);
   if (l.posted) parts.push(`${l.posted} ${plural(l.posted, 'ratę kredytu', 'raty kredytów', 'rat kredytów')}`);
+  if (b.posted) parts.push(`${b.posted} ${plural(b.posted, 'wypłatę z obligacji', 'wypłaty z obligacji', 'wypłat z obligacji')}`);
   if (parts.length) toast(`Zapisano ${parts.join(' i ')} z terminem do dziś.`);
 }
 
@@ -2364,27 +2434,43 @@ const lotPicker = instPicker({
   },
 });
 
+// Wiersz edycji pozycji: złoto – liczba sztuk i cena za sztukę (zapis: gramy czystego złota i cena za gram),
+// obligacje – rodzaj, data zakupu i parametry serii.
+function lotDraft(l) {
+  const d = { ...l, value: l.asset === 'manual' ? latestMark(l) : undefined };
+  if (isGoldLot(l)) {
+    const fine = goldFine(l.gold) || (l.gold?.pieces > 0 ? l.qty / l.gold.pieces : 1);
+    d.gold = { product: 'gramy', ...l.gold };
+    d.pieces = l.gold?.pieces ?? l.qty / fine;
+    d.pprice = l.price * fine;
+  }
+  if (isBondLot(l)) d.bond = { ...l.bond };
+  return d;
+}
+
 function openLots(accountId) {
   const a = acc(accountId);
   if (!a) return;
   lotsState = {
     accountId,
-    lots: (a.lots ?? []).filter((l) => !l.until).map((l) => ({ ...l, value: l.asset === 'manual' ? latestMark(l) : undefined })),
+    lots: (a.lots ?? []).filter((l) => !l.until).map(lotDraft),
     before: holdingsPLN(MARKET, a, valuationDate()) ?? 0,
     fundCategory: a.fundCategory ?? '',
   };
   $('#ld-title').textContent = `Aktywa: ${a.name}`;
-  $('#ld-info').textContent = `${marketNote()} Akcje i ETF-y z GPW wyceniam po kursie zamknięcia z giełdy, fundusze ING TFI (np. w PPE) – po wycenie jednostki z ING TFI, a popularne ETF-y UCITS – od ceny zakupu według zmiany indeksu, który śledzą (wycena przybliżona, oznaczona „≈”).`;
+  $('#ld-info').textContent = `${marketNote()} Akcje i ETF-y z GPW wyceniam po kursie zamknięcia z giełdy, fundusze ING TFI (np. w PPE) – po wycenie jednostki z ING TFI, popularne ETF-y UCITS – od ceny zakupu według zmiany indeksu, który śledzą (wycena przybliżona, oznaczona „≈”), złoto – po cenie NBP za gram, kryptowaluty – po kursie z CoinGecko, a obligacje skarbowe – według wzorów z listów emisyjnych (inflacja GUS, stopa referencyjna NBP).`;
   if (!$('#ld-picker').firstChild) $('#ld-picker').append(lotPicker);
   $('#ld-picker').hidden = true;
   $('#ld-fund').hidden = true;
+  $('#ld-crypto').hidden = true;
   lotPicker.reset();
   lotsForm.elements.settle.checked = true;
   lotsForm.elements.cash.value = '';
   $('#ld-errors').textContent = '';
   renderLots();
   openDialog(LOTS);
-  const refresh = () => lotsState?.accountId === accountId && lotsState.lots.some((l) => l.asset !== 'manual' && !MARKET.assets?.[l.asset] && addLibraryAsset(l.asset, l.name, l.currency)) && renderLots();
+  const mine = () => lotsState?.accountId === accountId;
+  const refresh = () => mine() && lotsState.lots.some((l) => isMarketLot(l) && !MARKET.assets?.[l.asset] && addLibraryAsset(l.asset, l.name, l.currency)) && renderLots();
   instLoadQuotes().then((data) => {
     libraryQuotes = libraryQuotes ?? data;
     refresh();
@@ -2395,10 +2481,30 @@ function openLots(accountId) {
       refresh();
     });
   }
+  if (lotsState.lots.some(isGoldLot))
+    assetLoadGold().then((data) => {
+      goldData = goldData ?? data;
+      refresh();
+    });
+  if (lotsState.lots.some(isCryptoLot))
+    assetLoadCrypto().then((data) => {
+      cryptoData = cryptoData ?? data;
+      refresh();
+    });
+  // Parametry bieżącej oferty obligacji – do podpowiedzi przy dodawaniu.
+  ensureBondData().then((added) => added && mine() && renderLots());
 }
 
-// Opis źródła ceny pozycji (GEM, GPW, USA, fundusz ING TFI, indeks albo cena zakupu).
+// Opis źródła ceny pozycji (GEM, GPW, USA, fundusz ING TFI, złoto, kryptowaluta, indeks albo cena zakupu).
 function lotSource(l) {
+  if (isGoldLot(l)) {
+    const q = goldData?.prices?.at(-1);
+    return q ? `Cena 1 g złota z NBP: ${NF2.format(q[1])} zł (${shortDate(q[0], true)}). To cena referencyjna – mennice skupują zwykle kilka procent taniej.` : 'Cena złota z NBP pojawi się po najbliższej aktualizacji aplikacji.';
+  }
+  if (isCryptoLot(l)) {
+    const q = cryptoQuotes(cryptoData, cryptoIdOf(l.asset)).at(-1);
+    return q ? `Kurs z CoinGecko: ${fmtCoinPrice(q[1])} zł (${shortDate(q[0], true)}).` : 'Kurs pojawi się po najbliższej aktualizacji aplikacji.';
+  }
   const a = MARKET.assets?.[l.asset];
   if (a && !a.library) return 'ETF strategii GEM – cena z codziennej aktualizacji';
   if (a) return instSourceLabel(a, libraryQuotes);
@@ -2408,10 +2514,24 @@ function lotSource(l) {
   return 'Brak notowań – wycena według ceny zakupu.';
 }
 
+function bondSummary(l) {
+  const at = valuationDate();
+  const st = bondState(l, at, MARKET.bonds);
+  if (!(l.qty > 0) || !st) return 'Uzupełnij liczbę obligacji i oprocentowanie w pierwszym okresie.';
+  if (l.date > at) return 'Data zakupu nie może być z przyszłości.';
+  if (st.matured) return `Obligacje wykupione ${shortDate(st.maturity, true)} (${zl(st.value * l.qty)} brutto). Pozycję możesz usunąć.`;
+  const cost = l.qty * (l.price || BOND_NOMINAL);
+  const gain = (st.value + st.paid) * l.qty - cost;
+  const red = bondRedeem(l, st);
+  return `Wartość dziś: ${zl(st.value * l.qty)} · zysk ${gainMoney(gain, cost > 0 ? gain / cost : null, 'PLN')} · wykup ${shortDate(st.maturity, true)} · przy wcześniejszym wykupie ok. ${zl(red.net * l.qty)} na rękę${st.estimated ? ' · szacunek (brak danych o inflacji lub stopie NBP)' : ''}`;
+}
+
 function lotSummary(l) {
   const at = valuationDate();
+  if (isBondLot(l)) return bondSummary(l);
   const lot = l.asset === 'manual' ? { ...l, marks: [[l.date, l.value]] } : l;
-  if (!(l.qty > 0) || !((l.asset === 'manual' ? l.value : l.price) > 0)) return isFundLot(l) ? 'Uzupełnij liczbę jednostek i kwotę wpłat (albo średnią cenę).' : 'Uzupełnij ilość i cenę.';
+  if (isGoldLot(l) && !goldFine(l.gold)) return 'Podaj masę i próbę wyrobu.';
+  if (!(l.qty > 0) || !((l.asset === 'manual' ? l.value : l.price) > 0)) return isFundLot(l) ? 'Uzupełnij liczbę jednostek i kwotę wpłat (albo średnią cenę).' : isGoldLot(l) ? 'Uzupełnij liczbę sztuk i cenę zakupu.' : 'Uzupełnij ilość i cenę.';
   const v = lotValuePLN(MARKET, lot, at);
   if (v === null) return 'Brak kursu waluty.';
   if (l.asset === 'manual') return `Wartość: ${zl(v)}`;
@@ -2421,19 +2541,61 @@ function lotSummary(l) {
   return r ? `Wartość dziś: ${money(r.value, acur)} · zysk ${gainMoney(r.gain, r.gainPct, acur)}${noPrice ? ' – wpisz kurs teraz z XTB, aby zobaczyć prawdziwy zysk' : ''}` : `Wartość dziś: ${zl(v)}`;
 }
 // Pozycja bez dokładnych notowań (ETF wyceniany według indeksu): przyda się bieżący kurs z XTB.
-const needsMark = (l) => l.asset !== 'manual' && !isFundLot(l) && !hasExactQuotes(MARKET, l.asset, valuationDate());
+const needsMark = (l) => l.asset !== 'manual' && !isFundLot(l) && !isGoldLot(l) && !isCryptoLot(l) && !isBondLot(l) && !hasExactQuotes(MARKET, l.asset, valuationDate());
 const withMark = (l, at) => (l.markNew > 0 ? { ...l, mark: [at, l.markNew] } : l);
+
+// Złoto: wyrób z listy (albo masa i próba), liczba sztuk, cena za sztukę.
+function goldRowBody(l) {
+  const p = goldProduct(l.gold?.product);
+  const grams = l.gold?.product === 'gramy';
+  return `<div class="full lot-inst"><b>Złoto</b> <span class="tag">${esc(l.qty > 0 ? `${NF2.format(l.qty)} g czystego złota` : 'inwestycyjne')}</span><div class="small muted">${esc(lotSource(l))}</div></div>
+    <label class="field full">Wyrób<select data-lf="gprod">${GOLD_PRODUCTS.map((g) => `<option value="${esc(g.id)}" ${g.id === p?.id ? 'selected' : ''}>${esc(g.name)}</option>`).join('')}</select></label>
+    ${p?.fine ? '' : `<label class="field">Masa sztuki (g)<input data-lf="gmass" inputmode="decimal" value="${esc(fmtQty(Number(l.gold?.mass) || 0, 4))}" placeholder="np. 7,98"></label><label class="field">Próba (‰)<input data-lf="gpurity" inputmode="decimal" value="${esc(fmtQty(Number(l.gold?.purity) || 0, 1))}" placeholder="np. 999,9 albo 916,7"></label>`}
+    <label class="field">${grams ? 'Gramy czystego złota' : 'Liczba sztuk'}<input data-lf="pieces" inputmode="decimal" value="${esc(fmtQty(l.pieces, 4))}"></label>
+    <label class="field">Cena zakupu za ${grams ? 'gram' : 'sztukę'} (zł)<input data-lf="pprice" inputmode="decimal" value="${esc(fmtInput(l.pprice))}"></label>
+    <label class="field">Zainwestowano (zł)<input data-lf="gcost" inputmode="decimal" value="${esc(fmtInput((l.pieces || 0) * (l.pprice || 0)))}" placeholder="sztuki × cena"></label>
+    <label class="field">Data zakupu<input type="date" data-lf="date" value="${esc(l.date)}"></label>`;
+}
+
+// Obligacje skarbowe: rodzaj, data zakupu (wyznacza serię), liczba i parametry serii z listu emisyjnego.
+function bondRowBody(l) {
+  const b = l.bond ?? {};
+  const t = BOND_TYPES[b.type] ?? BOND_TYPES.EDO;
+  const series = bondSeries(b.type, l.date);
+  const known = bondSeriesParams(bondData, series);
+  const first = t.step === 12 ? 'roku' : t.step === 1 ? 'miesiącu' : 'okresie';
+  const note = !series
+    ? ''
+    : known
+      ? `Parametry serii ${series} z oferty obligacjeskarbowe.pl: ${pctNum(known.rate1)}% w 1. ${first}${known.margin !== undefined && t.kind !== 'stale' ? `, potem ${t.kind === 'inflacja' ? 'inflacja' : 'stopa NBP'} + ${pctNum(known.margin)}%` : ''}.`
+      : `Serii ${series} nie ma jeszcze w tabeli aplikacji (zapisuje każdą nową emisję od listopada 2026). Przepisz oprocentowanie w 1. ${first}${t.kind === 'stale' ? '' : ' i marżę'} z serwisu obligacji (Moje obligacje) albo z listu emisyjnego na obligacjeskarbowe.pl.`;
+  const payOpts = `${accountOptions(b.payTo || lotsState.accountId, { none: false, filter: (x) => !isLoan(x) && !isCard(x) })}<option value="none" ${b.payTo === 'none' ? 'selected' : ''}>Nie zapisuj w dzienniku</option>`;
+  return `<div class="full lot-inst"><b>Obligacje skarbowe${series ? ` ${esc(series)}` : ''}</b> <span class="tag">${esc(t.name)}</span><div class="small muted">${esc(t.info)}. ${esc(note)}</div></div>
+    <label class="field">Rodzaj<select data-lf="btype">${Object.entries(BOND_TYPES).map(([k, x]) => `<option value="${k}" ${k === b.type ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
+    <label class="field">Data zakupu<input type="date" data-lf="date" value="${esc(l.date)}" max="${esc(today())}"></label>
+    <label class="field">Liczba obligacji<input data-lf="qty" inputmode="numeric" value="${esc(l.qty > 0 ? String(l.qty) : '')}" placeholder="np. 10 (po 100 zł)"></label>
+    <label class="field">Cena za sztukę<select data-lf="bprice"><option value="100" ${l.price !== 99.9 ? 'selected' : ''}>100,00 zł – zakup</option><option value="99.9" ${l.price === 99.9 ? 'selected' : ''}>99,90 zł – zamiana</option></select></label>
+    <label class="field">Oprocentowanie w 1. ${first} (%)<input data-lf="rate1" inputmode="decimal" value="${esc(b.rate1 > 0 ? pctNum(b.rate1) : '')}" placeholder="np. 5,35"></label>
+    ${t.kind === 'stale' ? '' : `<label class="field">Marża (%) – ${t.kind === 'inflacja' ? 'ponad inflację' : 'ponad stopę NBP'}<input data-lf="margin" inputmode="decimal" value="${esc(Number.isFinite(b.margin) ? pctNum(b.margin) : '')}" placeholder="np. 2,00"></label>`}
+    <label class="field">Opłata za wcześniejszy wykup (zł/szt.)<input data-lf="fee" inputmode="decimal" value="${esc(Number.isFinite(b.fee) ? fmtQty(b.fee, 2) || '0' : '')}"></label>
+    <label class="field">${t.pay ? 'Odsetki i wykup' : 'Kwotę z wykupu'} zapisuj na konto<select data-lf="payTo">${payOpts}</select></label>
+    <label class="check small full"><input type="checkbox" data-lf="ike" ${b.ike ? 'checked' : ''}> <span>Obligacje na koncie IKE/IKZE (bez podatku od odsetek i bez opłaty przy wypłacie z IKE)</span></label>`;
+}
 
 function renderLots() {
   $('#ld-rows').innerHTML = lotsState.lots.length
     ? lotsState.lots
         .map((l, i) => {
+          if (isGoldLot(l) || isBondLot(l)) return `<div class="lot-row" data-lot="${i}">${isGoldLot(l) ? goldRowBody(l) : bondRowBody(l)}<div class="lot-foot full"><span class="small muted" data-lot-val="${i}">${esc(lotSummary(l))}</span><button type="button" class="link small danger-text" data-lot-del="${i}">Usuń</button></div></div>`;
           const cur = lotCurrency(MARKET, l);
           const fund = isFundLot(l);
-          const pence = l.asset !== 'manual' && !fund ? instPenceHint({ market: l.asset.slice(l.asset.lastIndexOf('.') + 1), currency: cur, name: l.name ?? '' }) : '';
+          const coin = isCryptoLot(l);
+          const pence = l.asset !== 'manual' && !fund && !coin ? instPenceHint({ market: l.asset.slice(l.asset.lastIndexOf('.') + 1), currency: cur, name: l.name ?? '' }) : '';
           const head = fund
             ? `<b>${esc(l.name ?? 'Fundusz')}</b> <span class="tag">kat. ${esc(fundCategoryOf(l.asset))}</span>`
-            : `<b>${esc(l.asset)}</b> ${esc(l.name ?? MARKET.assets?.[l.asset]?.name ?? '')}`;
+            : coin
+              ? `<b>${esc(l.name ?? cryptoIdOf(l.asset))}</b> <span class="tag">kryptowaluta</span>`
+              : `<b>${esc(l.asset)}</b> ${esc(l.name ?? MARKET.assets?.[l.asset]?.name ?? '')}`;
           const body =
             l.asset === 'manual'
               ? `<label class="field full">Nazwa aktywa<input data-lf="name" value="${esc(l.name ?? '')}" placeholder="np. Obligacje skarbowe EDO"></label>
@@ -2442,15 +2604,15 @@ function renderLots() {
                  <label class="field">Wartość za sztukę dziś (${esc(curLabel(cur))})<input data-lf="value" inputmode="decimal" value="${esc(fmtInput(l.value))}"></label>
                  <label class="field">Od kiedy<input type="date" data-lf="date" value="${esc(l.date)}"></label>`
               : `<div class="full lot-inst">${head}<div class="small muted">${esc(lotSource(l))}</div>${l.hint ? `<div class="small muted">${esc(l.hint)}</div>` : ''}${pence ? `<div class="small warn">${esc(pence)}</div>` : ''}</div>
-                 <label class="field">${fund ? 'Liczba jednostek' : 'Ilość (szt.)'}<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty))}"></label>
-                 <label class="field">${fund ? 'Średnia cena jednostki' : 'Cena zakupu za szt.'} (${esc(curLabel(cur))})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}"></label>
+                 <label class="field">${fund ? 'Liczba jednostek' : coin ? 'Ilość (np. 0,0525)' : 'Ilość (szt.)'}<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty, coin ? 8 : 6))}"></label>
+                 <label class="field">${fund ? 'Średnia cena jednostki' : coin ? 'Średnia cena zakupu za 1' : 'Cena zakupu za szt.'} (${esc(curLabel(cur))})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}"></label>
                  <label class="field">${fund ? 'Suma wpłat' : 'Zainwestowano'} (${esc(curLabel(cur))})<input data-lf="cost" inputmode="decimal" value="${esc(fmtInput(l.qty * l.price))}" placeholder="ilość × cena"></label>
                  <label class="field">${fund ? 'Data pierwszej wpłaty' : 'Data zakupu'}<input type="date" data-lf="date" value="${esc(l.date)}"></label>
                  ${needsMark(l) ? `<label class="field full">Kurs teraz z XTB (${esc(curLabel(cur))}) – do wyceny i zysku<input data-lf="mark" inputmode="decimal" value="${esc(fmtInput(l.markNew))}" placeholder="${l.price > 0 ? `teraz ok. ${esc(fmtInput(lotPrice(MARKET, l, valuationDate())))}` : 'np. 143,22'}"><small>${l.mark ? `Ostatnio wpisany: ${esc(fmtInput(l.mark[1]))} (${esc(shortDate(l.mark[0], true))}); od tego dnia kurs zmienia się razem z indeksem. ` : ''}Przepisz cenę z XTB (pozycja → aktualna cena). Wystarczy raz – dalej aplikacja śledzi zmiany indeksu, a kurs możesz poprawić w każdej chwili.</small></label>` : ''}`;
           return `<div class="lot-row" data-lot="${i}">${body}<div class="lot-foot full"><span class="small muted" data-lot-val="${i}">${esc(lotSummary(l))}</span><button type="button" class="link small danger-text" data-lot-del="${i}">Usuń</button></div></div>`;
         })
         .join('')
-    : '<p class="muted small">Brak aktywów. Dodaj instrument z oferty XTB (wyszukaj po nazwie, symbolu albo ISIN), fundusz ING TFI (np. z PPE) albo inne aktywo z wyceną ręczną, np. obligacje skarbowe.</p>';
+    : '<p class="muted small">Brak aktywów. Dodaj instrument z oferty XTB (wyszukaj po nazwie, symbolu albo ISIN), fundusz ING TFI (np. z PPE), obligacje skarbowe, złoto, kryptowalutę albo inne aktywo z wyceną ręczną.</p>';
   updateLotsSum();
 }
 
@@ -2499,6 +2661,7 @@ $('#ld-add-fund').addEventListener('click', async () => {
   const box = $('#ld-fund');
   box.hidden = !box.hidden;
   $('#ld-picker').hidden = true;
+  $('#ld-crypto').hidden = true;
   if (box.hidden) return;
   fundsData = fundsData ?? (await instLoadFunds());
   fillFundPanel();
@@ -2549,6 +2712,59 @@ lotsForm.addEventListener('input', (ev) => {
     const input = $(`[data-lf="${name}"]`, row);
     if (input && input !== el) input.value = fmtInput(v);
   };
+  const done = () => {
+    $(`[data-lot-val="${row.dataset.lot}"]`).textContent = lotSummary(l);
+    updateLotsSum();
+  };
+  // Obligacje: rodzaj i data zakupu wyznaczają serię (i jej parametry z oferty), reszta to parametry z listu emisyjnego.
+  if (isBondLot(l)) {
+    const b = (l.bond ??= { type: 'EDO' });
+    if (k === 'btype' || k === 'date') {
+      if (k === 'btype') b.type = el.value;
+      else l.date = el.value;
+      applyBondSeries(l);
+      return renderLots();
+    }
+    if (k === 'qty') l.qty = Math.floor(num());
+    else if (k === 'bprice') l.price = Number(el.value) || BOND_NOMINAL;
+    else if (k === 'rate1' || k === 'margin') {
+      b[k] = num();
+      b.auto = null;
+    } else if (k === 'fee') {
+      b.fee = num();
+      b.feeSet = true;
+    } else if (k === 'ike') b.ike = el.checked;
+    else if (k === 'payTo') b.payTo = el.value;
+    return done();
+  }
+  // Złoto: liczba sztuk × cena za sztukę; zapis w gramach czystego złota (wycena po cenie NBP za gram).
+  if (isGoldLot(l)) {
+    const g = (l.gold ??= { product: 'moneta-1oz' });
+    if (k === 'gprod') {
+      g.product = el.value;
+      syncGold(l);
+      return renderLots();
+    }
+    if (k === 'gmass' || k === 'gpurity') g[k === 'gmass' ? 'mass' : 'purity'] = num();
+    else if (k === 'pieces') {
+      l.pieces = num();
+      if (l.costMode) {
+        l.pprice = l.pieces > 0 ? (l.gcost ?? 0) / l.pieces : 0;
+        setField('pprice', l.pprice);
+      } else setField('gcost', l.pieces * (l.pprice || 0));
+    } else if (k === 'pprice') {
+      l.pprice = num();
+      l.costMode = false;
+      setField('gcost', (l.pieces || 0) * l.pprice);
+    } else if (k === 'gcost') {
+      l.gcost = num();
+      l.costMode = true;
+      l.pprice = l.pieces > 0 ? l.gcost / l.pieces : 0;
+      setField('pprice', l.pprice);
+    } else if (k === 'date') l.date = el.value;
+    syncGold(l);
+    return done();
+  }
   // „Zainwestowano” i cena za sztukę są powiązane: kwota = ilość × cena. Ostatnio wpisane pole decyduje przy zmianie ilości.
   if (k === 'mark') l.markNew = num();
   else if (k === 'cost') {
@@ -2579,11 +2795,112 @@ $('#ld-add').addEventListener('click', () => {
   const box = $('#ld-picker');
   box.hidden = !box.hidden;
   $('#ld-fund').hidden = true;
+  $('#ld-crypto').hidden = true;
   if (!box.hidden) lotPicker.focusInput();
 });
 $('#ld-add-manual').addEventListener('click', () => {
   lotsState.lots.push({ id: newId(), asset: 'manual', name: '', currency: 'PLN', qty: 1, price: 0, value: 0, date: today() });
   renderLots();
+});
+
+// Złoto: gramy czystego złota (z wyrobu i liczby sztuk) i cena za gram – do wyceny po cenie NBP.
+function syncGold(l) {
+  const fine = goldFine(l.gold) || 0;
+  l.gold.pieces = l.pieces || 0;
+  l.qty = fine ? Math.round((l.pieces || 0) * fine * 1e6) / 1e6 : 0;
+  l.price = fine ? (l.pprice || 0) / fine : 0;
+}
+// Obligacje: seria z rodzaju i daty zakupu; parametry z tabeli aplikacji (oferta obligacjeskarbowe.pl), gdy ją znamy.
+function applyBondSeries(l) {
+  const b = l.bond;
+  const code = bondSeries(b.type, l.date);
+  l.asset = `${BOND_PREFIX}${code ?? ''}`;
+  l.name = code ?? '';
+  const p = bondSeriesParams(bondData, code);
+  if (p) {
+    b.rate1 = p.rate1;
+    if (BOND_TYPES[b.type].kind !== 'stale') b.margin = p.margin;
+    else delete b.margin;
+    if (!b.feeSet && Number.isFinite(p.fee)) b.fee = p.fee;
+    b.auto = code;
+  } else if (b.auto) {
+    // Wartości podpowiedziane dla innej serii nie pasują do tej – do uzupełnienia.
+    delete b.rate1;
+    delete b.margin;
+    b.auto = null;
+  }
+  if (!b.feeSet && !p) b.fee = bondDefaultFee(b.type, l.date);
+}
+const closeLotPanels = () => ['#ld-picker', '#ld-fund', '#ld-crypto'].forEach((s) => ($(s).hidden = true));
+const focusLastLot = (field) => $('#ld-rows').lastElementChild?.querySelector(`[data-lf="${field}"]`)?.focus();
+
+$('#ld-add-bond').addEventListener('click', async () => {
+  closeLotPanels();
+  await ensureBondData();
+  const a = acc(lotsState.accountId);
+  const l = { id: newId(), asset: BOND_PREFIX, name: '', currency: 'PLN', qty: 0, price: BOND_NOMINAL, date: today(), bond: { type: 'EDO', ike: /\bik(e|ze)\b/i.test(a?.name ?? '') || ['IKE', 'IKZE'].includes(a?.gemAccount) } };
+  applyBondSeries(l);
+  lotsState.lots.push(l);
+  renderLots();
+  focusLastLot('qty');
+});
+$('#ld-add-gold').addEventListener('click', async () => {
+  closeLotPanels();
+  goldData = goldData ?? (await assetLoadGold());
+  addLibraryAsset(GOLD_ASSET, 'Złoto', 'PLN');
+  lotsState.lots.push({ id: newId(), asset: GOLD_ASSET, name: 'Złoto', currency: 'PLN', qty: 0, price: 0, date: today(), gold: { product: 'moneta-1oz' }, pieces: 0, pprice: 0 });
+  renderLots();
+  focusLastLot('pieces');
+});
+
+// Kryptowaluty: wyszukiwarka wśród największych kryptowalut (lista z pliku data/krypto.js).
+const fmtCoinPrice = (x) => (x >= 1 ? NF2.format(x) : String(Number(x.toPrecision(3))).replace('.', ','));
+function renderCryptoList() {
+  const list = $('#ldc-list');
+  const info = $('#ldc-info');
+  if (!cryptoData?.coins?.length) {
+    list.innerHTML = '';
+    info.textContent = 'Kursy kryptowalut pojawią się po najbliższej aktualizacji aplikacji.';
+    return;
+  }
+  const items = cryptoSearch(cryptoData, $('#ldc-q').value, 12);
+  list.innerHTML = items
+    .map((c) => {
+      const last = cryptoQuotes(cryptoData, c.id).at(-1);
+      const meta = [c.rank ? `#${c.rank}` : '', last ? `${fmtCoinPrice(last[1])} zł` : '', Number.isFinite(c.ch?.d1) ? `24 h ${c.ch.d1 < 0 ? '−' : '+'}${pct1(c.ch.d1)}` : ''].filter(Boolean).join(' · ');
+      return `<button type="button" role="option" class="inst-opt" data-coin="${esc(c.id)}"><span class="inst-sym">${esc(c.symbol)}</span><span class="inst-name">${esc(c.name)}</span><span class="inst-meta">${esc(meta)}</span></button>`;
+    })
+    .join('');
+  info.textContent = items.length ? `Kursy z CoinGecko (${shortDate(cryptoData.asOf, true)}) – ${cryptoData.coins.length} największych kryptowalut.` : 'Brak wyników – spróbuj symbolu (np. BTC) albo nazwy. Kryptowalutę spoza listy dodasz jako „Inne aktywo”.';
+}
+$('#ld-add-crypto').addEventListener('click', async () => {
+  const box = $('#ld-crypto');
+  const show = box.hidden;
+  closeLotPanels();
+  box.hidden = !show;
+  if (!show) return;
+  cryptoData = cryptoData ?? (await assetLoadCrypto());
+  renderCryptoList();
+  $('#ldc-q').focus();
+});
+$('#ldc-q').addEventListener('input', renderCryptoList);
+$('#ldc-q').addEventListener('keydown', (ev) => {
+  if (ev.key !== 'Enter') return;
+  ev.preventDefault();
+  $('#ldc-list .inst-opt')?.click();
+});
+$('#ldc-list').addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-coin]');
+  const c = b && cryptoInfo(cryptoData, b.dataset.coin);
+  if (!c) return;
+  const symbol = cryptoSymbol(c.id);
+  const name = `${c.name} (${c.symbol})`;
+  addLibraryAsset(symbol, name, 'PLN');
+  lotsState.lots.push({ id: newId(), asset: symbol, name, currency: 'PLN', qty: 0, price: 0, date: today(), hint: 'Ilość i średnią cenę zakupu znajdziesz w aplikacji giełdy lub portfela.' });
+  $('#ldc-q').value = '';
+  $('#ld-crypto').hidden = true;
+  renderLots();
+  focusLastLot('qty');
 });
 lotsForm.addEventListener('submit', (ev) => {
   ev.preventDefault();
@@ -2591,7 +2908,16 @@ lotsForm.addEventListener('submit', (ev) => {
   const errors = [];
   lotsState.lots.forEach((l, i) => {
     const n = i + 1;
-    if (!(l.qty > 0)) errors.push(`Pozycja ${n}: podaj ${isFundLot(l) ? 'liczbę jednostek' : 'ilość'}.`);
+    if (isBondLot(l)) {
+      const b = l.bond ?? {};
+      if (!(Number.isInteger(l.qty) && l.qty >= 1)) errors.push(`Pozycja ${n}: podaj liczbę obligacji (całkowitą).`);
+      if (!(b.rate1 > 0 && b.rate1 < 50)) errors.push(`Pozycja ${n}: podaj oprocentowanie w pierwszym okresie (np. 5,35).`);
+      if (BOND_TYPES[b.type]?.kind !== 'stale' && !(Number.isFinite(b.margin) && b.margin >= 0 && b.margin < 20)) errors.push(`Pozycja ${n}: podaj marżę (np. 2,00).`);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(l.date ?? '') || l.date > today() || l.date < '2000-01-01') errors.push(`Pozycja ${n}: podaj datę zakupu obligacji (nie z przyszłości).`);
+      return;
+    }
+    if (isGoldLot(l) && !goldFine(l.gold)) errors.push(`Pozycja ${n}: podaj masę i próbę wyrobu ze złota.`);
+    if (!(l.qty > 0)) errors.push(`Pozycja ${n}: podaj ${isFundLot(l) ? 'liczbę jednostek' : isGoldLot(l) ? 'liczbę sztuk' : 'ilość'}.`);
     if (l.asset === 'manual' ? !(l.value > 0) : !(l.price > 0)) errors.push(`Pozycja ${n}: podaj ${l.asset === 'manual' ? 'wartość' : isFundLot(l) ? 'sumę wpłat albo średnią cenę jednostki' : 'cenę zakupu albo kwotę'}.`);
     if (l.asset === 'manual' && !String(l.name ?? '').trim()) errors.push(`Pozycja ${n}: podaj nazwę.`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(l.date ?? '')) errors.push(`Pozycja ${n}: podaj datę.`);
@@ -2619,6 +2945,18 @@ lotsForm.addEventListener('submit', (ev) => {
       const fx = lcur === 'PLN' ? null : old && old.date === l.date && old.fxCost > 0 ? old.fxCost : rateOn(MARKET, lcur, l.date);
       if (fx) out.fxCost = fx;
       if (l.planId) out.planId = l.planId;
+      if (isGoldLot(l)) out.gold = { product: l.gold.product, pieces: l.pieces, ...(goldProduct(l.gold.product)?.fine ? {} : { mass: l.gold.mass, purity: l.gold.purity }) };
+      if (isBondLot(l)) {
+        // Obligacje: seria z rodzaju i daty, parametry z listu emisyjnego; wypłaty zapisujemy od dnia dodania do dziennika.
+        const b = l.bond;
+        const code = bondSeries(b.type, l.date);
+        Object.assign(out, { asset: `${BOND_PREFIX}${code}`, name: code, currency: 'PLN', price: l.price === 99.9 ? 99.9 : BOND_NOMINAL });
+        out.bond = { type: b.type, rate1: b.rate1, fee: Number.isFinite(b.fee) ? b.fee : bondDefaultFee(b.type, l.date), trackFrom: old?.bond?.trackFrom ?? t };
+        if (BOND_TYPES[b.type].kind !== 'stale') out.bond.margin = b.margin;
+        if (b.ike) out.bond.ike = true;
+        if (b.payTo) out.bond.payTo = b.payTo;
+        if (old?.bond?.rates) out.bond.rates = old.bond.rates;
+      }
       return out;
     }
     // Aktywo z wyceną ręczną: każda zmiana wartości to nowy punkt historii (do wykresu majątku).
@@ -2685,8 +3023,10 @@ const planPicker = instPicker({
 
 // Ceny do planu: biblioteka XTB i fundusze ING TFI dla instrumentów, których jeszcze nie ma w wycenie.
 async function ensurePlanAssets(items) {
+  const coin = (i) => String(i.asset).startsWith(CRYPTO_PREFIX);
+  if (items.some(coin)) cryptoData = cryptoData ?? (await assetLoadCrypto());
   if (items.some((i) => String(i.asset).startsWith(FUND_PREFIX))) fundsData = fundsData ?? (await instLoadFunds());
-  if (items.some((i) => !String(i.asset).startsWith(FUND_PREFIX))) libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
+  if (items.some((i) => !String(i.asset).startsWith(FUND_PREFIX) && !coin(i))) libraryQuotes = libraryQuotes ?? (await instLoadQuotes());
   for (const i of items) if (!MARKET.assets?.[i.asset]) addLibraryAsset(i.asset, i.name, i.currency);
 }
 
@@ -2714,7 +3054,7 @@ function openPlan(accountId, planId) {
   if (!p) {
     const at = valuationDate();
     const byAsset = new Map();
-    for (const l of (a.lots ?? []).filter((x) => !x.until && x.asset !== 'manual')) byAsset.set(l.asset, { l, v: (byAsset.get(l.asset)?.v ?? 0) + (lotValuePLN(MARKET, l, at) ?? 0) });
+    for (const l of (a.lots ?? []).filter((x) => !x.until && x.asset !== 'manual' && !isBondLot(x) && !isGoldLot(x))) byAsset.set(l.asset, { l, v: (byAsset.get(l.asset)?.v ?? 0) + (lotValuePLN(MARKET, l, at) ?? 0) });
     const total = [...byAsset.values()].reduce((s, x) => s + x.v, 0);
     let left = 100;
     items = [...byAsset.values()].map(({ l, v }, k, arr) => {
@@ -2748,13 +3088,14 @@ function renderPlanEdit() {
   const d = planState.draft;
   const cur = a.currency || 'PLN';
   const r = d.recurring;
-  const held = [...new Map((a.lots ?? []).filter((l) => !l.until && l.asset !== 'manual').map((l) => [l.asset, l])).values()].filter((l) => !d.items.some((i) => i.asset === l.asset));
+  const held = [...new Map((a.lots ?? []).filter((l) => !l.until && l.asset !== 'manual' && !isBondLot(l) && !isGoldLot(l)).map((l) => [l.asset, l])).values()].filter((l) => !d.items.some((i) => i.asset === l.asset));
   $('#pl-body').innerHTML = `<label class="field">Nazwa planu<input id="pl-name" maxlength="60" value="${esc(d.name)}" placeholder="np. Plan globalny"></label>
   <div class="ln-sec">Instrumenty i udziały (%)</div>
   <div id="pl-items">${d.items.map((i, k) => `<div class="plan-item"><span><b>${esc(planItemLabel(i))}</b> <span class="muted">${esc(String(i.asset).startsWith(FUND_PREFIX) ? '' : i.name ?? '')}</span></span><input data-pl-pct="${k}" inputmode="decimal" value="${esc(fmtInput(i.pct))}" aria-label="Udział ${esc(planItemLabel(i))} w procentach"><button type="button" class="link small danger-text" data-pl-del="${k}">usuń</button></div>`).join('') || '<p class="small muted">Dodaj instrumenty poniżej.</p>'}</div>
   <p class="small"><span id="pl-sum"></span>${d.items.length > 1 ? ' · <button type="button" class="link small" data-pl-even="1">rozłóż po równo</button>' : ''}</p>
   ${held.length ? `<label class="field">Dodaj z aktywów tego konta<select id="pl-add-held"><option value="">— wybierz —</option>${held.map((l) => `<option value="${esc(l.asset)}">${esc(lotLabel(l))}</option>`).join('')}</select></label>` : ''}
-  <div class="row-btns"><button type="button" class="btn small" data-pl-xtb="1">+ Instrument z XTB</button><button type="button" class="btn small" data-pl-fund="1">+ Fundusz ING TFI</button></div>
+  <div class="row-btns"><button type="button" class="btn small" data-pl-xtb="1">+ Instrument z XTB</button><button type="button" class="btn small" data-pl-fund="1">+ Fundusz ING TFI</button><button type="button" class="btn small" data-pl-crypto="1">+ Kryptowaluta</button></div>
+  <div id="pl-crypto" class="ld-fund" hidden><label class="field">Kryptowaluta<select id="plc-coin"></select></label><button type="button" class="btn small primary" data-plc-ok="1">Dodaj kryptowalutę</button></div>
   <div id="pl-fund" class="ld-fund" hidden><label class="field">Fundusz<select id="plf-fund"></select></label><label class="field">Kategoria jednostek<select id="plf-cat"></select></label><button type="button" class="btn small primary" data-plf-ok="1">Dodaj fundusz</button></div>
   <div class="ln-sec">Wpłata cykliczna</div>
   <label class="check small"><input type="checkbox" id="pl-rec" ${r ? 'checked' : ''}> <span>Co miesiąc wpłacam stałą kwotę (np. zlecenie stałe do XTB albo składka do PPE)</span></label>
@@ -2895,12 +3236,28 @@ PLAN.addEventListener('click', async (ev) => {
       left -= i.pct;
     });
     renderPlanEdit();
+  } else if (b.dataset.plCrypto) {
+    $('#pl-picker').hidden = true;
+    $('#pl-fund').hidden = true;
+    const box = $('#pl-crypto');
+    box.hidden = !box.hidden;
+    if (box.hidden) return;
+    cryptoData = cryptoData ?? (await assetLoadCrypto());
+    $('#plc-coin').innerHTML = cryptoData?.coins?.length ? cryptoData.coins.map((c) => `<option value="${esc(c.id)}">${c.rank ? `#${c.rank} ` : ''}${esc(c.name)} (${esc(c.symbol)})</option>`).join('') : '<option value="">Brak danych – pojawią się po aktualizacji aplikacji</option>';
+  } else if (b.dataset.plcOk) {
+    const c = cryptoInfo(cryptoData, $('#plc-coin').value);
+    if (!c) return;
+    const symbol = cryptoSymbol(c.id);
+    addLibraryAsset(symbol, `${c.name} (${c.symbol})`, 'PLN');
+    addPlanItem({ asset: symbol, name: `${c.name} (${c.symbol})`, currency: 'PLN' });
   } else if (b.dataset.plXtb) {
     $('#pl-fund').hidden = true;
+    $('#pl-crypto').hidden = true;
     $('#pl-picker').hidden = !$('#pl-picker').hidden;
     if (!$('#pl-picker').hidden) planPicker.focusInput();
   } else if (b.dataset.plFund) {
     $('#pl-picker').hidden = true;
+    $('#pl-crypto').hidden = true;
     const box = $('#pl-fund');
     box.hidden = !box.hidden;
     if (!box.hidden) {

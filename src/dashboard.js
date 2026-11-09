@@ -10,6 +10,9 @@ import { monthNamePL, monthGenitivePL, datePL } from './lib/dates.js';
 import { fmtPct } from './explain.js';
 import { writeLibrary } from './instruments.js';
 import { writeFunds } from './funds.js';
+import { writeGold } from './gold.js';
+import { writeCrypto } from './crypto.js';
+import { writeBonds } from './bonds.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -19,8 +22,10 @@ const zl = (x) => (Number.isFinite(x) ? `${new Intl.NumberFormat('pl-PL', { maxi
 function clientScript() {
   const core = readFileSync(path.join(HERE, 'client', 'core.js'), 'utf8').replace(/^export /gm, '');
   const instruments = readFileSync(path.join(HERE, 'client', 'instruments.js'), 'utf8').replace(/^export /gm, '');
+  // Złoto, kryptowaluty i obligacje skarbowe (wspólne z dziennikiem finansowym).
+  const assets = readFileSync(path.join(HERE, 'client', 'assets.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '');
   const ui = readFileSync(path.join(HERE, 'client', 'ui.js'), 'utf8');
-  return `${core}\n${instruments}\n${ui}`;
+  return `${core}\n${instruments}\n${assets}\n${ui}`;
 }
 
 const ICONS = {
@@ -168,6 +173,8 @@ tr.grp td{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:u
 .ev-date{flex:none;width:76px;font-weight:700;font-size:13px;color:var(--accent)}.events small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
 .ev-gem .ev-date{color:var(--gem)}.ev-dane .ev-date{color:var(--muted)}
 .fund-tbl td:first-child{min-width:150px}
+.fund-tbl + .tbl-wrap,.tbl-wrap + .tbl-wrap{margin-top:10px}
+.crypto-q{font:inherit;font-size:15px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);min-width:0;width:min(210px,100%)}
 .seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;padding:7px 12px;border-radius:9px;cursor:pointer;white-space:nowrap}
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
 .seg.small button{padding:5px 10px;font-size:13px}
@@ -652,6 +659,9 @@ export async function writeDashboard(dir, payload) {
   const { config, research, podatki, prices, library, ...rest } = payload;
   await writeLibrary(dir, library ?? {});
   await writeFunds(dir, library?.funds);
+  await writeGold(dir, library?.gold);
+  await writeCrypto(dir, library?.crypto);
+  await writeBonds(dir, library?.bonds);
   await writeFile(path.join(dir, 'data', 'latest.json'), JSON.stringify(rest, null, 1));
   if (prices) await writeFile(path.join(dir, 'data', 'prices.json'), JSON.stringify(prices));
   await writeFile(

@@ -175,6 +175,16 @@ export default {
     historyStart: '2023-01-01',
   },
 
+  // Kryptowaluty, złoto i obligacje skarbowe do wyceny w Finansach (konto → Aktywa). Ceny publikowane przy każdej
+  // aktualizacji: złoto – NBP, kryptowaluty – CoinGecko, obligacje – inflacja GUS, stopa NBP i oferta obligacjeskarbowe.pl.
+  aktywa: {
+    // Ile największych kryptowalut (według kapitalizacji) publikować. Zawsze ta sama lista – nie zdradza, co masz.
+    kryptoTop: 100,
+    // Identyfikatory CoinGecko spoza tej listy, np. ['kaspa'] (z adresu coingecko.com/pl/waluty/kaspa).
+    // Uwaga: ta lista jest widoczna w repozytorium.
+    kryptoDodatkowe: [],
+  },
+
   data: {
     // Kolejność dostawców danych. Każdy wymaga darmowego klucza (README → krok 2).
     providers: ['tiingo', 'alphavantage'],

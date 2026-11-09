@@ -347,8 +347,13 @@ const LOTS_DIALOG = `<dialog id="lots-dialog"><form method="dialog" novalidate>
 <h3 id="ld-title">Aktywa na koncie</h3>
 <p class="small muted" id="ld-info"></p>
 <div id="ld-rows"></div>
-<div class="row-btns"><button type="button" class="btn small" id="ld-add">+ Instrument z XTB</button><button type="button" class="btn small" id="ld-add-fund">+ Fundusz ING TFI (PPE)</button><button type="button" class="btn small ghost" id="ld-add-manual">+ Inne aktywo (wycena ręczna)</button></div>
+<div class="row-btns"><button type="button" class="btn small" id="ld-add">+ Instrument z XTB</button><button type="button" class="btn small" id="ld-add-fund">+ Fundusz ING TFI (PPE)</button><button type="button" class="btn small" id="ld-add-bond">+ Obligacje skarbowe</button><button type="button" class="btn small" id="ld-add-gold">+ Złoto</button><button type="button" class="btn small" id="ld-add-crypto">+ Kryptowaluta</button><button type="button" class="btn small ghost" id="ld-add-manual">+ Inne aktywo (wycena ręczna)</button></div>
 <div id="ld-picker" hidden></div>
+<div id="ld-crypto" class="ld-fund inst-picker" hidden>
+<input type="search" id="ldc-q" class="inst-q" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Szukaj: Bitcoin, BTC, ETH, Solana…" aria-label="Szukaj kryptowaluty">
+<div id="ldc-list" class="inst-results" role="listbox"></div>
+<p class="small muted" id="ldc-info"></p>
+</div>
 <div id="ld-fund" class="ld-fund" hidden>
 <label class="field">Fundusz<select id="ldf-fund"></select></label>
 <label class="field">Kategoria jednostek<select id="ldf-cat"></select></label>
@@ -409,13 +414,13 @@ ${navHtml('finanse')}
 <main>
 <nav class="fin-tabs" id="fin-nav" aria-label="Dziennik">${TABS.map(([k, l]) => `<button data-view="${k}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg><span>${l}</span></button>`).join('')}</nav>
 <div id="fin-root"><p class="muted">Ładowanie…</p></div>
-<footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów strategii są dołączane do strony przy każdej aktualizacji aplikacji, a ceny pozostałych akcji i ETF-ów z oferty XTB oraz wyceny funduszy ING TFI strona wczytuje z plików aplikacji (data/notowania.js, data/fundusze.js) – to tylko pobranie gotowego pliku, bez wysyłania jakichkolwiek danych. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
+<footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów strategii są dołączane do strony przy każdej aktualizacji aplikacji, a ceny pozostałych akcji i ETF-ów z oferty XTB, wyceny funduszy ING TFI, cenę złota, kursy kryptowalut i dane do wyceny obligacji skarbowych strona wczytuje z plików aplikacji (data/notowania.js, data/fundusze.js, data/zloto.js, data/krypto.js, data/obligacje.js) – to tylko pobranie gotowego pliku, bez wysyłania jakichkolwiek danych. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
 ${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}${LOTS_DIALOG}${PLAN_DIALOG}${LOAN_DIALOG}${CONFIRM_DIALOG}${DOC_DIALOG}
 <noscript><p>Dziennik wymaga włączonej obsługi JavaScript.</p></noscript>
 <script type="application/json" id="fin-market">${market}</script>
-<script type="module">${read('finance-core.js')}\n${read('instruments.js')}\n${read('mmbackup.js')}\n${read('finance-ui.js')}</script>
+<script type="module">${read('assets.js')}\n${read('finance-core.js')}\n${read('instruments.js')}\n${read('mmbackup.js')}\n${read('finance-ui.js')}</script>
 </body></html>`;
 }
 
