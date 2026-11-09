@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-09T16:23:26.373Z",
+  "generatedAt": "2026-11-09T16:59:19.371Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -817,7 +817,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 405,
+  "fetched": 403,
   "items": [
    {
     "title": "As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360",
@@ -953,7 +953,7 @@
    {
     "title": "Dow rallies 900 points, Nasdaq jumps 2% as stocks climb out of postelection slump: Live updates",
     "link": "https://www.cnbc.com/2026/11/08/stock-market-today-live-updates.html",
-    "date": "2026-11-09T16:16:55.000Z",
+    "date": "2026-11-09T16:59:07.000Z",
     "summary": "Stocks surged on Monday, boosted by a decline in oil prices, as traders kept a close eye on technology shares after last week's volatility.",
     "source": "CNBC",
     "regions": [
@@ -978,6 +978,22 @@
     ],
     "themes": [
      "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Cena ropy spada po doniesieniach o umowie USA-Iran o wartości 8 mld USD dotyczącej cieśniny Ormuz: co dalej z Bitcoinem? - BeInCrypto",
+    "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFBhSXZLMnlNTE8zVUpkZS05R3pfZm0yZXEtdHowQlVlWWRSR3Y4T2pTbXJ4Vi04dmIxUjdwOWEyUU1hdFRtR2Y4cDVKOF93YU9ienRHTXVhQTJLVlZnTDF6cWUtemJCeS1tMk1CZWtR?oc=5",
+    "date": "2026-11-09T12:58:00.000Z",
+    "summary": "Cena ropy spada po doniesieniach o umowie USA-Iran o wartości 8 mld USD dotyczącej cieśniny Ormuz: co dalej z Bitcoinem? BeInCrypto",
+    "source": "Google News PL",
+    "regions": [
+     "USA",
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Energia i surowce"
     ],
     "relevant": true,
     "score": 6
@@ -1107,23 +1123,6 @@
     "score": 6
    },
    {
-    "title": "Giełdowy wstrząs przez AI, cyberataki na sklepy, Trump grozi Iranowi (Najważniejsze informacje dnia)",
-    "link": "https://www.pb.pl/gieldowy-wstrzas-przez-ai-cyberataki-na-sklepy-trump-grozi-iranowi-najwazniejsze-informacje-dnia-1270089",
-    "date": "2026-11-06T16:49:58.000Z",
-    "summary": "Fala wyprzedaży na światowych giełdach wywołała obawy o przyszłość boomu sztucznej inteligencji. W Polsce policja bada kolejne cyberataki na systemy chłodnicze, a twórcy gry „Copa City”, którzy zainwestowali w projekt niemal 50 mln zł, składają wniosek o upadłość. Tymczasem południowa Szwecja mierzy",
-    "source": "Puls Biznesu",
-    "regions": [
-     "USA",
-     "Polska",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Nastroje na giełdach"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
     "title": "HSBC radzi korzystać z przeceny i kupować akcje. Znów stawia na segment technologiczny",
     "link": "https://www.pb.pl/hsbc-radzi-korzystac-z-przeceny-i-kupowac-akcje-1270177",
     "date": "2026-11-09T15:51:10.000Z",
@@ -1143,20 +1142,20 @@
    "Konflikty i wojny": 8,
    "Sankcje i cła": 4,
    "Banki centralne i stopy": 5,
-   "Wybory i polityka": 30,
-   "Energia i surowce": 20,
-   "Inflacja i recesja": 6,
-   "Nastroje na giełdach": 18,
-   "Spółki i wyniki": 7
+   "Wybory i polityka": 28,
+   "Energia i surowce": 18,
+   "Inflacja i recesja": 7,
+   "Nastroje na giełdach": 15,
+   "Spółki i wyniki": 8
   },
   "regionCounts": {
-   "USA": 24,
+   "USA": 22,
    "Europa": 5,
    "Azja": 5,
    "Rynki wschodzące": 1,
-   "Polska": 12,
+   "Polska": 10,
    "Bliski Wschód": 6,
-   "Rosja/Ukraina": 2
+   "Rosja/Ukraina": 1
   },
   "errors": []
  },
@@ -1431,7 +1430,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-09T16:23:26.373Z",
+  "generatedAt": "2026-11-09T16:59:19.371Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -2035,9 +2034,9 @@
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (30 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Bez przekonania” (Parkiet).",
-      "Energia i surowce (20 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360” (Google News).",
-      "Nastroje na giełdach (18 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „Bez przekonania” (Parkiet)."
+      "Wybory i polityka (28 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Bez przekonania” (Parkiet).",
+      "Energia i surowce (18 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360” (Google News).",
+      "Nastroje na giełdach (15 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „Bez przekonania” (Parkiet)."
      ]
     },
     {
