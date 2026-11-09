@@ -52,6 +52,29 @@ test('pozycja ze średnią ceną: kurs z XTB daje od razu prawdziwy zysk, a dale
   assert.equal(marketPriceAt(MARKET, { lots: [] }, 'VWCE.DE', '2026-11-09'), null);
 });
 
+test('konto w EUR: koszt, wartość i zysk w euro; koszt w złotych po zapamiętanym kursie', () => {
+  // Kurs EUR rano (z piątku) i po publikacji tabeli NBP z poniedziałku – jak na koncie XTB EUR użytkownika.
+  const m1 = { fx: { EUR: [['2026-11-06', 4.3925]] }, assets: MARKET.assets };
+  const m2 = { fx: { EUR: [['2026-11-06', 4.3925], ['2026-11-09', 4.3873]] }, assets: MARKET.assets };
+  const lot = { id: 'v', asset: 'VWCE.DE', currency: 'EUR', qty: 154.9513, price: 140, date: '2026-11-09', mark: ['2026-11-09', 167.5] };
+  const account = { currency: 'EUR', lots: [lot] };
+  const eur = investSummary(m2, account, '2026-11-09', 'EUR');
+  near(eur.cost, 154.9513 * 140); // w euro koszt się nie zmienia
+  near(eur.value, 154.9513 * 167.5);
+  near(eur.gain, 154.9513 * 27.5);
+  // W złotych bez zapamiętanego kursu koszt „pływa” razem z kursem NBP z dnia zakupu…
+  const plnBefore = investSummary(m1, account, '2026-11-09').cost;
+  const plnAfter = investSummary(m2, account, '2026-11-09').cost;
+  assert.ok(Math.abs(plnBefore - plnAfter) > 50);
+  // …a z kursem zapamiętanym przy zapisie pozycji – już nie.
+  const fixed = { currency: 'EUR', lots: [{ ...lot, fxCost: 4.3925 }] };
+  near(investSummary(m2, fixed, '2026-11-09').cost, plnBefore);
+  // Pozycja w innej walucie niż konto: przeliczenie przez złotego (kursy NBP).
+  const usd = { fx: { EUR: [['2026-11-09', 4.4]], USD: [['2026-11-09', 4.0]] }, assets: {} };
+  const r = lotResult(usd, { asset: 'manual', currency: 'USD', qty: 1, price: 110, date: '2026-11-09', marks: [['2026-11-09', 110]] }, '2026-11-09', 'EUR');
+  near(r.value, 100);
+});
+
 test('rozliczenie z gotówką: kupno i sprzedaż tak, zmiana wyceny nie', () => {
   const a = { id: 'a', asset: 'VWCE.DE', currency: 'EUR', qty: 10, price: 140, date: '2026-11-09' };
   const b = { id: 'b', asset: 'CDR.PL', currency: 'PLN', qty: 2, price: 200, date: '2026-11-09' };

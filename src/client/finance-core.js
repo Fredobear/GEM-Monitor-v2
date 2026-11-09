@@ -629,7 +629,10 @@ export function planDeposit(fin, accountId, planId, { date, amount, prices, from
   const newLots = buys.map((b) => {
     const id = newId();
     lotIds.push(id);
-    return { id, asset: b.asset, name: b.name, currency: b.currency, qty: b.qty, price: b.price, date, mark: [date, b.price], planId: plan.id };
+    const lot = { id, asset: b.asset, name: b.name, currency: b.currency, qty: b.qty, price: b.price, date, mark: [date, b.price], planId: plan.id };
+    const fx = b.currency !== 'PLN' ? rateOn(market, b.currency, date) : null;
+    if (fx) lot.fxCost = fx;
+    return lot;
   });
   const txIds = [];
   const txs = [];
@@ -718,43 +721,58 @@ export function holdingsPLN(market, account, date) {
   return sum;
 }
 
+// Kurs przeliczenia z waluty from na walutę to (kursy średnie NBP przez złotego); null, gdy brak kursu.
+export function crossRate(market, from, to, date) {
+  if ((from || 'PLN') === (to || 'PLN')) return 1;
+  const a = rateOn(market, from || 'PLN', date);
+  const b = rateOn(market, to || 'PLN', date);
+  return a === null || b === null ? null : a / b;
+}
+
 // Ile zainwestowano w pozycję: ilość × cena zakupu, w walucie aktywa i w złotych po kursie NBP z dnia zakupu.
-export function lotCost(market, lot) {
+// lot.fxCost – kurs waluty aktywa zapamiętany przy zapisie pozycji: koszt w złotych nie zmienia się wtedy,
+// gdy NBP opublikuje kurs z dnia zakupu później (np. pozycja wpisana rano z dzisiejszą datą).
+export function lotCost(market, lot, cur = 'PLN') {
   const currency = lotCurrency(market, lot);
   const cost = lot.qty * lot.price;
-  const r = rateOn(market, currency, lot.date);
-  return { cost, currency, costPLN: r === null ? null : cost * r };
+  const fixed = currency !== 'PLN' && lot.fxCost > 0 ? lot.fxCost : null;
+  const toPLN = currency === 'PLN' ? 1 : fixed ?? rateOn(market, currency, lot.date);
+  const curRate = rateOn(market, cur, lot.date);
+  const costIn = currency === cur ? cost : toPLN === null || curRate === null ? null : (cost * toPLN) / curRate;
+  return { cost, currency, costPLN: toPLN === null ? null : cost * toPLN, costIn };
 }
 
-// Wynik otwartej pozycji na dany dzień: wartość, koszt i zysk w złotych (z efektem kursu walutowego)
-// oraz zmiana samej ceny w walucie aktywa.
-export function lotResult(market, lot, date) {
-  const value = lotValuePLN(market, lot, date);
-  const { costPLN, currency } = lotCost(market, lot);
-  if (value === null || costPLN === null) return null;
-  return { value, costPLN, gain: value - costPLN, gainPct: costPLN > 0 ? value / costPLN - 1 : null, priceChange: lot.price > 0 ? lotPrice(market, lot, date) / lot.price - 1 : null, currency };
+// Wynik otwartej pozycji na dany dzień: wartość, koszt i zysk w walucie cur (domyślnie w złotych – z efektem kursu
+// walutowego; w walucie aktywa – sama zmiana ceny) oraz zmiana ceny w walucie aktywa.
+export function lotResult(market, lot, date, cur = 'PLN') {
+  const { costIn, currency } = lotCost(market, lot, cur);
+  const price = lotPrice(market, lot, date);
+  const rate = crossRate(market, currency, cur, date);
+  if (costIn === null || rate === null || !Number.isFinite(price)) return null;
+  const value = lotActive(lot, date) ? lot.qty * price * rate : 0;
+  return { value, cost: costIn, costPLN: cur === 'PLN' ? costIn : lotCost(market, lot).costPLN, gain: value - costIn, gainPct: costIn > 0 ? value / costIn - 1 : null, priceChange: lot.price > 0 ? price / lot.price - 1 : null, currency };
 }
 
-// Podsumowanie konta inwestycyjnego: ile zainwestowano w otwarte pozycje, ile są dziś warte i jaki jest zysk.
-// Pozycje sprzedane (until) dają zysk zrealizowany: wartość w dniu sprzedaży minus koszt zakupu.
-export function investSummary(market, account, date) {
-  const out = { cost: 0, value: 0, gain: 0, gainPct: null, positions: 0, missing: 0, realized: null };
+// Podsumowanie konta inwestycyjnego: ile zainwestowano w otwarte pozycje, ile są dziś warte i jaki jest zysk
+// (w walucie cur – zwykle walucie konta). Pozycje sprzedane (until) dają zysk zrealizowany.
+export function investSummary(market, account, date, cur = 'PLN') {
+  const out = { cost: 0, value: 0, gain: 0, gainPct: null, positions: 0, missing: 0, realized: null, currency: cur };
   for (const lot of account.lots ?? []) {
     if (lot.until) {
       if (lot.until > date) continue;
-      const r = rateOn(market, lotCurrency(market, lot), lot.until);
-      const { costPLN } = lotCost(market, lot);
-      if (r === null || costPLN === null) continue;
-      out.realized = (out.realized ?? 0) + lot.qty * lotPrice(market, lot, lot.until) * r - costPLN;
+      const r = crossRate(market, lotCurrency(market, lot), cur, lot.until);
+      const { costIn } = lotCost(market, lot, cur);
+      if (r === null || costIn === null) continue;
+      out.realized = (out.realized ?? 0) + lot.qty * lotPrice(market, lot, lot.until) * r - costIn;
       continue;
     }
     if (!lotActive(lot, date)) continue;
-    const res = lotResult(market, lot, date);
+    const res = lotResult(market, lot, date, cur);
     if (!res) {
       out.missing++;
       continue;
     }
-    out.cost += res.costPLN;
+    out.cost += res.cost;
     out.value += res.value;
     out.positions++;
   }

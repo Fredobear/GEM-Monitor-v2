@@ -115,7 +115,7 @@ test('wycena funduszu w przeglądarce i zysk z pozycji (PPE)', () => {
 
   const market = { fx: {}, assets: { 'INGTFI:1:E': { name: 'ING Akcji', ...entry } } };
   const lot = { id: 'l1', asset: 'INGTFI:1:E', name: 'ING Akcji', currency: 'PLN', qty: 10, price: 1000, date: '2024-01-15' };
-  assert.deepEqual(lotCost(market, lot), { cost: 10000, currency: 'PLN', costPLN: 10000 });
+  assert.deepEqual(lotCost(market, lot), { cost: 10000, currency: 'PLN', costPLN: 10000, costIn: 10000 });
   const r = lotResult(market, lot, '2026-11-08');
   assert.equal(Math.round(r.value * 100) / 100, 12615.3);
   assert.equal(Math.round(r.gain * 100) / 100, 2615.3);

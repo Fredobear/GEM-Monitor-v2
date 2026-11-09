@@ -819,9 +819,14 @@ function lotLabel(l) {
   return l.asset;
 }
 
+// Zysk w dowolnej walucie, np. „+4 469,54 EUR (+17,5%)”.
+const gainMoney = (gain, gainPct, cur) => `${gain < -0.004 ? '−' : '+'}${money(Math.abs(gain), cur)}${gainPct === null || !Number.isFinite(gainPct) ? '' : ` (${gainPct < -0.00005 ? '−' : '+'}${pct1(gainPct)})`}`;
+
+// Aktywa konta inwestycyjnego w walucie konta (konto w EUR – w euro, jak w XTB), a przy innej walucie także w złotych.
 function investmentLines(a, cash) {
   const at = valuationDate();
-  const sum = investSummary(MARKET, a, at);
+  const acur = a.currency || 'PLN';
+  const sum = investSummary(MARKET, a, at, acur);
   // Pozycje tego samego instrumentu (np. kolejne wpłaty w planie) pokazujemy razem: ilość, koszt, wartość i zysk.
   const groups = new Map();
   for (const l of (a.lots ?? []).filter((x) => !x.until)) {
@@ -837,11 +842,11 @@ function investmentLines(a, cash) {
     let costCur = 0;
     let missing = false;
     for (const l of list) {
-      const r = lotResult(MARKET, l, at);
+      const r = lotResult(MARKET, l, at, acur);
       if (!r) missing = true;
       else if (lotActive(l, at)) {
         value += r.value;
-        cost += r.costPLN;
+        cost += r.cost;
         qty += l.qty;
         costCur += l.qty * l.price;
       }
@@ -854,16 +859,19 @@ function investmentLines(a, cash) {
     const priceChange = qty > 0 && costCur > 0 ? priceNow / (costCur / qty) - 1 : null;
     const gain = value - cost;
     const noMark = needsMark(l0) && !list.some((l) => l.mark);
+    const avg = qty > 0 ? costCur / qty : 0;
     const detail = qty > 0
-      ? `<small>zainwestowano ${esc(zl(cost))} · <span class="${gainClass(gain)}">${esc(gainText(gain, cost > 0 ? value / cost - 1 : null))}</span>${cur !== 'PLN' && priceChange !== null ? ` · cena w ${esc(cur)} ${priceChange < 0 ? '−' : '+'}${esc(pct1(priceChange))}` : ''}${list.length > 1 ? ` · ${list.length} ${plural(list.length, 'zakup', 'zakupy', 'zakupów')}` : ''}${noMark ? ' · <span class="warn">wpisz kurs z XTB w „Aktywa”, aby zobaczyć zysk</span>' : ''}</small>`
+      ? `<small>zainwestowano ${esc(money(cost, acur))}${cur === acur && avg ? ` (śr. ${esc(NF2.format(avg))}, teraz ${esc(approx)}${esc(NF2.format(priceNow))} ${esc(curLabel(cur))})` : ''} · <span class="${gainClass(gain)}">${esc(gainMoney(gain, cost > 0 ? value / cost - 1 : null, acur))}</span>${cur !== acur && priceChange !== null ? ` · cena w ${esc(cur)} ${priceChange < 0 ? '−' : '+'}${esc(pct1(priceChange))}` : ''}${list.length > 1 ? ` · ${list.length} ${plural(list.length, 'zakup', 'zakupy', 'zakupów')}` : ''}${noMark ? ' · <span class="warn">wpisz kurs z XTB w „Aktywa”, aby zobaczyć zysk</span>' : ''}</small>`
       : '';
-    return `<div class="inv-line inv-pos"><span>${esc(lotLabel(l0))} · ${esc(fmtQty(Math.round(list.reduce((s, l) => s + l.qty, 0) * 1e6) / 1e6))} ${unit}${detail}</span><b>${missing && !value ? 'brak kursu' : esc(approx + zl(value))}</b></div>`;
+    return `<div class="inv-line inv-pos"><span>${esc(lotLabel(l0))} · ${esc(fmtQty(Math.round(list.reduce((s, l) => s + l.qty, 0) * 1e6) / 1e6))} ${unit}${detail}</span><b>${missing && !value ? 'brak kursu' : esc(approx + money(value, acur))}</b></div>`;
   });
+  // Konto w obcej walucie: dla porządku te same liczby w złotych (z efektem kursu walut).
+  const pln = acur !== 'PLN' && sum?.positions ? investSummary(MARKET, a, at, 'PLN') : null;
   const head = sum?.positions
-    ? `<div class="inv-sum"><div><span>Zainwestowano</span><b>${esc(zl(sum.cost))}</b></div><div><span>Wartość aktywów</span><b>${esc(zl(sum.value))}</b></div><div><span>Zysk</span><b class="${gainClass(sum.gain)}">${esc(gainText(sum.gain, sum.gainPct))}</b></div></div>`
+    ? `<div class="inv-sum"><div><span>Zainwestowano</span><b>${esc(money(sum.cost, acur))}</b></div><div><span>Wartość aktywów</span><b>${esc(money(sum.value, acur))}</b></div><div><span>Zysk</span><b class="${gainClass(sum.gain)}">${esc(gainMoney(sum.gain, sum.gainPct, acur))}</b></div></div>${pln ? `<div class="small muted">W złotych: zainwestowano ${esc(zl(pln.cost))} · wartość ${esc(zl(pln.value))} · zysk ${esc(gainText(pln.gain, pln.gainPct))} (razem ze zmianą kursu ${esc(acur)})</div>` : ''}`
     : '';
-  const realized = sum?.realized !== null && sum?.realized !== undefined && Math.abs(sum.realized) >= 0.01 ? `<div class="inv-line"><span>Zysk zrealizowany (sprzedane pozycje)</span><b class="${gainClass(sum.realized)}">${esc(signed(sum.realized))}</b></div>` : '';
-  return `${head}${lines.join('')}${realized}<div class="inv-line"><span>Wolna gotówka</span><b>${esc(money(cash, a.currency))}</b></div>`;
+  const realized = sum?.realized !== null && sum?.realized !== undefined && Math.abs(sum.realized) >= 0.01 ? `<div class="inv-line"><span>Zysk zrealizowany (sprzedane pozycje)</span><b class="${gainClass(sum.realized)}">${esc(gainMoney(sum.realized, null, acur))}</b></div>` : '';
+  return `${head}${lines.join('')}${realized}<div class="inv-line"><span>Wolna gotówka <button type="button" class="link small" data-edit-acc="${esc(a.id)}">popraw</button></span><b>${esc(money(cash, acur))}</b></div>`;
 }
 
 const pctNum = (x) => NF2.format(Math.round(x * 100) / 100).replace(/,00$/, '');
@@ -953,8 +961,11 @@ function accountItem(a, b) {
   const due = card ? cardDue(a, b, today()) : null;
   const w = accountWorth(fin, a, MARKET, valuationDate(), b);
   const sub = [ACCOUNT_TYPES[a.type] ?? 'Konto', a.gemAccount ? `portfel GEM: ${GEM_ACCOUNTS[a.gemAccount] ?? a.gemAccount}` : '', cur !== 'PLN' ? cur : '', a.excludeFromTotal ? 'poza majątkiem' : ''].filter(Boolean).join(' · ');
-  const main = inv || gemVal ? (w ? zl(w.total) : money(b, cur)) : money(b, cur);
-  const conv = !inv && !gemVal && cur !== 'PLN' && w ? `<span class="acc-sub">≈ ${esc(zl(w.cashPLN))}</span>` : inv && !w ? '<span class="acc-sub">brak kursu</span>' : '';
+  // Konto inwestycyjne w obcej walucie: wartość w walucie konta (jak u brokera), a pod nią w złotych.
+  const curRate = cur !== 'PLN' ? rateOn(MARKET, cur, valuationDate()) : 1;
+  const invForeign = inv && !gemVal && cur !== 'PLN' && w && curRate;
+  const main = invForeign ? money(w.total / curRate, cur) : inv || gemVal ? (w ? zl(w.total) : money(b, cur)) : money(b, cur);
+  const conv = invForeign ? `<span class="acc-sub">≈ ${esc(zl(w.total))}</span>` : !inv && !gemVal && cur !== 'PLN' && w ? `<span class="acc-sub">≈ ${esc(zl(w.cashPLN))}</span>` : inv && !w ? '<span class="acc-sub">brak kursu</span>' : '';
   const cardInfo = card
     ? `${st.limit ? `<div class="meter" title="Wykorzystany limit"><span style="width:${(st.usedShare * 100).toFixed(1)}%;background:${st.usedShare > 0.8 ? 'var(--neg)' : 'var(--accent)'}"></span></div>` : ''}<div class="small muted">${st.debt > 0.004 ? `Do spłaty <b class="neg">${esc(zl(st.debt))}</b>` : 'Karta spłacona ✓'}${st.limit ? ` · limit ${esc(zl0(st.limit))} · dostępne ${esc(zl(st.available))}` : ''}${due ? ` · termin ${esc(shortDate(due.due))}` : ''}</div>${cardCostLine(a, st.debt)}`
     : '';
@@ -2404,9 +2415,10 @@ function lotSummary(l) {
   const v = lotValuePLN(MARKET, lot, at);
   if (v === null) return 'Brak kursu waluty.';
   if (l.asset === 'manual') return `Wartość: ${zl(v)}`;
-  const r = lotResult(MARKET, { ...withMark(l, at), since: undefined, until: undefined }, at);
+  const acur = acc(lotsState?.accountId)?.currency || 'PLN';
+  const r = lotResult(MARKET, { ...withMark(l, at), since: undefined, until: undefined }, at, acur);
   const noPrice = needsMark(l) && !(l.markNew > 0) && !l.mark;
-  return r ? `Wartość dziś: ${zl(r.value)} · zysk ${gainText(r.gain, r.gainPct)}${noPrice ? ' – wpisz kurs teraz z XTB, aby zobaczyć prawdziwy zysk' : ''}` : `Wartość dziś: ${zl(v)}`;
+  return r ? `Wartość dziś: ${money(r.value, acur)} · zysk ${gainMoney(r.gain, r.gainPct, acur)}${noPrice ? ' – wpisz kurs teraz z XTB, aby zobaczyć prawdziwy zysk' : ''}` : `Wartość dziś: ${zl(v)}`;
 }
 // Pozycja bez dokładnych notowań (ETF wyceniany według indeksu): przyda się bieżący kurs z XTB.
 const needsMark = (l) => l.asset !== 'manual' && !isFundLot(l) && !hasExactQuotes(MARKET, l.asset, valuationDate());
@@ -2519,7 +2531,11 @@ function workingValue() {
 function updateLotsSum() {
   const now = workingValue();
   const delta = now - lotsState.before;
-  $('#ld-sum').textContent = `Wartość aktywów: ${zl(now)}${Math.abs(delta) >= 0.01 ? ` (zmiana ${signed(delta)})` : ''}.`;
+  const acur = acc(lotsState.accountId)?.currency || 'PLN';
+  const rate = acur !== 'PLN' ? rateOn(MARKET, acur, valuationDate()) : null;
+  $('#ld-sum').textContent = rate
+    ? `Wartość aktywów: ${money(now / rate, acur)} (${zl(now)})${Math.abs(delta) >= 0.01 ? `, zmiana ${delta < 0 ? '−' : '+'}${money(Math.abs(delta) / rate, acur)}` : ''}.`
+    : `Wartość aktywów: ${zl(now)}${Math.abs(delta) >= 0.01 ? ` (zmiana ${signed(delta)})` : ''}.`;
 }
 
 lotsForm.addEventListener('input', (ev) => {
@@ -2597,6 +2613,12 @@ lotsForm.addEventListener('submit', (ev) => {
       const mark = l.markNew > 0 ? [t, Math.round(l.markNew * 1e6) / 1e6] : l.mark;
       const out = { id: l.id, asset: l.asset, name: l.name, currency: l.currency, qty: l.qty, price: Math.round(l.price * 1e6) / 1e6, date: l.date, since: l.since };
       if (mark) out.mark = mark;
+      // Kurs waluty do kosztu zakupu zapamiętany przy zapisie (koszt w złotych nie zmieni się po publikacji kursu NBP).
+      const lcur = lotCurrency(MARKET, l);
+      const old = (a.lots ?? []).find((x) => x.id === l.id);
+      const fx = lcur === 'PLN' ? null : old && old.date === l.date && old.fxCost > 0 ? old.fxCost : rateOn(MARKET, lcur, l.date);
+      if (fx) out.fxCost = fx;
+      if (l.planId) out.planId = l.planId;
       return out;
     }
     // Aktywo z wyceną ręczną: każda zmiana wartości to nowy punkt historii (do wykresu majątku).
