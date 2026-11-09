@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-09T16:59:19.371Z",
+  "generatedAt": "2026-11-09T17:02:34.020Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -817,7 +817,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 403,
+  "fetched": 405,
   "items": [
    {
     "title": "As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360",
@@ -1142,7 +1142,7 @@
    "Konflikty i wojny": 8,
    "Sankcje i cła": 4,
    "Banki centralne i stopy": 5,
-   "Wybory i polityka": 28,
+   "Wybory i polityka": 30,
    "Energia i surowce": 18,
    "Inflacja i recesja": 7,
    "Nastroje na giełdach": 15,
@@ -1152,7 +1152,7 @@
    "USA": 22,
    "Europa": 5,
    "Azja": 5,
-   "Rynki wschodzące": 1,
+   "Rynki wschodzące": 2,
    "Polska": 10,
    "Bliski Wschód": 6,
    "Rosja/Ukraina": 1
@@ -1430,7 +1430,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-09T16:59:19.371Z",
+  "generatedAt": "2026-11-09T17:02:34.020Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -2034,7 +2034,7 @@
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (28 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Bez przekonania” (Parkiet).",
+      "Wybory i polityka (30 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Bez przekonania” (Parkiet).",
       "Energia i surowce (18 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360” (Google News).",
       "Nastroje na giełdach (15 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „Bez przekonania” (Parkiet)."
      ]
