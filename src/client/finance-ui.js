@@ -13,7 +13,7 @@ const NF4 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 4, maximumFr
 const tidy = (x) => (Math.abs(x) < 0.005 ? 0 : x);
 const minus = (s) => s.replace(/^-/, '−');
 const zl = (x) => `${minus(NF2.format(tidy(x)))} zł`;
-const zl0 = (x) => `${minus(NF0.format(Math.round(tidy(x))))} zł`;
+const zl0 = (x) => `${minus(NF0.format(Math.round(tidy(x)) || 0))} zł`;
 const money = (x, cur) => (!cur || cur === 'PLN' ? zl(x) : `${minus(NF2.format(tidy(x)))} ${cur}`);
 const signed = (x) => `${x < -0.004 ? '−' : '+'}${zl(Math.abs(x))}`;
 const pct = (x) => (x === null || !Number.isFinite(x) ? '–' : `${Math.round(x * 100)}%`);
@@ -22,7 +22,8 @@ const pct1 = (x) => `${NF1.format(Math.abs(x * 100))}%`;
 const gainText = (gain, gainPct) => `${signed(gain)}${gainPct === null || !Number.isFinite(gainPct) ? '' : ` (${gainPct < -0.00005 ? '−' : '+'}${pct1(gainPct)})`}`;
 const gainClass = (x) => (x > 0.004 ? 'pos' : x < -0.004 ? 'neg' : '');
 const isFundLot = (l) => typeof l?.asset === 'string' && l.asset.startsWith(FUND_PREFIX);
-const compact = (x) => (x >= 10000 ? `${NF0.format(Math.round(x / 1000))} tys.` : NF0.format(Math.round(x)));
+// Kwota w kratce kalendarza: pełna, bez groszy i bez „zł” (np. 12 345).
+const compact = (x) => NF0.format(Math.round(x));
 const fmtInput = (x) => (Number.isFinite(x) && Math.abs(x) >= 0.005 ? String(round2(x)).replace('.', ',') : '');
 const fmtQty = (q, dec = 6) => (Number.isFinite(q) && q ? String(Number(q.toFixed(dec))).replace('.', ',') : '');
 const curLabel = (cur) => (!cur || cur === 'PLN' ? 'zł' : cur);
@@ -588,7 +589,7 @@ function heroBalance() {
   const delta = older ? now.worth - wealthAt(fin, MARKET, prevEnd).worth : null;
   const stat = (label, value, cls = '', note = '') => `<span><i>${esc(label)}</i><b class="${cls}">${esc(value)}</b>${note}</span>`;
   return `<button class="card hero-bal" data-view="majatek" aria-label="Majątek netto – otwórz zakładkę Majątek"><span class="hb-main"><span class="hb-top"><span class="muted small">Majątek netto</span><span class="hb-chev" aria-hidden="true">›</span></span><span class="hb-val ${now.worth < -0.004 ? 'neg' : ''}">${esc(zl(now.worth))}</span>${delta === null ? '' : `<span class="small"><b class="${gainClass(delta)}">${esc(signed(delta))}</b> <span class="muted">w tym miesiącu</span></span>`}
-  <span class="hb-stats">${stat('Gotówka i konta', kzl(now.cash))}${stat('Inwestycje', kzl(now.investments), '', inv.positions ? `<small class="${gainClass(inv.gain)}">${inv.gain < -0.004 ? '−' : '+'}${esc(kzl(Math.abs(inv.gain)))}${inv.gainPct === null ? '' : ` (${inv.gainPct < 0 ? '−' : '+'}${esc(pct1(inv.gainPct))})`}</small>` : '')}${stat('Długi', now.debt > 0.004 ? `−${kzl(now.debt)}` : kzl(0), now.debt > 0.004 ? 'neg' : '')}</span>${now.missing.length ? `<span class="small warn">Bez kursu waluty: ${esc(now.missing.join(', '))}</span>` : ''}</span></button>`;
+  <span class="hb-stats">${stat('Gotówka i konta', zl(now.cash))}${stat('Inwestycje', zl(now.investments), '', inv.positions ? `<small class="${gainClass(inv.gain)}">${esc(gainText(inv.gain, inv.gainPct))}</small>` : '')}${stat('Długi', now.debt > 0.004 ? `−${zl(now.debt)}` : zl(0), now.debt > 0.004 ? 'neg' : '')}</span>${now.missing.length ? `<span class="small warn">Bez kursu waluty: ${esc(now.missing.join(', '))}</span>` : ''}</span></button>`;
 }
 
 function alerts() {
@@ -725,7 +726,7 @@ function viewCalendar() {
     const heat = d.expense && cal.maxExpense ? Math.round(8 + 52 * (d.expense / cal.maxExpense) ** 0.75) : 0;
     const cls = ['cal-day', d.date === t && 'today', d.date === ui.calDay && 'sel', d.date > t && 'future'].filter(Boolean).join(' ');
     const label = `${dayLabel(d.date)}${d.expense ? `, wydatki ${zl(d.expense)}` : ''}${d.income ? `, przychody ${zl(d.income)}` : ''}${planBy.has(d.date) ? ', zaplanowana stała pozycja' : ''}`;
-    cells.push(`<button class="${cls}" data-day="${d.date}" style="--h:${heat}%" aria-label="${esc(label)}"><span class="d">${d.day}</span>${d.income ? '<i class="inc-dot"></i>' : ''}${planBy.has(d.date) ? '<i class="plan-dot">↻</i>' : ''}<span class="v">${d.expense ? esc(compact(d.expense)) : ''}</span></button>`);
+    cells.push(`<button class="${cls}" data-day="${d.date}" style="--h:${heat}%" aria-label="${esc(label)}"><span class="d">${d.day}</span>${d.income ? '<i class="inc-dot"></i>' : ''}${planBy.has(d.date) ? '<i class="plan-dot">↻</i>' : ''}<span class="v${d.expense >= 99999.5 ? ' long' : ''}">${d.expense ? esc(compact(d.expense)) : ''}</span></button>`);
   }
   const sel = ui.calDay && ui.calDay.startsWith(month) ? ui.calDay : '';
   return `<section class="card">
@@ -1043,17 +1044,10 @@ function viewAccounts() {
 // ---------- Majątek: historia, skąd przyrost, struktura i prognoza ----------
 // Wykresy są rysowane jako SVG. Każdy ma legendę (gdy serii jest więcej niż jedna), dymek po dotknięciu albo najechaniu
 // (wartości z danego miesiąca) i tabelę z tymi samymi danymi. Kolory serii: zmienne --s-cash, --s-inv, --s-debt.
-const trimZeros = (s) => s.replace(/,(\d*?)0+$/, (m, d) => (d ? `,${d}` : ''));
-// Kwoty w skrócie: 950 zł, 78,7 tys. zł, 643 tys. zł, 1,29 mln zł.
-function kzl(x, unit = ' zł') {
-  const a = Math.abs(x);
-  const sign = x <= -0.5 ? '−' : '';
-  if (a >= 999500) return `${sign}${trimZeros(NF2.format(a / 1e6))} mln${unit}`;
-  if (a >= 99950) return `${sign}${NF0.format(Math.round(a / 1000))} tys.${unit}`;
-  if (a >= 9995) return `${sign}${trimZeros(NF1.format(a / 1000))} tys.${unit}`;
-  return `${sign}${NF0.format(Math.round(a))}${unit}`;
-}
-const skzl = (x) => `${x < -0.5 ? '' : '+'}${kzl(x)}`;
+// Wszystkie kwoty są pełne (bez skrótów „tys.” i „mln”). Opis osi: pełna liczba bez „zł”, np. 1 500 000.
+const tickText = (t) => minus(NF0.format(Math.round(t) || 0));
+// Przybliżona szerokość opisu osi (cyfry ok. 6,4 jednostki, odstęp między tysiącami 3), żeby lewy margines mieścił pełne kwoty.
+const tickWidth = (s) => [...s].reduce((w, ch) => w + (/\s/.test(ch) ? 3 : 6.4), 0);
 const monthShort = (month, withYear = true) => `${MONTHS_SHORT[Number(month.slice(5, 7)) - 1]}${withYear ? ` ${month.slice(2, 4)}` : ''}`;
 
 function niceTicks(lo, hi, count = 4) {
@@ -1067,12 +1061,14 @@ function niceTicks(lo, hi, count = 4) {
 }
 
 // Pole wykresu: oś Y z okrągłymi wartościami, linie siatki i funkcja przeliczająca wartość na współrzędną.
-function plotArea(lo, hi, { W = 360, H = 210, left = 52, right = 12, top = 14, bottom = 24 } = {}) {
+function plotArea(lo, hi, { W = 360, H = 210, left, right = 12, top = 14, bottom = 24 } = {}) {
   const ticks = niceTicks(lo, hi);
+  const labels = ticks.map(tickText);
+  left ??= Math.max(36, Math.ceil(Math.max(...labels.map(tickWidth))) + 10);
   const y0 = ticks[0];
   const y1 = ticks[ticks.length - 1];
   const y = (v) => top + (H - top - bottom) * (1 - (v - y0) / (y1 - y0));
-  const grid = ticks.map((t) => `<line x1="${left}" x2="${W - right}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}" class="${t === 0 ? 'cx-zero' : 'cx-grid'}"/><text x="${left - 6}" y="${(y(t) + 3.5).toFixed(1)}" text-anchor="end" class="cx-tick">${esc(kzl(t, ''))}</text>`).join('');
+  const grid = ticks.map((t, i) => `<line x1="${left}" x2="${W - right}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}" class="${t === 0 ? 'cx-zero' : 'cx-grid'}"/><text x="${left - 6}" y="${(y(t) + 3.5).toFixed(1)}" text-anchor="end" class="cx-tick">${esc(labels[i])}</text>`).join('');
   return { W, H, left, right, top, bottom, y, grid, x0: left, x1: W - right, base: y(Math.min(y1, Math.max(y0, 0))), floor: H - bottom };
 }
 const xLabel = (x, text, H) => `<text x="${x.toFixed(1)}" y="${H - 7}" text-anchor="middle" class="cx-tick">${esc(text)}</text>`;
@@ -1154,7 +1150,7 @@ function savedChart(stats) {
     if (show(i)) parts.push(xLabel(cx(i), monthShort(m.month, m.month.endsWith('-01') || i === 0), P.H));
   });
   const ya = P.y(stats.avgSaved);
-  parts.push(`<line x1="${P.x0}" x2="${P.x1}" y1="${ya.toFixed(1)}" y2="${ya.toFixed(1)}" class="cx-avg"/><text x="${P.x1}" y="${(ya - 5).toFixed(1)}" text-anchor="end" class="cx-note">średnio ${esc(kzl(stats.avgSaved))}</text>${cross(P)}`);
+  parts.push(`<line x1="${P.x0}" x2="${P.x1}" y1="${ya.toFixed(1)}" y2="${ya.toFixed(1)}" class="cx-avg"/><text x="${P.x1}" y="${(ya - 5).toFixed(1)}" text-anchor="end" class="cx-note">średnio ${esc(zl0(stats.avgSaved))}</text>${cross(P)}`);
   const svg = `<svg viewBox="0 0 ${P.W} ${P.H}" role="img" aria-label="Kwota odłożona w każdym miesiącu">${parts.join('')}</svg>`;
   const tips = list.map((m, i) => [Math.round(cx(i) * 10) / 10, cap(monthLabel(m.month)), [['Odłożone', signed(m.saved), m.saved >= 0 ? 'cash' : 'debt'], ['Przychody', zl0(m.income), ''], ['Wydatki', zl0(m.expense), ''], ['Stopa oszczędności', m.rate === null ? '–' : pct(m.rate), '']]]);
   return chartBox(svg, tips, P.W);
@@ -1194,11 +1190,11 @@ function forecastChart(hist, fc, months, value) {
   const svg = `<svg viewBox="0 0 ${P.W} ${P.H}" role="img" aria-label="Prognoza majątku netto">${P.grid}${labels.join('')}
   <path d="${band}" class="cx-band s-net"/><path d="${histLine}" class="cx-line s-net"/><path d="M${x(0).toFixed(1)},${P.y(now).toFixed(1)}${path(base).replace(/^M/, 'L')}" class="cx-line cx-dash s-net"/>
   <line x1="${x(0).toFixed(1)}" x2="${x(0).toFixed(1)}" y1="${P.top}" y2="${P.floor}" class="cx-now"/><text x="${(x(0) + 4).toFixed(1)}" y="${P.top + 8}" class="cx-note">dziś</text>
-  <circle cx="${endX.toFixed(1)}" cy="${endY.toFixed(1)}" r="4" class="cx-dot s-net"/><text x="${(endX - 7).toFixed(1)}" y="${(endY < P.top + 22 ? endY + 16 : endY - 9).toFixed(1)}" text-anchor="end" class="cx-end">≈ ${esc(kzl(base[months]))}</text>${cross(P)}</svg>`;
+  <circle cx="${endX.toFixed(1)}" cy="${endY.toFixed(1)}" r="4" class="cx-dot s-net"/><text x="${(endX - 7).toFixed(1)}" y="${(endY < P.top + 22 ? endY + 16 : endY - 9).toFixed(1)}" text-anchor="end" class="cx-end">≈ ${esc(zl0(base[months]))}</text>${cross(P)}</svg>`;
   const step = Math.max(1, Math.ceil(months / 120));
   const tips = past.slice(0, -1).map((p, i) => [Math.round(x(tMin + i) * 10) / 10, cap(monthLabel(p.month)), [['Majątek netto', zl0(p.worth), 'net']]]);
   tips.push([Math.round(x(0) * 10) / 10, 'Dziś', [['Majątek netto', zl0(now), 'net']]]);
-  for (let m = step; m <= months; m += step) tips.push([Math.round(x(tOf(m)) * 10) / 10, cap(monthLabel(fc.dates[m].slice(0, 7))), [['Bazowo', kzl(base[m]), 'net'], ['Ostrożnie', kzl(low[m]), ''], ['Optymistycznie', kzl(high[m]), '']]]);
+  for (let m = step; m <= months; m += step) tips.push([Math.round(x(tOf(m)) * 10) / 10, cap(monthLabel(fc.dates[m].slice(0, 7))), [['Bazowo', zl0(base[m]), 'net'], ['Ostrożnie', zl0(low[m]), ''], ['Optymistycznie', zl0(high[m]), '']]]);
   return `${chartBox(svg, tips, P.W)}${legendRow([['s-net', 'Dotychczas', true], ['s-net cx-dash-key', 'Prognoza (wariant bazowy)', true], ['s-band', 'Od ostrożnego do optymistycznego']])}`;
 }
 
@@ -1210,10 +1206,10 @@ const sinceText = (month) => `od końca ${MONTHS_GEN[Number(month.slice(5, 7)) -
 function wealthHero(now, all) {
   const prev = all.length > 1 ? all[all.length - 2] : null;
   const year = all.length > 12 ? all[all.length - 13] : null;
-  const delta = (p, label) => (p ? `<span class="hero-delta"><b class="${gainClass(now.worth - p.worth)}">${esc(skzl(now.worth - p.worth))}</b> ${esc(label)}</span>` : '');
+  const delta = (p, label) => (p ? `<span class="hero-delta"><b class="${gainClass(now.worth - p.worth)}">${esc(signed(now.worth - p.worth))}</b> ${esc(label)}</span>` : '');
   return `<section class="card wealth-hero"><span class="muted small">Majątek netto</span><div class="hero-fig ${now.worth < -0.5 ? 'neg' : ''}">${esc(zl(now.worth))}</div>
   <div class="hero-deltas">${delta(prev, 'w tym miesiącu')}${delta(year, 'przez 12 miesięcy')}</div>
-  <div class="kpis">${kpiTile('Gotówka', kzl(now.cash))}${kpiTile('Inwestycje', kzl(now.investments))}${kpiTile('Długi', now.debt > 0.5 ? `−${kzl(now.debt)}` : kzl(0), '', now.debt > 0.5 ? 'neg' : '')}</div>
+  <div class="kpis">${kpiTile('Gotówka', zl(now.cash))}${kpiTile('Inwestycje', zl(now.investments))}${kpiTile('Długi', now.debt > 0.004 ? `−${zl(now.debt)}` : zl(0), '', now.debt > 0.004 ? 'neg' : '')}</div>
   ${now.missing.length ? `<p class="small warn">Bez kursu waluty (poza majątkiem): ${esc(now.missing.join(', '))}.</p>` : ''}</section>`;
 }
 
@@ -1251,7 +1247,7 @@ function savingsCard(stats, liquid) {
   const cushion = stats.avgExpense > 1 ? liquid / stats.avgExpense : null;
   const cushionNote = cushion === null ? '' : cushion >= 6 ? 'bezpieczny zapas (zwykle zaleca się 3–6 miesięcy)' : cushion >= 3 ? 'w zalecanym przedziale 3–6 miesięcy' : 'poniżej zalecanych 3–6 miesięcy';
   return `<section class="card"><h2>Ile odkładasz</h2>
-  <div class="kpis">${kpiTile('Średnio miesięcznie', kzl(stats.avgSaved), `z ${stats.n} ${plural(stats.n, 'pełnego miesiąca', 'pełnych miesięcy', 'pełnych miesięcy')}`, gainClass(stats.avgSaved))}${kpiTile('Stopa oszczędności', stats.rate === null ? '–' : pct(stats.rate), 'tyle przychodów zostaje')}${cushion === null ? '' : kpiTile('Poduszka finansowa', `${NF1.format(cushion)} mies.`, esc(cushionNote))}</div>
+  <div class="kpis">${kpiTile('Średnio miesięcznie', zl0(stats.avgSaved), `z ${stats.n} ${plural(stats.n, 'pełnego miesiąca', 'pełnych miesięcy', 'pełnych miesięcy')}`, gainClass(stats.avgSaved))}${kpiTile('Stopa oszczędności', stats.rate === null ? '–' : pct(stats.rate), 'tyle przychodów zostaje')}${cushion === null ? '' : kpiTile('Poduszka finansowa', `${NF1.format(cushion)} mies.`, esc(cushionNote))}</div>
   ${stats.n >= 2 ? savedChart(stats) : ''}
   <p class="small muted">Średnio w miesiącu: przychody ${esc(zl0(stats.avgIncome))}, wydatki ${esc(zl0(stats.avgExpense))}${stats.avgInvested > 1 ? `, na inwestycje trafia ${esc(zl0(stats.avgInvested))}` : ''}${stats.avgExternal > 1 ? `, spoza budżetu (np. PPE) ${esc(zl0(stats.avgExternal))}` : ''}. Poduszka finansowa: pieniądze na kontach, oszczędnościach i w gotówce (${esc(zl0(liquid))}) podzielone przez średnie wydatki.</p></section>`;
 }
@@ -1300,27 +1296,27 @@ function forecastCard(all, stats) {
   }
   for (const target of targets) {
     const m = firstM((p) => value(p.worth, p.m) >= target);
-    if (m > 0) miles.push([target === 0 ? '⚖️' : '🎯', target === 0 ? 'Majątek netto na plusie' : `Majątek ${kzl(target)}`, fcDate(fc.dates[m])]);
+    if (m > 0) miles.push([target === 0 ? '⚖️' : '🎯', target === 0 ? 'Majątek netto na plusie' : `Majątek ${zl0(target)}`, fcDate(fc.dates[m])]);
   }
   const yearly = stats.avgExpense * 12;
   if (yearly > 1000) {
     const m = firstM((p) => p.worth / (1 + infl / 100) ** (p.m / 12) >= 25 * yearly);
-    if (m > 0) miles.push(['🌴', `Niezależność finansowa (${kzl(25 * yearly)} w dzisiejszych pieniądzach)`, fcDate(fc.dates[m])]);
+    if (m > 0) miles.push(['🌴', `Niezależność finansowa (${zl0(25 * yearly)} w dzisiejszych pieniądzach)`, fcDate(fc.dates[m])]);
   }
   // Co daje dodatkowe 100 zł miesięcznie: inwestowane albo trzymane w gotówce.
   const extra = (invest) => at(wealthForecast(fin, MARKET, { today: today(), months, overrides: { ...o, saved: fc.params.saved + 100, invested: fc.params.invested + (invest ? 100 : 0) } }).base, months) - at(fc.base, months);
   const marks = [...new Set([1, 5, 10, 20, 30].filter((y) => y <= years))];
-  const rows = marks.map((y) => `<tr><td>za ${esc(yearsLabel(y))}</td><td class="num">${esc(kzl(at(fc.low, y * 12)))}</td><td class="num"><b>${esc(kzl(at(fc.base, y * 12)))}</b></td><td class="num">${esc(kzl(at(fc.high, y * 12)))}</td></tr>`).join('');
+  const rows = marks.map((y) => `<tr><td>za ${esc(yearsLabel(y))}</td><td class="num">${esc(zl0(at(fc.low, y * 12)))}</td><td class="num"><b>${esc(zl0(at(fc.base, y * 12)))}</b></td><td class="num">${esc(zl0(at(fc.high, y * 12)))}</td></tr>`).join('');
   const basis = { historia: `średnia z ostatnich ${d.n} pełnych miesięcy`, krotka: `tylko ${d.n} ${plural(d.n, 'pełny miesiąc', 'pełne miesiące', 'pełnych miesięcy')} historii – prognoza będzie dokładniejsza z czasem`, stale: 'stałe pozycje i plany (za mało historii)', brak: 'Twoje założenia' }[d.basis];
   const end = at(fc.base, months);
   const cashShare = fc.base[months].worth + fc.base[months].debt > 1 ? Math.max(0, fc.base[months].cash) / (Math.max(0, fc.base[months].cash) + fc.base[months].investments) : 0;
   return `<section class="card" id="forecast-card"><div class="card-head"><h2>Prognoza</h2><div class="seg small">${FC_YEARS.map((y) => `<button data-fc-years="${y}" class="${y === years ? 'on' : ''}">${y === 1 ? '1 rok' : `${y} lat`}</button>`).join('')}</div></div>
-  <p class="lead">Za ${esc(yearsLabel(years))} (${esc(fcDate(fc.dates[months]))}) Twój majątek netto może wynosić około <b>${esc(kzl(end))}</b> – prawdopodobnie między ${esc(kzl(at(fc.low, months)))} a ${esc(kzl(at(fc.high, months)))}${real ? ', w dzisiejszych pieniądzach' : ''}.</p>
+  <p class="lead">Za ${esc(yearsLabel(years))} (${esc(fcDate(fc.dates[months]))}) Twój majątek netto może wynosić około <b>${esc(zl0(end))}</b> – prawdopodobnie między ${esc(zl0(at(fc.low, months)))} a ${esc(zl0(at(fc.high, months)))}${real ? ', w dzisiejszych pieniądzach' : ''}.</p>
   ${forecastChart(hist, fc, months, value)}
   <label class="check small"><input type="checkbox" data-fc-real ${real ? 'checked' : ''}> <span>Pokaż w dzisiejszych pieniądzach (po odjęciu inflacji ${esc(pc1(infl))}% rocznie)</span></label>
   <div class="tbl-wrap"><table class="fc-table"><thead><tr><th></th><th class="num">Ostrożnie</th><th class="num">Bazowo</th><th class="num">Optymistycznie</th></tr></thead><tbody>${rows}</tbody></table></div>
   ${miles.length ? `<ul class="miles">${miles.map(([ico, label, when]) => `<li><span>${ico}</span><span>${esc(label)}</span><b>${esc(when)}</b></li>`).join('')}</ul>` : ''}
-  <div class="banner info small">Każde dodatkowe <b>100 zł</b> odkładane co miesiąc to po ${esc(afterYears(years))} około <b>${esc(kzl(extra(true)))}</b> więcej, jeśli je inwestujesz, albo ${esc(kzl(extra(false)))}, jeśli zostają w gotówce.${cashShare > 0.4 && years >= 10 ? ` Przy obecnych nawykach ${esc(pct(cashShare))} aktywów będzie wtedy w gotówce, która nie zarabia.` : ''}</div>
+  <div class="banner info small">Każde dodatkowe <b>100 zł</b> odkładane co miesiąc to po ${esc(afterYears(years))} około <b>${esc(zl0(extra(true)))}</b> więcej, jeśli je inwestujesz, albo ${esc(zl0(extra(false)))}, jeśli zostają w gotówce.${cashShare > 0.4 && years >= 10 ? ` Przy obecnych nawykach ${esc(pct(cashShare))} aktywów będzie wtedy w gotówce, która nie zarabia.` : ''}</div>
   <h3 class="sub-h">Założenia <span class="muted">– ${esc(basis)}</span></h3>
   ${forecastInputs(fc, o)}
   <details class="cx-table"><summary>Jak powstaje prognoza</summary><div class="small muted">

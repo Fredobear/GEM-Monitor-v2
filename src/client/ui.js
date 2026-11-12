@@ -211,7 +211,6 @@ function niceTicks(min, max, count = 4) {
 function drawChart(el, { lines, format, onSelect }) {
   const W = Math.max(280, el.clientWidth || 320);
   const H = W < 520 ? 230 : 300;
-  const M = { l: 58, r: 12, t: 14, b: 28 };
   const all = lines.flatMap((l) => l.points);
   if (!all.length) {
     el.innerHTML = '<p class="muted center">Brak danych w wybranym okresie.</p>';
@@ -230,10 +229,13 @@ function drawChart(el, { lines, format, onSelect }) {
   const pad = (y1 - y0) * 0.08 || Math.abs(y1) * 0.05 || 1;
   y0 -= pad;
   y1 += pad;
+  // Opisy osi to pełne kwoty (np. 125 000), bez skrótów „tys.” i „mln”; lewy margines dopasowuje się do najdłuższego.
+  const fmtY = (v) => (format === 'pct' ? `${(v * 100).toFixed(Math.abs(y1 - y0) < 0.1 ? 1 : 0).replace('.', ',')}%` : NF0.format(Math.round(v) || 0).replace(/^-/, '−'));
+  const yTicks = niceTicks(y0, y1, 5);
+  const labelW = Math.max(...yTicks.map((v) => [...fmtY(v)].reduce((w, ch) => w + (/\s/.test(ch) ? 3.2 : 6.8), 0)));
+  const M = { l: Math.max(46, Math.ceil(labelW) + 14), r: 12, t: 14, b: 28 };
   const X = (t) => M.l + ((t - x0) / (x1 - x0)) * (W - M.l - M.r);
   const Y = (v) => M.t + (1 - (v - y0) / (y1 - y0)) * (H - M.t - M.b);
-  const fmtY = (v) => (format === 'pct' ? `${(v * 100).toFixed(Math.abs(y1 - y0) < 0.1 ? 1 : 0).replace('.', ',')}%` : v >= 1e6 ? `${NF2.format(v / 1e6)} mln` : v >= 1e4 ? `${NF0.format(v / 1000)} tys.` : NF0.format(v));
-  const yTicks = niceTicks(y0, y1, 5);
   const spanDays = (x1 - x0) / 86400000;
   const xTicks = [];
   for (let i = 0; i <= 4; i++) xTicks.push(x0 + ((x1 - x0) * i) / 4);

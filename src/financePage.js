@@ -32,6 +32,7 @@ export function marketSnapshot(prices, config, podatki = null) {
 
 const FIN_CSS = `
 .offline-badge{display:inline-block;background:var(--pos-soft);color:var(--pos);border-radius:999px;padding:3px 10px;font-weight:600;font-size:12px;white-space:nowrap}
+@media (max-width:374px){.topbar .brand span{display:none}.offline-badge{padding:3px 8px;font-size:11px}}
 .toast{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .toast-btn{background:transparent;border:1px solid currentColor;color:inherit;border-radius:9px;padding:4px 12px;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
 .btn.danger-solid{background:var(--neg);border-color:var(--neg);color:var(--surface)}
@@ -99,7 +100,8 @@ dialog{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .hb-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .hb-stats>span{display:flex;flex-direction:column;min-width:0}
 .hb-stats i{font-style:normal;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hb-stats b{font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}.hb-stats small{font-size:11.5px;white-space:nowrap}
+.hb-stats b{font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}.hb-stats small{font-size:11.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.hb-stats{grid-template-columns:1fr;gap:7px}.hb-stats>span{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-items:baseline}.hb-stats i{font-size:13.5px}.hb-stats b{font-size:15.5px;text-align:right}.hb-stats small{grid-column:1/-1;justify-self:end;font-size:12px;margin-top:-2px}}
 .hb-val{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
 .hb-chev{font-size:30px;line-height:1;color:var(--muted)}
 .period{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
@@ -150,7 +152,7 @@ dialog{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .cal-dow{font-size:11px;color:var(--muted);text-align:center;font-weight:700;padding-bottom:2px}
 .cal-day{position:relative;min-height:52px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--neg) var(--h,0%),var(--surface));color:var(--ink);font:inherit;padding:6px 1px 5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:2px;min-width:0}
 .cal-day .d{font-size:13.5px;font-weight:700;line-height:1.1}
-.cal-day .v{font-size:10.5px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap;max-width:100%;overflow:hidden}
+.cal-day .v{font-size:10.5px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap;max-width:100%;overflow:hidden}.cal-day .v.long{font-size:9px;letter-spacing:-.02em}
 .cal-day.future{background:var(--surface-2)}.cal-day.future .d{color:var(--muted)}
 .cal-day.today{border:2px solid var(--accent);padding:5px 0 4px}
 .cal-day.sel{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.cal-day.sel .d{color:var(--accent-ink)}
@@ -246,7 +248,8 @@ form[data-type=wydatek] .amount-input{color:var(--neg)}form[data-type=przychod] 
 .kpi{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;min-width:0}
 .wealth-hero .kpi{background:color-mix(in srgb,var(--surface) 70%,transparent)}
 .kpi span{font-size:12px;color:var(--muted);line-height:1.3}.kpi b{font-size:17px;white-space:nowrap;line-height:1.35}.kpi small{font-size:11.5px;color:var(--muted);line-height:1.3}
-@media (max-width:400px){.kpi{padding:7px 8px}.kpi b{font-size:15px}.hb-stats b{font-size:14px}}
+@media (max-width:400px){.kpi{padding:7px 8px}.kpi b{font-size:15px}}
+@media (max-width:560px){.wealth-hero .kpis{grid-template-columns:1fr;gap:0;padding:2px 12px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 70%,transparent)}.wealth-hero .kpi{flex-direction:row;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border:0;border-radius:0;background:none}.wealth-hero .kpi+.kpi{border-top:1px solid var(--line)}.wealth-hero .kpi span{font-size:13.5px}.wealth-hero .kpi b{font-size:16px;font-variant-numeric:tabular-nums}}
 .lead{font-size:15px;line-height:1.5;margin:0 0 10px}
 .sub-h{font-size:14px;margin:18px 0 8px}.sub-h .muted{font-weight:500}
 .mode-seg{display:flex;width:100%;margin:2px 0 10px}.seg.mode-seg button{flex:1}
@@ -282,7 +285,8 @@ form[data-type=wydatek] .amount-input{color:var(--neg)}form[data-type=przychod] 
 .br-track span{display:block;height:100%;border-radius:99px}.br-track .s-cash{background:var(--s-cash)}.br-track .s-debt{background:var(--s-debt)}
 .bar-row small{display:block;font-size:12px;color:var(--muted)}
 .br-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-weight:700;margin:12px 0 2px;padding-bottom:4px;border-bottom:1px solid var(--line)}.br-head:first-of-type{margin-top:2px}
-.fc-table th,.fc-table td{padding:7px 4px}.fc-table{margin:8px 0 2px;font-size:13.5px}.fc-table td:first-child{white-space:nowrap;padding-left:0}.fc-table th:last-child,.fc-table td:last-child{padding-right:0}
+.fc-table th,.fc-table td{padding:7px 4px}.fc-table{margin:8px 0 2px;font-size:13.5px}.fc-table td:first-child{white-space:nowrap;padding-left:0}.fc-table th:last-child,.fc-table td:last-child{padding-right:0}.fc-table td.num{white-space:nowrap}
+@media (max-width:400px){.fc-table{font-size:12.5px}.fc-table th,.fc-table td{padding:6px 3px}.fc-table th{font-size:11.5px}}
 .miles{list-style:none;margin:10px 0 4px;padding:0}
 .miles li{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:14px}.miles b{white-space:nowrap}
 .fc-inputs{margin-top:4px}
