@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-12T15:19:58.259Z",
+  "generatedAt": "2026-11-12T16:28:02.298Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -818,26 +818,8 @@
   "errors": []
  },
  "news": {
-  "fetched": 397,
+  "fetched": 400,
   "items": [
-   {
-    "title": "Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji",
-    "link": "https://www.bankier.pl/wiadomosc/Rosyjska-ropa-bije-wieloletnie-rekordy-cenowe-mimo-zachodnich-sankcji-9227613.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-12T08:12:00.000Z",
-    "summary": "Rosyjska ropa, mimo międzynarodowych sankcji w związku z wojną przeciwko Ukrainie, osiąga wieloletnie maksima i jest rekordowo droga na tle światowych notowań – powiadomił w czwartek japoński dziennik „Nikkei Asia”. To efekt rosnącego popytu w Chinach i Indiach oraz wysokich kosztów transportu morsk",
-    "source": "Bankier.pl",
-    "regions": [
-     "Azja",
-     "Rosja/Ukraina"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Sankcje i cła",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 12
-   },
    {
     "title": "Oil prices mixed after Trump says no Iran deal needed: 'We've got their Strait'",
     "link": "https://www.cnbc.com/2026/11/12/oil-prices-jump-after-trump-says-no-iran-deal-needed-weve-got-their-strait.html",
@@ -902,22 +884,6 @@
     ],
     "themes": [
      "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "As War Roils Energy Markets, China Sees Its Emissions Drop - Yale E360",
-    "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE5oWXFTNXNrRkhJSzRtMHR2MVBrUERJb0xGeW4zbzJNSWx5RnNBbVI3eHZuV0RLNGJsMmpwYTJtMnIyWm1ud2NENmU5dXFlV2VKVkVkdWI0SnB2OThPa2NiWEJZVQ?oc=5",
-    "date": "2026-11-09T15:48:19.000Z",
-    "summary": "As War Roils Energy Markets, China Sees Its Emissions Drop Yale E360",
-    "source": "Google News",
-    "regions": [
-     "Azja"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
     ],
     "relevant": true,
     "score": 8
@@ -1037,6 +1003,22 @@
     "score": 7
    },
    {
+    "title": "BDS claims win as energy giants quit Israeli gas project off Gaza",
+    "link": "https://www.aljazeera.com/video/newsfeed/2026/11/12/bds-claims-win-as-energy-giants-quit-israeli-gas-project-off-gaza?traffic_source=rss",
+    "date": "2026-11-12T16:07:16.000Z",
+    "summary": "The Boycott, Divest and Sanctions movement is claiming victory after a company left an Israeli-led gas project off Gaza.",
+    "source": "Al Jazeera",
+    "regions": [
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
     "title": "Canada’s ambassador warns Trump tariffs are driving up costs, threatening U.S. investment",
     "link": "https://www.cnbc.com/2026/11/11/canada-ambassador-trump-tariffs-investments.html",
     "date": "2026-11-12T13:59:30.000Z",
@@ -1145,26 +1127,41 @@
     ],
     "relevant": true,
     "score": 6
+   },
+   {
+    "title": "Global Markets: Talks begin to end Russia-Ukraine war - Canadian Cattlemen",
+    "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQYU92aUNuTkFhRDY1R0w5S2o4NG5BRzVpdWhLQzRtaUg3NC04a0xfOEJyLUlWVnFfNkpqSDF5M3BZN1lZR0EzNjd5bk5pYVd5d2UtNVpUZFBBMEtrRFhpZjBqLVc4cHBQMFRjYkJRcE4zNTBSd043S0J5TkVObF8ydXR3NGVtTUZUUm5kcEcydnA0ZEUxN3pkay1EUFgwaEk5Wnc?oc=5",
+    "date": "2026-11-10T14:13:38.000Z",
+    "summary": "Global Markets: Talks begin to end Russia-Ukraine war Canadian Cattlemen",
+    "source": "Google News",
+    "regions": [
+     "Rosja/Ukraina"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 14,
+   "Konflikty i wojny": 12,
    "Sankcje i cła": 3,
-   "Banki centralne i stopy": 11,
-   "Wybory i polityka": 20,
-   "Energia i surowce": 15,
-   "Inflacja i recesja": 13,
-   "Nastroje na giełdach": 5,
-   "Spółki i wyniki": 5
+   "Banki centralne i stopy": 12,
+   "Wybory i polityka": 21,
+   "Energia i surowce": 14,
+   "Inflacja i recesja": 12,
+   "Nastroje na giełdach": 6,
+   "Spółki i wyniki": 3
   },
   "regionCounts": {
-   "USA": 24,
+   "USA": 26,
    "Europa": 4,
-   "Azja": 5,
-   "Rynki wschodzące": 0,
+   "Azja": 3,
+   "Rynki wschodzące": 1,
    "Polska": 9,
-   "Bliski Wschód": 6,
-   "Rosja/Ukraina": 3
+   "Bliski Wschód": 7,
+   "Rosja/Ukraina": 2
   },
   "errors": []
  },
@@ -1438,7 +1435,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-12T15:19:58.259Z",
+  "generatedAt": "2026-11-12T16:28:02.298Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -2049,9 +2046,9 @@
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (20 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Rumunia licytuje w ślad za Polską. Zaoferowała 15 tys. dolarów za żołnierza USA” (Bankier.pl).",
-      "Energia i surowce (15 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl).",
-      "Konflikty i wojny (14 wiadomości): napięcia geopolityczne zwykle zwiększają awersję do ryzyka: zyskują złoto, dolar i obligacje skarbowe, a gdy konflikt dotyczy regionów wydobycia – ropa; tracą akcje, zwłaszcza Europy i rynków wschodzących. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl)."
+      "Wybory i polityka (21 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Rumunia licytuje w ślad za Polską. Zaoferowała 15 tys. dolarów za żołnierza USA” (Bankier.pl).",
+      "Energia i surowce (14 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Oil prices mixed after Trump says no Iran deal needed: 'We've got their Strait'” (CNBC).",
+      "Konflikty i wojny (12 wiadomości): napięcia geopolityczne zwykle zwiększają awersję do ryzyka: zyskują złoto, dolar i obligacje skarbowe, a gdy konflikt dotyczy regionów wydobycia – ropa; tracą akcje, zwłaszcza Europy i rynków wschodzących. Przykład: „Oil prices mixed after Trump says no Iran deal needed: 'We've got their Strait'” (CNBC)."
      ]
     },
     {
