@@ -45,8 +45,8 @@ Saldo konta zmienia każda zapisana operacja, także dopisana z datą wsteczną.
 - **Wydatki / Przychody:** przełącznik nad wykresem. Pod nim bilans okresu i jaka część przychodów zostaje.
 - **Kategorie:** dotknięcie kategorii rozwija jej operacje z tego okresu. W widoku miesiąca pasek pokazuje wykorzystanie budżetu (czerwony po przekroczeniu).
 - **Raporty pod spodem:**
-  - miesiąc: każda kategoria w porównaniu z poprzednim miesiącem i średnią z 3 miesięcy. **Dotknij dowolnej kwoty**, a w dymku zobaczysz wydatki, z których się składa (w średniej – wszystkie z 3 miesięcy). Dotknięcie wydatku w dymku otwiera go do edycji, a dotknięcie poza dymkiem go zamyka;
-  - rok: przychody i wydatki miesiąc po miesiącu, średnie miesięczne;
+  - miesiąc: każda kategoria w porównaniu z poprzednim miesiącem i średnią z 3 poprzednich [pełnych miesięcy](#pełne-miesiące) (w młodym dzienniku – z tylu, ile ich jest). **Dotknij dowolnej kwoty**, a w dymku zobaczysz wydatki, z których się składa (w średniej – wszystkie z miesięcy średniej). Dotknięcie wydatku w dymku otwiera go do edycji, a dotknięcie poza dymkiem go zamyka;
+  - rok: przychody i wydatki miesiąc po miesiącu, średnie miesięczne z pełnych miesięcy;
   - każdy okres: sprzedawcy, u których wydajesz najwięcej.
 - Na górze pojawiają się przypomnienia: operacje bez kategorii, stałe pozycje do zatwierdzenia, zbliżający się termin spłaty karty.
 
@@ -203,17 +203,23 @@ Ceny instrumentów spoza strategii strona wczytuje z plików aplikacji (`data/no
 
 ## Majątek: wykres, struktura i prognoza
 
-Zakładka **Majątek** odpowiada na pięć pytań.
+Zakładka **Majątek** odpowiada na sześć pytań.
 
-**1. Ile mam?** Na górze **majątek netto** (aktywa minus długi), zmiana w tym miesiącu i przez 12 miesięcy oraz trzy kafle: gotówka, inwestycje, długi. Ten sam kafel jest na Przeglądzie i w Kontach – dotknięcie otwiera zakładkę Majątek.
+**1. Ile mam?** Na górze **majątek netto** (aktywa minus długi), zmiana w tym miesiącu i przez 12 miesięcy oraz gotówka, inwestycje i długi – pełne kwoty z groszami. Ten sam kafel jest na Przeglądzie i w Kontach – dotknięcie otwiera zakładkę Majątek.
 
-**2. Jak się zmienia?** Wykres miesiąc po miesiącu (ostatni punkt to dziś), zakres: 6 miesięcy, rok, 3 lata albo całość. Dwa widoki:
+**2. Jak rosną inwestycje?** Wykres jak w aplikacjach do śledzenia portfela: linia **Wartość inwestycji** (ile na koniec każdego miesiąca były warte Twoje akcje, ETF-y, fundusze, obligacje, złoto, kryptowaluty i portfel GEM) i linia **Wpłacone pieniądze** (koszt zakupu pozycji, które były wtedy w portfelu, minus wypłacone odsetki; portfel GEM – wpłaty netto). Odstęp między liniami to zysk z inwestowania. Nad wykresem: dzisiejsza wartość, wpłacone pieniądze i zysk w złotych i procentach; zakres: rok, 3 lata, 5 lat albo całość – od pierwszego zakupu.
+- Pozycje liczą się od daty zakupu, także te dopisane do dziennika później. Sprzedana pozycja znika z obu linii w dniu sprzedaży.
+- Aktywa z wyceną ręczną (np. mieszkanie) nie są tu liczone.
+- Gdy dla części okresu brakuje notowań, wartość pozycji jest tam równa cenie zakupu – pod wykresem widać, do kiedy.
+- Portfel GEM: wartość i wpłaty z historii, którą zapisuje zakładka GEM → Mój portfel GEM przy każdym otwarciu.
+
+**3. Jak się zmienia majątek?** Wykres miesiąc po miesiącu (ostatni punkt to dziś), zakres: 6 miesięcy, rok, 3 lata albo całość. Dwa widoki:
 - **Majątek netto** – jedna linia;
 - **Aktywa i długi** – słupki: gotówka i inwestycje nad osią, długi pod osią, a na tym linia majątku netto.
 
 Dotknięcie wykresu pokazuje wartości z danego miesiąca, a „Pokaż liczby w tabeli” – te same dane w tabeli. Konto powiązane z portfelem GEM (np. IKE) ma w historii prawdziwą wartość portfela z końca każdego miesiąca – zapisuje ją zakładka GEM → Mój portfel GEM przy każdym otwarciu.
 
-**3. Skąd ta zmiana?** Zmiana majątku w wybranym zakresie rozłożona na części, które dają razem dokładnie tę zmianę:
+**4. Skąd ta zmiana?** Zmiana majątku w wybranym zakresie (do dziś) rozłożona na części, które dają razem dokładnie tę zmianę:
 - **odłożone z dochodów** – przychody minus wydatki;
 - **wpłaty spoza budżetu** – np. składki pracodawcy do PPE (plan z wpłatą „spoza aplikacji”) i aktywa dopisane bez rozliczenia z gotówką;
 - **wynik inwestycji** – zmiana wartości kont inwestycyjnych, której nie tłumaczą wpłaty i wypłaty;
@@ -221,16 +227,24 @@ Dotknięcie wykresu pokazuje wartości z danego miesiąca, a „Pokaż liczby w 
 
 Spłata kapitału kredytu nie zmienia majątku (ubywa gotówki i długu jednocześnie); odsetki są w wydatkach.
 
-**4. Ile odkładam i z czego składa się majątek?**
-- **Ile odkładasz:** średnia z ostatnich pełnych miesięcy (do 12), stopa oszczędności (jaka część przychodów zostaje), wykres kwoty odłożonej w każdym miesiącu i **poduszka finansowa** – na ile miesięcy wydatków wystarczą pieniądze z kont, oszczędności i gotówki (zwykle zaleca się 3–6 miesięcy).
+**5. Ile odkładam i z czego składa się majątek?**
+- **Ile odkładasz:** średnia z ostatnich [pełnych miesięcy](#pełne-miesiące) (do 12), stopa oszczędności (jaka część przychodów zostaje), wykres kwoty odłożonej w każdym miesiącu i **poduszka finansowa** – na ile miesięcy wydatków wystarczą pieniądze z kont, oszczędności i gotówki (zwykle zaleca się 3–6 miesięcy). Pod spodem widać, które miesiące są liczone, a które pominięte i dlaczego.
 - **Z czego składa się majątek:** aktywa według rodzaju (konta, oszczędności, akcje i ETF-y, portfel GEM, fundusze, obligacje skarbowe, złoto, kryptowaluty, inne) z udziałem procentowym oraz długi (kredyty, karty).
 
 Jeśli masz kredyt, a w aplikacji nie ma tego, co za niego kupiłeś (mieszkania, samochodu), majątek netto jest zaniżony. Możesz dopisać wartość: konto inwestycyjne (np. „Nieruchomości”) → Aktywa → **Inne aktywo (wycena ręczna)**.
 
-**5. Dokąd zmierzam? – prognoza.** Wykres pokazuje dotychczasowy majątek (linia ciągła), **wariant bazowy** (linia przerywana) i przedział od **ostrożnego** do **optymistycznego** (pasmo). Horyzont: 1 rok, 5, 10, 20 albo 30 lat. Pod wykresem tabela wariantów, kamienie milowe (spłata kredytów, wyjście na plus, kolejne okrągłe kwoty, niezależność finansowa) i podpowiedź, ile daje każde dodatkowe 100 zł odkładane co miesiąc.
+### Pełne miesiące
+
+Średnie miesięczne (ile odkładasz, stopa oszczędności, poduszka finansowa, założenia prognozy, średnia kategorii w porównaniu i średnia w widoku roku) liczą się tylko z miesięcy zapisanych w całości – od pierwszego do ostatniego dnia:
+- **bieżący miesiąc** wchodzi do średnich dopiero po swoim końcu – zanim wpłynie np. wypłata, jego liczby są niepełne;
+- **pierwszy miesiąc dziennika** liczy się tylko wtedy, gdy pierwsza operacja jest z 1. dnia. Jeśli dziennik zaczyna się np. 15 września, wrzesień jest pominięty – wcześniejsze wpływy i wydatki z tego miesiąca (np. wypłata) mogły nie zostać zapisane.
+
+O początku dziennika decydują wpisane i zaimportowane przychody i wydatki. Raty kredytów i odsetki z obligacji, które aplikacja zapisuje sama według harmonogramu (także wstecz), nie przesuwają go.
+
+**6. Dokąd zmierzam? – prognoza.** Wykres pokazuje dotychczasowy majątek (linia ciągła), **wariant bazowy** (linia przerywana) i przedział od **ostrożnego** do **optymistycznego** (pasmo). Horyzont: 1 rok, 5, 10, 20 albo 30 lat. Pod wykresem tabela wariantów, kamienie milowe (spłata kredytów, wyjście na plus, kolejne okrągłe kwoty, niezależność finansowa) i podpowiedź, ile daje każde dodatkowe 100 zł odkładane co miesiąc.
 
 Prognoza opiera się na Twojej historii i nawykach:
-- **Co miesiąc odkładasz** – średnia z ostatnich pełnych miesięcy (przychody minus wydatki). Przy krótszej historii niż 3 miesiące aplikacja korzysta ze stałych pozycji (np. wynagrodzenie i rachunki) i planów inwestycyjnych.
+- **Co miesiąc odkładasz** – średnia z ostatnich [pełnych miesięcy](#pełne-miesiące) (przychody minus wydatki). Przy krótszej historii niż 3 pełne miesiące aplikacja korzysta ze stałych pozycji (np. wynagrodzenie i rachunki) i planów inwestycyjnych.
 - **Z tego inwestujesz** – ile średnio co miesiąc przenosisz na konta inwestycyjne (przelewy, wpłaty do planów). Reszta zostaje w gotówce.
 - **Zysk z inwestycji** – wynika ze składu portfela: akcje, ETF-y i portfel GEM ok. 7% rocznie, fundusze 6%, obligacje indeksowane: inflacja + marża, obligacje zmiennoprocentowe: stopa NBP + marża, złoto: inflacja + 1,5 pkt proc., kryptowaluty 7% (z bardzo szerokim przedziałem). To założenia długoterminowe, a nie wynik z ostatnich miesięcy – krótka historia własnego portfela niczego nie przesądza.
 - **Kredyty** spłacają się według harmonogramów: dług maleje, odsetki z każdą ratą są mniejsze, a po spłacie co miesiąc zostaje więcej.

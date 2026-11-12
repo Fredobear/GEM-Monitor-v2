@@ -259,7 +259,11 @@ form[data-type=wydatek] .amount-input{color:var(--neg)}form[data-type=przychod] 
 .cx svg{display:block;width:100%;height:auto;overflow:visible}
 .cx path.s-cash,.cx rect.s-cash{fill:var(--s-cash)}.cx path.s-inv{fill:var(--s-inv)}.cx path.s-debt{fill:var(--s-debt)}
 .cx-line{fill:none!important;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
-.cx-line.s-net{stroke:var(--s-cash)}.cx-line.s-ink{stroke:var(--ink)}
+.cx-line.s-net{stroke:var(--s-cash)}.cx-line.s-ink{stroke:var(--ink)}.cx-line.s-inv{stroke:var(--s-inv)}.cx-line.s-paid{stroke:var(--ink)}
+.cx-area.s-inv{fill:var(--s-inv);opacity:.13}.cx-dot.s-inv{fill:var(--s-inv)}.cx-dot.s-paid{fill:var(--ink)}.cx-key-line.s-paid{border-color:var(--ink)}
+.inv-legend{list-style:none;margin:2px 0 4px;padding:0}
+.inv-legend li{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;font-size:14px}.inv-legend li+li{border-top:1px solid var(--line)}
+.inv-legend b{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
 .cx-dash{stroke-dasharray:5 4}
 .cx-area.s-net{fill:var(--s-cash);opacity:.1}.cx-band.s-net{fill:var(--s-cash);opacity:.14}
 .cx-dot{stroke:var(--surface);stroke-width:2}.cx-dot.s-net{fill:var(--s-cash)}.cx-dot.s-ink{fill:var(--ink)}

@@ -5,9 +5,11 @@ import {
   accountWorth,
   compareMonth,
   emptyFinance,
+  flowStart,
   forecastDefaults,
   holdingsTradeDelta,
   investmentMix,
+  investSeries,
   investSummary,
   loanOutlook,
   loanSchedule,
@@ -31,8 +33,8 @@ const near = (a, b, eps = 0.01) => assert.ok(Math.abs(a - b) <= eps, `${a} ≉ $
 let n = 0;
 const tx = (type, amount, date, accountId, extra = {}) => ({ id: `t${++n}`, type, amount, date, accountId, createdAt: 1, updatedAt: 1, ...extra });
 
-// Dziennik: pensja 28. dnia, wydatki 5. dnia, 26. dnia 1000 zł na konto inwestycyjne (ETF po stałej cenie 100 zł,
-// dziś 120 zł), składka pracodawcy do PPE 300 zł miesięcznie i kredyt z ratami zapisywanymi z harmonogramu.
+// Dziennik od 1 lutego: pensja 28. dnia, wydatki 1. dnia, 26. dnia 1000 zł na konto inwestycyjne (ETF po stałej
+// cenie 100 zł, dziś 120 zł), składka pracodawcy do PPE 300 zł miesięcznie i kredyt z ratami z harmonogramu.
 const LOAN = { kind: 'gotowkowy', amount: 12000, principal: 12000, start: '2026-01-15', firstDue: '2026-02-15', months: 24, installments: 'rowne', rateType: 'stale', rates: [['2026-01-15', 12]], payFromId: 'bank', autoPost: true, trackFrom: '2026-01-15' };
 const RATY = loanSchedule(LOAN).filter((r) => r.kind === 'rata');
 const odsetki = (od, ile) => RATY.slice(od, od + ile).reduce((s, r) => s + r.interest, 0);
@@ -46,7 +48,7 @@ function sample() {
     { id: 'kredyt', name: 'Kredyt', type: 'kredyt', openingBalance: -12000, loan: { ...LOAN } },
   ];
   for (const m of ['2026-02', '2026-03', '2026-04', '2026-05', '2026-06']) {
-    fin.txs.push(tx('wydatek', 4000, `${m}-05`, 'bank', { categoryId: 'zakupy' }));
+    fin.txs.push(tx('wydatek', 4000, `${m}-01`, 'bank', { categoryId: 'zakupy' }));
     fin.txs.push(tx('przychod', 8000, `${m}-28`, 'bank', { categoryId: 'wynagrodzenie' }));
     // Wpłata na inwestycje: przelew i kupno 10 szt. po 100 zł.
     fin.txs.push(tx('przelew', 1000, `${m}-26`, 'bank', { toAccountId: 'xtb' }));
@@ -133,6 +135,105 @@ test('nawyki: pełne miesiące bez bieżącego, stopa oszczędności, kwota inwe
   near(rest.invested, 1000);
   near(rest.external, 300);
   near(monthRemainder(sample(), MARKET, '2026-07-29').cashIn, 0);
+});
+
+test('średnie tylko z pełnych miesięcy: bez niepełnego pierwszego miesiąca dziennika i bez bieżącego', () => {
+  const fin = emptyFinance();
+  fin.accounts = [{ id: 'bank', name: 'Bank', type: 'bank', openingBalance: 0 }];
+  // Dziennik od 15 września (wypłata z początku września nie jest zapisana), październik pełny, listopad jeszcze trwa.
+  fin.txs.push(tx('wydatek', 866, '2026-09-15', 'bank', { categoryId: 'zakupy' }));
+  fin.txs.push(tx('przychod', 7000, '2026-10-10', 'bank', { categoryId: 'wynagrodzenie' }), tx('wydatek', 3300, '2026-10-20', 'bank', { categoryId: 'zakupy' }));
+  fin.txs.push(tx('wydatek', 1600, '2026-11-05', 'bank', { categoryId: 'zakupy' }));
+  assert.deepEqual(flowStart(fin), { start: '2026-09-15', firstFull: '2026-10', partial: '2026-09' });
+  const s = savingsStats(fin, MARKET, { today: '2026-11-12' });
+  assert.deepEqual(s.months.map((m) => m.month), ['2026-10']);
+  near(s.avgSaved, 3700);
+  near(s.avgExpense, 3300);
+  near(s.rate, 3700 / 7000, 1e-9);
+  assert.equal(s.partial, '2026-09');
+  assert.equal(s.current, '2026-11');
+  // Reszta listopada w prognozie: to, co działo się po 12. dniu pełnych miesięcy (październik: wydatek 20.).
+  const rest = monthRemainder(fin, MARKET, '2026-11-12');
+  assert.equal(rest.n, 1);
+  near(rest.cashIn, -3300);
+  assert.equal(forecastDefaults(fin, MARKET, { today: '2026-11-12' }).n, 1);
+  // Raty kredytu zapisane automatycznie wstecz (od marca) nie przesuwają początku dziennika.
+  const withLoan = { ...fin, txs: [...fin.txs, tx('wydatek', 400, '2026-03-10', 'bank', { source: 'kredyt', categoryId: 'kredyt' })] };
+  assert.equal(flowStart(withLoan).start, '2026-09-15');
+  assert.equal(savingsStats(withLoan, MARKET, { today: '2026-11-12' }).n, 1);
+  // Dziennik od 1. dnia miesiąca: ten miesiąc też jest pełny.
+  fin.txs.push(tx('wydatek', 10, '2026-09-01', 'bank', { categoryId: 'zakupy' }));
+  const s2 = savingsStats(fin, MARKET, { today: '2026-11-12' });
+  assert.deepEqual(s2.months.map((m) => m.month), ['2026-09', '2026-10']);
+  assert.equal(s2.partial, null);
+  // Jeszcze bez pełnego miesiąca: brak średnich, a pominięty jest tylko bieżący miesiąc.
+  const fresh = emptyFinance();
+  fresh.accounts = fin.accounts;
+  fresh.txs.push(tx('wydatek', 50, '2026-11-03', 'bank', { categoryId: 'zakupy' }));
+  const s3 = savingsStats(fresh, MARKET, { today: '2026-11-12' });
+  assert.equal(s3.n, 0);
+  assert.equal(s3.partial, null);
+  assert.equal(monthRemainder(fresh, MARKET, '2026-11-12').n, 0);
+});
+
+test('inwestycje: wartość pozycji i wpłacone pieniądze miesiąc po miesiącu, zysk to różnica', () => {
+  const { points, approxUntil } = investSeries(sample(), MARKET, { today: '2026-07-10' });
+  // Pierwszy punkt: koniec miesiąca przed pierwszym zakupem (zero). Co miesiąc 10 szt. ETF i 3 j.u. funduszu po 100 zł.
+  assert.deepEqual(points.map((p) => p.month), ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07']);
+  near(points[0].value, 0);
+  near(points[0].invested, 0);
+  near(points[1].value, 1300);
+  near(points[1].invested, 1300);
+  near(points[5].invested, 6500);
+  const last = points.at(-1);
+  assert.equal(last.date, '2026-07-10');
+  near(last.value, 7500); // ETF podrożał do 120 zł
+  near(last.invested, 6500);
+  near(last.gain, 1000);
+  assert.equal(approxUntil, null);
+
+  // Pozycja dopisana później (since) liczy się od daty zakupu, sprzedana znika z obu linii, aktywo z wyceną ręczną
+  // jest pominięte, a portfel GEM ma wartość i wpłaty z historii zakładki GEM.
+  const fin = emptyFinance();
+  fin.accounts = [
+    {
+      id: 'xtb', name: 'XTB', type: 'inwestycje', openingBalance: 0,
+      lots: [
+        { id: 'a', asset: 'ETF.PL', currency: 'PLN', qty: 10, price: 100, date: '2026-03-10', since: '2026-06-01' },
+        { id: 's', asset: 'ETF.PL', currency: 'PLN', qty: 5, price: 100, date: '2026-03-10', until: '2026-05-15' },
+        { id: 'm', asset: 'manual', name: 'Mieszkanie', currency: 'PLN', qty: 1, price: 500000, date: '2026-03-01', marks: [['2026-03-01', 500000]] },
+      ],
+    },
+    { id: 'ike', name: 'IKE', type: 'inwestycje', openingBalance: 0, gemAccount: 'IKE', gemValuation: true },
+  ];
+  const market = { ...MARKET, gemValues: { IKE: { value: 13000, invested: 10000, date: '2026-07-10', history: [['2026-04-30', 10200, 10000], ['2026-05-29', 10800, 10000]] } } };
+  const pts = investSeries(fin, market, { today: '2026-07-10' }).points;
+  const at = (m) => pts.find((p) => p.month === m);
+  assert.equal(pts[0].month, '2026-02');
+  near(at('2026-03').value, 1500);
+  near(at('2026-03').invested, 1500);
+  near(at('2026-04').value, 1500 + 10200);
+  near(at('2026-04').invested, 1500 + 10000);
+  near(at('2026-05').value, 1000 + 10800);
+  near(at('2026-05').invested, 1000 + 10000);
+  near(at('2026-06').value, 1000 + 10800);
+  near(at('2026-07').value, 1200 + 13000);
+  near(at('2026-07').invested, 1000 + 10000);
+  // Starsza historia GEM bez wpłat: wpłaty netto to suma przelewów na konto.
+  market.gemValues.IKE.history = [['2026-04-30', 10200]];
+  fin.accounts.push({ id: 'bank', name: 'Bank', type: 'bank', openingBalance: 20000 });
+  fin.txs.push(tx('przelew', 9000, '2026-04-02', 'bank', { toAccountId: 'ike' }));
+  near(investSeries(fin, market, { today: '2026-07-10' }).points.find((p) => p.month === '2026-04').invested, 1500 + 9000);
+  // Notowania od późniejszej daty niż zakup: do tego dnia wycena po cenie zakupu.
+  const early = { ...market, assets: { 'ETF.PL': { currency: 'PLN', quotes: [['2026-04-01', 100], ['2026-07-10', 120]], series: [] } } };
+  assert.equal(investSeries(fin, early, { today: '2026-07-10' }).approxUntil, '2026-04-01');
+  assert.deepEqual(investSeries(emptyFinance(), MARKET, { today: '2026-07-10' }), { points: [], approxUntil: null });
+  // Obligacja COI: wypłacone odsetki (6% po podatku 19%) zmniejszają wpłacone pieniądze – to pieniądze już odebrane.
+  const coi = emptyFinance();
+  coi.accounts = [{ id: 'obl', name: 'Obligacje', type: 'inwestycje', openingBalance: 0, lots: [{ id: 'c', asset: `${BOND_PREFIX}COI0329`, currency: 'PLN', qty: 10, price: 100, date: '2025-03-10', bond: { type: 'COI', rate1: 6, margin: 1.5, fee: 2 } }] }];
+  const bp = investSeries(coi, { fx: {}, assets: {}, bonds: { cpi: [['2026-01', 4]] } }, { today: '2026-04-30' }).points;
+  near(bp.find((p) => p.month === '2026-02').invested, 1000);
+  near(bp.find((p) => p.month === '2026-03').invested, 1000 - 48.6);
 });
 
 test('symulacja: odkładanie, procent składany, kredyt z harmonogramu, brak gotówki i deficyt', () => {
@@ -244,14 +345,22 @@ test('obligacje przy sprzedaży: przedterminowy wykup na rękę (opłata i podat
   near(lotExitPrice(market, { ...lot, bond: { ...lot.bond, ike: true } }, '2015-06-16'), 104.16);
 });
 
-test('drobiazgi: dzisiejsza data lokalna i średnia z poprzednich miesięcy przy krótkiej historii', () => {
+test('drobiazgi: dzisiejsza data lokalna i średnia z poprzednich pełnych miesięcy przy krótkiej historii', () => {
   assert.match(localToday(), /^\d{4}-\d{2}-\d{2}$/);
   const d = new Date();
   assert.equal(Number(localToday().slice(8, 10)), d.getDate());
   const fin = emptyFinance();
   fin.accounts = [{ id: 'bank', name: 'Bank', type: 'bank', openingBalance: 0 }];
   fin.txs.push(tx('wydatek', 900, '2026-06-10', 'bank', { categoryId: 'zakupy' }), tx('wydatek', 600, '2026-07-03', 'bank', { categoryId: 'zakupy' }));
-  const cmp = compareMonth(fin, '2026-07');
-  assert.equal(cmp.avgMonths, 1);
-  assert.equal(cmp.rows[0].avg3, 900); // jeden miesiąc z danymi – nie dzielimy przez 3
+  // Dziennik od 10 czerwca: czerwiec jest niepełny, więc przed lipcem nie ma jeszcze pełnego miesiąca do średniej.
+  let cmp = compareMonth(fin, '2026-07');
+  assert.equal(cmp.avgMonths, 0);
+  assert.equal(cmp.rows[0].avg3, null);
+  // Dziennik od 1 maja: średnia z maja i czerwca – dwa pełne miesiące, nie dzielimy przez 3.
+  fin.txs.push(tx('wydatek', 300, '2026-05-01', 'bank', { categoryId: 'zakupy' }));
+  cmp = compareMonth(fin, '2026-07');
+  assert.equal(cmp.avgMonths, 2);
+  assert.equal(cmp.avgFrom, '2026-05');
+  assert.equal(cmp.rows[0].avg3, 600);
+  assert.equal(compareMonth(fin, '2026-10').avgMonths, 3);
 });

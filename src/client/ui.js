@@ -91,8 +91,8 @@ function publishGemSummary() {
       if (!own.length) continue;
       const points = buildTimeline(state.txs, D.prices, { account: acc, today: DATA_DAY }).points;
       const last = points.at(-1);
-      // Wartość na koniec każdego miesiąca – do wykresu majątku w Finansach (bez niej historia pokazywałaby same wpłaty).
-      const history = points.filter((p, i) => i === points.length - 1 || points[i + 1].date.slice(0, 7) !== p.date.slice(0, 7)).map((p) => [p.date, r2(p.value)]);
+      // Wartość i wpłaty netto na koniec każdego miesiąca – do wykresów majątku i inwestycji w Finansach.
+      const history = points.filter((p, i) => i === points.length - 1 || points[i + 1].date.slice(0, 7) !== p.date.slice(0, 7)).map((p) => [p.date, r2(p.value), r2(p.invested)]);
       if (last) accounts[acc] = { value: r2(last.value), invested: r2(last.invested), date: last.date, history: history.slice(-240) };
       else {
         const net = own.reduce((s, t) => s + (t.type === 'wplata' ? t.amountPLN || 0 : t.type === 'wyplata' ? -(t.amountPLN || 0) : 0), 0);

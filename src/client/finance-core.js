@@ -463,20 +463,52 @@ export function summarize(fin, from, to, { accountId = null } = {}) {
   };
 }
 
-// Porównanie kategorii z poprzednim miesiącem i średnią z 3 poprzednich miesięcy.
+// Liczba miesięcy od a do b (YYYY-MM), np. monthDiff('2026-09', '2026-11') = 2.
+export function monthDiff(a, b) {
+  return (Number(b.slice(0, 4)) - Number(a.slice(0, 4))) * 12 + Number(b.slice(5, 7)) - Number(a.slice(5, 7));
+}
+
+/**
+ * Od kiedy dziennik ma pełne dane o przychodach i wydatkach. start – dzień pierwszego przychodu albo wydatku;
+ * firstFull – pierwszy miesiąc zapisany w całości: miesiąc startu, jeśli dziennik zaczyna się 1. dnia, a w przeciwnym
+ * razie następny (w miesiącu startu mogło zabraknąć np. wypłaty sprzed założenia dziennika); partial – pominięty
+ * miesiąc startu. Średnie miesięczne liczą się tylko z pełnych miesięcy – bez niego i bez bieżącego, który jeszcze trwa.
+ * Raty kredytów i odsetki z obligacji zapisują się same według harmonogramu (także wstecz), więc o starcie decydują
+ * przychody i wydatki wpisane albo zaimportowane; zapisy automatyczne – tylko gdy innych nie ma.
+ */
+export function flowStart(fin) {
+  let start = '9999-12-31';
+  let auto = '9999-12-31';
+  for (const t of liveTx(fin)) {
+    if (!isFlow(t) || !t.date) continue;
+    if (t.source === 'kredyt' || t.source === 'obligacje') {
+      if (t.date < auto) auto = t.date;
+    } else if (t.date < start) start = t.date;
+  }
+  if (start === '9999-12-31') start = auto;
+  if (start === '9999-12-31') return { start: null, firstFull: null, partial: null };
+  const month = start.slice(0, 7);
+  const whole = start.slice(8, 10) === '01';
+  return { start, firstFull: whole ? month : shiftMonth(month, 1), partial: whole ? null : month };
+}
+
+// Porównanie kategorii z poprzednim miesiącem i średnią z (do) 3 poprzednich pełnych miesięcy (avg3 = null, gdy
+// pełnych miesięcy przed tym miesiącem jeszcze nie ma). avgFrom – pierwszy miesiąc średniej, avgMonths – ich liczba.
 export function compareMonth(fin, month) {
   const cur = summarize(fin, monthBounds(month).from, monthBounds(month).to);
   const prev = summarize(fin, monthBounds(shiftMonth(month, -1)).from, monthBounds(shiftMonth(month, -1)).to);
-  const last3 = summarize(fin, monthBounds(shiftMonth(month, -3)).from, monthBounds(shiftMonth(month, -1)).to);
+  const { firstFull } = flowStart(fin);
+  const avgTo = shiftMonth(month, -1);
+  const avgFrom = firstFull && firstFull > shiftMonth(month, -3) ? firstFull : shiftMonth(month, -3);
+  const n3 = firstFull && avgFrom <= avgTo ? monthDiff(avgFrom, avgTo) + 1 : 0;
+  const last3 = n3 ? summarize(fin, monthBounds(avgFrom).from, monthBounds(avgTo).to) : null;
   const ids = new Set([...cur.expenseByCategory, ...prev.expenseByCategory].map((c) => c.id));
   const find = (list, id) => list.find((c) => c.id === id)?.amount ?? 0;
-  // Średnia z poprzednich miesięcy, w których są dane (świeży dziennik ma ich mniej niż trzy).
-  const n3 = Math.max(1, last3.byMonth.length);
   const rows = [...ids].map((id) => {
     const c = cur.expenseByCategory.find((x) => x.id === id) ?? prev.expenseByCategory.find((x) => x.id === id);
-    return { id, name: c.name, emoji: c.emoji, color: c.color, current: find(cur.expenseByCategory, id), previous: find(prev.expenseByCategory, id), avg3: find(last3.expenseByCategory, id) / n3 };
+    return { id, name: c.name, emoji: c.emoji, color: c.color, current: find(cur.expenseByCategory, id), previous: find(prev.expenseByCategory, id), avg3: n3 ? find(last3.expenseByCategory, id) / n3 : null };
   });
-  return { current: cur, previous: prev, avgMonths: n3, rows: rows.sort((a, b) => b.current - a.current) };
+  return { current: cur, previous: prev, avgMonths: n3, avgFrom: n3 ? avgFrom : null, rows: rows.sort((a, b) => b.current - a.current) };
 }
 
 // ---------- Karty kredytowe ----------
@@ -1622,6 +1654,68 @@ export function wealthChange(points) {
   return { from: first.date, to: last.date, months: later.length, change, saved, external, invGain, other: change - saved - external - invGain, income: sum('income'), expense: sum('expense') };
 }
 
+/**
+ * Inwestycje miesiąc po miesiącu – jak wykres „wartość portfela i wpłacony kapitał” w aplikacjach do śledzenia
+ * inwestycji. value – ile są warte pozycje (akcje, ETF-y, fundusze, obligacje, złoto, kryptowaluty i portfel GEM);
+ * invested – ile pieniędzy w nie włożono: koszt zakupu pozycji, które są wtedy w portfelu, minus odsetki już z nich
+ * wypłacone (portfel GEM: wpłaty netto). Różnica to zysk. Pozycje liczą się od daty zakupu, także te dopisane do
+ * dziennika później; sprzedana pozycja znika z obu linii w dniu sprzedaży. Aktywa z wyceną ręczną (np. mieszkanie)
+ * są pominięte. Pierwszy punkt to koniec miesiąca przed pierwszym zakupem (zero), ostatni – dziś.
+ * approxUntil – do tego dnia brakuje notowań niektórych pozycji (wartość jest tam równa cenie zakupu).
+ */
+export function investSeries(fin, market, { today }) {
+  const accounts = fin.accounts.filter((a) => inWorth(a) && !isLoan(a));
+  const gems = [];
+  const lots = [];
+  for (const a of accounts) {
+    const g = a.gemValuation && a.gemAccount ? market?.gemValues?.[a.gemAccount] : null;
+    if (g && Number.isFinite(g.value)) gems.push({ a, g });
+    else for (const l of a.lots ?? []) if (l.asset && l.asset !== 'manual' && l.qty > 0 && l.date && l.date <= today) lots.push(l);
+  }
+  const starts = [...lots.map((l) => l.date), ...gems.map(({ g }) => g.history?.[0]?.[0] ?? g.date)].filter((d) => d && d <= today);
+  if (!starts.length) return { points: [], approxUntil: null };
+  // Od kiedy są notowania pozycji i kursy walut (wcześniej wycena stoi w miejscu na cenie zakupu).
+  let approxUntil = null;
+  for (const l of lots) {
+    if (isBondLot(l)) continue;
+    const a = market?.assets?.[l.asset];
+    const cur = lotCurrency(market, l);
+    const from = [a?.series?.[0]?.[0], a?.quotes?.[0]?.[0]].filter(Boolean).sort()[0];
+    const fx = cur === 'PLN' ? null : market?.fx?.[cur]?.[0]?.[0];
+    const known = [from, fx].filter(Boolean).sort().at(-1);
+    if (from && known > l.date && (!approxUntil || known > approxUntil)) approxUntil = known;
+  }
+  const first = starts.reduce((m, d) => (d < m ? d : m)).slice(0, 7);
+  const points = [];
+  for (let m = shiftMonth(first, -1); m <= today.slice(0, 7); m = shiftMonth(m, 1)) {
+    const end = monthBounds(m).to;
+    const date = end < today ? end : today;
+    let value = 0;
+    let invested = 0;
+    for (const l of lots) {
+      const close = lotEnd(l);
+      if (l.date > date || (close && date >= close)) continue;
+      const rate = rateOn(market, lotCurrency(market, l), date);
+      const cost = lotCost(market, l).costPLN;
+      if (rate === null || cost === null) continue;
+      value += l.qty * lotPrice(market, l, date) * rate;
+      invested += cost - lotIncome(market, l, date);
+    }
+    // Portfel GEM: wartość i wpłaty netto z historii zakładki GEM (starsza historia bez wpłat – suma przelewów na konto).
+    let bal = null;
+    for (const { a, g } of gems) {
+      let p = null;
+      if (date >= isoDays(g.date, -7)) p = [date, g.value, g.invested];
+      else if (g.history?.length && date >= g.history[0][0]) p = pairAt(g.history, date);
+      if (!p) continue;
+      value += p[1];
+      invested += Number.isFinite(p[2]) ? p[2] : (bal ??= balances(fin, date))[a.id];
+    }
+    points.push({ month: m, date, value, invested, gain: value - invested });
+  }
+  return { points, approxUntil };
+}
+
 /** Rodzaj aktywa pozycji – do struktury majątku i założeń prognozy. */
 export function lotClass(lot) {
   if (!lot?.asset || lot.asset === 'manual') return 'reczne';
@@ -1676,17 +1770,18 @@ export function wealthStructure(fin, market, date, bal = balances(fin, date)) {
 }
 
 /**
- * Nawyki z ostatnich pełnych miesięcy (bez bieżącego): średnie przychody, wydatki, odkładana kwota, stopa
- * oszczędności, ile co miesiąc trafia na inwestycje (invested – z własnych pieniędzy, external – spoza budżetu),
- * średni koszt kredytów i rozrzut odkładanej kwoty (sd).
+ * Nawyki z ostatnich pełnych miesięcy: średnie przychody, wydatki, odkładana kwota, stopa oszczędności, ile co miesiąc
+ * trafia na inwestycje (invested – z własnych pieniędzy, external – spoza budżetu), średni koszt kredytów i rozrzut
+ * odkładanej kwoty (sd). Bez bieżącego miesiąca (jeszcze trwa – np. wypłata może dopiero wpłynąć) i bez miesiąca,
+ * w którym dziennik się zaczyna, jeśli nie od 1. dnia (partial – wtedy, gdy wypadłby w liczonym okresie).
  */
 export function savingsStats(fin, market, { today, months = 12 } = {}) {
   const flows = monthFlows(fin, market, today);
   const cur = today.slice(0, 7);
-  const first = [...flows.keys()].sort().find((m) => flows.get(m).income || flows.get(m).expense);
+  const { start, firstFull, partial } = flowStart(fin);
   const list = [];
-  if (first) {
-    for (let m = shiftMonth(cur, -1), i = 0; m >= first && i < months; m = shiftMonth(m, -1), i++) {
+  if (firstFull) {
+    for (let m = shiftMonth(cur, -1), i = 0; m >= firstFull && i < months; m = shiftMonth(m, -1), i++) {
       const f = flows.get(m) ?? { income: 0, expense: 0, invTransfers: 0, external: 0, loanCost: 0 };
       list.unshift({ month: m, income: f.income, expense: f.expense, saved: f.income - f.expense, rate: f.income > 0 ? (f.income - f.expense) / f.income : null, invested: f.invTransfers, external: f.external, loanCost: f.loanCost });
     }
@@ -1696,7 +1791,8 @@ export function savingsStats(fin, market, { today, months = 12 } = {}) {
   const avgSaved = avg('saved');
   const income = list.reduce((s, x) => s + x.income, 0);
   const sd = n > 1 ? Math.sqrt(list.reduce((s, x) => s + (x.saved - avgSaved) ** 2, 0) / (n - 1)) : 0;
-  return { months: list, n, avgIncome: avg('income'), avgExpense: avg('expense'), avgSaved, rate: income > 0 ? (income - list.reduce((s, x) => s + x.expense, 0)) / income : null, sd, avgInvested: avg('invested'), avgExternal: avg('external'), avgLoanCost: avg('loanCost') };
+  const skipped = partial && partial < cur && n < months ? partial : null;
+  return { months: list, n, avgIncome: avg('income'), avgExpense: avg('expense'), avgSaved, rate: income > 0 ? (income - list.reduce((s, x) => s + x.expense, 0)) / income : null, sd, avgInvested: avg('invested'), avgExternal: avg('external'), avgLoanCost: avg('loanCost'), start, partial: skipped, current: cur };
 }
 
 // Długoterminowe założenia: oczekiwany zysk roczny (%, nominalnie) i typowy rozrzut wyniku (punkty procentowe).
@@ -1855,18 +1951,17 @@ export function simulateWealth({ cash, investments, debt, months, saved, investe
 }
 
 /**
- * Co zwykle dzieje się od dzisiejszego dnia miesiąca do jego końca (średnia z ostatnich pełnych miesięcy): wpływ do
- * gotówki bez kosztów kredytu (np. wypłata pod koniec miesiąca minus reszta wydatków), pieniądze przenoszone na
- * inwestycje i wpłaty spoza budżetu. Dzięki temu prognoza nie zależy od tego, czy otwierasz ją przed wypłatą, czy po.
+ * Co zwykle dzieje się od dzisiejszego dnia miesiąca do jego końca (średnia z ostatnich pełnych miesięcy – tych samych
+ * co w savingsStats): wpływ do gotówki bez kosztów kredytu (np. wypłata pod koniec miesiąca minus reszta wydatków),
+ * pieniądze przenoszone na inwestycje i wpłaty spoza budżetu. Dzięki temu prognoza nie zależy od tego, czy otwierasz
+ * ją przed wypłatą, czy po.
  */
 export function monthRemainder(fin, market, today, months = 12) {
   const cur = today.slice(0, 7);
   const day = today.slice(8, 10);
-  const first = liveTx(fin)
-    .reduce((m, t) => (isFlow(t) && t.date && t.date < m ? t.date : m), '9999-12-31')
-    .slice(0, 7);
-  const from = shiftMonth(cur, -months) > first ? shiftMonth(cur, -months) : first;
-  const n = from < cur ? (Number(cur.slice(0, 4)) - Number(from.slice(0, 4))) * 12 + Number(cur.slice(5, 7)) - Number(from.slice(5, 7)) : 0;
+  const { firstFull } = flowStart(fin);
+  const from = !firstFull ? cur : shiftMonth(cur, -months) > firstFull ? shiftMonth(cur, -months) : firstFull;
+  const n = from < cur ? monthDiff(from, cur) : 0;
   const out = { cashIn: 0, invested: 0, external: 0, n };
   if (!n) return out;
   const late = (date) => date.slice(0, 7) >= from && date.slice(0, 7) < cur && date.slice(8, 10) > day;

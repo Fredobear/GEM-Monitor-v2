@@ -102,6 +102,8 @@ test('cały cykl: sygnał miesięczny raz, ostrzeżenie o zmianie podglądu, pod
   assert.doesNotMatch(fin, /data-view="kalendarz"/);
   assert.match(fin, /function viewWealth\(/);
   assert.match(fin, /function wealthForecast\(/);
+  assert.match(fin, /function investSeries\(/);
+  assert.match(fin, /Jak rosną inwestycje/);
   assert.match(fin, /connect-src 'none'/);
   // Ceny do wyceny portfela: kursy NBP i indeksy instrumentów zapisane do kolejnego uruchomienia.
   const prices = JSON.parse(await readFile(path.join(tmp, 'docs', 'data', 'prices.json'), 'utf8'));

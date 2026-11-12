@@ -211,6 +211,7 @@ const ui = {
   setTab: 'kategorie',
   worthRange: 12,
   worthMode: 'netto',
+  invRange: 0,
   fcYears: 10,
   txMode: 'lista',
   detOpen: new Set(),
@@ -565,7 +566,18 @@ function investTotals() {
   const at = valuationDate();
   const out = { cost: 0, value: 0, income: 0, gain: 0, gainPct: null, positions: 0 };
   for (const a of activeAccounts()) {
-    if (a.excludeFromTotal || !a.lots?.length) continue;
+    if (a.excludeFromTotal) continue;
+    // Konto powiązane z portfelem GEM: wartość z zakładki GEM, koszt to wpłaty netto.
+    const g = a.gemValuation && a.gemAccount ? MARKET.gemValues?.[a.gemAccount] : null;
+    if (g && Number.isFinite(g.value)) {
+      if (Number.isFinite(g.invested)) {
+        out.cost += g.invested;
+        out.value += g.value;
+        out.positions++;
+      }
+      continue;
+    }
+    if (!a.lots?.length) continue;
     const s = investSummary(MARKET, a, at);
     if (!s?.positions) continue;
     out.cost += s.cost;
@@ -655,10 +667,12 @@ function reportCards(s) {
     const cmp = compareMonth(fin, month);
     // Każda kwota otwiera dymek z wydatkami, z których się składa (kategoria × okres).
     const amt = (id, col, value, cls = '') => `<button type="button" class="amt-pop ${cls}" data-cmp="${esc(id ?? '_none')}|${col}" aria-haspopup="dialog">${zl0(value)}</button>`;
+    // Średnia tylko z pełnych miesięcy (bez miesiąca, w którym dziennik zaczyna się później niż 1. dnia).
+    const avgNote = cmp.avgMonths === 3 ? '' : cmp.avgMonths ? ` Średnia z ${cmp.avgMonths} ${plural(cmp.avgMonths, 'pełnego miesiąca', 'pełnych miesięcy', 'pełnych miesięcy')} – tyle jest ich przed tym miesiącem w dzienniku.` : ' Średnia pojawi się, gdy przed tym miesiącem będzie choć jeden pełny miesiąc w dzienniku.';
     if (cmp.rows.length)
-      out.push(`<section class="card"><h2>Kategorie w porównaniu z poprzednim miesiącem</h2><div class="tbl-wrap"><table class="cmp-table"><thead><tr><th>Kategoria</th><th class="num">${esc(MONTHS_SHORT[Number(month.slice(5, 7)) - 1])}</th><th class="num">Poprz.</th><th class="num">Śr. 3 mies.</th></tr></thead><tbody>${cmp.rows
-        .map((r) => `<tr><td>${esc(r.emoji)} ${esc(r.name)}</td><td class="num">${amt(r.id, 'cur', r.current, 'strong')}</td><td class="num ${r.current > r.previous ? 'neg' : 'pos'}">${amt(r.id, 'prev', r.previous)}</td><td class="num muted">${amt(r.id, 'avg', r.avg3)}</td></tr>`)
-        .join('')}</tbody><tfoot><tr><td><b>Razem</b></td><td class="num">${amt('_all', 'cur', cmp.current.expense, 'strong')}</td><td class="num">${amt('_all', 'prev', cmp.previous.expense)}</td><td></td></tr></tfoot></table></div><p class="small muted">Dotknij kwoty, aby zobaczyć wydatki, z których się składa.</p></section>`);
+      out.push(`<section class="card"><h2>Kategorie w porównaniu z poprzednim miesiącem</h2><div class="tbl-wrap"><table class="cmp-table"><thead><tr><th>Kategoria</th><th class="num">${esc(MONTHS_SHORT[Number(month.slice(5, 7)) - 1])}</th><th class="num">Poprz.</th><th class="num">Śr. ${cmp.avgMonths || 3} mies.</th></tr></thead><tbody>${cmp.rows
+        .map((r) => `<tr><td>${esc(r.emoji)} ${esc(r.name)}</td><td class="num">${amt(r.id, 'cur', r.current, 'strong')}</td><td class="num ${r.current > r.previous ? 'neg' : 'pos'}">${amt(r.id, 'prev', r.previous)}</td><td class="num muted">${r.avg3 === null ? '–' : amt(r.id, 'avg', r.avg3)}</td></tr>`)
+        .join('')}</tbody><tfoot><tr><td><b>Razem</b></td><td class="num">${amt('_all', 'cur', cmp.current.expense, 'strong')}</td><td class="num">${amt('_all', 'prev', cmp.previous.expense)}</td><td></td></tr></tfoot></table></div><p class="small muted">Dotknij kwoty, aby zobaczyć wydatki, z których się składa.${avgNote}</p></section>`);
   }
   if (ui.period === 'rok') {
     const y = ui.anchor.slice(0, 4);
@@ -667,8 +681,15 @@ function reportCards(s) {
       const row = s.byMonth.find((x) => x.month === m) ?? { income: 0, expense: 0 };
       return { label: monthLabel(m), tick: MONTHS_SHORT[i], przychody: row.income, wydatki: row.expense };
     });
-    const n = Math.max(1, s.byMonth.length);
-    out.push(`<section class="card"><h2>Miesiąc po miesiącu</h2>${bars(months, { series })}<p class="small muted">Średnio miesięcznie (${n} mies. z danymi): wydatki ${zl0(s.expense / n)}, przychody ${zl0(s.income / n)}.</p></section>`);
+    // Średnia tylko z pełnych miesięcy: bez bieżącego (jeszcze trwa) i bez miesiąca, w którym dziennik zaczyna się później niż 1. dnia.
+    const cur = today().slice(0, 7);
+    const fs = flowStart(fin);
+    const full = s.byMonth.filter((x) => fs.firstFull && x.month >= fs.firstFull && x.month < cur);
+    const n = full.length;
+    const sum = (k) => full.reduce((a, x) => a + x[k], 0);
+    const skipped = skippedMonthsText(fs.partial?.startsWith(y) ? fs.partial : null, fs.start, cur.startsWith(y) ? cur : null);
+    const avgText = n ? `Średnio miesięcznie (z ${n} ${plural(n, 'pełnego miesiąca', 'pełnych miesięcy', 'pełnych miesięcy')}): wydatki ${zl0(sum('expense') / n)}, przychody ${zl0(sum('income') / n)}.` : 'Średnia miesięczna pojawi się po pierwszym pełnym miesiącu w dzienniku.';
+    out.push(`<section class="card"><h2>Miesiąc po miesiącu</h2>${bars(months, { series })}<p class="small muted">${esc(avgText)}${skipped ? ` ${esc(skipped)}` : ''}</p></section>`);
   }
   if (ui.period === 'okres' && s.byMonth.length > 1)
     out.push(`<section class="card"><h2>Miesiące</h2>${bars(
@@ -1198,6 +1219,42 @@ function forecastChart(hist, fc, months, value) {
   return `${chartBox(svg, tips, P.W)}${legendRow([['s-net', 'Dotychczas', true], ['s-net cx-dash-key', 'Prognoza (wariant bazowy)', true], ['s-band', 'Od ostrożnego do optymistycznego']])}`;
 }
 
+// Inwestycje: ile są warte i ile pieniędzy w nie włożono (jak w aplikacjach do śledzenia portfela). Wartość to linia
+// z polem pod spodem, wpłacone pieniądze – druga linia; odstęp między nimi to zysk z inwestowania.
+const INV_RANGES = [[12, '1 rok'], [36, '3 lata'], [60, '5 lat'], [0, 'Wszystko']];
+const signed0 = (x) => `${x < -0.5 ? '−' : '+'}${zl0(Math.abs(x))}`;
+function investChart(points) {
+  const n = points.length;
+  const P = plotArea(Math.min(0, ...points.map((p) => Math.min(p.value, p.invested))), Math.max(1, ...points.map((p) => Math.max(p.value, p.invested))), { H: 220 });
+  const x = (i) => (n === 1 ? (P.x0 + P.x1) / 2 : P.x0 + ((P.x1 - P.x0) * i) / (n - 1));
+  const path = (k) => points.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${P.y(p[k]).toFixed(1)}`).join('');
+  const value = path('value');
+  const show = pickLabels(n);
+  const labels = points.map((p, i) => (show(i) ? xLabel(x(i), monthShort(p.month), P.H) : '')).join('');
+  const last = points[n - 1];
+  const xe = x(n - 1).toFixed(1);
+  const svg = `<svg viewBox="0 0 ${P.W} ${P.H}" role="img" aria-label="Wartość inwestycji i wpłacone pieniądze miesiąc po miesiącu">${P.grid}${labels}<path d="${value}L${xe},${P.base.toFixed(1)}L${x(0).toFixed(1)},${P.base.toFixed(1)}Z" class="cx-area s-inv"/><path d="${path('invested')}" class="cx-line s-paid"/><path d="${value}" class="cx-line s-inv"/><circle cx="${xe}" cy="${P.y(last.invested).toFixed(1)}" r="4" class="cx-dot s-paid"/><circle cx="${xe}" cy="${P.y(last.value).toFixed(1)}" r="4" class="cx-dot s-inv"/>${cross(P)}</svg>`;
+  const tips = points.map((p, i) => [Math.round(x(i) * 10) / 10, i === n - 1 ? 'Dziś' : `Koniec: ${monthLabel(p.month)}`, [['Wartość', zl0(p.value), 'inv'], ['Wpłacono', zl0(p.invested), 'paid'], ['Zysk', signed0(p.gain), '']]]);
+  return chartBox(svg, tips, P.W);
+}
+
+function investChartCard(inv) {
+  const all = inv.points;
+  if (all.length < 2 || !all.some((p) => p.value > 0.5 || p.invested > 0.5)) return '';
+  const ranges = INV_RANGES.filter(([m]) => !m || all.length > m + 1);
+  const sel = ranges.some(([m]) => m === ui.invRange) ? ui.invRange : 0;
+  const points = sel ? all.slice(-(sel + 1)) : all;
+  const last = all[all.length - 1];
+  const rows = [...points].reverse().map((p, i) => `<tr><td>${i ? esc(cap(monthShort(p.month))) : 'dziś'}</td><td class="num">${esc(zl0(p.value))}</td><td class="num">${esc(zl0(p.invested))}</td><td class="num ${gainClass(p.gain)}">${esc(signed0(p.gain))}</td></tr>`).join('');
+  const approx = inv.approxUntil && inv.approxUntil > points[0].date ? ` Do ${Number(inv.approxUntil.slice(8, 10))} ${MONTHS_GEN[Number(inv.approxUntil.slice(5, 7)) - 1]} ${inv.approxUntil.slice(0, 4)} brakuje notowań części pozycji – do tego dnia ich wartość jest liczona po cenie zakupu.` : '';
+  const manual = fin.accounts.some((a) => !a.archived && (a.lots ?? []).some((l) => l.asset === 'manual')) ? ' Aktywa z wyceną ręczną (np. mieszkanie) nie są tu liczone.' : '';
+  return `<section class="card"><div class="card-head"><h2>Jak rosną inwestycje</h2>${ranges.length > 1 ? `<div class="seg small">${ranges.map(([m, l]) => `<button data-inv-range="${m}" class="${sel === m ? 'on' : ''}">${l}</button>`).join('')}</div>` : ''}</div>
+  <ul class="inv-legend"><li><i class="cx-key-line s-inv"></i><span>Wartość inwestycji</span><b>${esc(zl(last.value))}</b></li><li><i class="cx-key-line s-paid"></i><span>Wpłacone pieniądze</span><b>${esc(zl(last.invested))}</b></li><li><i class="cx-key-none"></i><span>Zysk</span><b class="${gainClass(last.gain)}">${esc(gainText(last.gain, last.invested > 0.5 ? last.gain / last.invested : null))}</b></li></ul>
+  ${investChart(points)}
+  <details class="cx-table"><summary>Pokaż liczby w tabeli</summary><div class="tbl-wrap"><table><thead><tr><th>Koniec miesiąca</th><th class="num">Wartość</th><th class="num">Wpłacono</th><th class="num">Zysk</th></tr></thead><tbody>${rows}</tbody></table></div></details>
+  <p class="small muted">„Wartość inwestycji” to wycena Twoich pozycji na koniec każdego miesiąca (akcje, ETF-y, fundusze, obligacje, złoto, kryptowaluty i portfel GEM), a „Wpłacone pieniądze” – ile w nie włożono: koszt zakupu pozycji, które były wtedy w portfelu (sprzedane znikają z obu linii), minus wypłacone odsetki. Odstęp między liniami to zysk z inwestowania.${approx}${manual} Dotknij wykresu, aby zobaczyć wartości z danego miesiąca.</p></section>`;
+}
+
 // Wiersz z paskiem: nazwa, kwota i pasek proporcjonalny do największej pozycji.
 const barRow = (label, value, share, cls, note = '') => `<li class="bar-row"><div class="br-top"><span>${label}</span><b>${esc(value)}</b></div><div class="br-track"><span class="${cls}" style="width:${Math.max(1.5, Math.min(100, share * 100)).toFixed(1)}%"></span></div>${note ? `<small>${note}</small>` : ''}</li>`;
 const kpiTile = (label, value, note = '', cls = '') => `<div class="kpi"><span>${esc(label)}</span><b class="${cls}">${esc(value)}</b>${note ? `<small>${note}</small>` : ''}</div>`;
@@ -1237,18 +1294,35 @@ function wealthChangeCard(all) {
   ].filter(([, v], i) => i === 0 || Math.abs(v) >= 1);
   const max = Math.max(1, ...items.map(([, v]) => Math.abs(v)));
   return `<section class="card"><h2>Skąd ta zmiana</h2>
-  <p class="lead">Majątek ${ch.change >= 0 ? 'urósł' : 'zmalał'} o <b class="${gainClass(ch.change)}">${esc(zl0(Math.abs(ch.change)))}</b> ${esc(sinceText(points[0].month))} (${ch.months} ${plural(ch.months, 'miesiąc', 'miesiące', 'miesięcy')}).</p>
+  <p class="lead">Majątek ${ch.change >= 0 ? 'urósł' : 'zmalał'} o <b class="${gainClass(ch.change)}">${esc(zl0(Math.abs(ch.change)))}</b> ${esc(sinceText(points[0].month))} do dziś.</p>
   <ul class="bar-rows">${items.map(([label, v, note]) => barRow(esc(label), signed(v), Math.abs(v) / max, v >= 0 ? 's-cash' : 's-debt', esc(note))).join('')}</ul>
   <p class="small muted">Spłata kapitału kredytu nie zmienia majątku (ubywa gotówki i długu jednocześnie); odsetki są w wydatkach.</p></section>`;
 }
 
+// Pominięte w średnich: niepełny pierwszy miesiąc dziennika i bieżący miesiąc, który jeszcze trwa.
+function skippedMonthsText(partial, start, current) {
+  const parts = [];
+  if (partial && start) parts.push(`${monthLabel(partial)} (dziennik zaczyna się ${Number(start.slice(8, 10))} ${MONTHS_GEN[Number(start.slice(5, 7)) - 1]} – brakuje początku miesiąca)`);
+  if (current) parts.push(`${monthLabel(current)} (jeszcze trwa – np. wypłata może dopiero wpłynąć)`);
+  return parts.length ? `Pominięte: ${parts.join(' i ')}.` : '';
+}
+// Zakres miesięcy: „październik 2026” albo „od listopada 2025 do października 2026”.
+function monthsRange(list) {
+  const a = list[0].month;
+  const b = list[list.length - 1].month;
+  const gen = (m) => MONTHS_GEN[Number(m.slice(5, 7)) - 1];
+  return a === b ? monthLabel(a) : `od ${gen(a)}${a.slice(0, 4) === b.slice(0, 4) ? '' : ` ${a.slice(0, 4)}`} do ${gen(b)} ${b.slice(0, 4)}`;
+}
+
 function savingsCard(stats, liquid) {
-  if (!stats.n) return '';
+  const skipped = skippedMonthsText(stats.partial, stats.start, stats.current);
+  if (!stats.n) return stats.start ? `<section class="card"><h2>Ile odkładasz</h2><p class="muted small">Średnie pojawią się po pierwszym pełnym miesiącu w dzienniku – liczą się tylko miesiące zapisane od pierwszego do ostatniego dnia. ${esc(skipped)}</p></section>` : '';
   const cushion = stats.avgExpense > 1 ? liquid / stats.avgExpense : null;
   const cushionNote = cushion === null ? '' : cushion >= 6 ? 'bezpieczny zapas (zwykle zaleca się 3–6 miesięcy)' : cushion >= 3 ? 'w zalecanym przedziale 3–6 miesięcy' : 'poniżej zalecanych 3–6 miesięcy';
   return `<section class="card"><h2>Ile odkładasz</h2>
   <div class="kpis">${kpiTile('Średnio miesięcznie', zl0(stats.avgSaved), `z ${stats.n} ${plural(stats.n, 'pełnego miesiąca', 'pełnych miesięcy', 'pełnych miesięcy')}`, gainClass(stats.avgSaved))}${kpiTile('Stopa oszczędności', stats.rate === null ? '–' : pct(stats.rate), 'tyle przychodów zostaje')}${cushion === null ? '' : kpiTile('Poduszka finansowa', `${NF1.format(cushion)} mies.`, esc(cushionNote))}</div>
   ${stats.n >= 2 ? savedChart(stats) : ''}
+  <p class="small muted">Liczone są tylko pełne miesiące: ${esc(monthsRange(stats.months))}. ${esc(skipped)}</p>
   <p class="small muted">Średnio w miesiącu: przychody ${esc(zl0(stats.avgIncome))}, wydatki ${esc(zl0(stats.avgExpense))}${stats.avgInvested > 1 ? `, na inwestycje trafia ${esc(zl0(stats.avgInvested))}` : ''}${stats.avgExternal > 1 ? `, spoza budżetu (np. PPE) ${esc(zl0(stats.avgExternal))}` : ''}. Poduszka finansowa: pieniądze na kontach, oszczędnościach i w gotówce (${esc(zl0(liquid))}) podzielone przez średnie wydatki.</p></section>`;
 }
 
@@ -1352,7 +1426,7 @@ function viewWealth() {
   const stats = savingsStats(fin, MARKET, { today: t, months: 12 });
   // Kredyt bez wpisanej wartości tego, co za niego kupiono, zaniża majątek netto.
   const hint = now.loanDebt > 0.5 && !st.assets.some((i) => i.key === 'reczne') ? '<div class="banner info small">Masz kredyt, ale w aplikacji nie ma tego, co za niego kupiłeś (np. mieszkania albo samochodu), dlatego majątek netto jest zaniżony. Możesz dopisać jego wartość: Konta → konto inwestycyjne (np. „Nieruchomości”) → Aktywa → „Inne aktywo (wycena ręczna)”.</div>' : '';
-  return `${wealthHero(now, all)}${hint}<div class="wealth-grid">${wealthHistoryCard(all)}${wealthChangeCard(all)}${savingsCard(stats, st.liquid)}${structureCard(st)}</div>${forecastCard(all, stats)}`;
+  return `${wealthHero(now, all)}${hint}${investChartCard(investSeries(fin, MARKET, { today: t }))}<div class="wealth-grid">${wealthHistoryCard(all)}${wealthChangeCard(all)}${savingsCard(stats, st.liquid)}${structureCard(st)}</div>${forecastCard(all, stats)}`;
 }
 
 // Dymek wykresu: najbliższy punkt do palca albo kursora, pionowa linia i wartości wszystkich serii.
@@ -1643,11 +1717,12 @@ function hideCmpPop() {
   cmpAnchor = null;
 }
 
-// Wydatki kategorii (albo wszystkie) w miesiącu z tabeli, w poprzednim albo w 3 poprzednich miesiącach.
+// Wydatki kategorii (albo wszystkie) w miesiącu z tabeli, w poprzednim albo w pełnych miesiącach średniej (do 3).
 function cmpExpenses(key, month) {
   const [catKey, col] = key.split('|');
-  const range = col === 'cur' ? monthBounds(month) : col === 'prev' ? monthBounds(shiftMonth(month, -1)) : { from: monthBounds(shiftMonth(month, -3)).from, to: monthBounds(shiftMonth(month, -1)).to };
-  const label = col === 'cur' ? monthLabel(month) : col === 'prev' ? monthLabel(shiftMonth(month, -1)) : `${MONTHS[Number(shiftMonth(month, -3).slice(5, 7)) - 1]} – ${monthLabel(shiftMonth(month, -1))}`;
+  const avgFrom = compareMonth(fin, month).avgFrom ?? shiftMonth(month, -1);
+  const range = col === 'cur' ? monthBounds(month) : col === 'prev' ? monthBounds(shiftMonth(month, -1)) : { from: monthBounds(avgFrom).from, to: monthBounds(shiftMonth(month, -1)).to };
+  const label = col === 'cur' ? monthLabel(month) : col === 'prev' || avgFrom === shiftMonth(month, -1) ? monthLabel(shiftMonth(month, -1)) : `${MONTHS[Number(avgFrom.slice(5, 7)) - 1]} – ${monthLabel(shiftMonth(month, -1))}`;
   const list = liveTx(fin)
     .filter((t) => t.type === 'wydatek' && t.date >= range.from && t.date <= range.to && (catKey === '_all' || (catKey === '_none' ? !t.categoryId : t.categoryId === catKey)))
     .sort(byNewest);
@@ -1659,7 +1734,8 @@ function toggleCmpPop(btn, key) {
   if (cmpAnchor === btn && !cmpPop.hidden) return hideCmpPop();
   hideCmpPop();
   const { list, label, col, c, total } = cmpExpenses(key, ui.anchor.slice(0, 7));
-  const avg = col === 'avg' ? ` · średnio ${zl(total / 3)} / mies.` : '';
+  const avgN = compareMonth(fin, ui.anchor.slice(0, 7)).avgMonths || 1;
+  const avg = col === 'avg' ? ` · średnio ${zl(total / avgN)} / mies.` : '';
   const shown = list.slice(0, 40);
   cmpPop.innerHTML = `<div class="pop-head"><div><b>${esc(c.emoji)} ${esc(c.name)}</b><small>${esc(label)} · ${list.length} ${plural(list.length, 'wydatek', 'wydatki', 'wydatków')} · ${esc(zl(total))}${esc(avg)}</small></div><button type="button" class="pop-x" aria-label="Zamknij">×</button></div>
   <div class="pop-list">${shown.length ? shown.map(txRow).join('') : '<p class="muted small">Brak wydatków w tym okresie.</p>'}${list.length > shown.length ? `<p class="muted small">…i ${list.length - shown.length} więcej. Pełną listę zobaczysz w Operacjach.</p>` : ''}</div>`;
@@ -1864,6 +1940,10 @@ $('#fin-root').addEventListener('click', async (ev) => {
   }
   if (d.worthMode) {
     ui.worthMode = d.worthMode;
+    return render();
+  }
+  if (d.invRange !== undefined) {
+    ui.invRange = Number(d.invRange);
     return render();
   }
   if (d.fcYears) {
