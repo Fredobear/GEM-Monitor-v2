@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-12T07:25:50.994Z",
+  "generatedAt": "2026-11-12T13:07:14.979Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -809,34 +809,51 @@
    }
   ],
   "usdpln": {
-   "date": "2026-11-10",
-   "rate": 3.9099,
-   "change12m": 0.0575586270319981
+   "date": "2026-11-12",
+   "rate": 3.9676,
+   "change12m": 0.07762507469172686
   },
   "stress": 0,
   "summary": "Wskaźniki ryzyka w normie.",
   "errors": []
  },
  "news": {
-  "fetched": 404,
+  "fetched": 399,
   "items": [
    {
-    "title": "Ropa Brent już poniżej 90 USD. Rosną szanse na brak podwyżki stóp w Polsce. Obligacje drożeją",
-    "link": "https://www.pb.pl/cena-ropy-brent-zeszla-ponizej-90-usd-trump-sygnalizuje-ze-usa-nie-wznowia-atakow-na-iran-1270206",
-    "date": "2026-11-10T10:28:17.000Z",
-    "summary": "Ceny ropy naftowej spadły do najniższych poziomów od sierpnia. To zasługa nadziei na deeskalację konfliktu na Bliskim Wschodzie. Niższe koszty surowców mogą ograniczyć presję inflacyjną, a tym samym zmniejszyć naciski na zacieśnienie polityki monetarnej. Również w przypadku RPP. Spadające rentownośc",
-    "source": "Puls Biznesu",
+    "title": "Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji",
+    "link": "https://www.bankier.pl/wiadomosc/Rosyjska-ropa-bije-wieloletnie-rekordy-cenowe-mimo-zachodnich-sankcji-9227613.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-12T08:12:00.000Z",
+    "summary": "Rosyjska ropa, mimo międzynarodowych sankcji w związku z wojną przeciwko Ukrainie, osiąga wieloletnie maksima i jest rekordowo droga na tle światowych notowań – powiadomił w czwartek japoński dziennik „Nikkei Asia”. To efekt rosnącego popytu w Chinach i Indiach oraz wysokich kosztów transportu morsk",
+    "source": "Bankier.pl",
     "regions": [
-     "Polska",
-     "Bliski Wschód"
+     "Azja",
+     "Rosja/Ukraina"
     ],
     "themes": [
      "Konflikty i wojny",
-     "Banki centralne i stopy",
+     "Sankcje i cła",
      "Energia i surowce"
     ],
     "relevant": true,
-    "score": 11
+    "score": 12
+   },
+   {
+    "title": "Rumunia licytuje w ślad za Polską. Zaoferowała 15 tys. dolarów za żołnierza USA",
+    "link": "https://www.bankier.pl/wiadomosc/Rumunia-licytuje-zgapiajac-od-Polski-Zaoferowala-15-tys-dolarow-za-zolnierza-USA-9227654.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-12T09:22:00.000Z",
+    "summary": "Rumunia pozazdrościła Polsce stałej bazy amerykańskich żołnierzy. Jak zapowiada, jest gotowa zoferować tyle, co Warszawa, czyli 15 tys. dolarów rocznie za jednego wojskowego z flagą USA, który będzie stacjonował w Fort Trump. Prezydent Nicusor Dan oświadczył, że jego kraj chce sobie zapewnić \"większ",
+    "source": "Bankier.pl",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 9
    },
    {
     "title": "Putin negocjuje z USA. Koniec dominacji dolara? Nowy porządek świata. PB Brief",
@@ -872,57 +889,9 @@
     "score": 8
    },
    {
-    "title": "Grudniowa podwyżka stóp Fedu już pewna",
-    "link": "https://www.parkiet.com/gospodarka-swiatowa/art45476681-grudniowa-podwyzka-stop-fedu-juz-pewna",
-    "date": "2026-11-12T05:00:00.000Z",
-    "summary": "Inwestorzy od dawna oczekiwali, że Fed podniesie stopy procentowe na ostatnim posiedzeniu przed końcem roku. Po danych o inflacji konsumenckiej za październik są już tego pewni.",
-    "source": "Parkiet",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Banki centralne i stopy",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Finansowa iluzja Kremla. Jak Rosja \"odmroziła\" miliardy bez zgody Zachodu",
-    "link": "https://www.bankier.pl/wiadomosc/Finansowa-iluzja-Kremla-Jak-Rosja-odmrozila-miliardy-bez-zgody-Zachodu-9226751.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-12T05:00:00.000Z",
-    "summary": "Szefowa Banku Rosji Elwira Nabiullina ogłosiła w Dumie Państwowej, że Moskwie udało się zwrócić inwestorom \"znaczną część\" aktywów zamrożonych przez zachodnie sankcje. Z europejskich instytucji takich jak Euroclear nie wypłynęło jednak ani jedno euro. Za rzekomym sukcesem stoi przymusowa operacja na",
-    "source": "Bankier.pl",
-    "regions": [
-     "Europa",
-     "Rosja/Ukraina"
-    ],
-    "themes": [
-     "Sankcje i cła"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Inside India newsletter: Trump's poll setback fuels hope for U.S.-India trade deal by year end",
-    "link": "https://www.cnbc.com/2026/11/12/us-india-trade-tariffs-trump-modi.html",
-    "date": "2026-11-11T23:57:38.000Z",
-    "summary": "While American voters are more affected by import duties on Canadian goods, experts said that a trade deal with India could blunt criticism against tariffs.",
-    "source": "CNBC",
-    "regions": [
-     "USA",
-     "Azja"
-    ],
-    "themes": [
-     "Sankcje i cła"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Jensen Huang affair in D.C.: Resignation calls and moves to tighten Nvidia China exports",
+    "title": "Jensen Huang affair in DC: Resignation calls and moves to tighten Nvidia China exports",
     "link": "https://www.cnbc.com/2026/11/11/nvidia-jensen-huang-congress-resign-ai-chips.html",
-    "date": "2026-11-11T22:46:29.000Z",
+    "date": "2026-11-12T12:03:39.000Z",
     "summary": "Huang was notably opposed to strict export controls on AI chips to China, which ruffled feathers with congressional China hawks.",
     "source": "CNBC",
     "regions": [
@@ -936,16 +905,64 @@
     "score": 7
    },
    {
-    "title": "Falling oil prices are no longer enough to bring down borrowing costs in the world’s most important bond market",
-    "link": "https://www.marketwatch.com/story/falling-oil-prices-are-no-longer-enough-to-bring-down-borrowing-costs-in-the-worlds-most-important-bond-market-3176d25a?mod=mw_rss_topstories",
-    "date": "2026-11-11T21:42:00.000Z",
-    "summary": "The tight trading relationship between oil prices and Treasury yields has broken down. It’s a sign that inflation concerns are extending beyond the energy shock.",
-    "source": "MarketWatch",
+    "title": "Kurs USD/PLN w cieniu psychologicznej bariery 4,00",
+    "link": "https://www.parkiet.com/waluty/art45478241-kurs-usd-pln-w-cieniu-psychologicznej-bariery-4-00",
+    "date": "2026-11-12T09:18:14.000Z",
+    "summary": "Amerykańska waluta błyskawicznie odzyskuje rezon po krótkotrwałym zawahaniu wokół wyborów połówkowych w Stanach Zjednoczonych, a kupujący znów przejmują pełną kontrolę nad rynkiem. Najnowsze dane inflacyjne z gospodarki amerykańskiej ugruntowały oczekiwania na podwyżki stóp procentowych za oceanem, ",
+    "source": "Parkiet",
     "regions": [
      "USA"
     ],
     "themes": [
-     "Energia i surowce",
+     "Banki centralne i stopy",
+     "Wybory i polityka"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "US envoys meet Putin in Moscow to discuss Russia-Ukraine war",
+    "link": "https://www.aljazeera.com/news/2026/11/12/us-envoys-arrive-in-moscow-for-russia-ukraine-talks-with-putin?traffic_source=rss",
+    "date": "2026-11-12T09:01:24.000Z",
+    "summary": "The meeting with Kushner and Witkoff comes after two days of trilateral talks in the UAE yielded no breakthrough.",
+    "source": "Al Jazeera",
+    "regions": [
+     "USA",
+     "Rosja/Ukraina"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Amerykańska łapa na wenezuelskiej kasie. Ponad 12 miliardów z ropy pod kluczem",
+    "link": "https://www.bankier.pl/wiadomosc/Amerykanska-lapa-na-wenezuelskiej-kasie-Ponad-12-miliardow-z-ropy-pod-kluczem-9227604.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-12T07:51:00.000Z",
+    "summary": "Tylko w pierwszych dziewięciu miesiącach tego roku rząd USA zarządzał kwotą ponad 12 mld dolarów pochodzącą z eksportu wenezuelskich surowców. Z poufnego raportu KPMG, do którego dotarł „The New York Times”, wynika, że choć Waszyngton formalnie pełni jedynie funkcję „powiernika”, to amerykańscy urzę",
+    "source": "Bankier.pl",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Grudniowa podwyżka stóp Fedu już pewna",
+    "link": "https://www.parkiet.com/gospodarka-swiatowa/art45476681-grudniowa-podwyzka-stop-fedu-juz-pewna",
+    "date": "2026-11-12T05:00:00.000Z",
+    "summary": "Inwestorzy od dawna oczekiwali, że Fed podniesie stopy procentowe na ostatnim posiedzeniu przed końcem roku. Po danych o inflacji konsumenckiej za październik są już tego pewni.",
+    "source": "Parkiet",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
      "Inflacja i recesja"
     ],
     "relevant": true,
@@ -1001,55 +1018,6 @@
     "score": 7
    },
    {
-    "title": "Przed sesją na Wall Street: rynek czeka na dane o inflacji, Fed studzi nadzieje na obniżki stóp, a branża AI traci impet",
-    "link": "https://www.pb.pl/przed-sesja-na-wall-street-rynek-czeka-na-dane-o-inflacji-fed-studzi-nadzieje-na-obnizki-stop-a-branza-ai-traci-impet-1270223",
-    "date": "2026-11-10T13:33:32.000Z",
-    "summary": "Wtorkowa sesja na Wall Street rozpocznie się w cieniu oczekiwań na październikowy raport o inflacji CPI i nowych sygnałów z Rezerwy Federalnej. Choć poniedziałkowe odbicie głównych indeksów przywróciło część optymizmu, inwestorzy ponownie muszą uwzględnić ryzyko utrzymania restrykcyjnej polityki pie",
-    "source": "Puls Biznesu",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Banki centralne i stopy",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Import ropy do Chin wzrósł w październiku. Dostawy z Zatoki Perskiej odbudowują się",
-    "link": "https://www.pb.pl/import-ropy-do-chin-wzrosl-w-pazdzierniku-dostawy-z-zatoki-perskiej-odbudowuja-sie-1270221",
-    "date": "2026-11-10T13:01:00.000Z",
-    "summary": "Chiński import ropy naftowej wzrósł w październiku do blisko 42 mln ton, osiągając najwyższy poziom od 7 miesięcy. Odbicie było związane przede wszystkim z większymi dostawami z Zatoki Perskiej, w tym z Iraku. Zakupy pozostają jednak wyraźnie niższe niż przed rokiem, ponieważ skutki wojny z Iranem n",
-    "source": "Puls Biznesu",
-    "regions": [
-     "Azja",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Lane: EBC ostrożnie szykuje się ewentualnej podwyżki stóp procentowych. Decyzja nie jest przesądzona",
-    "link": "https://www.pb.pl/lane-ebc-ostroznie-szykuje-sie-ewentualnej-podwyzki-stop-procentowych-decyzja-nie-jest-przesadzona-1270212",
-    "date": "2026-11-10T12:15:52.000Z",
-    "summary": "Europejski Bank Centralny może ponownie podnieść stopy procentowe w grudniu, jeśli napływające dane nie zmienią obecnego obrazu gospodarki i inflacji. Główny ekonomista EBC Philip Lane ocenia, że takie działanie byłoby uzasadnione, ale decyzje banku w 2027 r. będą zależeć od szerszego zestawu wskaźn",
-    "source": "Puls Biznesu",
-    "regions": [
-     "Europa"
-    ],
-    "themes": [
-     "Banki centralne i stopy",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
     "title": "Manus on Markets: Pressure eases after Trump’s comments on Iran war - www.thenationalnews.com",
     "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNVVFtU0lLOE9mT1dBTnY5UGpiemhhUWxMVGtob3d2ZThYcU4ybXFHbjIyZDVOOGxXOWs4ZVFod0tRbjR1MTgyWVNOUXE3cC1sSk92QTIzQlQ0SWxDd3l5MUhtOFVDLU91VWplLW9WVkRicTVteFJETmd1b2VkVllsUW5vRG1KSlJucTlFMV9RUkpieTZ4QkZIMTcxRkd2QkZ2QUV4ekhvZUlzaG53bDUtUTBqVjBDeGpjVnZSNVVraFQ1UElY?oc=5",
     "date": "2026-11-10T08:08:04.000Z",
@@ -1083,6 +1051,82 @@
     "score": 7
    },
    {
+    "title": "Nvidia’s Jensen Huang crisis tests how much of the AI industry depends on one man",
+    "link": "https://www.marketwatch.com/story/nvidias-jensen-huang-dilemma-is-a-test-of-the-ai-industrys-dependence-on-one-flawed-man-a9a1d99c?mod=mw_rss_topstories",
+    "date": "2026-11-12T12:29:00.000Z",
+    "summary": "Huang’s exit could fray tight bonds among AI businesses. Plus, Oracle’s potential AI catalyst, a $1.5 trillion Social Security stock proposal and what the oil-yield split may mean for inflation.",
+    "source": "MarketWatch",
+    "regions": [],
+    "themes": [
+     "Energia i surowce",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Kable, energia i miedź. Na boomie AI mogą zarobić nie tylko technologiczni giganci",
+    "link": "https://www.bankier.pl/wiadomosc/Kable-energia-i-miedz-Na-boomie-AI-moga-zarobic-nie-tylko-technologiczni-giganci-9227825.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Gielda",
+    "date": "2026-11-12T12:28:00.000Z",
+    "summary": "Ostatnia przecena akcji spółek z sektora technologicznego może być okazją do tego, by podejść do tego sektora selektywnie i postawić na spółki o dobrych fundamentach - uważa Tomasz Matras, dyrektor Biura Rynku Akcji TFI PZU. Jego zdaniem, amerykańskiej giełdzie nie grozi bessa lub głębsza korekta, p",
+    "source": "Bankier.pl Giełda",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Energia i surowce",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "AM Markets Need to Know: Nvidia CEO faces pressure, EU delays EV tariffs, and more (SP500:) - Seeking Alpha",
+    "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxORDJUamJ4c2Z4SmJFM1IyMVM3TnhPdTdzbF9jU2FvSnl1ZlJEbnFQNWw1TUxEbTI5U1UwUE9hbVZBT19WLWs2c21oT0k4eEl5QUNnR1NrbFU0VlNYSWxfd1lqOFJfUS1sVERQYjBRaElXZUw2TW9tMHBjRUoyRnZKYjNLeVl5RXQ5dFlTYUE1NEZTalBRRnNLdXpKNzcxTnpkLWU5QmktMTA5NFhGdDYyaUN0ck5uNU1M?oc=5",
+    "date": "2026-11-12T11:15:00.000Z",
+    "summary": "AM Markets Need to Know: Nvidia CEO faces pressure, EU delays EV tariffs, and more (SP500:) Seeking Alpha",
+    "source": "Google News",
+    "regions": [
+     "Europa"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Spółka stowarzyszona Boryszewa ma koncesję m.in. na wytwarzanie i obrót określonymi rodzajami amunicji",
+    "link": "https://www.bankier.pl/wiadomosc/Spolka-stowarzyszona-Boryszewa-ma-koncesje-m-in-na-wytwarzanie-i-obrot-okreslonymi-rodzajami-amunicji-9227724.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Gielda",
+    "date": "2026-11-12T10:30:00.000Z",
+    "summary": "Spółka Hornet - Polskie Drony, w której Boryszew posiada 48 proc. udziałów, otrzymała koncesję na wykonywanie działalności gospodarczej w zakresie wytwarzania i obrotu wybranymi rodzajami amunicji, wyrobami oraz technologiami o przeznaczeniu wojskowym lub policyjnym - podał Boryszew w komunikacie.",
+    "source": "Bankier.pl Giełda",
+    "regions": [
+     "Polska"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Dzień niepodległości nie służył polskiej walucie. Euro i dolar podrożały w narodowe święto",
+    "link": "https://www.bankier.pl/wiadomosc/Dzien-niepodleglosci-nie-sluzyl-polskiej-walucie-Euro-i-dolar-podrozaly-w-narodowe-swieto-9227695.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-12T09:50:00.000Z",
+    "summary": "Czwartkowy handel na krajowym rynku walutowym przynosi próbę ustabilizowania notowań złotego po osłabieniu z poprzednich dwóch dni. Głównym czynnikiem determinującym nastroje pozostaje globalna siła dolara napędzana wysokim odczytem inflacji CPI w USA oraz jastrzębią retoryką Rezerwy Federalnej.",
+    "source": "Bankier.pl",
+    "regions": [
+     "USA",
+     "Polska"
+    ],
+    "themes": [
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
     "title": "Dolar na 19-miesięcznym szczycie. Rośnie presja na Fed i jena",
     "link": "https://www.pb.pl/dolar-na-19-miesiecznym-szczycie-rosnie-presja-na-fed-i-jena-1270279",
     "date": "2026-11-12T06:53:55.000Z",
@@ -1097,72 +1141,26 @@
     ],
     "relevant": true,
     "score": 6
-   },
-   {
-    "title": "Ceny ropy najniżej od dwóch miesięcy. Arabia Saudyjska zwiększyła wydobycie o 26 proc.",
-    "link": "https://www.bankier.pl/wiadomosc/Ceny-ropy-najnizej-od-dwoch-miesiecy-Arabia-Saudyjska-zwiekszyla-wydobycie-o-26-proc-9227572.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-12T06:51:00.000Z",
-    "summary": "Ceny ropy na rynkach spadają w czwartek rano, a notowania surowca są na najniższych poziomach od 2 miesięcy. Pozytywną informacją jest to, że produkcja ropy na Bliskim Wschodzie rośnie, a do tego jest względne uspokojenie działań wojennych pomiędzy USA a Iranem - podają maklerzy.",
-    "source": "Bankier.pl",
-    "regions": [
-     "USA",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Indian Stock Markets Open Marginally Lower Amid FII DII Tug of War - Asianet Newsable",
-    "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNR3dJcjIxR3h1bnIyOHJYc2k4ZTJZMm1UbGZyUVZtdHpGM3ZzbEdYNVJ5Qm9DSkNxclpsM18xdjRFREdhbG9qMzJEa3FfX3FLbzdwT2hSWmlyNy1FNFpXVU1MRHd5QS1Fc0JXeVdDbHpfRFNsZndSYW9sRkhnRGFWM3JUajY1Yl90bDdLOVN4Y0VoWlYxUVZrZEdub2RfWEk1dWVrQ2x5bXBiSFFwNHhPZ3pndnZGSXh2SEFlWWVLNGwtOUxuTVB30gHMAUFVX3lxTE04ZGpNNFJGRWZaZ2hETTlway1KNE8zWDBtdGJqX2pMMDBQUzh0TmlBcmJKSE9PVkVSbDNhbVY4YU5FT0k2blJzendIeW1TbzVNNURtWjFwRzZpYWlBaVo3a0dHcGFRT0dfTlZvZl8yRUtMUzNTWGVZblJZLUhJN20yNEVPY3NFaTlxajJ4YXBWWlZiQlBsVU52VTI3UnM5QUFaT0FmclpiTUozYU83blNwT3JZYmZ0ZS12VkJCVjl6dURONVJwNFJ3WWpXbg?oc=5",
-    "date": "2026-11-12T04:10:47.000Z",
-    "summary": "Indian Stock Markets Open Marginally Lower Amid FII DII Tug of War Asianet Newsable",
-    "source": "Google News",
-    "regions": [
-     "Azja"
-    ],
-    "themes": [
-     "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Canada’s ambassador warns Trump tariffs are driving up costs, threatening U.S. investment",
-    "link": "https://www.cnbc.com/2026/11/11/canada-ambassador-trump-tariffs-investments.html",
-    "date": "2026-11-11T22:30:57.000Z",
-    "summary": "U.S.-Canada trade tensions persist as Trump's tariffs drive up costs, threaten investment and complicate negotiations between the two countries.",
-    "source": "CNBC",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Sankcje i cła"
-    ],
-    "relevant": true,
-    "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 12,
+   "Konflikty i wojny": 15,
    "Sankcje i cła": 5,
-   "Banki centralne i stopy": 10,
+   "Banki centralne i stopy": 9,
    "Wybory i polityka": 23,
-   "Energia i surowce": 19,
-   "Inflacja i recesja": 13,
+   "Energia i surowce": 17,
+   "Inflacja i recesja": 14,
    "Nastroje na giełdach": 7,
-   "Spółki i wyniki": 4
+   "Spółki i wyniki": 5
   },
   "regionCounts": {
-   "USA": 30,
-   "Europa": 7,
-   "Azja": 8,
+   "USA": 27,
+   "Europa": 6,
+   "Azja": 7,
    "Rynki wschodzące": 0,
-   "Polska": 6,
-   "Bliski Wschód": 8,
-   "Rosja/Ukraina": 3
+   "Polska": 10,
+   "Bliski Wschód": 5,
+   "Rosja/Ukraina": 5
   },
   "errors": []
  },
@@ -1306,10 +1304,10 @@
      "score": 7
     },
     {
-     "title": "Ile wyniesie limit wpłat na IKE w 2027 r.? - INFOR.PL",
-     "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQaXR4VEdWZ3pZWTFvRzNkQWNsdVFFaS1PRjBEQWlLclc1d1VJWXZoQ09kM1dfVThPSWY5OFpsdkswYzQ1eFZjdXZRbW4xZHJrUG1pRm1RMmIyZF9pUjZKZTVNLWhhc3k2R2RRV2hHM0JpcU5pa1l2WE9Xb05fQ3I1MDZIazVhVnFUdXNLYXAyWGl2bkRmY3BjMmJSczAzZ3A3RXhuM0dR?oc=5",
-     "date": "2026-11-11T17:54:00.000Z",
-     "summary": "Ile wyniesie limit wpłat na IKE w 2027 r.? INFOR.PL",
+     "title": "Więcej pieniędzy bez podatku. Znamy limity wpłat na IKE i IKZE w 2027 roku - Analizy.pl",
+     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOdEhnYU93TnVtTmlJTmhRY3ZwWFlsbk9tNi03c3BLbGgtRy1hd0Mtc2pENkFCU05oOURxdjJQUXpjRG90OG5iNGdCX19Oc0VaYVhXV3hyajJSSFNnOVdJc3lnV0s4WEpxcHliWU8tU3ljYlpLRml3bGZsd0cwTEtxVDJ6SlNyNTV6bnhZQ0ZUWFM1Y2JPVWlCakxacVM5VjBNalozZkN3dEFQZkJBM2JYeVBodw?oc=5",
+     "date": "2026-11-12T07:47:26.000Z",
+     "summary": "Więcej pieniędzy bez podatku. Znamy limity wpłat na IKE i IKZE w 2027 roku Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
       "IKE/IKZE"
@@ -1318,13 +1316,13 @@
      "score": 6
     },
     {
-     "title": "Więcej pieniędzy bez podatku. Znamy limity wpłat na IKE i IKZE w 2027 roku - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOdEhnYU93TnVtTmlJTmhRY3ZwWFlsbk9tNi03c3BLbGgtRy1hd0Mtc2pENkFCU05oOURxdjJQUXpjRG90OG5iNGdCX19Oc0VaYVhXV3hyajJSSFNnOVdJc3lnV0s4WEpxcHliWU8tU3ljYlpLRml3bGZsd0cwTEtxVDJ6SlNyNTV6bnhZQ0ZUWFM1Y2JPVWlCakxacVM5VjBNalozZkN3dEFQZkJBM2JYeVBodw?oc=5",
-     "date": "2026-11-10T16:56:34.000Z",
-     "summary": "Więcej pieniędzy bez podatku. Znamy limity wpłat na IKE i IKZE w 2027 roku Analizy.pl",
+     "title": "Podatek na OKI – jak działa? Limity 100 tys. i 25 tys. zł, stawka i przykłady - Analizy.pl",
+     "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNa0ZiSkhhbGhnMF80QzAzVEdzSEdtV2VGUjUyUkpudEo4Rk9mSGxWT3dlOURCZHdZTVFvRnA1NjgwbDFoY3JyQnpYUl9RNFozdnVMbVM3OGIwZ05UV0pUR1FhbU5WOFdMVXAydXFqMUxCSWVyYWpzNDJMYzNFWWl3QWhHV3pQN1NaTE9jc0xR?oc=5",
+     "date": "2026-11-12T07:00:50.000Z",
+     "summary": "Podatek na OKI – jak działa? Limity 100 tys. i 25 tys. zł, stawka i przykłady Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
-      "IKE/IKZE"
+      "OKI"
      ],
      "important": true,
      "score": 6
@@ -1436,13 +1434,13 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-12T07:25:50.994Z",
+  "generatedAt": "2026-11-12T13:07:14.979Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
  },
  "rynek": {
-  "asOf": "2026-11-11",
+  "asOf": "2026-11-12",
   "world": [
    {
     "key": "SPX",
@@ -1830,13 +1828,13 @@
     "kind": "fx",
     "src": "nbp",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 4.3895,
-    "d1": 0.000501,
-    "w1": -0.007641,
-    "m1": 0.002741,
-    "ytd": 0.038517,
-    "y1": 0.036457,
+    "date": "2026-11-12",
+    "last": 4.4018,
+    "d1": 0.002802,
+    "w1": 0.002323,
+    "m1": 0.00484,
+    "ytd": 0.041427,
+    "y1": 0.04032,
     "high52": 4.4233,
     "low52": 4.2009,
     "fromHigh": null,
@@ -1851,14 +1849,14 @@
     "kind": "fx",
     "src": "nbp",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 3.9099,
-    "d1": -0.002551,
-    "w1": -0.010803,
-    "m1": 0.001973,
-    "ytd": 0.085601,
-    "y1": 0.067987,
-    "high52": 3.9624,
+    "date": "2026-11-12",
+    "last": 3.9676,
+    "d1": 0.014757,
+    "w1": 0.014706,
+    "m1": 0.012737,
+    "ytd": 0.101622,
+    "y1": 0.084933,
+    "high52": 3.9676,
     "low52": 3.5045,
     "fromHigh": null,
     "trend": null,
@@ -2041,15 +2039,15 @@
    "summary": [
     "Akcje w ostatnim tygodniu: S&P 500 −0,6%, Europa −0,7%, rynki wschodzące +0,7%, WIG20 +0,7% (S&P 500 od początku roku +9,9%).",
     "Rentowność 10-letnich obligacji USA 4,88% (−0,03 pp w tydzień), złoto −2,0%, ropa Brent 107,0 USD (−13,1%).",
-    "Złoty: EUR/PLN 4,3895 (−0,8% w tydzień), USD/PLN 3,9099 (−1,1% w tydzień)."
+    "Złoty: EUR/PLN 4,4018 (+0,2% w tydzień), USD/PLN 3,9676 (+1,5% w tydzień)."
    ],
    "sections": [
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (23 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych.",
-      "Energia i surowce (19 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Ropa Brent już poniżej 90 USD. Rosną szanse na brak podwyżki stóp w Polsce. Obligacje drożeją” (Puls Biznesu).",
-      "Inflacja i recesja (13 wiadomości): wyższa inflacja oddala obniżki stóp, a słabsze dane o wzroście zwiększają ryzyko spadku zysków firm, choć mogą przyspieszyć obniżki stóp. Przykład: „Grudniowa podwyżka stóp Fedu już pewna” (Parkiet)."
+      "Wybory i polityka (23 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Rumunia licytuje w ślad za Polską. Zaoferowała 15 tys. dolarów za żołnierza USA” (Bankier.pl).",
+      "Energia i surowce (17 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl).",
+      "Konflikty i wojny (15 wiadomości): napięcia geopolityczne zwykle zwiększają awersję do ryzyka: zyskują złoto, dolar i obligacje skarbowe, a gdy konflikt dotyczy regionów wydobycia – ropa; tracą akcje, zwłaszcza Europy i rynków wschodzących. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl)."
      ]
     },
     {
