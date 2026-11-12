@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-12T13:07:14.979Z",
+  "generatedAt": "2026-11-12T14:07:36.895Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -770,8 +770,8 @@
    {
     "id": "BAMLH0A0HYM2",
     "name": "Spread obligacji śmieciowych (USA)",
-    "date": "2026-11-09",
-    "value": "3,34 pp",
+    "date": "2026-11-11",
+    "value": "3,30 pp",
     "tier": 0,
     "comment": "niski stres kredytowy"
    },
@@ -786,8 +786,8 @@
    {
     "id": "USEPUINDXD",
     "name": "Niepewność polityki gospodarczej USA (EPU)",
-    "date": "2026-11-10",
-    "value": "297",
+    "date": "2026-11-11",
+    "value": "295",
     "tier": 1,
     "comment": "podwyższona (percentyl 76 z 5 lat, średnia 30 dni)"
    },
@@ -818,7 +818,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 399,
+  "fetched": 397,
   "items": [
    {
     "title": "Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji",
@@ -837,6 +837,40 @@
     ],
     "relevant": true,
     "score": 12
+   },
+   {
+    "title": "Oil prices jump after Trump says no Iran deal needed: 'We've got their Strait'",
+    "link": "https://www.cnbc.com/2026/11/12/oil-prices-jump-after-trump-says-no-iran-deal-needed-weve-got-their-strait.html",
+    "date": "2026-11-12T13:49:46.000Z",
+    "summary": "Oil prices popped Thursday, after the latest comments from President Donald Trump raised worries that an end to the U.S.-Iran war was not in sight.",
+    "source": "CNBC",
+    "regions": [
+     "USA",
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
+    "title": "Kurs złota. Niekorzystne sygnały analizy techincznej",
+    "link": "https://www.parkiet.com/inwestycje/art45479821-zloto-kurs-prognozy-krotki-termin",
+    "date": "2026-11-12T13:42:01.000Z",
+    "summary": "Złoto utrzymuje się na względnie stabilnym poziomie pomimo oczekiwań na dalsze podwyżki stóp procentowych przez Fed. Inwestorzy coraz większą uwagę zwracają na możliwość spadku inflacji w następstwie niedawnego gwałtownego obniżenia cen energii.",
+    "source": "Parkiet",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
+     "Energia i surowce",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 9
    },
    {
     "title": "Rumunia licytuje w ślad za Polską. Zaoferowała 15 tys. dolarów za żołnierza USA",
@@ -889,17 +923,17 @@
     "score": 8
    },
    {
-    "title": "Jensen Huang affair in DC: Resignation calls and moves to tighten Nvidia China exports",
-    "link": "https://www.cnbc.com/2026/11/11/nvidia-jensen-huang-congress-resign-ai-chips.html",
-    "date": "2026-11-12T12:03:39.000Z",
-    "summary": "Huang was notably opposed to strict export controls on AI chips to China, which ruffled feathers with congressional China hawks.",
+    "title": "10-year Treasury yield jumps back above 5% as oil gains, more Fed hikes expected",
+    "link": "https://www.cnbc.com/2026/11/12/us-treasurys-bonds-yields.html",
+    "date": "2026-11-12T14:07:29.000Z",
+    "summary": "Treasury yields rose as bond markets reopened following Veterans Day.",
     "source": "CNBC",
     "regions": [
-     "USA",
-     "Azja"
+     "USA"
     ],
     "themes": [
-     "Sankcje i cła"
+     "Banki centralne i stopy",
+     "Energia i surowce"
     ],
     "relevant": true,
     "score": 7
@@ -1051,6 +1085,21 @@
     "score": 7
    },
    {
+    "title": "Canada’s ambassador warns Trump tariffs are driving up costs, threatening U.S. investment",
+    "link": "https://www.cnbc.com/2026/11/11/canada-ambassador-trump-tariffs-investments.html",
+    "date": "2026-11-12T13:59:30.000Z",
+    "summary": "U.S.-Canada trade tensions persist as Trump's tariffs drive up costs, threaten investment and complicate negotiations between the two countries.",
+    "source": "CNBC",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
     "title": "Nvidia’s Jensen Huang crisis tests how much of the AI industry depends on one man",
     "link": "https://www.marketwatch.com/story/nvidias-jensen-huang-dilemma-is-a-test-of-the-ai-industrys-dependence-on-one-flawed-man-a9a1d99c?mod=mw_rss_topstories",
     "date": "2026-11-12T12:29:00.000Z",
@@ -1094,73 +1143,26 @@
     ],
     "relevant": true,
     "score": 6
-   },
-   {
-    "title": "Spółka stowarzyszona Boryszewa ma koncesję m.in. na wytwarzanie i obrót określonymi rodzajami amunicji",
-    "link": "https://www.bankier.pl/wiadomosc/Spolka-stowarzyszona-Boryszewa-ma-koncesje-m-in-na-wytwarzanie-i-obrot-okreslonymi-rodzajami-amunicji-9227724.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Gielda",
-    "date": "2026-11-12T10:30:00.000Z",
-    "summary": "Spółka Hornet - Polskie Drony, w której Boryszew posiada 48 proc. udziałów, otrzymała koncesję na wykonywanie działalności gospodarczej w zakresie wytwarzania i obrotu wybranymi rodzajami amunicji, wyrobami oraz technologiami o przeznaczeniu wojskowym lub policyjnym - podał Boryszew w komunikacie.",
-    "source": "Bankier.pl Giełda",
-    "regions": [
-     "Polska"
-    ],
-    "themes": [
-     "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Dzień niepodległości nie służył polskiej walucie. Euro i dolar podrożały w narodowe święto",
-    "link": "https://www.bankier.pl/wiadomosc/Dzien-niepodleglosci-nie-sluzyl-polskiej-walucie-Euro-i-dolar-podrozaly-w-narodowe-swieto-9227695.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-12T09:50:00.000Z",
-    "summary": "Czwartkowy handel na krajowym rynku walutowym przynosi próbę ustabilizowania notowań złotego po osłabieniu z poprzednich dwóch dni. Głównym czynnikiem determinującym nastroje pozostaje globalna siła dolara napędzana wysokim odczytem inflacji CPI w USA oraz jastrzębią retoryką Rezerwy Federalnej.",
-    "source": "Bankier.pl",
-    "regions": [
-     "USA",
-     "Polska"
-    ],
-    "themes": [
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 6
-   },
-   {
-    "title": "Dolar na 19-miesięcznym szczycie. Rośnie presja na Fed i jena",
-    "link": "https://www.pb.pl/dolar-na-19-miesiecznym-szczycie-rosnie-presja-na-fed-i-jena-1270279",
-    "date": "2026-11-12T06:53:55.000Z",
-    "summary": "Dolar umacnia się w oczekiwaniu na kolejne podwyżki stóp procentowych przez Rezerwę Federalną (Fed). Amerykańska waluta osiągnęła najwyższy poziom od 19 miesięcy, a kurs USD/JPY zbliżył się do granicy 160 jenów. Różnice w polityce pieniężnej USA i Japonii zwiększają presję na japońską walutę.",
-    "source": "Puls Biznesu",
-    "regions": [
-     "USA",
-     "Azja"
-    ],
-    "themes": [
-     "Banki centralne i stopy"
-    ],
-    "relevant": true,
-    "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 15,
-   "Sankcje i cła": 5,
-   "Banki centralne i stopy": 9,
-   "Wybory i polityka": 23,
-   "Energia i surowce": 17,
+   "Konflikty i wojny": 16,
+   "Sankcje i cła": 3,
+   "Banki centralne i stopy": 11,
+   "Wybory i polityka": 24,
+   "Energia i surowce": 20,
    "Inflacja i recesja": 14,
-   "Nastroje na giełdach": 7,
+   "Nastroje na giełdach": 8,
    "Spółki i wyniki": 5
   },
   "regionCounts": {
    "USA": 27,
-   "Europa": 6,
+   "Europa": 4,
    "Azja": 7,
-   "Rynki wschodzące": 0,
+   "Rynki wschodzące": 1,
    "Polska": 10,
-   "Bliski Wschód": 5,
-   "Rosja/Ukraina": 5
+   "Bliski Wschód": 6,
+   "Rosja/Ukraina": 4
   },
   "errors": []
  },
@@ -1434,7 +1436,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-12T13:07:14.979Z",
+  "generatedAt": "2026-11-12T14:07:36.895Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -1450,16 +1452,16 @@
     "kind": "index",
     "src": "fred",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 7520.93,
-    "d1": -0.003842,
-    "w1": -0.00634,
-    "m1": -0.037203,
-    "ytd": 0.098668,
-    "y1": 0.100769,
+    "date": "2026-11-11",
+    "last": 7619.38,
+    "d1": 0.01309,
+    "w1": -0.009006,
+    "m1": -0.024062,
+    "ytd": 0.113049,
+    "y1": 0.112869,
     "high52": 7818.93,
     "low52": 6343.72,
-    "fromHigh": -0.038113,
+    "fromHigh": -0.025521,
     "trend": "up",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1904,7 +1906,7 @@
     {
      "label": "Obsunięcie S&P 500",
      "score": 1,
-     "detail": "−3,8% od szczytu z 52 tygodni"
+     "detail": "−2,6% od szczytu z 52 tygodni"
     },
     {
      "label": "Zmienność (VIX)",
@@ -1914,7 +1916,7 @@
     {
      "label": "Stres kredytowy",
      "score": 0,
-     "detail": "3,34 pp – niski stres kredytowy"
+     "detail": "3,30 pp – niski stres kredytowy"
     },
     {
      "label": "Niepewność polityczna USA",
@@ -2037,7 +2039,7 @@
     "tone": "pos"
    },
    "summary": [
-    "Akcje w ostatnim tygodniu: S&P 500 −0,6%, Europa −0,7%, rynki wschodzące +0,7%, WIG20 +0,7% (S&P 500 od początku roku +9,9%).",
+    "Akcje w ostatnim tygodniu: S&P 500 −0,9%, Europa −0,7%, rynki wschodzące +0,7%, WIG20 +0,7% (S&P 500 od początku roku +11,3%).",
     "Rentowność 10-letnich obligacji USA 4,88% (−0,03 pp w tydzień), złoto −2,0%, ropa Brent 107,0 USD (−13,1%).",
     "Złoty: EUR/PLN 4,4018 (+0,2% w tydzień), USD/PLN 3,9676 (+1,5% w tydzień)."
    ],
@@ -2045,9 +2047,9 @@
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (23 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Rumunia licytuje w ślad za Polską. Zaoferowała 15 tys. dolarów za żołnierza USA” (Bankier.pl).",
-      "Energia i surowce (17 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl).",
-      "Konflikty i wojny (15 wiadomości): napięcia geopolityczne zwykle zwiększają awersję do ryzyka: zyskują złoto, dolar i obligacje skarbowe, a gdy konflikt dotyczy regionów wydobycia – ropa; tracą akcje, zwłaszcza Europy i rynków wschodzących. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl)."
+      "Wybory i polityka (24 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Rumunia licytuje w ślad za Polską. Zaoferowała 15 tys. dolarów za żołnierza USA” (Bankier.pl).",
+      "Energia i surowce (20 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl).",
+      "Konflikty i wojny (16 wiadomości): napięcia geopolityczne zwykle zwiększają awersję do ryzyka: zyskują złoto, dolar i obligacje skarbowe, a gdy konflikt dotyczy regionów wydobycia – ropa; tracą akcje, zwłaszcza Europy i rynków wschodzących. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl)."
      ]
     },
     {
