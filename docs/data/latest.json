@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-12T14:11:22.231Z",
+  "generatedAt": "2026-11-12T14:13:57.568Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -818,7 +818,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 397,
+  "fetched": 395,
   "items": [
    {
     "title": "Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji",
@@ -1149,17 +1149,17 @@
    "Konflikty i wojny": 16,
    "Sankcje i cła": 3,
    "Banki centralne i stopy": 11,
-   "Wybory i polityka": 24,
+   "Wybory i polityka": 22,
    "Energia i surowce": 20,
    "Inflacja i recesja": 14,
-   "Nastroje na giełdach": 8,
+   "Nastroje na giełdach": 6,
    "Spółki i wyniki": 5
   },
   "regionCounts": {
    "USA": 27,
    "Europa": 4,
-   "Azja": 7,
-   "Rynki wschodzące": 1,
+   "Azja": 5,
+   "Rynki wschodzące": 0,
    "Polska": 10,
    "Bliski Wschód": 6,
    "Rosja/Ukraina": 4
@@ -1436,7 +1436,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-12T14:11:22.231Z",
+  "generatedAt": "2026-11-12T14:13:57.568Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -2047,7 +2047,7 @@
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (24 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Rumunia licytuje w ślad za Polską. Zaoferowała 15 tys. dolarów za żołnierza USA” (Bankier.pl).",
+      "Wybory i polityka (22 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Rumunia licytuje w ślad za Polską. Zaoferowała 15 tys. dolarów za żołnierza USA” (Bankier.pl).",
       "Energia i surowce (20 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl).",
       "Konflikty i wojny (16 wiadomości): napięcia geopolityczne zwykle zwiększają awersję do ryzyka: zyskują złoto, dolar i obligacje skarbowe, a gdy konflikt dotyczy regionów wydobycia – ropa; tracą akcje, zwłaszcza Europy i rynków wschodzących. Przykład: „Rosyjska ropa bije wieloletnie rekordy cenowe mimo zachodnich sankcji” (Bankier.pl)."
      ]
