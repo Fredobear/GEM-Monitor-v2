@@ -4,10 +4,10 @@ Zakładka **Finanse** to osobna strona aplikacji (`finanse.html`) do śledzenia 
 
 | Zakładka | Co tam jest |
 |---|---|
-| **Przegląd** | majątek, wydatki i przychody za dzień, tydzień, miesiąc, rok albo dowolny okres, wykres kategorii, duże przyciski **− Wydatek** i **+ Przychód**, raporty |
-| **Kalendarz** | miesiąc dzień po dniu: ile wydano każdego dnia; dotknięcie dnia pokazuje jego operacje |
-| **Operacje** | lista wszystkich operacji, wyszukiwanie i filtry, eksport do CSV |
-| **Konta** | wykres majątku i dochodów, konta w złotych i innych walutach, karty kredytowe (zadłużenie, limit, spłata), konta inwestycyjne z aktywami |
+| **Przegląd** | majątek netto, wydatki i przychody za dzień, tydzień, miesiąc, rok albo dowolny okres, wykres kategorii, duże przyciski **− Wydatek** i **+ Przychód**, raporty |
+| **Operacje** | lista wszystkich operacji z wyszukiwaniem i filtrami albo **kalendarz** (przełącznik Lista / Kalendarz), eksport do CSV |
+| **Majątek** | jak zmienia się majątek, skąd bierze się przyrost, ile odkładasz, z czego majątek się składa i **prognoza** na przyszłość |
+| **Konta** | konta pogrupowane według rodzaju (konta i gotówka, inwestycje, karty, kredyty) z sumami, karty kredytowe, konta inwestycyjne z aktywami |
 | **Stałe** | stałe dochody, płatności i przelewy (pensja, czynsz, rachunki, subskrypcje) |
 | **Więcej** | kategorie i reguły, import (Money Manager, wyciąg CSV), dokumenty (paski płacowe, paragony), Apple Pay, kopia zapasowa |
 
@@ -51,6 +51,8 @@ Saldo konta zmienia każda zapisana operacja, także dopisana z datą wsteczną.
 - Na górze pojawiają się przypomnienia: operacje bez kategorii, stałe pozycje do zatwierdzenia, zbliżający się termin spłaty karty.
 
 ## Kalendarz
+
+Kalendarz jest w zakładce **Operacje** – przełącznik **Lista / Kalendarz** na górze.
 
 - Każdy dzień miesiąca pokazuje kwotę wydatków. Im ciemniejsze pole, tym więcej wydane.
 - Zielona kropka oznacza przychód, a symbol ↻ zaplanowaną stałą pozycję.
@@ -161,7 +163,7 @@ Na liście kont pozycje tego samego instrumentu (np. kolejne zakupy w planie) po
 2. Wpisz **liczbę obligacji** (po 100 zł) i cenę: 100 zł przy zakupie albo 99,90 zł przy zamianie.
 3. Wybierz konto, na które mają się zapisywać **odsetki i kwota z wykupu** (np. konto w PKO), albo „Nie zapisuj w dzienniku”. Zaznacz **IKE/IKZE**, jeśli obligacje są na takim koncie (bez podatku Belki i bez opłaty przy wypłacie z IKE).
 
-Aplikacja liczy wartość według wzorów z list emisyjnych: od 2. roku COI, ROS, EDO i ROD mają inflację z GUS (ogłoszoną w miesiącu przed początkiem okresu, czyli za miesiąc o dwa wcześniejszy) + marżę, a ROR i DOR – stopę referencyjną NBP + marżę. EDO, ROS, ROD i TOS dopisują odsetki co rok, COI wypłaca je co rok, ROR i DOR – co miesiąc. Przy koncie widać: odsetki narosłe, oprocentowanie w bieżącym okresie, wypłacone odsetki, najbliższą wypłatę, datę wykupu i **ile dostaniesz na rękę przy wcześniejszym wykupie** (po opłacie i 19% podatku). Zysk pozycji obejmuje też odsetki już wypłacone.
+Aplikacja liczy wartość według wzorów z list emisyjnych: od 2. roku COI, ROS, EDO i ROD mają inflację z GUS (ogłoszoną w miesiącu przed początkiem okresu, czyli za miesiąc o dwa wcześniejszy) + marżę, a ROR i DOR – stopę referencyjną NBP + marżę. EDO, ROS, ROD i TOS dopisują odsetki co rok, COI wypłaca je co rok, ROR i DOR – co miesiąc. Przy koncie widać: odsetki narosłe, oprocentowanie w bieżącym okresie, wypłacone odsetki, najbliższą wypłatę, datę wykupu i **ile dostaniesz na rękę przy wcześniejszym wykupie** (po opłacie i 19% podatku). Zysk pozycji obejmuje też odsetki już wypłacone (po podatku – tyle wpłynęło na konto). Gdy usuniesz obligacje przed terminem wykupu z włączonym rozliczeniem z gotówką, do gotówki trafi kwota przedterminowego wykupu na rękę (po opłacie i podatku).
 
 **Wypłaty zapisują się same:** po terminie (przy otwarciu aplikacji) odsetki z COI, ROR i DOR trafiają na wybrane konto jako przychód w kategorii „Odsetki z obligacji” – po 19% podatku, z kwotą brutto i podatkiem w notatce. Przy wykupie zapisuje się też zwrot wartości nominalnej, a obligacje znikają z aktywów (ich wynik jest w zysku zrealizowanym). Zapisują się wypłaty od dnia dodania obligacji do aplikacji – wcześniejsze masz już na koncie w banku. Usunięta wypłata nie wraca.
 
@@ -199,15 +201,47 @@ Każda wpłata zapisuje się jako osobne pozycje z ceną zakupu z tego dnia (dok
 
 Ceny instrumentów spoza strategii strona wczytuje z plików aplikacji (`data/notowania.js`, wyceny funduszy – `data/fundusze.js`, złoto – `data/zloto.js`, kryptowaluty – `data/krypto.js`, dane obligacji – `data/obligacje.js`). To zwykłe pobranie gotowego pliku z tej samej strony – nic nie jest wysyłane, a blokada połączeń sieciowych (`connect-src 'none'`) działa jak dotąd.
 
-## Wykres majątku i dochodów
+## Majątek: wykres, struktura i prognoza
 
-Na górze zakładki **Konta**:
-- **linia** – majątek na koniec każdego miesiąca (ostatni punkt to dziś);
-- **słupki** – przychody (zielone) i wydatki (czerwone) w każdym miesiącu;
-- zakres: 6 miesięcy, rok, 3 lata albo całość;
-- pod wykresem: zmiana majątku, suma przychodów i ile z nich udało się odłożyć (przychody − wydatki).
+Zakładka **Majątek** odpowiada na pięć pytań.
 
-Majątek rośnie nie tylko z oszczędności, ale też ze wzrostu wartości inwestycji i z korekt salda (np. aktualizacji wyceny PPE). Wykres zaczyna się od pierwszej operacji w dzienniku.
+**1. Ile mam?** Na górze **majątek netto** (aktywa minus długi), zmiana w tym miesiącu i przez 12 miesięcy oraz trzy kafle: gotówka, inwestycje, długi. Ten sam kafel jest na Przeglądzie i w Kontach – dotknięcie otwiera zakładkę Majątek.
+
+**2. Jak się zmienia?** Wykres miesiąc po miesiącu (ostatni punkt to dziś), zakres: 6 miesięcy, rok, 3 lata albo całość. Dwa widoki:
+- **Majątek netto** – jedna linia;
+- **Aktywa i długi** – słupki: gotówka i inwestycje nad osią, długi pod osią, a na tym linia majątku netto.
+
+Dotknięcie wykresu pokazuje wartości z danego miesiąca, a „Pokaż liczby w tabeli” – te same dane w tabeli. Konto powiązane z portfelem GEM (np. IKE) ma w historii prawdziwą wartość portfela z końca każdego miesiąca – zapisuje ją zakładka GEM → Mój portfel GEM przy każdym otwarciu.
+
+**3. Skąd ta zmiana?** Zmiana majątku w wybranym zakresie rozłożona na części, które dają razem dokładnie tę zmianę:
+- **odłożone z dochodów** – przychody minus wydatki;
+- **wpłaty spoza budżetu** – np. składki pracodawcy do PPE (plan z wpłatą „spoza aplikacji”) i aktywa dopisane bez rozliczenia z gotówką;
+- **wynik inwestycji** – zmiana wartości kont inwestycyjnych, której nie tłumaczą wpłaty i wypłaty;
+- **pozostałe** – korekty sald i zmiany kursów walut na kontach walutowych.
+
+Spłata kapitału kredytu nie zmienia majątku (ubywa gotówki i długu jednocześnie); odsetki są w wydatkach.
+
+**4. Ile odkładam i z czego składa się majątek?**
+- **Ile odkładasz:** średnia z ostatnich pełnych miesięcy (do 12), stopa oszczędności (jaka część przychodów zostaje), wykres kwoty odłożonej w każdym miesiącu i **poduszka finansowa** – na ile miesięcy wydatków wystarczą pieniądze z kont, oszczędności i gotówki (zwykle zaleca się 3–6 miesięcy).
+- **Z czego składa się majątek:** aktywa według rodzaju (konta, oszczędności, akcje i ETF-y, portfel GEM, fundusze, obligacje skarbowe, złoto, kryptowaluty, inne) z udziałem procentowym oraz długi (kredyty, karty).
+
+Jeśli masz kredyt, a w aplikacji nie ma tego, co za niego kupiłeś (mieszkania, samochodu), majątek netto jest zaniżony. Możesz dopisać wartość: konto inwestycyjne (np. „Nieruchomości”) → Aktywa → **Inne aktywo (wycena ręczna)**.
+
+**5. Dokąd zmierzam? – prognoza.** Wykres pokazuje dotychczasowy majątek (linia ciągła), **wariant bazowy** (linia przerywana) i przedział od **ostrożnego** do **optymistycznego** (pasmo). Horyzont: 1 rok, 5, 10, 20 albo 30 lat. Pod wykresem tabela wariantów, kamienie milowe (spłata kredytów, wyjście na plus, kolejne okrągłe kwoty, niezależność finansowa) i podpowiedź, ile daje każde dodatkowe 100 zł odkładane co miesiąc.
+
+Prognoza opiera się na Twojej historii i nawykach:
+- **Co miesiąc odkładasz** – średnia z ostatnich pełnych miesięcy (przychody minus wydatki). Przy krótszej historii niż 3 miesiące aplikacja korzysta ze stałych pozycji (np. wynagrodzenie i rachunki) i planów inwestycyjnych.
+- **Z tego inwestujesz** – ile średnio co miesiąc przenosisz na konta inwestycyjne (przelewy, wpłaty do planów). Reszta zostaje w gotówce.
+- **Zysk z inwestycji** – wynika ze składu portfela: akcje, ETF-y i portfel GEM ok. 7% rocznie, fundusze 6%, obligacje indeksowane: inflacja + marża, obligacje zmiennoprocentowe: stopa NBP + marża, złoto: inflacja + 1,5 pkt proc., kryptowaluty 7% (z bardzo szerokim przedziałem). To założenia długoterminowe, a nie wynik z ostatnich miesięcy – krótka historia własnego portfela niczego nie przesądza.
+- **Kredyty** spłacają się według harmonogramów: dług maleje, odsetki z każdą ratą są mniejsze, a po spłacie co miesiąc zostaje więcej.
+- **Wpłaty spoza budżetu** (np. PPE od pracodawcy) są doliczane do inwestycji.
+- Odkładane kwoty rosną razem z **inflacją** (domyślnie 3% rocznie), czyli realnie się nie zmieniają. Domyślnie wynik jest pokazany **w dzisiejszych pieniądzach** – przełącznik pod wykresem.
+- Wariant ostrożny i optymistyczny: odkładana kwota mniejsza lub większa o 10–40% (im równiejsze miesiące i dłuższa historia, tym węższy przedział) i zysk z inwestycji niższy lub wyższy o kilka punktów procentowych (zależnie od składu portfela).
+- Prognoza nie zależy od dnia miesiąca: aplikacja dolicza to, co zwykle jeszcze wpływa i wypływa do końca bieżącego miesiąca (np. wypłatę pod koniec miesiąca).
+
+Każde założenie możesz zmienić w polach pod wykresem („Co miesiąc odkładasz”, „Z tego inwestujesz”, „Zysk z inwestycji”, „Inflacja”) i od razu zobaczyć wynik – np. co da odkładanie 500 zł więcej. „Przywróć założenia wyliczone z historii” wraca do wartości domyślnych. Uproszczenia: gotówka nie jest oprocentowana, podatki od przyszłych zysków nie są odliczane, a „niezależność finansowa” to popularna reguła 25-krotności rocznych wydatków.
+
+Prognoza to szacunek przy dzisiejszych nawykach, a nie obietnica ani porada inwestycyjna: zmiana pracy, duży wydatek albo bessa mogą ją znacząco zmienić.
 
 ## Korekta salda
 

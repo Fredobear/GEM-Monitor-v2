@@ -89,8 +89,11 @@ function publishGemSummary() {
     for (const acc of ACCOUNTS) {
       const own = live.filter((t) => t.account === acc);
       if (!own.length) continue;
-      const last = buildTimeline(state.txs, D.prices, { account: acc, today: DATA_DAY }).points.at(-1);
-      if (last) accounts[acc] = { value: r2(last.value), invested: r2(last.invested), date: last.date };
+      const points = buildTimeline(state.txs, D.prices, { account: acc, today: DATA_DAY }).points;
+      const last = points.at(-1);
+      // Wartość na koniec każdego miesiąca – do wykresu majątku w Finansach (bez niej historia pokazywałaby same wpłaty).
+      const history = points.filter((p, i) => i === points.length - 1 || points[i + 1].date.slice(0, 7) !== p.date.slice(0, 7)).map((p) => [p.date, r2(p.value)]);
+      if (last) accounts[acc] = { value: r2(last.value), invested: r2(last.invested), date: last.date, history: history.slice(-240) };
       else {
         const net = own.reduce((s, t) => s + (t.type === 'wplata' ? t.amountPLN || 0 : t.type === 'wyplata' ? -(t.amountPLN || 0) : 0), 0);
         accounts[acc] = { value: r2(net), invested: r2(net), date: DATA_DAY };

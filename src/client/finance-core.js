@@ -1,7 +1,7 @@
 // Rdzeń dziennika finansowego: konta, kategorie, transakcje, import (Apple Pay ze Skrótów, wyciągi CSV) i raporty.
 // Działa wyłącznie lokalnie – bez DOM, bez sieci. Plik jest wklejany do strony finanse.html i testowany w Node.
 // Wycena obligacji skarbowych (wzory z list emisyjnych) jest w assets.js – na stronie to ten sam skrypt.
-import { BOND_PREFIX, BOND_TAX, BOND_TYPES, bondEvents, bondLotPrice, bondMaturity, bondState, isBondLot } from './assets.js';
+import { BOND_PREFIX, BOND_TAX, BOND_TYPES, bondEvents, bondLotPrice, bondMaturity, bondRedeem, bondState, isBondLot, isCryptoLot, isGoldLot } from './assets.js';
 
 // Korekta salda: zmiana salda konta (saldo początkowe, wycena konta inwestycyjnego, wyrównanie do banku).
 // Kwota korekty ma znak (+/−) i nie liczy się do wydatków ani przychodów.
@@ -37,6 +37,11 @@ export const isCard = (a) => a?.type === 'karta';
 export const nextColor = (n) => PALETTE[n % PALETTE.length];
 export const liveTx = (fin) => fin.txs.filter((t) => !t.deleted);
 const pad = (n) => String(n).padStart(2, '0');
+/** Dzisiejsza data według zegara urządzenia (nie UTC – tuż po północy czasu polskiego to już nowy dzień). */
+export const localToday = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 // Porównania bez wielkości liter, emoji i polskich znaków (banki często je usuwają: „ŻABKA” → „ZABKA”).
 const norm = (s) =>
   String(s ?? '')
@@ -465,11 +470,13 @@ export function compareMonth(fin, month) {
   const last3 = summarize(fin, monthBounds(shiftMonth(month, -3)).from, monthBounds(shiftMonth(month, -1)).to);
   const ids = new Set([...cur.expenseByCategory, ...prev.expenseByCategory].map((c) => c.id));
   const find = (list, id) => list.find((c) => c.id === id)?.amount ?? 0;
+  // Średnia z poprzednich miesięcy, w których są dane (świeży dziennik ma ich mniej niż trzy).
+  const n3 = Math.max(1, last3.byMonth.length);
   const rows = [...ids].map((id) => {
     const c = cur.expenseByCategory.find((x) => x.id === id) ?? prev.expenseByCategory.find((x) => x.id === id);
-    return { id, name: c.name, emoji: c.emoji, color: c.color, current: find(cur.expenseByCategory, id), previous: find(prev.expenseByCategory, id), avg3: find(last3.expenseByCategory, id) / 3 };
+    return { id, name: c.name, emoji: c.emoji, color: c.color, current: find(cur.expenseByCategory, id), previous: find(prev.expenseByCategory, id), avg3: find(last3.expenseByCategory, id) / n3 };
   });
-  return { current: cur, previous: prev, rows: rows.sort((a, b) => b.current - a.current) };
+  return { current: cur, previous: prev, avgMonths: n3, rows: rows.sort((a, b) => b.current - a.current) };
 }
 
 // ---------- Karty kredytowe ----------
@@ -627,7 +634,7 @@ export function planDeposit(fin, accountId, planId, { date, amount, prices, from
     const amtAsset = convert(market, part.amount, accCur, cur, date);
     if (!(price > 0)) return { fin, error: `Brak ceny dla ${part.name || part.asset} – wpisz ją ręcznie.` };
     if (amtAsset === null) return { fin, error: `Brak kursu ${cur} z dnia wpłaty.` };
-    buys.push({ asset: part.asset, name: part.name, currency: cur, qty: Math.round((amtAsset / price) * 1e6) / 1e6, price: Math.round(price * 1e6) / 1e6, amount: part.amount });
+    buys.push({ asset: part.asset, name: part.name, currency: cur, qty: Math.round((amtAsset / price) * 1e8) / 1e8, price: Math.round(price * 1e6) / 1e6, amount: part.amount });
   }
   const lotIds = [];
   const newLots = buys.map((b) => {
@@ -683,11 +690,29 @@ export function advancePlan(fin, accountId, planId, now = Date.now()) {
   };
 }
 
+/**
+ * Cena, po której pozycja zamienia się w gotówkę. Obligacja skarbowa: kwota wykupu na rękę – po podatku od odsetek,
+ * a przed terminem także po opłacie za przedterminowy wykup. Pozostałe aktywa: bieżąca wycena.
+ */
+export function lotExitPrice(market, lot, date) {
+  if (isBondLot(lot) && lot.bond) {
+    const st = bondState(lot, date, market?.bonds);
+    if (st) return bondRedeem(lot, st).net;
+  }
+  return lotPrice(market, lot, date);
+}
+
 /** Zmiana wartości aktywów z kupna i sprzedaży (nowe i usunięte pozycje, zmiany ilości) – bez zmiany samej wyceny. */
 export function holdingsTradeDelta(market, oldLots, newLots, soldLots, date) {
+  const rate = (lot) => rateOn(market, lotCurrency(market, lot), date);
   const unit = (lot) => {
-    const r = rateOn(market, lotCurrency(market, lot), date);
+    const r = rate(lot);
     return r === null ? 0 : lotPrice(market, { ...lot, since: undefined, until: undefined }, date) * r;
+  };
+  // Sprzedaż: obligacje przed terminem dają kwotę przedterminowego wykupu (po opłacie i podatku).
+  const exit = (lot) => {
+    const r = rate(lot);
+    return r === null ? 0 : lotExitPrice(market, { ...lot, since: undefined, until: undefined }, date) * r;
   };
   let delta = 0;
   for (const l of newLots) {
@@ -695,7 +720,7 @@ export function holdingsTradeDelta(market, oldLots, newLots, soldLots, date) {
     if (!old) delta += l.qty * unit(l);
     else if (Math.abs(l.qty - old.qty) > 1e-9) delta += (l.qty - old.qty) * unit(l);
   }
-  for (const o of soldLots) delta -= o.qty * unit(o);
+  for (const o of soldLots) delta -= o.qty * exit(o);
   return delta;
 }
 
@@ -713,12 +738,13 @@ export const lotActive = (lot, date) => {
   return (lot.since && lot.since > lot.date ? lot.since : lot.date) <= date && !(end && date >= end);
 };
 
-// Odsetki już wypłacone z obligacji (COI, ROR, DOR) do dnia `date`, w złotych – część zysku z pozycji.
+// Odsetki już wypłacone z obligacji (COI, ROR, DOR) do dnia `date`, w złotych, po podatku 19% (na IKE/IKZE bez
+// podatku) – tyle faktycznie wpłynęło na konto; to część zysku z pozycji.
 export function lotIncome(market, lot, date) {
   if (!isBondLot(lot)) return 0;
   const end = lotEnd(lot);
   const st = bondState(lot, end && end < date ? end : date, market?.bonds);
-  return st ? st.paid * lot.qty : 0;
+  return st ? st.paid * lot.qty * (lot.bond?.ike ? 1 : 1 - BOND_TAX) : 0;
 }
 
 export function lotValuePLN(market, lot, date) {
@@ -785,7 +811,7 @@ export function investSummary(market, account, date, cur = 'PLN') {
       const { costIn } = lotCost(market, lot, cur);
       if (r === null || costIn === null) continue;
       const plnRate = crossRate(market, 'PLN', cur, end) ?? 0;
-      out.realized = (out.realized ?? 0) + lot.qty * lotPrice(market, lot, end) * r + lotIncome(market, lot, end) * plnRate - costIn;
+      out.realized = (out.realized ?? 0) + lot.qty * lotExitPrice(market, lot, end) * r + lotIncome(market, lot, end) * plnRate - costIn;
       continue;
     }
     if (!lotActive(lot, date)) continue;
@@ -808,7 +834,15 @@ export function investSummary(market, account, date, cur = 'PLN') {
 // Konto powiązane z portfelem GEM (gemValuation) ma wartość z wyceny portfela – saldo to wtedy suma przelewów (wpłaty netto).
 export function accountWorth(fin, account, market, date, balance = balances(fin, date)[account.id]) {
   const gem = account.gemValuation && account.gemAccount ? market?.gemValues?.[account.gemAccount] : null;
-  if (gem && Number.isFinite(gem.value) && date >= isoDays(gem.date, -7)) return { cash: balance, cashPLN: 0, investments: gem.value, total: gem.value, gem: true };
+  if (gem && Number.isFinite(gem.value)) {
+    if (date >= isoDays(gem.date, -7)) return { cash: balance, cashPLN: 0, investments: gem.value, total: gem.value, gem: true };
+    // Wcześniejsze daty: wartość portfela z historii, którą zapisuje zakładka GEM (koniec każdego miesiąca).
+    const h = gem.history;
+    if (h?.length && date >= h[0][0]) {
+      const v = pairAt(h, date)[1];
+      return { cash: balance, cashPLN: 0, investments: v, total: v, gem: true };
+    }
+  }
   const rate = rateOn(market, account.currency || 'PLN', date);
   const inv = account.lots?.length ? holdingsPLN(market, account, date) : 0;
   if (rate === null || inv === null) return null;
@@ -819,7 +853,7 @@ export function accountWorth(fin, account, market, date, balance = balances(fin,
 // Konta „nie wliczaj do salda łącznego” są pomijane, a konta bez kursu waluty trafiają do listy missing.
 export function netWorth(fin, market = null, date = null) {
   // Domyślnie wycena na dziś (jak na liście kont): najnowsze kursy i notowania, także z biblioteki instrumentów.
-  const at = date ?? new Date().toISOString().slice(0, 10);
+  const at = date ?? localToday();
   const bal = balances(fin, date ?? '9999-12-31');
   const out = { total: 0, assets: 0, debt: 0, cardDebt: 0, investments: 0, missing: [] };
   for (const a of fin.accounts) {
@@ -1037,7 +1071,7 @@ export function validateRecurring(r, fin) {
 }
 
 // Stałe pozycje w przeliczeniu na miesiąc i na złote (bez wstrzymanych i zakończonych) oraz najbliższe raty kredytów.
-export function recurringMonthly(fin, market = null, today = new Date().toISOString().slice(0, 10)) {
+export function recurringMonthly(fin, market = null, today = localToday()) {
   const out = { przychod: 0, wydatek: 0, przelew: 0, kredyty: 0 };
   for (const r of fin.recurring ?? []) {
     if (!r.nextDate || !recActive(r, r.nextDate)) continue;
@@ -1451,4 +1485,445 @@ export function rulePatternFor(merchant) {
 
 export function shortcutCategoriesText(fin) {
   return [...fin.categories.filter((c) => c.kind === 'wydatek' && !c.archived).map((c) => c.name), 'Pomiń'].join('\n');
+}
+
+// ---------- Majątek: historia, struktura, skąd przyrost i prognoza ----------
+// Zakładka „Majątek”: jak majątek zmieniał się miesiąc po miesiącu (gotówka, inwestycje, długi), z czego wziął się
+// przyrost (pieniądze odłożone z dochodów, wynik inwestycji), jak jest zbudowany i dokąd zmierza przy obecnych
+// nawykach. Prognoza to prosty, jawny model – nie obietnica: te same założenia widać i można je zmienić w aplikacji.
+const FUND_ASSET_PREFIX = 'INGTFI:';
+/** Konto inwestycyjne (albo inne konto z aktywami): jego wartość to wolna gotówka plus pozycje. */
+export const isInvAccount = (a) => !isLoan(a) && (a?.type === 'inwestycje' || (a?.lots?.length ?? 0) > 0);
+const inWorth = (a) => !a.archived && !a.excludeFromTotal;
+
+/** Majątek w dniu `date` z podziałem: gotówka (dodatnie salda), inwestycje i długi (kredyty, karty, debety). */
+export function wealthAt(fin, market, date, bal = balances(fin, date)) {
+  const out = { date, worth: 0, cash: 0, investments: 0, debt: 0, loanDebt: 0, cardDebt: 0, invTotal: 0, missing: [] };
+  for (const a of fin.accounts) {
+    if (!inWorth(a)) continue;
+    const w = accountWorth(fin, a, market, date, bal[a.id]);
+    if (!w) {
+      out.missing.push(a.name);
+      continue;
+    }
+    const owed = Math.max(0, -w.cashPLN);
+    out.cash += Math.max(0, w.cashPLN);
+    out.investments += w.investments;
+    out.debt += owed;
+    if (isLoan(a)) out.loanDebt += owed;
+    else if (isCard(a)) out.cardDebt += owed;
+    if (isInvAccount(a)) out.invTotal += w.total;
+  }
+  out.worth = out.cash + out.investments - out.debt;
+  return out;
+}
+
+/**
+ * Przepływy w każdym miesiącu (w złotych): przychody, wydatki, pieniądze przeniesione na konta inwestycyjne
+ * (invTransfers), przychody i wydatki zapisane na kontach inwestycyjnych (invFlows), wpłaty spoza budżetu (external),
+ * koszty kredytów zapisane z harmonogramu (loanCost) i spłacony kapitał (loanPrincipal).
+ */
+export function monthFlows(fin, market = null, upTo = '9999-12-31') {
+  const kind = new Map(fin.accounts.map((a) => [a.id, { inv: isInvAccount(a) && inWorth(a), loan: isLoan(a) }]));
+  const flows = new Map();
+  const at = (month) => flows.get(month) ?? flows.set(month, { month, income: 0, expense: 0, invTransfers: 0, invFlows: 0, external: 0, loanCost: 0, loanPrincipal: 0 }).get(month);
+  for (const t of liveTx(fin)) {
+    if (!t.date || t.date > upTo) continue;
+    const f = at(t.date.slice(0, 7));
+    const from = kind.get(t.accountId);
+    if (isFlow(t)) {
+      const sign = t.type === 'przychod' ? 1 : -1;
+      if (sign > 0) f.income += t.amount;
+      else f.expense += t.amount;
+      if (from?.inv) f.invFlows += sign * t.amount;
+      if (t.type === 'wydatek' && t.source === 'kredyt') f.loanCost += t.amount;
+    } else if (t.type === 'przelew') {
+      const to = kind.get(t.toAccountId);
+      if (to?.inv && !from?.inv) f.invTransfers += t.amount;
+      if (from?.inv && !to?.inv) f.invTransfers -= t.amount;
+      if (to?.loan) f.loanPrincipal += t.amount;
+    }
+  }
+  // Pieniądze spoza budżetu: wpłaty do planów „spoza aplikacji” (np. składka pracodawcy do PPE) oraz pozycje dopisane
+  // bez rozliczenia z gotówką (np. kupione, zanim powstał dziennik) – w dniu zakupu, po cenie zakupu.
+  for (const a of fin.accounts) {
+    if (!inWorth(a)) continue;
+    const cur = a.currency || 'PLN';
+    for (const p of a.plans ?? []) {
+      for (const e of p.log ?? []) {
+        if (e.fromId !== PLAN_EXTERNAL || !e.date || e.date > upTo) continue;
+        at(e.date.slice(0, 7)).external += convert(market, e.amount, cur, 'PLN', e.date) ?? e.amount;
+      }
+    }
+    for (const l of a.lots ?? []) {
+      if (l.planId || l.since || !l.date || l.date > upTo) continue;
+      const cost = lotCost(market, l).costPLN;
+      if (cost !== null) at(l.date.slice(0, 7)).external += cost;
+    }
+  }
+  return flows;
+}
+
+/**
+ * Historia majątku miesiąc po miesiącu (ostatni punkt to dziś): wartość, gotówka, inwestycje, długi oraz przepływy
+ * miesiąca. invIn – pieniądze, które trafiły na konta inwestycyjne (przelewy, wpłaty spoza budżetu, przychody
+ * i wydatki na tych kontach); reszta zmiany wartości tych kont to wynik inwestycji.
+ */
+export function worthSeries(fin, market, { today, months = 0 } = {}) {
+  const dates = [...liveTx(fin).map((t) => t.date), ...fin.accounts.flatMap((a) => (a.lots ?? []).map((l) => l.date))].filter((d) => d && d <= today);
+  if (!dates.length) return [];
+  let start = dates.reduce((m, d) => (d < m ? d : m)).slice(0, 7);
+  if (months) {
+    const cut = shiftMonth(today.slice(0, 7), -(months - 1));
+    if (cut > start) start = cut;
+  }
+  const flows = monthFlows(fin, market, today);
+  const points = [];
+  for (let m = start; m <= today.slice(0, 7); m = shiftMonth(m, 1)) {
+    const end = monthBounds(m).to;
+    const date = end < today ? end : today;
+    const w = wealthAt(fin, market, date);
+    const f = flows.get(m) ?? { income: 0, expense: 0, invTransfers: 0, invFlows: 0, external: 0, loanCost: 0 };
+    points.push({
+      month: m,
+      date,
+      worth: w.worth,
+      cash: w.cash,
+      investments: w.investments,
+      debt: w.debt,
+      loanDebt: w.loanDebt,
+      invTotal: w.invTotal,
+      income: f.income,
+      expense: f.expense,
+      saved: f.income - f.expense,
+      external: f.external,
+      invested: f.invTransfers,
+      invIn: f.invTransfers + f.invFlows + f.external,
+      loanCost: f.loanCost,
+    });
+  }
+  return points;
+}
+
+/**
+ * Skąd wzięła się zmiana majątku między pierwszym a ostatnim punktem: odłożone z dochodów (przychody − wydatki),
+ * wpłaty spoza budżetu (np. pracodawca do PPE), wynik inwestycji i pozostałe (korekty sald, kursy walut).
+ */
+export function wealthChange(points) {
+  if (!points || points.length < 2) return null;
+  const first = points[0];
+  const last = points[points.length - 1];
+  const later = points.slice(1);
+  const sum = (k) => later.reduce((s, p) => s + p[k], 0);
+  const change = last.worth - first.worth;
+  const saved = sum('saved');
+  const external = sum('external');
+  const invGain = last.invTotal - first.invTotal - sum('invIn');
+  return { from: first.date, to: last.date, months: later.length, change, saved, external, invGain, other: change - saved - external - invGain, income: sum('income'), expense: sum('expense') };
+}
+
+/** Rodzaj aktywa pozycji – do struktury majątku i założeń prognozy. */
+export function lotClass(lot) {
+  if (!lot?.asset || lot.asset === 'manual') return 'reczne';
+  if (isBondLot(lot)) return 'obligacje';
+  if (isGoldLot(lot)) return 'zloto';
+  if (isCryptoLot(lot)) return 'krypto';
+  if (lot.asset.startsWith(FUND_ASSET_PREFIX)) return 'fundusze';
+  return 'akcje';
+}
+export const ASSET_CLASSES = {
+  konta: 'Konta bankowe',
+  oszczednosci: 'Oszczędności',
+  gotowka: 'Gotówka',
+  broker: 'Gotówka na kontach inwestycyjnych',
+  inne: 'Inne konta',
+  akcje: 'Akcje i ETF-y',
+  gem: 'Portfel GEM',
+  fundusze: 'Fundusze inwestycyjne',
+  obligacje: 'Obligacje skarbowe',
+  zloto: 'Złoto',
+  krypto: 'Kryptowaluty',
+  reczne: 'Inne aktywa',
+  karty: 'Karty kredytowe',
+  kredyty: 'Kredyty i pożyczki',
+  debet: 'Debet na kontach',
+};
+const CASH_CLASS = { bank: 'konta', oszczednosci: 'oszczednosci', gotowka: 'gotowka', inwestycje: 'broker' };
+
+/**
+ * Z czego składa się majątek w dniu `date`: aktywa i długi według rodzaju (posortowane malejąco), suma aktywów,
+ * długów, majątek netto i płynne pieniądze (konta, oszczędności, gotówka).
+ */
+export function wealthStructure(fin, market, date, bal = balances(fin, date)) {
+  const sums = new Map();
+  const add = (key, v) => v && sums.set(key, (sums.get(key) ?? 0) + v);
+  for (const a of fin.accounts) {
+    if (!inWorth(a)) continue;
+    const w = accountWorth(fin, a, market, date, bal[a.id]);
+    if (!w) continue;
+    if (w.cashPLN >= 0) add(CASH_CLASS[a.type] ?? 'inne', w.cashPLN);
+    else add(isLoan(a) ? 'kredyty' : isCard(a) ? 'karty' : 'debet', w.cashPLN);
+    if (w.gem) add('gem', w.investments);
+    else for (const l of a.lots ?? []) add(lotClass(l), lotValuePLN(market, l, date) ?? 0);
+  }
+  const items = [...sums].map(([key, value]) => ({ key, label: ASSET_CLASSES[key] ?? key, value, debt: value < 0 }));
+  const assets = items.filter((i) => !i.debt).sort((x, y) => y.value - x.value);
+  const debts = items.filter((i) => i.debt).sort((x, y) => x.value - y.value);
+  const total = assets.reduce((s, i) => s + i.value, 0);
+  const owed = -debts.reduce((s, i) => s + i.value, 0);
+  for (const i of assets) i.share = total > 0 ? i.value / total : 0;
+  return { assets, debts, total, owed, net: total - owed, liquid: (sums.get('konta') ?? 0) + (sums.get('oszczednosci') ?? 0) + (sums.get('gotowka') ?? 0) };
+}
+
+/**
+ * Nawyki z ostatnich pełnych miesięcy (bez bieżącego): średnie przychody, wydatki, odkładana kwota, stopa
+ * oszczędności, ile co miesiąc trafia na inwestycje (invested – z własnych pieniędzy, external – spoza budżetu),
+ * średni koszt kredytów i rozrzut odkładanej kwoty (sd).
+ */
+export function savingsStats(fin, market, { today, months = 12 } = {}) {
+  const flows = monthFlows(fin, market, today);
+  const cur = today.slice(0, 7);
+  const first = [...flows.keys()].sort().find((m) => flows.get(m).income || flows.get(m).expense);
+  const list = [];
+  if (first) {
+    for (let m = shiftMonth(cur, -1), i = 0; m >= first && i < months; m = shiftMonth(m, -1), i++) {
+      const f = flows.get(m) ?? { income: 0, expense: 0, invTransfers: 0, external: 0, loanCost: 0 };
+      list.unshift({ month: m, income: f.income, expense: f.expense, saved: f.income - f.expense, rate: f.income > 0 ? (f.income - f.expense) / f.income : null, invested: f.invTransfers, external: f.external, loanCost: f.loanCost });
+    }
+  }
+  const n = list.length;
+  const avg = (k) => (n ? list.reduce((s, x) => s + x[k], 0) / n : 0);
+  const avgSaved = avg('saved');
+  const income = list.reduce((s, x) => s + x.income, 0);
+  const sd = n > 1 ? Math.sqrt(list.reduce((s, x) => s + (x.saved - avgSaved) ** 2, 0) / (n - 1)) : 0;
+  return { months: list, n, avgIncome: avg('income'), avgExpense: avg('expense'), avgSaved, rate: income > 0 ? (income - list.reduce((s, x) => s + x.expense, 0)) / income : null, sd, avgInvested: avg('invested'), avgExternal: avg('external'), avgLoanCost: avg('loanCost') };
+}
+
+// Długoterminowe założenia: oczekiwany zysk roczny (%, nominalnie) i typowy rozrzut wyniku (punkty procentowe).
+// Akcje świata dawały historycznie ok. 5% rocznie ponad inflację, obligacje indeksowane – inflację plus marżę,
+// złoto – niewiele ponad inflację. Krótka historia własnego portfela nie jest wiarygodną prognozą, dlatego domyślnie
+// liczy się skład portfela, a nie jego ostatni wynik. Każde założenie można zmienić w aplikacji.
+export const RETURN_ASSUMPTIONS = { akcje: [7, 3], gem: [7, 3], fundusze: [6, 2.5], krypto: [7, 12], obligacje: [null, 0.75], zloto: [null, 2.5], reczne: [null, 1.5] };
+export const DEFAULT_INFLATION = 3;
+
+/** Oczekiwany zysk roczny pozycji (%): obligacje według swoich zasad, złoto inflacja + 1,5 pp, inne aktywa – inflacja. */
+function expectedReturn(lot, cls, market, date, inflationPct) {
+  if (cls === 'obligacje') {
+    const t = BOND_TYPES[lot.bond?.type];
+    if (!t) return inflationPct;
+    if (t.kind === 'inflacja') return inflationPct + (Number(lot.bond.margin) || 0);
+    if (t.kind === 'nbp') return (market?.bonds?.ref?.at(-1)?.[1] ?? inflationPct) + (Number(lot.bond.margin) || 0);
+    return Number(lot.bond.rate1) || inflationPct;
+  }
+  if (cls === 'zloto') return inflationPct + 1.5;
+  if (cls === 'reczne') return inflationPct;
+  return RETURN_ASSUMPTIONS[cls]?.[0] ?? 6;
+}
+
+/** Skład inwestycji z oczekiwanym zyskiem: [{ key, label, value, share, ret, spread }] oraz średnia ważona. */
+export function investmentMix(fin, market, date, inflationPct = DEFAULT_INFLATION) {
+  const by = new Map();
+  const add = (key, value, ret) => {
+    if (!(value > 0)) return;
+    const x = by.get(key) ?? { key, label: ASSET_CLASSES[key] ?? key, value: 0, weighted: 0, spread: RETURN_ASSUMPTIONS[key]?.[1] ?? 2 };
+    x.value += value;
+    x.weighted += value * ret;
+    by.set(key, x);
+  };
+  const bal = balances(fin, date);
+  for (const a of fin.accounts) {
+    if (!inWorth(a)) continue;
+    const w = accountWorth(fin, a, market, date, bal[a.id]);
+    if (!w) continue;
+    if (w.gem) add('gem', w.investments, RETURN_ASSUMPTIONS.gem[0]);
+    else {
+      for (const l of a.lots ?? []) {
+        const cls = lotClass(l);
+        add(cls, lotValuePLN(market, l, date) ?? 0, expectedReturn(l, cls, market, date, inflationPct));
+      }
+    }
+  }
+  const total = [...by.values()].reduce((s, x) => s + x.value, 0);
+  const items = [...by.values()].map((x) => ({ key: x.key, label: x.label, value: x.value, share: total > 0 ? x.value / total : 0, ret: x.weighted / x.value, spread: x.spread })).sort((x, y) => y.value - x.value);
+  // Bez inwestycji: założenie dla przyszłych wpłat jak dla szerokiego portfela akcji i obligacji.
+  const returnPct = total > 0 ? items.reduce((s, x) => s + x.share * x.ret, 0) : 6;
+  const spread = total > 0 ? items.reduce((s, x) => s + x.share * x.spread, 0) : 2.5;
+  return { items, total, returnPct: Math.round(returnPct * 10) / 10, spread: Math.round(spread * 10) / 10 };
+}
+
+/** Raty kredytów: pozycja 0 – reszta bieżącego miesiąca, potem kolejne miesiące; kapitał i koszt (odsetki, opłaty). */
+export function loanOutlook(fin, market, today, months) {
+  const out = Array.from({ length: months + 1 }, () => ({ principal: 0, cost: 0 }));
+  const cur = today.slice(0, 7);
+  const index = (month) => (Number(month.slice(0, 4)) - Number(cur.slice(0, 4))) * 12 + Number(month.slice(5, 7)) - Number(cur.slice(5, 7));
+  for (const a of fin.accounts) {
+    if (!isLoan(a) || !inWorth(a)) continue;
+    const rate = rateOn(market, a.currency || 'PLN', today) ?? 1;
+    const ins = Number(a.loan.insurance) || 0;
+    for (const r of loanSchedule(a.loan)) {
+      if (r.date <= today) continue;
+      const i = index(r.date.slice(0, 7));
+      if (i > months) break;
+      const slot = out[i];
+      if (r.kind === 'nadplata') slot.principal += r.overpay * rate;
+      else {
+        slot.principal += r.principal * rate;
+        // Koszt odliczamy tylko dla kredytów, których raty trafiają do dziennika – tylko one są w historii wydatków.
+        if (a.loan.autoPost) slot.cost += (r.interest + ins) * rate;
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * Założenia prognozy wyprowadzone z historii i nawyków: ile co miesiąc zostaje (saved), ile z tego trafia na
+ * inwestycje (invested), wpłaty spoza budżetu (external), koszt kredytów zawarty w historii (loanCost), oczekiwany
+ * zysk inwestycji według składu portfela i rozrzut. basis: 'historia' (≥ 3 pełne miesiące), 'krotka', 'stale'
+ * (ze stałych pozycji i planów) albo 'brak'.
+ */
+export function forecastDefaults(fin, market, { today, inflationPct = DEFAULT_INFLATION } = {}) {
+  const s = savingsStats(fin, market, { today, months: 12 });
+  const mix = investmentMix(fin, market, today, inflationPct);
+  let basis = s.n >= 3 ? 'historia' : s.n ? 'krotka' : 'brak';
+  let saved = s.avgSaved;
+  let invested = Math.max(0, s.avgInvested);
+  let external = Math.max(0, s.avgExternal);
+  let loanCost = s.avgLoanCost;
+  if (s.n < 3) {
+    const rec = recurringMonthly(fin, market, today);
+    if (rec.przychod > 0 || rec.wydatek > 0) {
+      const next = loanOutlook(fin, market, today, 1)[1] ?? { cost: 0 };
+      basis = 'stale';
+      loanCost = next.cost;
+      saved = rec.przychod - rec.wydatek - loanCost;
+      invested = 0;
+      external = 0;
+      for (const a of fin.accounts) {
+        if (!inWorth(a)) continue;
+        for (const p of a.plans ?? []) {
+          if (!p.recurring?.amount) continue;
+          const pln = convert(market, p.recurring.amount, a.currency || 'PLN', 'PLN', today) ?? p.recurring.amount;
+          if (p.recurring.fromId === PLAN_EXTERNAL) external += pln;
+          else if (p.recurring.fromId !== a.id) invested += pln;
+        }
+      }
+    }
+  }
+  // Niepewność odkładanej kwoty: im bardziej równe miesiące i dłuższa historia, tym węższy przedział (10–40%).
+  const rel = s.n >= 4 && Math.abs(s.avgSaved) > 1 ? s.sd / Math.sqrt(s.n) / Math.abs(s.avgSaved) : 0.25;
+  return { basis, n: s.n, saved: round2(saved), invested: round2(invested), external: round2(external), loanCost: round2(loanCost), savedSpread: Math.min(0.4, Math.max(0.1, rel)), returnPct: mix.returnPct, spread: mix.spread, inflationPct, mix, stats: s };
+}
+
+/**
+ * Symulacja miesiąc po miesiącu (kwoty nominalne). Co miesiąc: inwestycje rosną o oczekiwany zysk, do gotówki trafia
+ * odłożona kwota (bez kosztu kredytu z harmonogramu) minus kapitał raty, a zaplanowana część idzie na inwestycje –
+ * nigdy więcej, niż jest gotówki. Gdy pieniędzy brakuje, różnica jest pokrywana z inwestycji. Odkładane kwoty rosną
+ * z inflacją (realnie się nie zmieniają). Dług maleje zgodnie z harmonogramami kredytów.
+ */
+export function simulateWealth({ cash, investments, debt, months, saved, invested = 0, external = 0, loanCost = 0, loans = [], returnPct = 0, inflationPct = 0, indexed = true, month0 = null }) {
+  const rm = (1 + returnPct / 100) ** (1 / 12) - 1;
+  const out = [];
+  let c = cash;
+  let i = investments;
+  let d = debt;
+  // Jeden krok: wpływ do gotówki (bez kosztu kredytu), kapitał raty, wpłata na inwestycje i wpłata spoza budżetu.
+  const step = (m, cashIn, loan, toInvest, fromOutside) => {
+    const principal = Math.min(d, loan?.principal ?? 0);
+    i += fromOutside;
+    c += cashIn - (d > 0.005 ? loan?.cost ?? 0 : 0) - principal;
+    d = Math.max(0, d - principal);
+    if (c < 0) {
+      const take = Math.min(i, -c);
+      i -= take;
+      c += take;
+    } else {
+      const put = Math.min(Math.max(0, toInvest), c);
+      i += put;
+      c -= put;
+    }
+    out.push({ m, cash: c, investments: i, debt: d, worth: c + i - d });
+  };
+  // Krok 0: do końca bieżącego miesiąca – to, co zwykle jeszcze wpływa i wypływa po tym dniu miesiąca.
+  step(0, month0?.cashIn ?? 0, loans[0], month0?.invested ?? 0, month0?.external ?? 0);
+  for (let m = 1; m <= months; m++) {
+    const f = indexed ? (1 + inflationPct / 100) ** (m / 12) : 1;
+    i *= 1 + rm;
+    step(m, (saved + loanCost) * f, loans[m], invested * f, external * f);
+  }
+  return out;
+}
+
+/**
+ * Co zwykle dzieje się od dzisiejszego dnia miesiąca do jego końca (średnia z ostatnich pełnych miesięcy): wpływ do
+ * gotówki bez kosztów kredytu (np. wypłata pod koniec miesiąca minus reszta wydatków), pieniądze przenoszone na
+ * inwestycje i wpłaty spoza budżetu. Dzięki temu prognoza nie zależy od tego, czy otwierasz ją przed wypłatą, czy po.
+ */
+export function monthRemainder(fin, market, today, months = 12) {
+  const cur = today.slice(0, 7);
+  const day = today.slice(8, 10);
+  const first = liveTx(fin)
+    .reduce((m, t) => (isFlow(t) && t.date && t.date < m ? t.date : m), '9999-12-31')
+    .slice(0, 7);
+  const from = shiftMonth(cur, -months) > first ? shiftMonth(cur, -months) : first;
+  const n = from < cur ? (Number(cur.slice(0, 4)) - Number(from.slice(0, 4))) * 12 + Number(cur.slice(5, 7)) - Number(from.slice(5, 7)) : 0;
+  const out = { cashIn: 0, invested: 0, external: 0, n };
+  if (!n) return out;
+  const late = (date) => date.slice(0, 7) >= from && date.slice(0, 7) < cur && date.slice(8, 10) > day;
+  const kind = new Map(fin.accounts.map((a) => [a.id, isInvAccount(a) && inWorth(a)]));
+  for (const t of liveTx(fin)) {
+    if (!t.date || !late(t.date)) continue;
+    if (isFlow(t)) {
+      if (!(t.type === 'wydatek' && t.source === 'kredyt')) out.cashIn += t.type === 'przychod' ? t.amount : -t.amount;
+    } else if (t.type === 'przelew') {
+      if (kind.get(t.toAccountId) && !kind.get(t.accountId)) out.invested += t.amount;
+      if (kind.get(t.accountId) && !kind.get(t.toAccountId)) out.invested -= t.amount;
+    }
+  }
+  for (const a of fin.accounts) {
+    if (!inWorth(a)) continue;
+    for (const p of a.plans ?? []) for (const e of p.log ?? []) if (e.fromId === PLAN_EXTERNAL && e.date && late(e.date)) out.external += convert(market, e.amount, a.currency || 'PLN', 'PLN', e.date) ?? e.amount;
+  }
+  out.cashIn /= n;
+  out.invested = Math.max(0, out.invested / n);
+  out.external /= n;
+  return out;
+}
+
+/**
+ * Prognoza majątku: wariant bazowy oraz ostrożny i optymistyczny (mniej/więcej odkładanych pieniędzy i niższy/wyższy
+ * zysk z inwestycji). Parametry z `overrides` zastępują założenia wyprowadzone z historii.
+ * Zwraca też punkt startowy i miesiące prognozy (koniec każdego miesiąca).
+ */
+export function wealthForecast(fin, market, { today, months = 120, overrides = {} } = {}) {
+  const num = (v, fallback) => (Number.isFinite(Number(v)) && v !== null && v !== '' ? Number(v) : fallback);
+  const inflationPct = num(overrides.inflationPct, DEFAULT_INFLATION);
+  const defaults = forecastDefaults(fin, market, { today, inflationPct });
+  const params = { saved: num(overrides.saved, defaults.saved), invested: Math.max(0, num(overrides.invested, defaults.invested)), external: defaults.external, returnPct: num(overrides.returnPct, defaults.returnPct), inflationPct };
+  const now = wealthAt(fin, market, today);
+  const start = { cash: now.worth - now.investments + now.loanDebt, investments: now.investments, debt: now.loanDebt };
+  const loans = loanOutlook(fin, market, today, months);
+  const cur = today.slice(0, 7);
+  // Reszta bieżącego miesiąca: typowy wpływ po tym dniu miesiąca; zmiana założenia o odkładanej kwocie przesuwa go
+  // proporcjonalnie do tego, ile miesiąca zostało.
+  const rest = defaults.basis === 'historia' || defaults.basis === 'krotka' ? monthRemainder(fin, market, today) : null;
+  const left = 1 - Number(today.slice(8, 10)) / Number(monthBounds(cur).to.slice(8, 10));
+  const run = (k) => {
+    const saved = params.saved + k * Math.abs(params.saved) * defaults.savedSpread;
+    return simulateWealth({
+      ...start,
+      months,
+      loans,
+      loanCost: defaults.loanCost,
+      external: params.external,
+      invested: params.invested,
+      inflationPct,
+      saved,
+      returnPct: params.returnPct + k * defaults.spread,
+      month0: rest?.n ? { cashIn: rest.cashIn + (saved - defaults.saved) * left, invested: Math.min(rest.invested, params.invested), external: rest.external } : null,
+    });
+  };
+  // Pozycja 0 – koniec bieżącego miesiąca, potem koniec każdego kolejnego (pozycja 12 to „za rok”).
+  const dates = Array.from({ length: months + 1 }, (_, i) => monthBounds(shiftMonth(cur, i)).to);
+  return { today, now, start, params, defaults, rest, dates, base: run(0), low: run(-1), high: run(1) };
 }

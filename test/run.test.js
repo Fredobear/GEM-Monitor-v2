@@ -96,6 +96,13 @@ test('cały cykl: sygnał miesięczny raz, ostrzeżenie o zmianie podglądu, pod
   assert.match(html, /id="tab-instrumenty"/);
   assert.match(html, /Notatka rynkowa/);
   assert.match(html, /Rynki świata/);
+  // Dziennik finansowy: zakładka Majątek (wykresy i prognoza), kalendarz jako tryb Operacji, blokada sieci.
+  const fin = await readFile(path.join(tmp, 'docs', 'finanse.html'), 'utf8');
+  assert.match(fin, /data-view="majatek"/);
+  assert.doesNotMatch(fin, /data-view="kalendarz"/);
+  assert.match(fin, /function viewWealth\(/);
+  assert.match(fin, /function wealthForecast\(/);
+  assert.match(fin, /connect-src 'none'/);
   // Ceny do wyceny portfela: kursy NBP i indeksy instrumentów zapisane do kolejnego uruchomienia.
   const prices = JSON.parse(await readFile(path.join(tmp, 'docs', 'data', 'prices.json'), 'utf8'));
   assert.ok(prices.fx.USD.length > 0);

@@ -43,7 +43,7 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
 - **Finanse (offline):**
   - dziennik wydatków i przychodów: konta, własne kategorie, budżety, reguły;
   - przegląd jak w aplikacji Money Manager: dzień, tydzień, miesiąc, rok albo dowolny okres, wykres kategorii;
-  - kalendarz: wydatki dzień po dniu, jedno dotknięcie pokazuje operacje z danego dnia;
+  - kalendarz (w zakładce Operacje): wydatki dzień po dniu, jedno dotknięcie pokazuje operacje z danego dnia;
   - stałe przelewy i dochody (pensja, czynsz, subskrypcje), zapisywane automatycznie albo po zatwierdzeniu;
   - karty kredytowe: zadłużenie jako saldo ujemne, limit, termin, oprocentowanie, minimalna spłata i spłata z wybranego konta;
   - **kredyty i pożyczki**: oprocentowanie stałe, zmienne (WIBOR/WIRON + marża) albo 0%, raty równe lub malejące, karencja, prowizja, ubezpieczenie, harmonogram, RRSO, całkowity koszt, zmiany oprocentowania, nadpłaty z symulacją (krótszy okres albo niższa rata) i raty zapisywane w dzienniku (kapitał jako przelew, odsetki jako wydatek);
@@ -53,7 +53,7 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
   - przy każdym koncie inwestycyjnym i każdej pozycji: **ile zainwestowano, ile to jest warte i jaki jest zysk** (w złotych i procentach, z efektem kursu walut), a w podsumowaniu majątku – łączny zysk z inwestycji; pozycje można wpisać ze średnią ceną i kursem z XTB (zysk od razu, bez całej historii transakcji);
   - **plany inwestycyjne**: wpłata dzielona procentowo na kilka ETF-ów, funduszy albo kryptowalut (jak plany w XTB i alokacja w PPE), także cyklicznie i automatycznie;
   - tabela porównania kategorii z poprzednim miesiącem: dotknięcie kwoty pokazuje dymek z wydatkami, z których się składa;
-  - wykres majątku i dochodów miesiąc po miesiącu;
+  - zakładka **Majątek**: majątek netto miesiąc po miesiącu (gotówka, inwestycje, długi), skąd bierze się przyrost (odłożone z dochodów, wynik inwestycji, wpłaty pracodawcy), stopa oszczędności i poduszka finansowa, struktura majątku oraz **prognoza** na 1–30 lat z wariantem ostrożnym i optymistycznym, liczona z Twojej historii i nawyków (założenia można zmienić);
   - dokumenty offline (paski płacowe, paragony, umowy) przy operacjach i w osobnej zakładce;
   - usuwanie i zmiany zawsze z potwierdzeniem i przyciskiem „Cofnij”;
   - import z aplikacji Money Manager (plik .mmbackup) z łączeniem kont i kategorii, płatności Apple Pay przez Skróty (karta → konto, zapis dwuetapowy – płatność nie ginie, nawet gdy okno z kategoriami się nie pokaże) i wyciągi CSV z banku;
@@ -61,7 +61,7 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
 - **Bezpieczniki:**
   - bez kompletnych i aktualnych danych sygnał nie powstaje, a Ty dostajesz komunikat o problemie;
   - dwa niezależne źródła danych są ze sobą porównywane;
-  - 124 testów automatycznych.
+  - 135 testów automatycznych.
 
 | Rola | ETF w XTB | Waluta |
 |---|---|---|
@@ -258,7 +258,7 @@ node src/cli.js demo
 node scripts/serve.js
 ```
 
-- `npm test` uruchamia 124 testów.
+- `npm test` uruchamia 135 testów.
 - `node src/cli.js demo` buduje aplikację demonstracyjną bez kluczy API. Sygnał pochodzi z danych historycznych, a w zakładce GEM → Mój portfel GEM możesz wczytać przykładowe transakcje.
 - `node scripts/serve.js` udostępnia panel pod adresem http://localhost:8080.
 

@@ -128,8 +128,8 @@ test('dziennik: wartość obligacji na koncie, zysk z wypłaconymi odsetkami, ko
   const lot = { ...bond('COI', '2026-11-09', { rate1: 4.75, margin: 1.5 }), qty: 10 };
   near(lotPrice(market, lot, '2027-11-08'), 104.74, 0.02);
   const r = lotResult(market, lot, '2028-01-09');
-  near(r.income, 47.5, 1e-9);
-  near(r.gain, r.value + 47.5 - 1000, 1e-9);
+  near(r.income, 47.5 * 0.81, 1e-9); // wypłacone odsetki po podatku 19%
+  near(r.gain, r.value + 47.5 * 0.81 - 1000, 1e-9);
   assert.equal(lotActive(lot, '2030-11-08'), true);
   assert.equal(lotActive(lot, '2030-11-09'), false); // po wykupie pozycja znika z aktywów
   const sum = investSummary(market, { lots: [lot] }, '2031-01-01');
@@ -195,3 +195,15 @@ function bondDaysOf(a, b) {
 function round2(x) {
   return Math.round(x * 100) / 100;
 }
+
+test('EDO z 2017 r.: wartości z oficjalnej tabeli odsetkowej MF (10. rok, obligacja kupiona 1.01.2017)', () => {
+  // Tabela odsetkowa EDO0127 na 2026 r. (obligacjeskarbowe.pl): odsetki od 1 obligacji kupionej w pierwszym dniu
+  // sprzedaży. Oprocentowanie: 2,70% w 1. roku, potem inflacja z listopada poprzedniego roku (GUS) + marża 1,50%.
+  const data = { cpi: [['2017-11', 2.5], ['2018-11', 1.3], ['2019-11', 2.6], ['2020-11', 3.0], ['2021-11', 7.8], ['2022-11', 17.5], ['2023-11', 6.6], ['2024-11', 4.7], ['2025-11', 2.5]] };
+  const lot = { id: 'mf', asset: `${BOND_PREFIX}EDO0127`, qty: 1, price: 100, date: '2017-01-01', bond: { type: 'EDO', rate1: 2.7, margin: 1.5 } };
+  const table = { '2026-01-02': 78.37, '2026-01-03': 78.39, '2026-01-30': 78.92, '2026-01-31': 78.94, '2026-02-01': 78.96, '2026-02-02': 78.98, '2026-03-01': 79.51, '2026-04-01': 80.11, '2026-07-01': 81.89, '2026-12-01': 84.88, '2027-01-01': 85.49 };
+  for (const [date, interest] of Object.entries(table)) assert.equal(bondState(lot, date, data).interest, interest, date);
+  const st = bondState(lot, '2026-06-15', data);
+  assert.deepEqual(st.rates.map((r) => Math.round(r * 10000) / 100), [2.7, 4, 2.8, 4.1, 4.5, 9.3, 19, 8.1, 6.2, 4]);
+  assert.equal(st.estimated, false);
+});

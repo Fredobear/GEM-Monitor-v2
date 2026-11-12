@@ -11,9 +11,10 @@ const NF2 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFr
 const NF1 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const NF4 = new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 const tidy = (x) => (Math.abs(x) < 0.005 ? 0 : x);
-const zl = (x) => `${NF2.format(tidy(x))} zł`;
-const zl0 = (x) => `${NF0.format(Math.round(tidy(x)))} zł`;
-const money = (x, cur) => (!cur || cur === 'PLN' ? zl(x) : `${NF2.format(tidy(x))} ${cur}`);
+const minus = (s) => s.replace(/^-/, '−');
+const zl = (x) => `${minus(NF2.format(tidy(x)))} zł`;
+const zl0 = (x) => `${minus(NF0.format(Math.round(tidy(x))))} zł`;
+const money = (x, cur) => (!cur || cur === 'PLN' ? zl(x) : `${minus(NF2.format(tidy(x)))} ${cur}`);
 const signed = (x) => `${x < -0.004 ? '−' : '+'}${zl(Math.abs(x))}`;
 const pct = (x) => (x === null || !Number.isFinite(x) ? '–' : `${Math.round(x * 100)}%`);
 const pct1 = (x) => `${NF1.format(Math.abs(x * 100))}%`;
@@ -141,7 +142,7 @@ function gemTxsSave(list) {
   } catch {
     // brak wyceny portfela GEM – konto pokaże saldo przelewów
   }
-  if (s?.accounts) MARKET.gemValues = Object.fromEntries(Object.entries(s.accounts).filter(([, v]) => Number.isFinite(v?.value)).map(([k, v]) => [k, { value: v.value, invested: v.invested, date: v.date ?? s.date ?? today() }]));
+  if (s?.accounts) MARKET.gemValues = Object.fromEntries(Object.entries(s.accounts).filter(([, v]) => Number.isFinite(v?.value)).map(([k, v]) => [k, { value: v.value, invested: v.invested, date: v.date ?? s.date ?? today(), history: Array.isArray(v.history) ? v.history : undefined }]));
 }
 // Limit wpłat w roku (IKE, IKZE) z danych podatkowych aplikacji.
 function gemLimit(gemAccount, year) {
@@ -208,6 +209,10 @@ const ui = {
   limit: 120,
   setTab: 'kategorie',
   worthRange: 12,
+  worthMode: 'netto',
+  fcYears: 10,
+  txMode: 'lista',
+  detOpen: new Set(),
   csv: null,
   mm: null,
   inbox: false,
@@ -484,56 +489,6 @@ function bars(data, { height = 180, series }) {
   return `<div class="bars-wrap"><svg class="bars" viewBox="0 0 ${W} ${H}" ${size} role="img">${parts.join('')}</svg></div><div class="legend-row">${series.map((s) => `<span><i class="sw" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>`;
 }
 
-// Majątek (linia) i przychody/wydatki w każdym miesiącu (słupki pod spodem).
-function worthChart(points) {
-  if (points.length < 2) return `<p class="muted small">Wykres pokaże się, gdy dziennik obejmie co najmniej dwa miesiące${points.length ? ` (dane od: ${esc(monthLabel(points[0].month))})` : ''}.</p>`;
-  const n = points.length;
-  const fit = n <= 14;
-  const W = fit ? 340 : n * 26;
-  const M = { l: 6, r: 6, t: 16 };
-  const H1 = 130;
-  const GAP = 26;
-  const H2 = 60;
-  const H = M.t + H1 + GAP + H2 + 20;
-  const slot = (W - M.l - M.r) / n;
-  const x = (i) => M.l + slot * (i + 0.5);
-  const ws = points.map((p) => p.worth);
-  let lo = Math.min(...ws);
-  let hi = Math.max(...ws);
-  const padY = (hi - lo) * 0.15 || Math.abs(hi) * 0.05 || 1;
-  lo -= padY;
-  hi += padY;
-  const y1 = (v) => M.t + H1 - ((v - lo) / (hi - lo)) * H1;
-  const line = points.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y1(p.worth).toFixed(1)}`).join('');
-  const area = `${line}L${x(n - 1).toFixed(1)},${M.t + H1}L${x(0).toFixed(1)},${M.t + H1}Z`;
-  const maxFlow = Math.max(1, ...points.flatMap((p) => [p.income, p.expense]));
-  const base2 = M.t + H1 + GAP + H2;
-  const bw = Math.max(3, Math.min(12, slot / 2 - 3));
-  const parts = [`<text x="${M.l}" y="${M.t - 5}" class="wc-axis">majątek</text>`, `<path d="${area}" class="wc-area"/>`, `<path d="${line}" class="wc-line"/>`, `<text x="${M.l}" y="${M.t + H1 + GAP - 7}" class="wc-axis">przychody i wydatki w miesiącu</text>`, `<line x1="${M.l}" x2="${W - M.r}" y1="${base2}" y2="${base2}" class="wc-grid"/>`];
-  points.forEach((p, i) => {
-    const label = monthLabel(p.month);
-    parts.push(`<circle cx="${x(i).toFixed(1)}" cy="${y1(p.worth).toFixed(1)}" r="3.4" class="wc-dot"><title>${esc(label)}: majątek ${zl(p.worth)}</title></circle>`);
-    const hi2 = (p.income / maxFlow) * H2;
-    const he = (p.expense / maxFlow) * H2;
-    parts.push(`<rect x="${(x(i) - bw - 1).toFixed(1)}" y="${(base2 - hi2).toFixed(1)}" width="${bw.toFixed(1)}" height="${hi2.toFixed(1)}" rx="2" class="wc-inc"><title>${esc(label)}: przychody ${zl(p.income)}</title></rect>`);
-    parts.push(`<rect x="${(x(i) + 1).toFixed(1)}" y="${(base2 - he).toFixed(1)}" width="${bw.toFixed(1)}" height="${he.toFixed(1)}" rx="2" class="wc-exp"><title>${esc(label)}: wydatki ${zl(p.expense)}</title></rect>`);
-    if (fit || i % 2 === 0 || i === n - 1) parts.push(`<text x="${x(i).toFixed(1)}" y="${H - 5}" text-anchor="middle" class="wc-axis">${MONTHS_SHORT[Number(p.month.slice(5, 7)) - 1]}${p.month.endsWith('-01') || i === 0 ? ` ${p.month.slice(2, 4)}` : ''}</text>`);
-  });
-  const size = fit ? 'style="width:100%;height:auto"' : `width="${W}" height="${H}"`;
-  return `<div class="bars-wrap"><svg class="worth-chart" viewBox="0 0 ${W} ${H}" ${size} role="img" aria-label="Majątek oraz przychody i wydatki miesiąc po miesiącu">${parts.join('')}</svg></div><div class="legend-row"><span><i class="sw"></i>Majątek</span><span><i class="sw" style="background:var(--pos)"></i>Przychody</span><span><i class="sw" style="background:var(--neg)"></i>Wydatki</span></div>`;
-}
-
-function worthStats(points) {
-  if (points.length < 2) return '';
-  const first = points[0];
-  const last = points.at(-1);
-  const income = points.slice(1).reduce((s, p) => s + p.income, 0);
-  const expense = points.slice(1).reduce((s, p) => s + p.expense, 0);
-  const change = last.worth - first.worth;
-  const since = `od końca ${MONTHS_GEN[Number(first.month.slice(5, 7)) - 1]}`;
-  return `<div class="sum3 worth-stats"><div><span>Zmiana majątku</span><b class="${change >= 0 ? 'pos' : 'neg'}">${esc(signed(change))}</b><small>${esc(since)}</small></div><div><span>Przychody</span><b class="pos">${esc(zl0(income))}</b><small>${esc(since)}</small></div><div><span>Odłożone</span><b class="${income - expense >= 0 ? 'pos' : 'neg'}">${esc(signed(income - expense))}</b><small>przychody − wydatki</small></div></div>`;
-}
-
 // ---------- Wiersze list ----------
 function txRow(t) {
   const { icon, color } = look(t);
@@ -607,30 +562,33 @@ function periodControls() {
 // Zysk z inwestycji na kontach wliczanych do majątku (otwarte pozycje, wycena na dziś).
 function investTotals() {
   const at = valuationDate();
-  const out = { cost: 0, value: 0, gain: 0, gainPct: null, positions: 0 };
+  const out = { cost: 0, value: 0, income: 0, gain: 0, gainPct: null, positions: 0 };
   for (const a of activeAccounts()) {
     if (a.excludeFromTotal || !a.lots?.length) continue;
     const s = investSummary(MARKET, a, at);
     if (!s?.positions) continue;
     out.cost += s.cost;
     out.value += s.value;
+    out.income += s.income ?? 0;
     out.positions += s.positions;
   }
-  out.gain = out.value - out.cost;
-  out.gainPct = out.cost > 0 ? out.value / out.cost - 1 : null;
+  out.gain = out.value + out.income - out.cost;
+  out.gainPct = out.cost > 0 ? (out.value + out.income) / out.cost - 1 : null;
   return out;
 }
 
 function heroBalance() {
   if (!activeAccounts().length) return '';
-  const nw = netWorth(fin, MARKET);
+  const t = today();
+  const now = wealthAt(fin, MARKET, t);
   const inv = investTotals();
-  const lines = [];
-  if (nw.investments > 0.004) lines.push(`w tym inwestycje: <b>${esc(zl(nw.investments))}</b>`);
-  if (inv.positions) lines.push(`zysk z inwestycji: <b class="${gainClass(inv.gain)}">${esc(gainText(inv.gain, inv.gainPct))}</b>`);
-  if (nw.debt > 0.004) lines.push(`zadłużenie: <b class="neg">−${esc(zl(nw.debt))}</b>`);
-  if (nw.missing.length) lines.push(`bez kursu: ${esc(nw.missing.join(', '))}`);
-  return `<button class="card hero-bal" data-view="konta"><span class="hb-main"><span class="muted small">Majątek – wszystkie konta</span><span class="hb-val ${nw.total < -0.004 ? 'neg' : ''}">${esc(zl(nw.total))}</span>${lines.length ? `<span class="small muted">${lines.join(' · ')}</span>` : ''}</span><span class="hb-chev" aria-hidden="true">›</span></button>`;
+  // Zmiana od końca poprzedniego miesiąca (gdy dziennik sięga tak daleko).
+  const prevEnd = monthBounds(shiftMonth(t.slice(0, 7), -1)).to;
+  const older = liveTx(fin).some((x) => x.date <= prevEnd) || fin.accounts.some((a) => (a.lots ?? []).some((l) => l.date <= prevEnd));
+  const delta = older ? now.worth - wealthAt(fin, MARKET, prevEnd).worth : null;
+  const stat = (label, value, cls = '', note = '') => `<span><i>${esc(label)}</i><b class="${cls}">${esc(value)}</b>${note}</span>`;
+  return `<button class="card hero-bal" data-view="majatek" aria-label="Majątek netto – otwórz zakładkę Majątek"><span class="hb-main"><span class="hb-top"><span class="muted small">Majątek netto</span><span class="hb-chev" aria-hidden="true">›</span></span><span class="hb-val ${now.worth < -0.004 ? 'neg' : ''}">${esc(zl(now.worth))}</span>${delta === null ? '' : `<span class="small"><b class="${gainClass(delta)}">${esc(signed(delta))}</b> <span class="muted">w tym miesiącu</span></span>`}
+  <span class="hb-stats">${stat('Gotówka i konta', kzl(now.cash))}${stat('Inwestycje', kzl(now.investments), '', inv.positions ? `<small class="${gainClass(inv.gain)}">${inv.gain < -0.004 ? '−' : '+'}${esc(kzl(Math.abs(inv.gain)))}${inv.gainPct === null ? '' : ` (${inv.gainPct < 0 ? '−' : '+'}${esc(pct1(inv.gainPct))})`}</small>` : '')}${stat('Długi', now.debt > 0.004 ? `−${kzl(now.debt)}` : kzl(0), now.debt > 0.004 ? 'neg' : '')}</span>${now.missing.length ? `<span class="small warn">Bez kursu waluty: ${esc(now.missing.join(', '))}</span>` : ''}</span></button>`;
 }
 
 function alerts() {
@@ -868,14 +826,14 @@ function bondLines(list, at) {
     st0 = st0 ?? st;
     estimated = estimated || st.estimated;
     accrued += st.interest * l.qty;
-    paid += st.paid * l.qty;
+    paid += st.paid * l.qty * (l.bond.ike ? 1 : 1 - BOND_TAX);
     net += (bondRedeem(l, st)?.net ?? 0) * l.qty;
     qty += l.qty;
   }
   if (!st0) return `<small class="muted">Po wykupie (${esc(shortDate(bondMaturity(l0), true))}).</small>`;
   const next = bondNextPayout(l0, st0);
   const parts = [`${t.cap ? 'odsetki narosłe (z dopisanymi)' : 'odsetki narosłe w tym okresie'} <b class="pos">+${esc(zl(accrued))}</b>`, `oprocentowanie ${esc(pctNum(st0.rate * 100))}%${t.kind === 'stale' ? '' : ` w ${st0.k}. ${t.step === 12 ? 'roku' : t.step === 1 ? 'miesiącu' : 'okresie'}`}${estimated ? ' <span class="warn">(szacunek – czeka na dane GUS/NBP)</span>' : ''}`];
-  if (paid > 0.004) parts.push(`wypłacone odsetki ${esc(zl(paid))}`);
+  if (paid > 0.004) parts.push(`wypłacone odsetki ${esc(zl(paid))}${l0.bond.ike ? '' : ' po podatku'}`);
   if (next?.gross) parts.push(`najbliższa wypłata ${esc(shortDate(next.date, true))}: ok. ${esc(zl(next.gross * qty))} brutto`);
   parts.push(`wykup ${esc(shortDate(st0.maturity, true))}`);
   parts.push(`przy wcześniejszym wykupie dziś ok. <b>${esc(zl(net))}</b> na rękę${l0.bond.ike ? ' (IKE/IKZE – bez opłaty i podatku)' : ' (po opłacie i podatku)'}`);
@@ -934,10 +892,11 @@ function investmentLines(a, cash) {
   // Konto w obcej walucie: dla porządku te same liczby w złotych (z efektem kursu walut).
   const pln = acur !== 'PLN' && sum?.positions ? investSummary(MARKET, a, at, 'PLN') : null;
   const head = sum?.positions
-    ? `<div class="inv-sum"><div><span>Zainwestowano</span><b>${esc(money(sum.cost, acur))}</b></div><div><span>Wartość aktywów</span><b>${esc(money(sum.value, acur))}</b></div><div><span>Zysk</span><b class="${gainClass(sum.gain)}">${esc(gainMoney(sum.gain, sum.gainPct, acur))}</b></div></div>${pln ? `<div class="small muted">W złotych: zainwestowano ${esc(zl(pln.cost))} · wartość ${esc(zl(pln.value))} · zysk ${esc(gainText(pln.gain, pln.gainPct))} (razem ze zmianą kursu ${esc(acur)})</div>` : ''}`
+    ? `<div class="inv-sum"><div><span>Zainwestowano</span><b>${esc(money(sum.cost, acur))}</b></div><div><span>Wartość</span><b>${esc(money(sum.value, acur))}</b></div><div><span>Zysk</span><b class="${gainClass(sum.gain)}">${esc(gainMoney(sum.gain, null, acur))}</b>${sum.gainPct === null ? '' : `<small class="${gainClass(sum.gain)}">${sum.gainPct < -0.00005 ? '−' : '+'}${esc(pct1(sum.gainPct))}</small>`}</div></div>${pln ? `<div class="small muted">W złotych: zainwestowano ${esc(zl(pln.cost))} · wartość ${esc(zl(pln.value))} · zysk ${esc(gainText(pln.gain, pln.gainPct))} (razem ze zmianą kursu ${esc(acur)})</div>` : ''}`
     : '';
   const realized = sum?.realized !== null && sum?.realized !== undefined && Math.abs(sum.realized) >= 0.01 ? `<div class="inv-line"><span>Zysk zrealizowany (sprzedane pozycje)</span><b class="${gainClass(sum.realized)}">${esc(gainMoney(sum.realized, null, acur))}</b></div>` : '';
-  return `${head}${lines.join('')}${realized}<div class="inv-line"><span>Wolna gotówka <button type="button" class="link small" data-edit-acc="${esc(a.id)}">popraw</button></span><b>${esc(money(cash, acur))}</b></div>`;
+  const positions = lines.length ? `<details class="acc-det" data-det="${esc(a.id)}" ${ui.detOpen.has(a.id) ? 'open' : ''}><summary>${lines.length} ${plural(lines.length, 'pozycja', 'pozycje', 'pozycji')} – pokaż szczegóły</summary>${lines.join('')}${realized}</details>` : realized;
+  return `${head}${positions}<div class="inv-line"><span>Wolna gotówka <button type="button" class="link small" data-edit-acc="${esc(a.id)}">popraw</button></span><b>${esc(money(cash, acur))}</b></div>`;
 }
 
 const pctNum = (x) => NF2.format(Math.round(x * 100) / 100).replace(/,00$/, '');
@@ -1051,29 +1010,415 @@ function accountItem(a, b) {
   <div class="acc-more">${details}<div class="acc-actions">${buttons}</div></div></li>`;
 }
 
+// Konta pogrupowane według rodzaju, z sumą każdej grupy (w złotych, bez kont wyłączonych z majątku).
+const ACCOUNT_GROUPS = [
+  ['pieniadze', 'Konta i gotówka', (a) => !isLoan(a) && !isCard(a) && !isInvAccount(a) && !a.gemAccount],
+  ['inwestycje', 'Inwestycje', (a) => !isLoan(a) && !isCard(a) && (isInvAccount(a) || Boolean(a.gemAccount))],
+  ['karty', 'Karty kredytowe', (a) => isCard(a)],
+  ['kredyty', 'Kredyty i pożyczki', (a) => isLoan(a)],
+];
+function accountGroups(list, bal) {
+  return ACCOUNT_GROUPS.map(([key, label, test]) => {
+    const accounts = list.filter(test);
+    if (!accounts.length) return '';
+    let sum = 0;
+    for (const a of accounts) if (!a.excludeFromTotal) sum += accountWorth(fin, a, MARKET, valuationDate(), bal[a.id])?.total ?? 0;
+    return `<div class="acc-group"><div class="acc-group-h"><span>${esc(label)}</span><b class="${sum < -0.004 ? 'neg' : ''}">${esc(zl(sum))}</b></div><ul class="acc-list">${accounts.map((a) => accountItem(a, bal[a.id])).join('')}</ul></div>`;
+  }).join('');
+}
+
 function viewAccounts() {
   const bal = balances(fin);
-  const nw = netWorth(fin, MARKET);
-  const inv = investTotals();
   const active = activeAccounts();
   const hidden = fin.accounts.filter((a) => a.archived);
-  const points = active.length ? worthHistory(fin, MARKET, { today: today(), months: ui.worthRange }) : [];
-  const worth = active.length
-    ? `<section class="card"><div class="card-head"><h2>Majątek</h2><div class="seg small">${WORTH_RANGES.map(([m, l]) => `<button data-worth-range="${m}" class="${ui.worthRange === m ? 'on' : ''}">${l}</button>`).join('')}</div></div>
-      <div class="worth-top"><b class="hb-val ${nw.total < -0.004 ? 'neg' : ''}">${esc(zl(nw.total))}</b></div>
-      <div class="sum3"><div><span>Na kontach</span><b class="pos">${esc(zl(nw.assets - nw.investments))}</b></div><div><span>Inwestycje</span><b>${esc(zl(nw.investments))}</b>${inv.positions ? `<small class="${gainClass(inv.gain)}">zysk ${esc(gainText(inv.gain, inv.gainPct))}</small>` : ''}</div><div><span>Zadłużenie</span><b class="${nw.debt > 0.004 ? 'neg' : ''}">${nw.debt > 0.004 ? '−' : ''}${esc(zl(nw.debt))}</b></div></div>
-      ${worthChart(points)}${worthStats(points)}
-      ${nw.missing.length ? `<p class="small warn">Bez kursu waluty (poza majątkiem): ${esc(nw.missing.join(', '))}.</p>` : ''}
-      <p class="small muted">${esc(marketNote())}</p></section>`
-    : '';
-  return `${worth}
-  <section class="card"><div class="card-head"><h2>Konta i karty</h2><button class="btn small primary" data-act="add-acc">+ Dodaj konto</button></div>
-  ${active.length ? `<ul class="acc-list">${active.map((a) => accountItem(a, bal[a.id])).join('')}</ul>` : '<p class="muted">Nie masz jeszcze kont. Dodaj konto w banku, kartę kredytową, konto inwestycyjne albo gotówkę.</p>'}
+  return `${heroBalance()}
+  <section class="card"><div class="card-head"><h2>Konta</h2><button class="btn small primary" data-act="add-acc">+ Dodaj konto</button></div>
+  ${active.length ? accountGroups(active, bal) : '<p class="muted">Nie masz jeszcze kont. Dodaj konto w banku, kartę kredytową, konto inwestycyjne albo gotówkę.</p>'}
   ${active.length > 1 ? '<div class="row-btns"><button class="btn" data-act="transfer">⇄ Przelew między kontami</button></div>' : ''}</section>
   ${cardPrompt()}
   ${hidden.length ? `<details class="card"><summary>Ukryte konta (${hidden.length})</summary><ul class="acc-list">${hidden.map((a) => accountItem(a, bal[a.id])).join('')}</ul></details>` : ''}
-  <p class="small muted">Karta kredytowa ma saldo ujemne: to Twoje zadłużenie. Wydatek kartą je powiększa, a „Spłać kartę” przelewa pieniądze z wybranego konta (spłata nie jest wydatkiem). Konto inwestycyjne: wartość to wolna gotówka plus aktywa wyceniane po bieżących cenach.</p>`;
+  <p class="small muted">${esc(marketNote())} Karta kredytowa ma saldo ujemne: to Twoje zadłużenie. Wydatek kartą je powiększa, a „Spłać kartę” przelewa pieniądze z wybranego konta (spłata nie jest wydatkiem). Konto inwestycyjne: wartość to wolna gotówka plus aktywa wyceniane po bieżących cenach. Wykres majątku i prognozę znajdziesz w zakładce Majątek.</p>`;
 }
+
+// ---------- Majątek: historia, skąd przyrost, struktura i prognoza ----------
+// Wykresy są rysowane jako SVG. Każdy ma legendę (gdy serii jest więcej niż jedna), dymek po dotknięciu albo najechaniu
+// (wartości z danego miesiąca) i tabelę z tymi samymi danymi. Kolory serii: zmienne --s-cash, --s-inv, --s-debt.
+const trimZeros = (s) => s.replace(/,(\d*?)0+$/, (m, d) => (d ? `,${d}` : ''));
+// Kwoty w skrócie: 950 zł, 78,7 tys. zł, 643 tys. zł, 1,29 mln zł.
+function kzl(x, unit = ' zł') {
+  const a = Math.abs(x);
+  const sign = x <= -0.5 ? '−' : '';
+  if (a >= 999500) return `${sign}${trimZeros(NF2.format(a / 1e6))} mln${unit}`;
+  if (a >= 99950) return `${sign}${NF0.format(Math.round(a / 1000))} tys.${unit}`;
+  if (a >= 9995) return `${sign}${trimZeros(NF1.format(a / 1000))} tys.${unit}`;
+  return `${sign}${NF0.format(Math.round(a))}${unit}`;
+}
+const skzl = (x) => `${x < -0.5 ? '' : '+'}${kzl(x)}`;
+const monthShort = (month, withYear = true) => `${MONTHS_SHORT[Number(month.slice(5, 7)) - 1]}${withYear ? ` ${month.slice(2, 4)}` : ''}`;
+
+function niceTicks(lo, hi, count = 4) {
+  if (!(hi > lo)) hi = lo + 1;
+  const raw = (hi - lo) / count;
+  const pow = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 2.5, 5, 10].map((k) => k * pow).find((s) => s >= raw - 1e-9);
+  const ticks = [];
+  for (let k = Math.floor(lo / step + 1e-9); k * step <= hi + step - 1e-9; k++) ticks.push(Math.round(k * step * 100) / 100);
+  return ticks;
+}
+
+// Pole wykresu: oś Y z okrągłymi wartościami, linie siatki i funkcja przeliczająca wartość na współrzędną.
+function plotArea(lo, hi, { W = 360, H = 210, left = 52, right = 12, top = 14, bottom = 24 } = {}) {
+  const ticks = niceTicks(lo, hi);
+  const y0 = ticks[0];
+  const y1 = ticks[ticks.length - 1];
+  const y = (v) => top + (H - top - bottom) * (1 - (v - y0) / (y1 - y0));
+  const grid = ticks.map((t) => `<line x1="${left}" x2="${W - right}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}" class="${t === 0 ? 'cx-zero' : 'cx-grid'}"/><text x="${left - 6}" y="${(y(t) + 3.5).toFixed(1)}" text-anchor="end" class="cx-tick">${esc(kzl(t, ''))}</text>`).join('');
+  return { W, H, left, right, top, bottom, y, grid, x0: left, x1: W - right, base: y(Math.min(y1, Math.max(y0, 0))), floor: H - bottom };
+}
+const xLabel = (x, text, H) => `<text x="${x.toFixed(1)}" y="${H - 7}" text-anchor="middle" class="cx-tick">${esc(text)}</text>`;
+const cross = (P) => `<line class="cx-cross" x1="0" x2="0" y1="${P.top}" y2="${P.floor}" visibility="hidden"/>`;
+// Słupek z zaokrąglonym końcem od strony danych (góra dla wartości dodatnich, dół dla ujemnych), prosty przy osi.
+function column(x, yTop, w, h, cls, up = true) {
+  if (!(h > 0.4)) return '';
+  const r = Math.min(4, w / 2, h);
+  const d = up
+    ? `M${x},${yTop + h}V${yTop + r}Q${x},${yTop} ${x + r},${yTop}H${x + w - r}Q${x + w},${yTop} ${x + w},${yTop + r}V${yTop + h}Z`
+    : `M${x},${yTop}V${yTop + h - r}Q${x},${yTop + h} ${x + r},${yTop + h}H${x + w - r}Q${x + w},${yTop + h} ${x + w},${yTop + h - r}V${yTop}Z`;
+  return `<path d="${d.replace(/(\d+\.\d{2})\d+/g, '$1')}" class="${cls}"/>`;
+}
+// Wykres z dymkiem: tips = [[x, tytuł, [[etykieta, wartość, klucz koloru], …]], …].
+const chartBox = (svg, tips, W) => `<div class="cx" data-w="${W}" data-tips="${esc(JSON.stringify(tips))}">${svg}<div class="cx-tip" role="status" hidden></div></div>`;
+const legendRow = (items) => `<div class="cx-legend">${items.map(([cls, label, line]) => `<span><i class="${line ? 'cx-key-line' : 'cx-key'} ${cls}"></i>${esc(label)}</span>`).join('')}</div>`;
+const pickLabels = (n, max = 6) => {
+  const step = Math.max(1, Math.ceil(n / max));
+  return (i) => (n - 1 - i) % step === 0;
+};
+
+// Majątek netto miesiąc po miesiącu (jedna linia z delikatnym wypełnieniem).
+function wealthNetChart(points) {
+  const n = points.length;
+  const vals = points.map((p) => p.worth);
+  const P = plotArea(Math.min(...vals), Math.max(...vals));
+  const x = (i) => (n === 1 ? (P.x0 + P.x1) / 2 : P.x0 + ((P.x1 - P.x0) * i) / (n - 1));
+  const line = points.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${P.y(p.worth).toFixed(1)}`).join('');
+  const show = pickLabels(n);
+  const labels = points.map((p, i) => (show(i) ? xLabel(x(i), monthShort(p.month), P.H) : '')).join('');
+  const last = points[n - 1];
+  const svg = `<svg viewBox="0 0 ${P.W} ${P.H}" role="img" aria-label="Majątek netto miesiąc po miesiącu">${P.grid}${labels}<path d="${line}L${x(n - 1).toFixed(1)},${P.base.toFixed(1)}L${x(0).toFixed(1)},${P.base.toFixed(1)}Z" class="cx-area s-net"/><path d="${line}" class="cx-line s-net"/><circle cx="${x(n - 1).toFixed(1)}" cy="${P.y(last.worth).toFixed(1)}" r="4" class="cx-dot s-net"/>${cross(P)}</svg>`;
+  const tips = points.map((p, i) => [Math.round(x(i) * 10) / 10, cap(monthLabel(p.month)), [['Majątek netto', zl0(p.worth), 'net']]]);
+  return chartBox(svg, tips, P.W);
+}
+
+// Aktywa (gotówka i inwestycje) nad osią, długi pod osią, a na tym linia majątku netto.
+function wealthStackChart(points) {
+  const n = points.length;
+  const P = plotArea(-Math.max(0, ...points.map((p) => p.debt)), Math.max(1, ...points.map((p) => p.cash + p.investments)));
+  const slot = (P.x1 - P.x0) / n;
+  const bw = Math.max(2, Math.min(24, slot - 2));
+  const cx = (i) => P.x0 + slot * (i + 0.5);
+  const zero = P.y(0);
+  const show = pickLabels(n);
+  const parts = [P.grid];
+  points.forEach((p, i) => {
+    const left = cx(i) - bw / 2;
+    const cashTop = P.y(p.cash);
+    const invTop = P.y(p.cash + p.investments);
+    const gap = p.cash > 0 && p.investments > 0 && cashTop - invTop > 4 ? 2 : 0;
+    // Gotówka przy osi, inwestycje nad nią (z przerwą 2 px), długi pod osią.
+    parts.push(p.investments > 0 ? column(left, invTop, bw, cashTop - invTop - gap, 's-inv') : '');
+    parts.push(p.investments > 0 ? `<rect x="${left.toFixed(2)}" y="${cashTop.toFixed(2)}" width="${bw.toFixed(2)}" height="${Math.max(0, zero - cashTop - 1).toFixed(2)}" class="s-cash"/>` : column(left, cashTop, bw, zero - cashTop - 1, 's-cash'));
+    parts.push(column(left, zero + 1, bw, P.y(-p.debt) - zero - 1, 's-debt', false));
+    if (show(i)) parts.push(xLabel(cx(i), monthShort(p.month), P.H));
+  });
+  const line = points.map((p, i) => `${i ? 'L' : 'M'}${cx(i).toFixed(1)},${P.y(p.worth).toFixed(1)}`).join('');
+  parts.push(`<path d="${line}" class="cx-line s-ink"/><circle cx="${cx(n - 1).toFixed(1)}" cy="${P.y(points[n - 1].worth).toFixed(1)}" r="4" class="cx-dot s-ink"/>${cross(P)}`);
+  const svg = `<svg viewBox="0 0 ${P.W} ${P.H}" role="img" aria-label="Gotówka, inwestycje i długi miesiąc po miesiącu oraz majątek netto">${parts.join('')}</svg>`;
+  const tips = points.map((p, i) => [Math.round(cx(i) * 10) / 10, cap(monthLabel(p.month)), [['Inwestycje', zl0(p.investments), 'inv'], ['Gotówka', zl0(p.cash), 'cash'], ['Długi', p.debt > 0.5 ? `−${zl0(p.debt)}` : zl0(0), 'debt'], ['Majątek netto', zl0(p.worth), 'ink']]]);
+  return `${chartBox(svg, tips, P.W)}${legendRow([['s-inv', 'Inwestycje'], ['s-cash', 'Gotówka'], ['s-debt', 'Długi'], ['s-ink', 'Majątek netto', true]])}`;
+}
+
+// Ile zostało z dochodów w każdym miesiącu (słupki) i średnia (linia).
+function savedChart(stats) {
+  const list = stats.months;
+  const n = list.length;
+  const P = plotArea(Math.min(0, ...list.map((m) => m.saved)), Math.max(1, ...list.map((m) => m.saved)), { H: 170 });
+  const slot = (P.x1 - P.x0) / n;
+  const bw = Math.max(3, Math.min(24, slot - 4));
+  const cx = (i) => P.x0 + slot * (i + 0.5);
+  const zero = P.y(0);
+  const show = pickLabels(n, 7);
+  const parts = [P.grid];
+  list.forEach((m, i) => {
+    const yv = P.y(m.saved);
+    parts.push(m.saved >= 0 ? column(cx(i) - bw / 2, yv, bw, zero - yv, 's-cash') : column(cx(i) - bw / 2, zero, bw, yv - zero, 's-debt', false));
+    if (show(i)) parts.push(xLabel(cx(i), monthShort(m.month, m.month.endsWith('-01') || i === 0), P.H));
+  });
+  const ya = P.y(stats.avgSaved);
+  parts.push(`<line x1="${P.x0}" x2="${P.x1}" y1="${ya.toFixed(1)}" y2="${ya.toFixed(1)}" class="cx-avg"/><text x="${P.x1}" y="${(ya - 5).toFixed(1)}" text-anchor="end" class="cx-note">średnio ${esc(kzl(stats.avgSaved))}</text>${cross(P)}`);
+  const svg = `<svg viewBox="0 0 ${P.W} ${P.H}" role="img" aria-label="Kwota odłożona w każdym miesiącu">${parts.join('')}</svg>`;
+  const tips = list.map((m, i) => [Math.round(cx(i) * 10) / 10, cap(monthLabel(m.month)), [['Odłożone', signed(m.saved), m.saved >= 0 ? 'cash' : 'debt'], ['Przychody', zl0(m.income), ''], ['Wydatki', zl0(m.expense), ''], ['Stopa oszczędności', m.rate === null ? '–' : pct(m.rate), '']]]);
+  return chartBox(svg, tips, P.W);
+}
+
+// Prognoza: historia (linia ciągła), wariant bazowy (linia przerywana) i przedział ostrożny–optymistyczny (pasmo).
+function forecastChart(hist, fc, months, value) {
+  const [yy, mm, dd] = fc.today.split('-').map(Number);
+  const frac = 1 - dd / new Date(yy, mm, 0).getDate();
+  const h = Math.min(hist.length, Math.max(6, Math.round(months / 3)));
+  const past = hist.slice(-h);
+  const tOf = (m) => m + frac;
+  const base = fc.base.slice(0, months + 1).map((p) => value(p.worth, p.m));
+  const low = fc.low.slice(0, months + 1).map((p) => value(p.worth, p.m));
+  const high = fc.high.slice(0, months + 1).map((p) => value(p.worth, p.m));
+  const P = plotArea(Math.min(...past.map((p) => p.worth), ...low), Math.max(...past.map((p) => p.worth), ...high), { H: 230, right: 14 });
+  const tMin = -(past.length - 1);
+  const tMax = tOf(months);
+  const x = (t) => P.x0 + ((t - tMin) / (tMax - tMin)) * (P.x1 - P.x0);
+  const path = (vals) => vals.map((v, m) => `${m ? 'L' : 'M'}${x(tOf(m)).toFixed(1)},${P.y(v).toFixed(1)}`).join('');
+  const now = past[past.length - 1].worth;
+  const histLine = past.map((p, i) => `${i ? 'L' : 'M'}${x(tMin + i).toFixed(1)},${P.y(p.worth).toFixed(1)}`).join('');
+  const band = `M${x(0).toFixed(1)},${P.y(now).toFixed(1)}${high.map((v, m) => `L${x(tOf(m)).toFixed(1)},${P.y(v).toFixed(1)}`).join('')}${[...low].reverse().map((v, k) => `L${x(tOf(months - k)).toFixed(1)},${P.y(v).toFixed(1)}`).join('')}Z`;
+  // Oś czasu: przy krótkim horyzoncie miesiące, przy długim – lata.
+  const labels = [];
+  if (months <= 24) {
+    for (let m = 0; m <= months; m += months <= 12 ? 3 : 6) labels.push(xLabel(x(tOf(m)), monthShort(fc.dates[m].slice(0, 7)), P.H));
+  } else {
+    const every = Math.max(1, Math.ceil(months / 12 / 5));
+    for (let m = 0; m <= months; m++) {
+      const d = fc.dates[m];
+      if (d.slice(5, 7) === '12' && (Number(d.slice(0, 4)) + 1) % every === 0 && m + 6 <= months) labels.push(xLabel(x(tOf(m)), String(Number(d.slice(0, 4)) + 1), P.H));
+    }
+  }
+  const endX = x(tMax);
+  const endY = P.y(base[months]);
+  const svg = `<svg viewBox="0 0 ${P.W} ${P.H}" role="img" aria-label="Prognoza majątku netto">${P.grid}${labels.join('')}
+  <path d="${band}" class="cx-band s-net"/><path d="${histLine}" class="cx-line s-net"/><path d="M${x(0).toFixed(1)},${P.y(now).toFixed(1)}${path(base).replace(/^M/, 'L')}" class="cx-line cx-dash s-net"/>
+  <line x1="${x(0).toFixed(1)}" x2="${x(0).toFixed(1)}" y1="${P.top}" y2="${P.floor}" class="cx-now"/><text x="${(x(0) + 4).toFixed(1)}" y="${P.top + 8}" class="cx-note">dziś</text>
+  <circle cx="${endX.toFixed(1)}" cy="${endY.toFixed(1)}" r="4" class="cx-dot s-net"/><text x="${(endX - 7).toFixed(1)}" y="${(endY < P.top + 22 ? endY + 16 : endY - 9).toFixed(1)}" text-anchor="end" class="cx-end">≈ ${esc(kzl(base[months]))}</text>${cross(P)}</svg>`;
+  const step = Math.max(1, Math.ceil(months / 120));
+  const tips = past.slice(0, -1).map((p, i) => [Math.round(x(tMin + i) * 10) / 10, cap(monthLabel(p.month)), [['Majątek netto', zl0(p.worth), 'net']]]);
+  tips.push([Math.round(x(0) * 10) / 10, 'Dziś', [['Majątek netto', zl0(now), 'net']]]);
+  for (let m = step; m <= months; m += step) tips.push([Math.round(x(tOf(m)) * 10) / 10, cap(monthLabel(fc.dates[m].slice(0, 7))), [['Bazowo', kzl(base[m]), 'net'], ['Ostrożnie', kzl(low[m]), ''], ['Optymistycznie', kzl(high[m]), '']]]);
+  return `${chartBox(svg, tips, P.W)}${legendRow([['s-net', 'Dotychczas', true], ['s-net cx-dash-key', 'Prognoza (wariant bazowy)', true], ['s-band', 'Od ostrożnego do optymistycznego']])}`;
+}
+
+// Wiersz z paskiem: nazwa, kwota i pasek proporcjonalny do największej pozycji.
+const barRow = (label, value, share, cls, note = '') => `<li class="bar-row"><div class="br-top"><span>${label}</span><b>${esc(value)}</b></div><div class="br-track"><span class="${cls}" style="width:${Math.max(1.5, Math.min(100, share * 100)).toFixed(1)}%"></span></div>${note ? `<small>${note}</small>` : ''}</li>`;
+const kpiTile = (label, value, note = '', cls = '') => `<div class="kpi"><span>${esc(label)}</span><b class="${cls}">${esc(value)}</b>${note ? `<small>${note}</small>` : ''}</div>`;
+const sinceText = (month) => `od końca ${MONTHS_GEN[Number(month.slice(5, 7)) - 1]}${month.slice(0, 4) === today().slice(0, 4) ? '' : ` ${month.slice(0, 4)}`}`;
+
+function wealthHero(now, all) {
+  const prev = all.length > 1 ? all[all.length - 2] : null;
+  const year = all.length > 12 ? all[all.length - 13] : null;
+  const delta = (p, label) => (p ? `<span class="hero-delta"><b class="${gainClass(now.worth - p.worth)}">${esc(skzl(now.worth - p.worth))}</b> ${esc(label)}</span>` : '');
+  return `<section class="card wealth-hero"><span class="muted small">Majątek netto</span><div class="hero-fig ${now.worth < -0.5 ? 'neg' : ''}">${esc(zl(now.worth))}</div>
+  <div class="hero-deltas">${delta(prev, 'w tym miesiącu')}${delta(year, 'przez 12 miesięcy')}</div>
+  <div class="kpis">${kpiTile('Gotówka', kzl(now.cash))}${kpiTile('Inwestycje', kzl(now.investments))}${kpiTile('Długi', now.debt > 0.5 ? `−${kzl(now.debt)}` : kzl(0), '', now.debt > 0.5 ? 'neg' : '')}</div>
+  ${now.missing.length ? `<p class="small warn">Bez kursu waluty (poza majątkiem): ${esc(now.missing.join(', '))}.</p>` : ''}</section>`;
+}
+
+function wealthHistoryCard(all) {
+  if (all.length < 2) return `<section class="card"><h2>Jak zmienia się majątek</h2><p class="muted small">Wykres pokaże się, gdy dziennik obejmie co najmniej dwa miesiące${all.length ? ` (dane od: ${esc(monthLabel(all[0].month))})` : ''}.</p></section>`;
+  const points = ui.worthRange ? all.slice(-ui.worthRange) : all;
+  const stack = ui.worthMode === 'struktura';
+  const rows = [...points].reverse().map((p) => `<tr><td>${esc(cap(monthShort(p.month)))}</td><td class="num">${esc(zl0(p.worth))}</td><td class="num">${esc(zl0(p.cash))}</td><td class="num">${esc(zl0(p.investments))}</td><td class="num">${p.debt > 0.5 ? '−' : ''}${esc(zl0(p.debt))}</td></tr>`).join('');
+  return `<section class="card"><div class="card-head"><h2>Jak zmienia się majątek</h2><div class="seg small">${WORTH_RANGES.map(([m, l]) => `<button data-worth-range="${m}" class="${ui.worthRange === m ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+  <div class="seg small mode-seg"><button data-worth-mode="netto" class="${stack ? '' : 'on'}">Majątek netto</button><button data-worth-mode="struktura" class="${stack ? 'on' : ''}">Aktywa i długi</button></div>
+  ${stack ? wealthStackChart(points) : wealthNetChart(points)}
+  <details class="cx-table"><summary>Pokaż liczby w tabeli</summary><div class="tbl-wrap"><table><thead><tr><th>Koniec miesiąca</th><th class="num">Majątek netto</th><th class="num">Gotówka</th><th class="num">Inwestycje</th><th class="num">Długi</th></tr></thead><tbody>${rows}</tbody></table></div></details>
+  <p class="small muted">Dotknij wykresu, aby zobaczyć wartości z danego miesiąca. Ostatni punkt to dziś. ${esc(marketNote())}</p></section>`;
+}
+
+function wealthChangeCard(all) {
+  const points = ui.worthRange ? all.slice(-ui.worthRange) : all;
+  const ch = wealthChange(points);
+  if (!ch) return '';
+  const items = [
+    ['Odłożone z dochodów', ch.saved, `przychody ${zl0(ch.income)} − wydatki ${zl0(ch.expense)}`],
+    ['Wpłaty spoza budżetu', ch.external, 'np. składki pracodawcy do PPE i aktywa dopisane do dziennika'],
+    ['Wynik inwestycji', ch.invGain, 'zmiana wartości kont inwestycyjnych poza wpłatami'],
+    ['Pozostałe', ch.other, 'korekty sald i zmiany kursów walut na kontach'],
+  ].filter(([, v], i) => i === 0 || Math.abs(v) >= 1);
+  const max = Math.max(1, ...items.map(([, v]) => Math.abs(v)));
+  return `<section class="card"><h2>Skąd ta zmiana</h2>
+  <p class="lead">Majątek ${ch.change >= 0 ? 'urósł' : 'zmalał'} o <b class="${gainClass(ch.change)}">${esc(zl0(Math.abs(ch.change)))}</b> ${esc(sinceText(points[0].month))} (${ch.months} ${plural(ch.months, 'miesiąc', 'miesiące', 'miesięcy')}).</p>
+  <ul class="bar-rows">${items.map(([label, v, note]) => barRow(esc(label), signed(v), Math.abs(v) / max, v >= 0 ? 's-cash' : 's-debt', esc(note))).join('')}</ul>
+  <p class="small muted">Spłata kapitału kredytu nie zmienia majątku (ubywa gotówki i długu jednocześnie); odsetki są w wydatkach.</p></section>`;
+}
+
+function savingsCard(stats, liquid) {
+  if (!stats.n) return '';
+  const cushion = stats.avgExpense > 1 ? liquid / stats.avgExpense : null;
+  const cushionNote = cushion === null ? '' : cushion >= 6 ? 'bezpieczny zapas (zwykle zaleca się 3–6 miesięcy)' : cushion >= 3 ? 'w zalecanym przedziale 3–6 miesięcy' : 'poniżej zalecanych 3–6 miesięcy';
+  return `<section class="card"><h2>Ile odkładasz</h2>
+  <div class="kpis">${kpiTile('Średnio miesięcznie', kzl(stats.avgSaved), `z ${stats.n} ${plural(stats.n, 'pełnego miesiąca', 'pełnych miesięcy', 'pełnych miesięcy')}`, gainClass(stats.avgSaved))}${kpiTile('Stopa oszczędności', stats.rate === null ? '–' : pct(stats.rate), 'tyle przychodów zostaje')}${cushion === null ? '' : kpiTile('Poduszka finansowa', `${NF1.format(cushion)} mies.`, esc(cushionNote))}</div>
+  ${stats.n >= 2 ? savedChart(stats) : ''}
+  <p class="small muted">Średnio w miesiącu: przychody ${esc(zl0(stats.avgIncome))}, wydatki ${esc(zl0(stats.avgExpense))}${stats.avgInvested > 1 ? `, na inwestycje trafia ${esc(zl0(stats.avgInvested))}` : ''}${stats.avgExternal > 1 ? `, spoza budżetu (np. PPE) ${esc(zl0(stats.avgExternal))}` : ''}. Poduszka finansowa: pieniądze na kontach, oszczędnościach i w gotówce (${esc(zl0(liquid))}) podzielone przez średnie wydatki.</p></section>`;
+}
+
+function structureCard(st) {
+  if (!st.assets.length && !st.debts.length) return '';
+  const top = st.assets[0]?.value ?? 1;
+  const maxDebt = Math.max(1, ...st.debts.map((d) => -d.value));
+  return `<section class="card"><h2>Z czego składa się majątek</h2>
+  ${st.assets.length ? `<div class="br-head"><span>Aktywa</span><b>${esc(zl0(st.total))}</b></div><ul class="bar-rows">${st.assets.map((i) => barRow(`${esc(i.label)} <span class="muted small">${esc(pct1(i.share))}</span>`, zl0(i.value), i.value / top, 's-cash')).join('')}</ul>` : ''}
+  ${st.debts.length ? `<div class="br-head"><span>Długi</span><b class="neg">−${esc(zl0(st.owed))}</b></div><ul class="bar-rows">${st.debts.map((i) => barRow(esc(i.label), `−${zl0(-i.value)}`, -i.value / maxDebt, 's-debt')).join('')}</ul>` : ''}
+  </section>`;
+}
+
+const FC_YEARS = [1, 5, 10, 20, 30];
+const yearsLabel = (y) => `${y} ${y === 1 ? 'rok' : plural(y, 'rok', 'lata', 'lat')}`;
+const afterYears = (y) => (y === 1 ? 'roku' : `${y} latach`);
+// Procenty z jednym miejscem po przecinku, bez zbędnego zera: 6,1%, 3%.
+const pc1 = (x) => String(Math.round(x * 10) / 10).replace('.', ',');
+const fcDate = (iso) => `${MONTHS[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}`;
+
+function forecastCard(all, stats) {
+  const o = fin.forecast ?? {};
+  const fc = wealthForecast(fin, MARKET, { today: today(), months: 480, overrides: o });
+  const d = fc.defaults;
+  const real = o.real !== false;
+  const years = FC_YEARS.includes(ui.fcYears) ? ui.fcYears : 10;
+  const months = years * 12;
+  const infl = fc.params.inflationPct;
+  const value = (v, m) => (real ? v / (1 + infl / 100) ** (m / 12) : v);
+  const at = (series, m) => value(series[m].worth, m);
+  const hist = all.length ? all : [{ month: today().slice(0, 7), worth: fc.now.worth }];
+  if (d.basis === 'brak' && !Number.isFinite(Number(o.saved)))
+    return `<section class="card"><h2>Prognoza</h2><p class="muted small">Prognoza pojawi się, gdy w dzienniku będą przychody i wydatki z co najmniej jednego pełnego miesiąca albo stałe pozycje (np. wynagrodzenie i rachunki). Możesz też od razu wpisać, ile odkładasz co miesiąc.</p>${forecastInputs(fc, o)}</section>`;
+  // Kamienie milowe w wariancie bazowym: spłata kredytów, kolejne okrągłe kwoty i niezależność finansowa.
+  const miles = [];
+  const firstM = (test) => fc.base.findIndex(test);
+  if (fc.start.debt > 0.5) {
+    const m = firstM((p) => p.debt <= 0.5);
+    if (m > 0) miles.push(['🏁', 'Kredyty spłacone', fcDate(fc.dates[m])]);
+  }
+  const nowWorth = fc.now.worth;
+  const targets = [];
+  for (const x of [0, 10000, 25000, 50000, 100000, 250000, 500000, 1e6, 2e6, 5e6, 1e7]) {
+    if (x > nowWorth + 1 && targets.length < 3 && (!targets.length || x >= Math.max(targets.at(-1) * 2, 100000))) targets.push(x);
+  }
+  for (const target of targets) {
+    const m = firstM((p) => value(p.worth, p.m) >= target);
+    if (m > 0) miles.push([target === 0 ? '⚖️' : '🎯', target === 0 ? 'Majątek netto na plusie' : `Majątek ${kzl(target)}`, fcDate(fc.dates[m])]);
+  }
+  const yearly = stats.avgExpense * 12;
+  if (yearly > 1000) {
+    const m = firstM((p) => p.worth / (1 + infl / 100) ** (p.m / 12) >= 25 * yearly);
+    if (m > 0) miles.push(['🌴', `Niezależność finansowa (${kzl(25 * yearly)} w dzisiejszych pieniądzach)`, fcDate(fc.dates[m])]);
+  }
+  // Co daje dodatkowe 100 zł miesięcznie: inwestowane albo trzymane w gotówce.
+  const extra = (invest) => at(wealthForecast(fin, MARKET, { today: today(), months, overrides: { ...o, saved: fc.params.saved + 100, invested: fc.params.invested + (invest ? 100 : 0) } }).base, months) - at(fc.base, months);
+  const marks = [...new Set([1, 5, 10, 20, 30].filter((y) => y <= years))];
+  const rows = marks.map((y) => `<tr><td>za ${esc(yearsLabel(y))}</td><td class="num">${esc(kzl(at(fc.low, y * 12)))}</td><td class="num"><b>${esc(kzl(at(fc.base, y * 12)))}</b></td><td class="num">${esc(kzl(at(fc.high, y * 12)))}</td></tr>`).join('');
+  const basis = { historia: `średnia z ostatnich ${d.n} pełnych miesięcy`, krotka: `tylko ${d.n} ${plural(d.n, 'pełny miesiąc', 'pełne miesiące', 'pełnych miesięcy')} historii – prognoza będzie dokładniejsza z czasem`, stale: 'stałe pozycje i plany (za mało historii)', brak: 'Twoje założenia' }[d.basis];
+  const end = at(fc.base, months);
+  const cashShare = fc.base[months].worth + fc.base[months].debt > 1 ? Math.max(0, fc.base[months].cash) / (Math.max(0, fc.base[months].cash) + fc.base[months].investments) : 0;
+  return `<section class="card" id="forecast-card"><div class="card-head"><h2>Prognoza</h2><div class="seg small">${FC_YEARS.map((y) => `<button data-fc-years="${y}" class="${y === years ? 'on' : ''}">${y === 1 ? '1 rok' : `${y} lat`}</button>`).join('')}</div></div>
+  <p class="lead">Za ${esc(yearsLabel(years))} (${esc(fcDate(fc.dates[months]))}) Twój majątek netto może wynosić około <b>${esc(kzl(end))}</b> – prawdopodobnie między ${esc(kzl(at(fc.low, months)))} a ${esc(kzl(at(fc.high, months)))}${real ? ', w dzisiejszych pieniądzach' : ''}.</p>
+  ${forecastChart(hist, fc, months, value)}
+  <label class="check small"><input type="checkbox" data-fc-real ${real ? 'checked' : ''}> <span>Pokaż w dzisiejszych pieniądzach (po odjęciu inflacji ${esc(pc1(infl))}% rocznie)</span></label>
+  <div class="tbl-wrap"><table class="fc-table"><thead><tr><th></th><th class="num">Ostrożnie</th><th class="num">Bazowo</th><th class="num">Optymistycznie</th></tr></thead><tbody>${rows}</tbody></table></div>
+  ${miles.length ? `<ul class="miles">${miles.map(([ico, label, when]) => `<li><span>${ico}</span><span>${esc(label)}</span><b>${esc(when)}</b></li>`).join('')}</ul>` : ''}
+  <div class="banner info small">Każde dodatkowe <b>100 zł</b> odkładane co miesiąc to po ${esc(afterYears(years))} około <b>${esc(kzl(extra(true)))}</b> więcej, jeśli je inwestujesz, albo ${esc(kzl(extra(false)))}, jeśli zostają w gotówce.${cashShare > 0.4 && years >= 10 ? ` Przy obecnych nawykach ${esc(pct(cashShare))} aktywów będzie wtedy w gotówce, która nie zarabia.` : ''}</div>
+  <h3 class="sub-h">Założenia <span class="muted">– ${esc(basis)}</span></h3>
+  ${forecastInputs(fc, o)}
+  <details class="cx-table"><summary>Jak powstaje prognoza</summary><div class="small muted">
+  <p>Punkt wyjścia to dzisiejszy majątek: gotówka i konta ${esc(zl0(fc.start.cash))}, inwestycje ${esc(zl0(fc.start.investments))}${fc.start.debt > 0.5 ? `, kredyty ${esc(zl0(fc.start.debt))}` : ''}. Co miesiąc dodaję kwotę, która zwykle zostaje z dochodów, zaplanowaną część przenoszę na inwestycje, a inwestycje rosną o założony zysk. Odkładane kwoty rosną razem z inflacją (realnie się nie zmieniają).</p>
+  ${fc.start.debt > 0.5 ? '<p>Kredyty spłacają się według harmonogramów: kapitał raty zmniejsza gotówkę i dług jednocześnie, a odsetki maleją z każdą ratą – po spłacie kredytu co miesiąc zostaje więcej.</p>' : ''}
+  ${d.external > 1 ? `<p>Do inwestycji doliczam też wpłaty spoza budżetu (np. składki pracodawcy do PPE): ${esc(zl0(d.external))} miesięcznie.</p>` : ''}
+  <p>Zysk z inwestycji (${esc(pc1(d.returnPct))}% rocznie) wynika ze składu Twojego portfela: ${d.mix.items.length ? esc(d.mix.items.map((i) => `${i.label.toLowerCase()} ${pct(i.share)} → ${pc1(i.ret)}%`).join(', ')) : 'nie masz jeszcze inwestycji, więc przyjmuję 6% jak dla szerokiego portfela akcji i obligacji'}. To założenia długoterminowe (akcje ok. 7% rocznie, obligacje indeksowane: inflacja + marża, złoto: inflacja + 1,5 pkt proc.), a nie wynik z ostatnich miesięcy – krótka historia własnego portfela niczego nie przesądza.</p>
+  <p>Wariant ostrożny i optymistyczny: odkładana kwota mniejsza lub większa o ${esc(pct(d.savedSpread))}, zysk z inwestycji niższy lub wyższy o ${esc(pc1(d.spread))} pkt proc. Gotówka nie jest oprocentowana. Podatki od zysków nie są odliczane.</p>
+  ${yearly > 1000 ? `<p>Niezależność finansowa to majątek równy 25-krotności rocznych wydatków (dziś wydajesz ok. ${esc(zl0(yearly))} rocznie). Wypłacając z takiego majątku około 4% rocznie, pokrywasz wydatki bez pracy – to popularna, przybliżona reguła.</p>` : ''}
+  <p>Prognoza to szacunek przy dzisiejszych nawykach, a nie obietnica: zmiana pracy, duży wydatek albo bessa mogą ją znacząco zmienić.</p></div></details></section>`;
+}
+
+function forecastInputs(fc, o) {
+  const d = fc.defaults;
+  const field = (key, label, val, hint, unit) => `<label class="field">${esc(label)}<span class="in-unit"><input data-fc="${key}" inputmode="decimal" autocomplete="off" value="${esc(val)}"><i>${esc(unit)}</i></span><small>${esc(hint)}</small></label>`;
+  const num = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
+  const custom = ['saved', 'invested', 'returnPct', 'inflationPct'].some((k) => Number.isFinite(Number(o[k])) && o[k] !== null && o[k] !== '');
+  return `<div class="two fc-inputs">
+  ${field('saved', 'Co miesiąc odkładasz', num(Math.round(fc.params.saved)), d.basis === 'brak' ? 'przychody minus wydatki' : `z historii: ${zl0(d.saved)}`, 'zł')}
+  ${field('invested', 'Z tego inwestujesz', num(Math.round(fc.params.invested)), d.basis === 'brak' ? 'np. wpłaty do planu' : `z historii: ${zl0(d.invested)}`, 'zł')}
+  ${field('returnPct', 'Zysk z inwestycji', num(fc.params.returnPct), `ze składu portfela: ${pc1(d.returnPct)}%`, '% rocznie')}
+  ${field('inflationPct', 'Inflacja', num(fc.params.inflationPct), 'cel NBP to 2,5% ± 1 pkt proc.', '% rocznie')}
+  </div>${custom ? '<p class="small"><button type="button" class="link small" data-fc-reset="1">Przywróć założenia wyliczone z historii</button></p>' : ''}`;
+}
+
+function viewWealth() {
+  const active = activeAccounts();
+  if (!active.length) return `<section class="card empty"><div class="empty-icon">📈</div><h2 class="h2-plain">Majątek</h2><p>Dodaj konta (bank, oszczędności, inwestycje, kredyty), a zobaczysz tu, jak zmienia się Twój majątek, z czego się składa i dokąd zmierza.</p><div class="row-btns"><button class="btn primary" data-act="add-acc">+ Dodaj konto</button></div></section>`;
+  const t = today();
+  const all = worthSeries(fin, MARKET, { today: t });
+  const now = wealthAt(fin, MARKET, t);
+  const st = wealthStructure(fin, MARKET, t);
+  const stats = savingsStats(fin, MARKET, { today: t, months: 12 });
+  // Kredyt bez wpisanej wartości tego, co za niego kupiono, zaniża majątek netto.
+  const hint = now.loanDebt > 0.5 && !st.assets.some((i) => i.key === 'reczne') ? '<div class="banner info small">Masz kredyt, ale w aplikacji nie ma tego, co za niego kupiłeś (np. mieszkania albo samochodu), dlatego majątek netto jest zaniżony. Możesz dopisać jego wartość: Konta → konto inwestycyjne (np. „Nieruchomości”) → Aktywa → „Inne aktywo (wycena ręczna)”.</div>' : '';
+  return `${wealthHero(now, all)}${hint}<div class="wealth-grid">${wealthHistoryCard(all)}${wealthChangeCard(all)}${savingsCard(stats, st.liquid)}${structureCard(st)}</div>${forecastCard(all, stats)}`;
+}
+
+// Dymek wykresu: najbliższy punkt do palca albo kursora, pionowa linia i wartości wszystkich serii.
+function chartTip(ev) {
+  const box = ev.target.closest?.('.cx');
+  for (const other of $$('.cx.on')) if (other !== box) hideChartTip(other);
+  if (!box) return;
+  const svg = $('svg', box);
+  const rect = svg.getBoundingClientRect();
+  if (!rect.width) return;
+  box.tips ??= JSON.parse(box.dataset.tips);
+  const W = Number(box.dataset.w);
+  const px = ((ev.clientX - rect.left) / rect.width) * W;
+  let best = box.tips[0];
+  for (const tip of box.tips) if (Math.abs(tip[0] - px) < Math.abs(best[0] - px)) best = tip;
+  const line = $('.cx-cross', svg);
+  line.setAttribute('x1', best[0]);
+  line.setAttribute('x2', best[0]);
+  line.setAttribute('visibility', 'visible');
+  const tip = $('.cx-tip', box);
+  tip.replaceChildren();
+  const head = document.createElement('div');
+  head.className = 'cx-tip-h';
+  head.textContent = best[1];
+  tip.append(head);
+  for (const [label, val, key] of best[2]) {
+    const row = document.createElement('div');
+    row.className = 'cx-tip-r';
+    const k = document.createElement('i');
+    k.className = key ? `cx-key-line s-${key}` : 'cx-key-none';
+    const b = document.createElement('b');
+    b.textContent = val;
+    const s = document.createElement('span');
+    s.textContent = label;
+    row.append(k, b, s);
+    tip.append(row);
+  }
+  tip.hidden = false;
+  box.classList.add('on');
+  const x = (best[0] / W) * rect.width;
+  const half = tip.offsetWidth / 2;
+  tip.style.left = `${Math.max(half, Math.min(rect.width - half, x))}px`;
+}
+function hideChartTip(box) {
+  box.classList.remove('on');
+  $('.cx-tip', box).hidden = true;
+  $('.cx-cross', box)?.setAttribute('visibility', 'hidden');
+}
+$('#fin-root').addEventListener('pointermove', (ev) => (ev.pointerType === 'mouse' || ev.buttons) && chartTip(ev));
+$('#fin-root').addEventListener('pointerdown', chartTip);
+$('#fin-root').addEventListener('pointerleave', () => $$('.cx.on').forEach(hideChartTip));
+// Rozwinięte szczegóły konta zostają rozwinięte po odświeżeniu widoku.
+$('#fin-root').addEventListener(
+  'toggle',
+  (ev) => {
+    const id = ev.target.dataset?.det;
+    if (!id) return;
+    if (ev.target.open) ui.detOpen.add(id);
+    else ui.detOpen.delete(id);
+  },
+  true,
+);
 
 // ---------- Stałe pozycje ----------
 function recRow(r) {
@@ -1283,7 +1628,9 @@ function csvMapping() {
 }
 
 // ---------- Render i nawigacja ----------
-const VIEWS = { przeglad: viewOverview, kalendarz: viewCalendar, operacje: viewTransactions, konta: viewAccounts, stale: viewRecurring, ustawienia: viewSettings };
+// Operacje mają dwa tryby: lista i kalendarz (jak w aplikacji Money Manager).
+const txModeSwitch = () => `<div class="seg mode-seg tx-mode" role="tablist" aria-label="Widok operacji"><button data-tx-mode="lista" class="${ui.txMode === 'kalendarz' ? '' : 'on'}">Lista</button><button data-tx-mode="kalendarz" class="${ui.txMode === 'kalendarz' ? 'on' : ''}">Kalendarz</button></div>`;
+const VIEWS = { przeglad: viewOverview, operacje: () => `${txModeSwitch()}${ui.txMode === 'kalendarz' ? viewCalendar() : viewTransactions()}`, majatek: viewWealth, konta: viewAccounts, stale: viewRecurring, ustawienia: viewSettings };
 
 // ---------- Dymek z wydatkami (tabela porównania kategorii) ----------
 const cmpPop = document.createElement('div');
@@ -1519,12 +1866,29 @@ $('#fin-root').addEventListener('click', async (ev) => {
     ui.worthRange = Number(d.worthRange);
     return render();
   }
+  if (d.worthMode) {
+    ui.worthMode = d.worthMode;
+    return render();
+  }
+  if (d.fcYears) {
+    ui.fcYears = Number(d.fcYears);
+    return render();
+  }
+  if (d.fcReset) {
+    fin.forecast = fin.forecast?.real === false ? { real: false } : {};
+    save();
+    return render();
+  }
+  if (d.txMode) {
+    ui.txMode = d.txMode;
+    return render();
+  }
   if (d.openCat) {
     ui.openCat = ui.openCat === d.openCat ? null : d.openCat;
     return render();
   }
   if (d.catAll) {
-    Object.assign(ui, { category: d.catAll, account: '', type: '', q: '' });
+    Object.assign(ui, { category: d.catAll, account: '', type: '', q: '', txMode: 'lista' });
     return setView('operacje');
   }
   if (d.calShift) return shiftCal(Number(d.calShift));
@@ -1592,7 +1956,7 @@ $('#fin-root').addEventListener('click', async (ev) => {
   if (d.gemLink) return linkGemTxs(d.gemLink);
   if (d.editRec?.startsWith('loan:')) return openLoan(d.editRec.slice(5));
   if (d.history) {
-    Object.assign(ui, { account: d.history, category: '', type: '', q: '' });
+    Object.assign(ui, { account: d.history, category: '', type: '', q: '', txMode: 'lista' });
     return setView('operacje');
   }
   if (d.editAcc) return openAccount(d.editAcc);
@@ -1750,6 +2114,22 @@ $('#fin-root').addEventListener('click', async (ev) => {
 
 $('#fin-root').addEventListener('change', async (ev) => {
   const el = ev.target;
+  if (el.dataset.fc) {
+    // Założenie prognozy wpisane ręcznie; puste pole wraca do wartości wyliczonej z historii.
+    const limits = { saved: [-1e6, 1e6], invested: [0, 1e6], returnPct: [-20, 30], inflationPct: [0, 20] }[el.dataset.fc];
+    const v = parseAmount(el.value);
+    const next = { ...(fin.forecast ?? {}) };
+    if (!limits || el.value.trim() === '' || !Number.isFinite(v)) delete next[el.dataset.fc];
+    else next[el.dataset.fc] = Math.min(limits[1], Math.max(limits[0], v));
+    fin.forecast = next;
+    save();
+    return render();
+  }
+  if (el.dataset.fcReal !== undefined) {
+    fin.forecast = { ...(fin.forecast ?? {}), real: el.checked };
+    save();
+    return render();
+  }
   if (el.id === 'f-account') ui.account = el.value;
   else if (el.id === 'f-category') ui.category = el.value;
   else if (el.id === 'f-type') ui.type = el.value;
@@ -2448,12 +2828,15 @@ function lotDraft(l) {
   return d;
 }
 
+// Pozycja zamknięta: sprzedana albo obligacja po terminie wykupu (pieniądze z wykupu są już na koncie).
+const lotClosed = (l) => Boolean(l.until) || (isBondLot(l) && Boolean(l.bond) && lotEnd(l) <= valuationDate());
+
 function openLots(accountId) {
   const a = acc(accountId);
   if (!a) return;
   lotsState = {
     accountId,
-    lots: (a.lots ?? []).filter((l) => !l.until).map(lotDraft),
+    lots: (a.lots ?? []).filter((l) => !lotClosed(l)).map(lotDraft),
     before: holdingsPLN(MARKET, a, valuationDate()) ?? 0,
     fundCategory: a.fundCategory ?? '',
   };
@@ -2976,8 +3359,8 @@ lotsForm.addEventListener('submit', (ev) => {
     const target = acc(lotsState.accountId);
     // Rozliczenie z gotówką: nowa pozycja liczy się osobno od dziś (wcześniej jej wartość była w saldzie gotówki),
     // a usunięta to sprzedaż – zostaje w historii do dziś. Bez rozliczenia usunięta pozycja znika całkiem.
-    const oldActive = (target.lots ?? []).filter((l) => !l.until);
-    const closed = (target.lots ?? []).filter((l) => l.until);
+    const oldActive = (target.lots ?? []).filter((l) => !lotClosed(l));
+    const closed = (target.lots ?? []).filter(lotClosed);
     const kept = new Set(lots.map((l) => l.id));
     const sold = settleCash ? oldActive.filter((l) => !kept.has(l.id)).map((l) => ({ ...l, until: t })) : [];
     for (const l of lots) {
