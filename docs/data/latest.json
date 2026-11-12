@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-11T07:19:58.525Z",
+  "generatedAt": "2026-11-12T07:25:50.994Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -50,14 +50,14 @@
    "changed": false
   },
   "preview": {
-   "asOf": "2026-11-10",
+   "asOf": "2026-11-11",
    "returns": {
-    "US": 0.11234721358349109,
-    "EXUS": 0.13190444640323706,
-    "TBILLS": 0.03669315599297751,
-    "BONDS": -0.003226209287977455,
-    "DEVX": 0.1326519279605567,
-    "EM": 0.1051151241103172
+    "US": 0.12444277740503074,
+    "EXUS": 0.13735723943366485,
+    "TBILLS": 0.036919730843366416,
+    "BONDS": -0.006617438568673251,
+    "DEVX": 0.1276243975863005,
+    "EM": 0.1297568155937734
    },
    "decision": {
     "asset": "EXUS",
@@ -68,8 +68,8 @@
      "US"
     ],
     "absAsset": "US",
-    "excess": 0.07565405759051358,
-    "relativeMargin": 0.019557232819745973,
+    "excess": 0.08752304656166432,
+    "relativeMargin": 0.01291446202863411,
     "safeMargin": null,
     "nearTie": false,
     "bufferApplied": false
@@ -692,7 +692,7 @@
   ],
   "switchesInHistory": 6,
   "nextDecisionDate": "2026-11-30",
-  "lastDataDate": "2026-11-10",
+  "lastDataDate": "2026-11-11",
   "warnings": []
  },
  "explanation": {
@@ -716,7 +716,7 @@
    "level": "słaby"
   },
   "stabilityText": "Stabilność sygnału: słaby (do zmiany sygnału brakuje 1,7 pp).",
-  "previewNote": "Wstępny sygnał na dziś (dane do 10 listopada 2026) potwierdza EXUS.DE.",
+  "previewNote": "Wstępny sygnał na dziś (dane do 11 listopada 2026) potwierdza EXUS.DE.",
   "currency": [
    {
     "key": "IKE",
@@ -762,8 +762,8 @@
    {
     "id": "VIXCLS",
     "name": "VIX – „indeks strachu”",
-    "date": "2026-11-09",
-    "value": "19,9",
+    "date": "2026-11-10",
+    "value": "19,5",
     "tier": 1,
     "comment": "umiarkowana nerwowość"
    },
@@ -786,10 +786,10 @@
    {
     "id": "USEPUINDXD",
     "name": "Niepewność polityki gospodarczej USA (EPU)",
-    "date": "2026-11-09",
-    "value": "289",
+    "date": "2026-11-10",
+    "value": "297",
     "tier": 1,
-    "comment": "podwyższona (percentyl 75 z 5 lat, średnia 30 dni)"
+    "comment": "podwyższona (percentyl 76 z 5 lat, średnia 30 dni)"
    },
    {
     "id": "DTWEXBGS",
@@ -818,7 +818,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 383,
+  "fetched": 404,
   "items": [
    {
     "title": "Ropa Brent już poniżej 90 USD. Rosną szanse na brak podwyżki stóp w Polsce. Obligacje drożeją",
@@ -839,84 +839,18 @@
     "score": 11
    },
    {
-    "title": "Oil prices fall to lowest since August as Trump says Iran war is ‘effectively over’ - The Guardian",
-    "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQVmUxcnRYTG1rQzR0VFZuQW9uSXhBTExLd0stSVNWcFBIZE5aMi0wUnV1eWNFeFpvcFF1SFVvbjF6dDJfZXlQczlkUm92Z0xFYzUyLVlPWTE2d1pHeUhHYlNna0hEaEdBTmhkMU0xclNFRGhvWHZaY3V1WDgxcktaMVNyN3NsaUdTdlpjZ0c5X1pmSmtvd3dyNkdDUXF4ZEt0Slg4bDF3?oc=5",
-    "date": "2026-11-10T09:52:00.000Z",
-    "summary": "Oil prices fall to lowest since August as Trump says Iran war is ‘effectively over’ The Guardian",
-    "source": "Google News",
+    "title": "Putin negocjuje z USA. Koniec dominacji dolara? Nowy porządek świata. PB Brief",
+    "link": "https://www.pb.pl/putin-negocjuje-z-usa-koniec-dominacji-dolara-nowy-porzadek-swiata-pb-brief-1270282",
+    "date": "2026-11-12T07:43:36.000Z",
+    "summary": "W Moskwie mają odbyć się kolejne rozmowy dotyczące zakończenia wojny w Ukrainie, a europejscy przywódcy spotykają się w Dublinie, by dyskutować o bezpieczeństwie kontynentu. Tymczasem Międzynarodowy Fundusz Walutowy analizuje przyszłość dominacji dolara. W PB Brief także o decyzjach rosyjskiego soju",
+    "source": "Puls Biznesu",
     "regions": [
      "USA",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
-    "title": "Atak na banki może uderzyć w całą gospodarkę. NBP wskazuje słaby punkt",
-    "link": "https://www.bankier.pl/wiadomosc/Atak-na-banki-moze-uderzyc-w-cala-gospodarke-NBP-wskazuje-slaby-punkt-9223249.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-11T07:00:00.000Z",
-    "summary": "Polski system finansowy jest dobrze przygotowany na ataki, ale długotrwałe i powtarzające się działania mogą prowadzić do zakłóceń - ocenia Paweł Szałamacha, członek zarządu Narodowego Banku Polskiego. Jego zdaniem kluczowe są sprawne procedury awaryjne i przygotowanie ludzi. Wskazuje też na potrzeb",
-    "source": "Bankier.pl",
-    "regions": [
-     "Polska"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Banki centralne i stopy"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Spadki na Wall Street. Wyprzedaż akcji Nvidii i wyższa inflacja uderzają w amerykańskie indeksy",
-    "link": "https://www.bankier.pl/wiadomosc/Spadki-na-Wall-Street-Wyprzedaz-akcji-Nvidii-i-wyzsza-inflacja-uderzaja-w-amerykanskie-indeksy-9227196.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-10T22:20:00.000Z",
-    "summary": "Wtorkowa sesja na Wall Street zakończyła się spadkami głównych indeksów. W centrum uwagi była wyprzedaż akcji firmy Nvidia, pojawiły się też ponownie obawy o podwyżkę stóp procentowych po opublikowaniu najnowszych danych o inflacji w USA.",
-    "source": "Bankier.pl",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Banki centralne i stopy",
-     "Inflacja i recesja",
-     "Nastroje na giełdach"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Eksport paliw przez cieśninę Ormuz rośnie. Rynek wciąż jednak daleki od odbudowy dostaw",
-    "link": "https://www.pb.pl/eksport-paliw-przez-ciesnine-ormuz-rosnie-rynek-wciaz-jednak-daleki-od-odbudowy-dostaw-1270200",
-    "date": "2026-11-10T07:18:19.000Z",
-    "summary": "Przepływy produktów rafinowanych przez cieśninę Ormuz stopniowo się odbudowują, ale nadal pozostają znacznie poniżej poziomów sprzed wojny z Iranem. Rosnący eksport może częściowo złagodzić napięcia na światowym rynku paliw, choć ograniczenia produkcyjne i zagrożenie atakami utrudniają powrót do nor",
-    "source": "Puls Biznesu",
-    "regions": [
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Francja twierdzi, że za atakami na systemy chłodnicze stał Iran. Zapowiedziała odwet",
-    "link": "https://www.pb.pl/francja-twierdzi-ze-za-atakami-na-systemy-chlodnicze-stoi-iran-1270191",
-    "date": "2026-11-09T19:00:06.000Z",
-    "summary": "Francja oskarżyła Iran o cyberataki, które doprowadziły do ​​nieprawidłowego działania systemów chłodniczych supermarketów w wielu europejskich krajach. Zapowiedziała działania odwetowe i nałożenie sankcji na osoby odpowiedzialne za atak, informuje Bloomberg.",
-    "source": "Puls Biznesu",
-    "regions": [
      "Europa",
-     "Bliski Wschód"
+     "Rosja/Ukraina"
     ],
     "themes": [
-     "Konflikty i wojny",
-     "Sankcje i cła"
+     "Konflikty i wojny"
     ],
     "relevant": true,
     "score": 8
@@ -938,48 +872,80 @@
     "score": 8
    },
    {
-    "title": "Cena ropy Brent spadła o 12,5%, ale były doradca Bidena ostrzega, że wojna z Iranem może powrócić - BeInCrypto",
-    "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTE1hem1NbWRPalFUaktrcVEzT0pITGhpakVlR19nME15SUdzVHdxa1VoUEhaRV9YcmtDdHp3dzJXM01Rc2NxXzZ0Tm80R3pmT2ZibDktNWYzRFdrWTJEcDlRNXJVOVh4STE2VTgtR05iNWxNTWtzeUt0Skpn?oc=5",
-    "date": "2026-11-09T02:07:00.000Z",
-    "summary": "Cena ropy Brent spadła o 12,5%, ale były doradca Bidena ostrzega, że wojna z Iranem może powrócić BeInCrypto",
-    "source": "Google News PL",
-    "regions": [
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Section 219: the future of US-Israeli defence partnership",
-    "link": "https://www.aljazeera.com/video/newsfeed/2026/11/11/aje-onl-nf_the-future-of-us-israeli-defence-partnership-101126?traffic_source=rss",
-    "date": "2026-11-11T03:48:58.000Z",
-    "summary": "US President Donald Trump has announced plans to end the billions of dollars in annual US military aid to Israel.",
-    "source": "Al Jazeera",
-    "regions": [
-     "USA",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "10-year Treasury yield races back to 5% as inflation data, Waller comments drive rate hike expectations",
-    "link": "https://www.cnbc.com/2026/11/10/us-bonds-treasurys-yields.html",
-    "date": "2026-11-10T21:06:07.000Z",
-    "summary": "Treasury yields moved higher after a hotter-than-expected CPI report.",
-    "source": "CNBC",
+    "title": "Grudniowa podwyżka stóp Fedu już pewna",
+    "link": "https://www.parkiet.com/gospodarka-swiatowa/art45476681-grudniowa-podwyzka-stop-fedu-juz-pewna",
+    "date": "2026-11-12T05:00:00.000Z",
+    "summary": "Inwestorzy od dawna oczekiwali, że Fed podniesie stopy procentowe na ostatnim posiedzeniu przed końcem roku. Po danych o inflacji konsumenckiej za październik są już tego pewni.",
+    "source": "Parkiet",
     "regions": [
      "USA"
     ],
     "themes": [
      "Banki centralne i stopy",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Finansowa iluzja Kremla. Jak Rosja \"odmroziła\" miliardy bez zgody Zachodu",
+    "link": "https://www.bankier.pl/wiadomosc/Finansowa-iluzja-Kremla-Jak-Rosja-odmrozila-miliardy-bez-zgody-Zachodu-9226751.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-12T05:00:00.000Z",
+    "summary": "Szefowa Banku Rosji Elwira Nabiullina ogłosiła w Dumie Państwowej, że Moskwie udało się zwrócić inwestorom \"znaczną część\" aktywów zamrożonych przez zachodnie sankcje. Z europejskich instytucji takich jak Euroclear nie wypłynęło jednak ani jedno euro. Za rzekomym sukcesem stoi przymusowa operacja na",
+    "source": "Bankier.pl",
+    "regions": [
+     "Europa",
+     "Rosja/Ukraina"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Inside India newsletter: Trump's poll setback fuels hope for U.S.-India trade deal by year end",
+    "link": "https://www.cnbc.com/2026/11/12/us-india-trade-tariffs-trump-modi.html",
+    "date": "2026-11-11T23:57:38.000Z",
+    "summary": "While American voters are more affected by import duties on Canadian goods, experts said that a trade deal with India could blunt criticism against tariffs.",
+    "source": "CNBC",
+    "regions": [
+     "USA",
+     "Azja"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Jensen Huang affair in D.C.: Resignation calls and moves to tighten Nvidia China exports",
+    "link": "https://www.cnbc.com/2026/11/11/nvidia-jensen-huang-congress-resign-ai-chips.html",
+    "date": "2026-11-11T22:46:29.000Z",
+    "summary": "Huang was notably opposed to strict export controls on AI chips to China, which ruffled feathers with congressional China hawks.",
+    "source": "CNBC",
+    "regions": [
+     "USA",
+     "Azja"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Falling oil prices are no longer enough to bring down borrowing costs in the world’s most important bond market",
+    "link": "https://www.marketwatch.com/story/falling-oil-prices-are-no-longer-enough-to-bring-down-borrowing-costs-in-the-worlds-most-important-bond-market-3176d25a?mod=mw_rss_topstories",
+    "date": "2026-11-11T21:42:00.000Z",
+    "summary": "The tight trading relationship between oil prices and Treasury yields has broken down. It’s a sign that inflation concerns are extending beyond the energy shock.",
+    "source": "MarketWatch",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Energia i surowce",
      "Inflacja i recesja"
     ],
     "relevant": true,
@@ -1003,22 +969,6 @@
     "score": 7
    },
    {
-    "title": "Op-ed: In Nvidia CEO Jensen Huang's alleged China spy scandal, there's plenty of blame to go around",
-    "link": "https://www.cnbc.com/2026/11/10/nvidia-ceo-jensen-huang-china-spy-scandal.html",
-    "date": "2026-11-10T19:40:41.000Z",
-    "summary": "In the AI era, our economic competitiveness, military capabilities, and intelligence edge can be taken down by one man. We aren't prepared. Congress must act.",
-    "source": "CNBC",
-    "regions": [
-     "USA",
-     "Azja"
-    ],
-    "themes": [
-     "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
     "title": "Na Wall Street przewaga podaży. Dane o inflacji popsuły nastroje",
     "link": "https://www.pb.pl/na-wall-street-przewaga-podazy-dane-o-inflacji-popsuly-nastroje-1270241",
     "date": "2026-11-10T17:22:54.000Z",
@@ -1035,23 +985,6 @@
     "score": 7
    },
    {
-    "title": "Sankcje zamiast bomb. Waszyngton stawia na ekonomiczne dławienie Iranu",
-    "link": "https://www.bankier.pl/wiadomosc/Sankcje-zamiast-bomb-Waszyngton-stawia-na-ekonomiczne-dlawienie-Iranu-9227013.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-10T16:00:00.000Z",
-    "summary": "Sekretarz stanu USA Marco Rubio ocenił we wtorek, że nie ma potrzeby wznawiać działań wojennych przeciwko Iranowi, bo presja ekonomiczna działa i zmusi Iran do ustępstw. Pytany o potencjalny impeachment szefa Pentagonu, odparł zaś, że wykonywał polecenia prezydenta USA.",
-    "source": "Bankier.pl",
-    "regions": [
-     "USA",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Sankcje i cła",
-     "Wybory i polityka"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
     "title": "US inflation higher than expected in October - here's what is happening with prices",
     "link": "https://www.bbc.co.uk/news/articles/cwy8lx3pg4k2o?at_medium=RSS&at_campaign=rss",
     "date": "2026-11-10T14:45:46.000Z",
@@ -1062,22 +995,6 @@
     ],
     "themes": [
      "Energia i surowce",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
-    "title": "Inflacja w USA negatywnie zaskoczyła. Fed podniesie stopy",
-    "link": "https://www.parkiet.com/gospodarka-swiatowa/art45471921-inflacja-w-usa-negatywnie-zaskoczyla-fed-podniesie-stopy",
-    "date": "2026-11-10T14:33:00.000Z",
-    "summary": "Inflacja konsumencka w USA była wyższa od prognoz. Inwestorzy oczekują podwyżki stóp procentowych w grudniu",
-    "source": "Parkiet",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Banki centralne i stopy",
      "Inflacja i recesja"
     ],
     "relevant": true,
@@ -1117,22 +1034,6 @@
     "score": 7
    },
    {
-    "title": "Złoto z Rosji zalewa Chiny. Jedna trzecia pochodzi z rezerw Banku Rosji",
-    "link": "https://www.parkiet.com/inwestycje/art45471331-zloto-rosja-chiny-eksport",
-    "date": "2026-11-10T12:32:39.000Z",
-    "summary": "Od rosyjskiej agresji na Ukrainę, Chiny stały się dla Kremla głównym rynkiem eksportu złota, importując co najmniej 165 ton w trzy kwartały. Państwo Środka korzysta na sankcjach Zachodu na rosyjski kruszec.",
-    "source": "Parkiet",
-    "regions": [
-     "Azja",
-     "Rosja/Ukraina"
-    ],
-    "themes": [
-     "Sankcje i cła"
-    ],
-    "relevant": true,
-    "score": 7
-   },
-   {
     "title": "Lane: EBC ostrożnie szykuje się ewentualnej podwyżki stóp procentowych. Decyzja nie jest przesądzona",
     "link": "https://www.pb.pl/lane-ebc-ostroznie-szykuje-sie-ewentualnej-podwyzki-stop-procentowych-decyzja-nie-jest-przesadzona-1270212",
     "date": "2026-11-10T12:15:52.000Z",
@@ -1147,30 +1048,123 @@
     ],
     "relevant": true,
     "score": 7
+   },
+   {
+    "title": "Manus on Markets: Pressure eases after Trump’s comments on Iran war - www.thenationalnews.com",
+    "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNVVFtU0lLOE9mT1dBTnY5UGpiemhhUWxMVGtob3d2ZThYcU4ybXFHbjIyZDVOOGxXOWs4ZVFod0tRbjR1MTgyWVNOUXE3cC1sSk92QTIzQlQ0SWxDd3l5MUhtOFVDLU91VWplLW9WVkRicTVteFJETmd1b2VkVllsUW5vRG1KSlJucTlFMV9RUkpieTZ4QkZIMTcxRkd2QkZ2QUV4ekhvZUlzaG53bDUtUTBqVjBDeGpjVnZSNVVraFQ1UElY?oc=5",
+    "date": "2026-11-10T08:08:04.000Z",
+    "summary": "Manus on Markets: Pressure eases after Trump’s comments on Iran war www.thenationalnews.com",
+    "source": "Google News",
+    "regions": [
+     "USA",
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "The superpower battle over energy – and what it means for your bills",
+    "link": "https://www.bbc.co.uk/news/articles/cw62y2z53pg1o?at_medium=RSS&at_campaign=rss",
+    "date": "2026-11-10T00:08:28.000Z",
+    "summary": "A tug-of-war between China and the US could have a big impact on energy costs, but who will win?",
+    "source": "BBC Business",
+    "regions": [
+     "USA",
+     "Azja"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Dolar na 19-miesięcznym szczycie. Rośnie presja na Fed i jena",
+    "link": "https://www.pb.pl/dolar-na-19-miesiecznym-szczycie-rosnie-presja-na-fed-i-jena-1270279",
+    "date": "2026-11-12T06:53:55.000Z",
+    "summary": "Dolar umacnia się w oczekiwaniu na kolejne podwyżki stóp procentowych przez Rezerwę Federalną (Fed). Amerykańska waluta osiągnęła najwyższy poziom od 19 miesięcy, a kurs USD/JPY zbliżył się do granicy 160 jenów. Różnice w polityce pieniężnej USA i Japonii zwiększają presję na japońską walutę.",
+    "source": "Puls Biznesu",
+    "regions": [
+     "USA",
+     "Azja"
+    ],
+    "themes": [
+     "Banki centralne i stopy"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Ceny ropy najniżej od dwóch miesięcy. Arabia Saudyjska zwiększyła wydobycie o 26 proc.",
+    "link": "https://www.bankier.pl/wiadomosc/Ceny-ropy-najnizej-od-dwoch-miesiecy-Arabia-Saudyjska-zwiekszyla-wydobycie-o-26-proc-9227572.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-12T06:51:00.000Z",
+    "summary": "Ceny ropy na rynkach spadają w czwartek rano, a notowania surowca są na najniższych poziomach od 2 miesięcy. Pozytywną informacją jest to, że produkcja ropy na Bliskim Wschodzie rośnie, a do tego jest względne uspokojenie działań wojennych pomiędzy USA a Iranem - podają maklerzy.",
+    "source": "Bankier.pl",
+    "regions": [
+     "USA",
+     "Bliski Wschód"
+    ],
+    "themes": [
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Indian Stock Markets Open Marginally Lower Amid FII DII Tug of War - Asianet Newsable",
+    "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNR3dJcjIxR3h1bnIyOHJYc2k4ZTJZMm1UbGZyUVZtdHpGM3ZzbEdYNVJ5Qm9DSkNxclpsM18xdjRFREdhbG9qMzJEa3FfX3FLbzdwT2hSWmlyNy1FNFpXVU1MRHd5QS1Fc0JXeVdDbHpfRFNsZndSYW9sRkhnRGFWM3JUajY1Yl90bDdLOVN4Y0VoWlYxUVZrZEdub2RfWEk1dWVrQ2x5bXBiSFFwNHhPZ3pndnZGSXh2SEFlWWVLNGwtOUxuTVB30gHMAUFVX3lxTE04ZGpNNFJGRWZaZ2hETTlway1KNE8zWDBtdGJqX2pMMDBQUzh0TmlBcmJKSE9PVkVSbDNhbVY4YU5FT0k2blJzendIeW1TbzVNNURtWjFwRzZpYWlBaVo3a0dHcGFRT0dfTlZvZl8yRUtMUzNTWGVZblJZLUhJN20yNEVPY3NFaTlxajJ4YXBWWlZiQlBsVU52VTI3UnM5QUFaT0FmclpiTUozYU83blNwT3JZYmZ0ZS12VkJCVjl6dURONVJwNFJ3WWpXbg?oc=5",
+    "date": "2026-11-12T04:10:47.000Z",
+    "summary": "Indian Stock Markets Open Marginally Lower Amid FII DII Tug of War Asianet Newsable",
+    "source": "Google News",
+    "regions": [
+     "Azja"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 6
+   },
+   {
+    "title": "Canada’s ambassador warns Trump tariffs are driving up costs, threatening U.S. investment",
+    "link": "https://www.cnbc.com/2026/11/11/canada-ambassador-trump-tariffs-investments.html",
+    "date": "2026-11-11T22:30:57.000Z",
+    "summary": "U.S.-Canada trade tensions persist as Trump's tariffs drive up costs, threaten investment and complicate negotiations between the two countries.",
+    "source": "CNBC",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 6
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 17,
+   "Konflikty i wojny": 12,
    "Sankcje i cła": 5,
-   "Banki centralne i stopy": 15,
-   "Wybory i polityka": 26,
+   "Banki centralne i stopy": 10,
+   "Wybory i polityka": 23,
    "Energia i surowce": 19,
-   "Inflacja i recesja": 15,
-   "Nastroje na giełdach": 3,
-   "Spółki i wyniki": 13
+   "Inflacja i recesja": 13,
+   "Nastroje na giełdach": 7,
+   "Spółki i wyniki": 4
   },
   "regionCounts": {
-   "USA": 32,
-   "Europa": 5,
-   "Azja": 7,
+   "USA": 30,
+   "Europa": 7,
+   "Azja": 8,
    "Rynki wschodzące": 0,
-   "Polska": 7,
-   "Bliski Wschód": 11,
-   "Rosja/Ukraina": 2
+   "Polska": 6,
+   "Bliski Wschód": 8,
+   "Rosja/Ukraina": 3
   },
-  "errors": [
-   "RSS Fed: HTTP 404"
-  ]
+  "errors": []
  },
  "ai": null,
  "taxMonitor": {
@@ -1221,7 +1215,7 @@
     {
      "title": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI - Forsal.pl",
      "link": "https://news.google.com/rss/articles/CBMiogJBVV95cUxPN3k1OGRqM0tCQkg2Y2JEcWRnOGRVZ2tFNVI4SGJ3U2dPSUJqRHBVWk9NUHo3allXSHE1dVFOTXJ3dUY0dy05WWlIcEphREl4T1Bra3NqSjV2eFF1VmEwakZZemhpV3Q5dzU3WVlybW5OQXlkQ3pfS1pad2EwUVd4S3dCSlVnZDJ0YnlubkFzbVoweDJsYnhPTDdFazg4NVBDQ0lZOTlSZmROLTdqSUcxNW9sZ1k3X0hRX000RmZuT2ZUV1hYbVoxWTg4Y091bkM4ZFo3MGQxbGpTNVpuNnczLWxVMmFjTUdTN2h6UFM3TG5EVHBKRjV5d0ZaT2J1SVNQTkhmR3hYMkswZU9ZU0p5Um95bG4xWlZ2UF82MWE2Mk5pZw?oc=5",
-     "date": "2026-11-03T13:02:00.000Z",
+     "date": "2026-11-03T08:00:00.000Z",
      "summary": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI Forsal.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1234,7 +1228,7 @@
     {
      "title": "Inwestor Wojtek: ETF-y a OKI. Jak unikniesz podatku Belki i czy nie lepiej zostać przy IKE - pb.pl",
      "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNd2ZpLWhxbmtqOE1QcXdCbXZxMmtOZWRMTThfRnVYWWVkYzdiSUZWQ0FuQ0tGYkR0dVhJUmxJa0hLTkozdWNKVVQ4eFB1MlRvRlBJelZZT3ZKUS10WkVOekRTbU1Ba19zaG9BNlNEZHRUU09LbDA5ZFRuRVJYa3lHVXpvSHpZa2wxSVFMNUxaQzVjTXdSTGwtbjc2cjVfNEp0N1Fhb2xZOVlKNHFFUy0tRUEyMWU?oc=5",
-     "date": "2026-11-02T14:00:00.000Z",
+     "date": "2026-11-02T08:00:00.000Z",
      "summary": "Inwestor Wojtek: ETF-y a OKI. Jak unikniesz podatku Belki i czy nie lepiej zostać przy IKE pb.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1312,28 +1306,27 @@
      "score": 7
     },
     {
-     "title": "Prezydent podpisał ustawę o OKI. Nowe konta mają ruszyć od 2027 roku - Analizy.pl",
-     "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQaGgxRnJzNU9kYVZ5WXJPQS1ib2JscnRGano5ZmhibHRZSVhIaGFzamE1cEJQOG9OTFVBeUU0Nm4yYlJEMmt4RkNQQmw2ZWlHVVR0R2ZqUjEtX25GTHQ5cW56eDF6MWR6T1NNVkhuS0dSeU5VcXdQTVU1RW9EWVlwdGpubk9BNkhleVVMX3FJQkp2NEE2MjRxa29CbXA5QmE3eFRtUQ?oc=5",
-     "date": "2026-11-10T11:41:10.000Z",
-     "summary": "Prezydent podpisał ustawę o OKI. Nowe konta mają ruszyć od 2027 roku Analizy.pl",
+     "title": "Ile wyniesie limit wpłat na IKE w 2027 r.? - INFOR.PL",
+     "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQaXR4VEdWZ3pZWTFvRzNkQWNsdVFFaS1PRjBEQWlLclc1d1VJWXZoQ09kM1dfVThPSWY5OFpsdkswYzQ1eFZjdXZRbW4xZHJrUG1pRm1RMmIyZF9pUjZKZTVNLWhhc3k2R2RRV2hHM0JpcU5pa1l2WE9Xb05fQ3I1MDZIazVhVnFUdXNLYXAyWGl2bkRmY3BjMmJSczAzZ3A3RXhuM0dR?oc=5",
+     "date": "2026-11-11T17:54:00.000Z",
+     "summary": "Ile wyniesie limit wpłat na IKE w 2027 r.? INFOR.PL",
      "source": "Google News – podatki inwestora",
      "topics": [
-      "OKI"
+      "IKE/IKZE"
      ],
      "important": true,
      "score": 6
     },
     {
-     "title": "Czy OKI zjedzą IKE. Eksperci mają pomysły na ograniczenie tego ryzyka - Parkiet",
-     "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPZ2RZd2JRVGxMSTVHdjNoUUVEZVlaLTUtWnhBV3N2WkJvZngtbmR3bXE2UzJBQjE2TzVhcmY1OV9UbWhiUG9TbWhJUE45YUlqNEtqeTFCVUZCb3VnOVRuTHB6d3Z4TmY2REQwOFlhQTdUVlN6SzRyWkVIaW5SOWdtS3U2MTJJM2dCSFdmMkVoNzZkOHU1RDV5bEpNbVo3SmJkY1dycFd0LUdGX3VFdFNjRWxB?oc=5",
-     "date": "2026-11-09T05:00:00.000Z",
-     "summary": "Czy OKI zjedzą IKE. Eksperci mają pomysły na ograniczenie tego ryzyka Parkiet",
+     "title": "Więcej pieniędzy bez podatku. Znamy limity wpłat na IKE i IKZE w 2027 roku - Analizy.pl",
+     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOdEhnYU93TnVtTmlJTmhRY3ZwWFlsbk9tNi03c3BLbGgtRy1hd0Mtc2pENkFCU05oOURxdjJQUXpjRG90OG5iNGdCX19Oc0VaYVhXV3hyajJSSFNnOVdJc3lnV0s4WEpxcHliWU8tU3ljYlpLRml3bGZsd0cwTEtxVDJ6SlNyNTV6bnhZQ0ZUWFM1Y2JPVWlCakxacVM5VjBNalozZkN3dEFQZkJBM2JYeVBodw?oc=5",
+     "date": "2026-11-10T16:56:34.000Z",
+     "summary": "Więcej pieniędzy bez podatku. Znamy limity wpłat na IKE i IKZE w 2027 roku Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
-      "IKE/IKZE",
-      "OKI"
+      "IKE/IKZE"
      ],
-     "important": false,
+     "important": true,
      "score": 6
     }
    ],
@@ -1383,7 +1376,7 @@
     {
      "title": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI - Forsal.pl",
      "link": "https://news.google.com/rss/articles/CBMiogJBVV95cUxPN3k1OGRqM0tCQkg2Y2JEcWRnOGRVZ2tFNVI4SGJ3U2dPSUJqRHBVWk9NUHo3allXSHE1dVFOTXJ3dUY0dy05WWlIcEphREl4T1Bra3NqSjV2eFF1VmEwakZZemhpV3Q5dzU3WVlybW5OQXlkQ3pfS1pad2EwUVd4S3dCSlVnZDJ0YnlubkFzbVoweDJsYnhPTDdFazg4NVBDQ0lZOTlSZmROLTdqSUcxNW9sZ1k3X0hRX000RmZuT2ZUV1hYbVoxWTg4Y091bkM4ZFo3MGQxbGpTNVpuNnczLWxVMmFjTUdTN2h6UFM3TG5EVHBKRjV5d0ZaT2J1SVNQTkhmR3hYMkswZU9ZU0p5Um95bG4xWlZ2UF82MWE2Mk5pZw?oc=5",
-     "date": "2026-11-03T13:02:00.000Z",
+     "date": "2026-11-03T08:00:00.000Z",
      "summary": "Od 2027 r. od oszczędności trzeba będzie zapłacić nowy podatek. Podatek Belki zostaje ale będą zwolnienia podatkowe dla właścicieli kont OKI Forsal.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1443,13 +1436,13 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-11T07:19:58.525Z",
+  "generatedAt": "2026-11-12T07:25:50.994Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
  },
  "rynek": {
-  "asOf": "2026-11-10",
+  "asOf": "2026-11-11",
   "world": [
    {
     "key": "SPX",
@@ -1480,17 +1473,17 @@
     "kind": "index",
     "src": "fred",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 25065.87,
-    "d1": -0.007416,
-    "w1": -0.012066,
-    "m1": -0.084056,
-    "ytd": 0.078473,
-    "y1": 0.065401,
+    "date": "2026-11-11",
+    "last": 25466.19,
+    "d1": 0.015971,
+    "w1": -0.010503,
+    "m1": -0.06532,
+    "ytd": 0.095697,
+    "y1": 0.085131,
     "high52": 27599.89,
     "low52": 20794.64,
-    "fromHigh": -0.091813,
-    "trend": "down",
+    "fromHigh": -0.077308,
+    "trend": "up",
     "trendBasis": "średnia 200 sesji"
    },
    {
@@ -1501,16 +1494,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 280.58,
-    "d1": -0.006832,
-    "w1": 0.002824,
-    "m1": 0.005879,
-    "ytd": 0.147549,
-    "y1": 0.161467,
+    "date": "2026-11-11",
+    "last": 283.09,
+    "d1": 0.008946,
+    "w1": -0.003274,
+    "m1": 0.018676,
+    "ytd": 0.157814,
+    "y1": 0.17085,
     "high52": 304.2892,
     "low52": 226.8039,
-    "fromHigh": -0.077917,
+    "fromHigh": -0.069668,
     "trend": "up",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1522,16 +1515,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 154.94,
-    "d1": -0.004753,
-    "w1": -0.001418,
-    "m1": -0.030595,
-    "ytd": 0.10781,
-    "y1": 0.118904,
+    "date": "2026-11-11",
+    "last": 156.71,
+    "d1": 0.011424,
+    "w1": -0.00697,
+    "m1": -0.017492,
+    "ytd": 0.120466,
+    "y1": 0.128639,
     "high52": 161.9728,
     "low52": 132.5333,
-    "fromHigh": -0.04342,
+    "fromHigh": -0.032492,
     "trend": "up",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1543,16 +1536,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 76.13,
-    "d1": -0.003273,
-    "w1": 0.024079,
-    "m1": 0.04145,
-    "ytd": 0.094588,
-    "y1": 0.138864,
+    "date": "2026-11-11",
+    "last": 76,
+    "d1": -0.001708,
+    "w1": -0.007444,
+    "m1": 0.043383,
+    "ytd": 0.092719,
+    "y1": 0.124703,
     "high52": 78.77,
     "low52": 64.3787,
-    "fromHigh": -0.033515,
+    "fromHigh": -0.035166,
     "trend": "up",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1564,17 +1557,17 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 90.39,
-    "d1": -0.011915,
-    "w1": -0.023761,
-    "m1": -0.076334,
-    "ytd": 0.125482,
-    "y1": 0.127059,
+    "date": "2026-11-11",
+    "last": 92.12,
+    "d1": 0.019139,
+    "w1": -0.018538,
+    "m1": -0.053432,
+    "ytd": 0.147023,
+    "y1": 0.14767,
     "high52": 99.32,
     "low52": 76.1842,
-    "fromHigh": -0.089911,
-    "trend": "down",
+    "fromHigh": -0.072493,
+    "trend": "up",
     "trendBasis": "średnia 200 sesji"
    },
    {
@@ -1585,16 +1578,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 60.57,
-    "d1": -0.007537,
-    "w1": -0.008674,
-    "m1": -0.093263,
-    "ytd": 0.112678,
-    "y1": 0.112442,
+    "date": "2026-11-11",
+    "last": 62.04,
+    "d1": 0.024269,
+    "w1": 0.006816,
+    "m1": -0.062132,
+    "ytd": 0.139682,
+    "y1": 0.13821,
     "high52": 71.21,
     "low52": 52.0839,
-    "fromHigh": -0.149417,
+    "fromHigh": -0.128774,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1753,16 +1746,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": true,
-    "date": "2026-11-10",
-    "last": 80.88,
-    "d1": -0.013177,
-    "w1": -0.002836,
-    "m1": 0.041544,
-    "ytd": -0.035614,
-    "y1": -0.054277,
+    "date": "2026-11-11",
+    "last": 80.92,
+    "d1": 0.000495,
+    "w1": -0.010274,
+    "m1": 0.041125,
+    "ytd": -0.035137,
+    "y1": -0.058122,
     "high52": 87.7236,
     "low52": 76.7876,
-    "fromHigh": -0.078013,
+    "fromHigh": -0.077557,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1774,16 +1767,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 369.36,
-    "d1": -0.026796,
-    "w1": 0.028113,
-    "m1": -0.039576,
-    "ytd": -0.068002,
-    "y1": -0.023838,
+    "date": "2026-11-11",
+    "last": 365.17,
+    "d1": -0.011344,
+    "w1": -0.019652,
+    "m1": -0.044433,
+    "ytd": -0.078575,
+    "y1": -0.038697,
     "high52": 495.9,
     "low52": 355.78,
-    "fromHigh": -0.255172,
+    "fromHigh": -0.263622,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1816,16 +1809,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-10",
-    "last": 41.68,
-    "d1": -0.015123,
-    "w1": -0.053802,
-    "m1": -0.104619,
-    "ytd": -0.160524,
-    "y1": -0.307526,
-    "high52": 58.35,
+    "date": "2026-11-11",
+    "last": 42.24,
+    "d1": 0.013436,
+    "w1": -0.068167,
+    "m1": -0.098592,
+    "ytd": -0.149245,
+    "y1": -0.276093,
+    "high52": 57.59,
     "low52": 33.29,
-    "fromHigh": -0.28569,
+    "fromHigh": -0.266539,
     "trend": "up",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1898,7 +1891,7 @@
    "label": "sprzyjające",
    "tone": "pos",
    "text": "Warunki sprzyjają akcjom: trendy są wzrostowe, a stres na rynku niski.",
-   "score": 3,
+   "score": 4,
    "factors": [
     {
      "label": "Trend S&P 500",
@@ -1907,8 +1900,8 @@
     },
     {
      "label": "Szerokość rynku",
-     "score": 0,
-     "detail": "7 z 11 rynków akcji w trendzie wzrostowym"
+     "score": 1,
+     "detail": "9 z 11 rynków akcji w trendzie wzrostowym"
     },
     {
      "label": "Obsunięcie S&P 500",
@@ -1918,7 +1911,7 @@
     {
      "label": "Zmienność (VIX)",
      "score": 0,
-     "detail": "19,9 – umiarkowana nerwowość"
+     "detail": "19,5 – umiarkowana nerwowość"
     },
     {
      "label": "Stres kredytowy",
@@ -1928,7 +1921,7 @@
     {
      "label": "Niepewność polityczna USA",
      "score": 0,
-     "detail": "podwyższona (percentyl 75 z 5 lat, średnia 30 dni)"
+     "detail": "podwyższona (percentyl 76 z 5 lat, średnia 30 dni)"
     },
     {
      "label": "Momentum (sygnał GEM)",
@@ -1941,8 +1934,8 @@
    "key": "up|mid",
    "trend": "up",
    "vol": "mid",
-   "volValue": 0.2171,
-   "date": "2026-11-10"
+   "volValue": 0.2203,
+   "date": "2026-11-11"
   },
   "stats": {
    "since": "1993-01-29",
@@ -2029,34 +2022,41 @@
     "kind": "bank",
     "note": "Ogłoszenie ok. 20:00 czasu polskiego, potem konferencja prezesa Fed.",
     "approx": false
+   },
+   {
+    "date": "2026-12-17",
+    "title": "Decyzja EBC w sprawie stóp procentowych (strefa euro)",
+    "kind": "bank",
+    "note": "Ogłoszenie ok. 14:15, konferencja prezes EBC ok. 14:45.",
+    "approx": false
    }
   ],
   "note": {
-   "date": "2026-11-11",
+   "date": "2026-11-12",
    "stance": {
     "id": "sprzyjajace",
     "label": "sprzyjające",
     "tone": "pos"
    },
    "summary": [
-    "Akcje w ostatnim tygodniu: S&P 500 −0,6%, Europa +2,4%, rynki wschodzące −0,9%, WIG20 +0,7% (S&P 500 od początku roku +9,9%).",
-    "Rentowność 10-letnich obligacji USA 4,88% (−0,03 pp w tydzień), złoto +2,8%, ropa Brent 107,0 USD (−13,1%).",
+    "Akcje w ostatnim tygodniu: S&P 500 −0,6%, Europa −0,7%, rynki wschodzące +0,7%, WIG20 +0,7% (S&P 500 od początku roku +9,9%).",
+    "Rentowność 10-letnich obligacji USA 4,88% (−0,03 pp w tydzień), złoto −2,0%, ropa Brent 107,0 USD (−13,1%).",
     "Złoty: EUR/PLN 4,3895 (−0,8% w tydzień), USD/PLN 3,9099 (−1,1% w tydzień)."
    ],
    "sections": [
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Wybory i polityka (26 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Sankcje zamiast bomb. Waszyngton stawia na ekonomiczne dławienie Iranu” (Bankier.pl).",
+      "Wybory i polityka (23 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych.",
       "Energia i surowce (19 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Ropa Brent już poniżej 90 USD. Rosną szanse na brak podwyżki stóp w Polsce. Obligacje drożeją” (Puls Biznesu).",
-      "Konflikty i wojny (17 wiadomości): napięcia geopolityczne zwykle zwiększają awersję do ryzyka: zyskują złoto, dolar i obligacje skarbowe, a gdy konflikt dotyczy regionów wydobycia – ropa; tracą akcje, zwłaszcza Europy i rynków wschodzących. Przykład: „Ropa Brent już poniżej 90 USD. Rosną szanse na brak podwyżki stóp w Polsce. Obligacje drożeją” (Puls Biznesu)."
+      "Inflacja i recesja (13 wiadomości): wyższa inflacja oddala obniżki stóp, a słabsze dane o wzroście zwiększają ryzyko spadku zysków firm, choć mogą przyspieszyć obniżki stóp. Przykład: „Grudniowa podwyżka stóp Fedu już pewna” (Parkiet)."
      ]
     },
     {
      "title": "Największe zmiany w tygodniu",
      "items": [
-      "Najmocniej: złoto +2,8%, Europa +2,4%.",
-      "Najsłabiej: ropa Brent −13,1%, bitcoin −5,4%."
+      "Najmocniej: polskie obligacje +0,8%, WIG +0,7%.",
+      "Najsłabiej: ropa Brent −13,1%, bitcoin −6,8%."
      ]
     },
     {
