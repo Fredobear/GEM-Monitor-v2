@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "lastRun": "2026-11-13T07:21:50.905Z",
-  "lastSuccess": "2026-11-13T07:21:50.905Z",
+  "lastRun": "2026-11-16T08:51:22.446Z",
+  "lastSuccess": "2026-11-16T08:51:22.446Z",
   "lastError": null,
   "official": {
     "forMonth": "2026-11",
@@ -12,7 +12,7 @@
     "forMonth": "2026-11",
     "asset": "EXUS"
   },
-  "lastDigest": "2026-11-09",
+  "lastDigest": "2026-11-16",
   "lastErrorNotified": null,
   "ai": null,
   "marketAi": null,
