@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "lastRun": "2026-11-19T07:24:32.363Z",
-  "lastSuccess": "2026-11-19T07:24:32.363Z",
+  "lastRun": "2026-11-20T07:24:15.838Z",
+  "lastSuccess": "2026-11-20T07:24:15.838Z",
   "lastError": null,
   "official": {
     "forMonth": "2026-11",
@@ -10,7 +10,7 @@
   },
   "previewNotified": {
     "forMonth": "2026-11",
-    "asset": "US"
+    "asset": "EXUS"
   },
   "lastDigest": "2026-11-16",
   "lastErrorNotified": null,
