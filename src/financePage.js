@@ -264,6 +264,10 @@ form[data-type=wydatek] .amount-input{color:var(--neg)}form[data-type=przychod] 
 .inv-legend{list-style:none;margin:2px 0 4px;padding:0}
 .inv-legend li{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;font-size:14px}.inv-legend li+li{border-top:1px solid var(--line)}
 .inv-legend b{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.day-table{margin-top:10px}.day-table td:first-child{color:var(--muted)}.day-table tbody tr:first-child td:first-child{color:var(--ink);font-weight:600}
+.plan-log{margin:6px 0 2px}.plan-log ul{list-style:none;margin:6px 0;padding:0}
+.plan-log li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+.plan-log li b{font-variant-numeric:tabular-nums}.plan-log-act{white-space:nowrap}
 .cx-dash{stroke-dasharray:5 4}
 .cx-area.s-net{fill:var(--s-cash);opacity:.1}.cx-band.s-net{fill:var(--s-cash);opacity:.14}
 .cx-dot{stroke:var(--surface);stroke-width:2}.cx-dot.s-net{fill:var(--s-cash)}.cx-dot.s-ink{fill:var(--ink)}

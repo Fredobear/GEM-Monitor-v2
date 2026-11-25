@@ -180,14 +180,18 @@ Tak działają plany inwestycyjne w XTB i alokacja wpłat w PPE: wpłacasz jedn�
 1. Przy koncie inwestycyjnym: **+ Plan inwestycyjny**. Aplikacja od razu podpowiada instrumenty, które masz na koncie, z udziałami według ich obecnej wartości – popraw je tak, jak w planie w XTB (np. VWCE 70%, EUNL 15%, IS3N 10%, MEUD 5%). Suma musi dawać 100% („rozłóż po równo” dzieli równo).
 2. Instrumenty dodasz też spoza konta: **+ Instrument z XTB** (wyszukiwarka), **+ Fundusz ING TFI** (fundusz i kategoria jednostek – dla PPE) albo **+ Kryptowaluta**.
 3. **Wpłata cykliczna** (opcjonalnie): kwota, dzień miesiąca, najbliższy termin i **skąd pieniądze**:
-   - **przelew z konta** (np. mBank) – w dzienniku zapisze się przelew na konto inwestycyjne, a gotówka na nim się nie zmieni (pieniądze od razu idą w ETF-y);
-   - **z wolnej gotówki na tym koncie**;
+   - **z wolnej gotówki na tym koncie** – zakup zmniejsza wolną gotówkę (pieniądze przelane wcześniej, np. przelewem z banku na konto w euro – trafiają tam w walucie konta);
+   - **nowy przelew z konta** (np. mBank) – wpłata sama zapisze przelew na konto inwestycyjne, a gotówka na nim się nie zmieni (pieniądze od razu idą w ETF-y). Wybierz to tylko wtedy, gdy przelewu nie zapisujesz osobno – inaczej pieniądze zejdą z konta dwa razy;
    - **spoza aplikacji** – np. składka pracodawcy do PPE (nie zmienia innych kont).
    
    Z zaznaczonym **Kupuj automatycznie** wpłata zapisze się sama w dniu terminu (po otwarciu aplikacji). Bez zaznaczenia w Przeglądzie pojawi się prośba „Wpłata do planu – Zapisz wpłatę / Pomiń” – przydaje się, gdy kwota co miesiąc jest inna (np. składka PPE zależna od pensji).
 4. **Wpłać do planu**: kwota i data, a pod spodem podział – ile pójdzie na każdy instrument, po jakiej cenie i ile jednostek kupisz. Ceny funduszy ING TFI i akcji z GPW są z notowań z dnia wpłaty, a ETF-ów z Xetry czy Londynu – szacunek od ostatniego kursu wpisanego z XTB według zmiany indeksu. Możesz je poprawić według potwierdzenia z XTB albo ING.
 
-Każda wpłata zapisuje się jako osobne pozycje z ceną zakupu z tego dnia (dokładny koszt i historia), a na liście kont widać je razem z pozostałymi pozycjami tego instrumentu. Przy planie widać sumę wpłat i liczbę wpłat. Usunięcie planu nie usuwa kupionych aktywów.
+   Gdy na koncie jest wolna gotówka, wpłata domyślnie kupuje z niej. Okno wpłaty ostrzega, gdy wybierzesz przelew z banku, a na koncie są już pieniądze (przelew był pewnie zapisany osobno), albo gdy wolnej gotówki brakuje.
+
+Każda wpłata zapisuje się jako osobne pozycje z ceną zakupu z tego dnia (dokładny koszt i historia), a na liście kont widać je razem z pozostałymi pozycjami tego instrumentu. Przy planie widać sumę wpłat, a w **Historii wpłat** – każdą wpłatę z datą, kwotą i źródłem pieniędzy. Przy wpłacie z przelewu jest **kup z wolnej gotówki** (usuwa przelew zapisany przez wpłatę), a przy każdej – **usuń** (znikają jej jednostki, przelew i kupno). Usunięcie planu nie usuwa kupionych aktywów.
+
+**Naprawa podwójnych wpłat.** Jeśli przelew na konto inwestycyjne jest zapisany osobno, a wpłata do planu zapisała jeszcze „nowy przelew z konta”, pieniądze zeszły z banku dwa razy, a wolna gotówka się nie zmieniła. Aplikacja wykrywa takie wpłaty (przelew z tego samego konta w dniu wpłaty albo do 7 dni wcześniej, na co najmniej tę kwotę) i pokazuje na Przeglądzie baner **Napraw** – zakup przechodzi wtedy na wolną gotówkę, a pieniądze wracają na konto bankowe. Wykrywa też wpłaty wpisane dwa razy (te same instrumenty, jednostki i ceny) i proponuje usunięcie jednej. Każdą naprawę można cofnąć („Cofnij”), a „To nie błąd” / „To nie duplikat” wyłącza ostrzeżenie.
 
 **Jak liczona jest cena** (odświeżana w każdy dzień roboczy, ten sam sposób co w portfelu GEM):
 - **akcje, ETF-y, ETC i ETN z GPW i NewConnect** – kurs zamknięcia z ostatniej sesji, prosto z giełdy;
@@ -207,10 +211,15 @@ Zakładka **Majątek** odpowiada na sześć pytań.
 
 **1. Ile mam?** Na górze **majątek netto** (aktywa minus długi), zmiana w tym miesiącu i przez 12 miesięcy oraz gotówka, inwestycje i długi – pełne kwoty z groszami. Ten sam kafel jest na Przeglądzie i w Kontach – dotknięcie otwiera zakładkę Majątek.
 
-**2. Jak rosną inwestycje?** Wykres jak w aplikacjach do śledzenia portfela: linia **Wartość inwestycji** (ile na koniec każdego miesiąca były warte Twoje akcje, ETF-y, fundusze, obligacje, złoto, kryptowaluty i portfel GEM) i linia **Wpłacone pieniądze** (koszt zakupu pozycji, które były wtedy w portfelu, minus wypłacone odsetki; portfel GEM – wpłaty netto). Odstęp między liniami to zysk z inwestowania. Nad wykresem: dzisiejsza wartość, wpłacone pieniądze i zysk w złotych i procentach; zakres: rok, 3 lata, 5 lat albo całość – od pierwszego zakupu.
-- Pozycje liczą się od daty zakupu, także te dopisane do dziennika później. Sprzedana pozycja znika z obu linii w dniu sprzedaży.
-- Aktywa z wyceną ręczną (np. mieszkanie) nie są tu liczone.
-- Gdy dla części okresu brakuje notowań, wartość pozycji jest tam równa cenie zakupu – pod wykresem widać, do kiedy.
+**2. Czy inwestowanie się opłaca? – Majątek dzień po dniu.** Wykres z punktem na każdy dzień (przy długiej historii – co tydzień), zakres: miesiąc, 3 miesiące, rok albo całość. Dwa widoki:
+- **Cały majątek** – linia **Majątek całkowity** i linia **Majątek zarobiony**, czyli majątek bez zysków z inwestycji (to, co pochodzi z pracy, oszczędności i wpłat). Odstęp między liniami to zysk z inwestowania – widać, ile dokładnie dało inwestowanie i jaką część majątku stanowi.
+- **Inwestycje** – linia **Wartość inwestycji** (akcje, ETF-y, fundusze, obligacje, złoto, kryptowaluty i portfel GEM) i linia **Wpłacone pieniądze** (koszt zakupu pozycji, które są w portfelu, minus wypłacone odsetki; portfel GEM – wpłaty netto), jak w aplikacjach do śledzenia portfela.
+
+Pod wykresem **dzienna analiza**: o ile zmienił się majątek dziś, w tym miesiącu i w tym roku – i ile z tego dały inwestycje, a ile pieniądze zarobione (dochody minus wydatki, wpłaty). Niżej krótka **prognoza** z wariantu bazowego: majątek na koniec roku i za rok oraz ile z tego to przyszłe zyski z inwestycji. Wszystko przelicza się z Twoich operacji i cen z każdego dnia – przy każdej aktualizacji cen (w dni robocze rano).
+- **Zysk z inwestycji** to wartość pozycji minus ich koszt zakupu, razem z wypłaconymi odsetkami i zyskiem z pozycji już sprzedanych (po sprzedaży nie staje się „zarobiony”).
+- Pozycja dopisana później z rozliczeniem gotówki (jej wartość była wcześniej w saldzie konta): zysk, który miała w dniu dopisania, liczy się od początku dziennika – majątek zarobiony nie spada w dniu dopisania pozycji.
+- Aktywa z wyceną ręczną (np. mieszkanie) nie są inwestycjami – ich wartość jest w majątku całkowitym i zarobionym.
+- Gdy dla części okresu brakuje notowań, wartość pozycji jest tam równa cenie zakupu – w widoku inwestycji widać, do kiedy.
 - Portfel GEM: wartość i wpłaty z historii, którą zapisuje zakładka GEM → Mój portfel GEM przy każdym otwarciu.
 
 **3. Jak się zmienia majątek?** Wykres miesiąc po miesiącu (ostatni punkt to dziś), zakres: 6 miesięcy, rok, 3 lata albo całość. Dwa widoki:
@@ -222,8 +231,8 @@ Dotknięcie wykresu pokazuje wartości z danego miesiąca, a „Pokaż liczby w 
 **4. Skąd ta zmiana?** Zmiana majątku w wybranym zakresie (do dziś) rozłożona na części, które dają razem dokładnie tę zmianę:
 - **odłożone z dochodów** – przychody minus wydatki;
 - **wpłaty spoza budżetu** – np. składki pracodawcy do PPE (plan z wpłatą „spoza aplikacji”) i aktywa dopisane bez rozliczenia z gotówką;
-- **wynik inwestycji** – zmiana wartości kont inwestycyjnych, której nie tłumaczą wpłaty i wypłaty;
-- **pozostałe** – korekty sald i zmiany kursów walut na kontach walutowych.
+- **wynik inwestycji** – zmiana zysku z inwestycji (ten sam, co na wykresie „Majątek dzień po dniu”: wartość pozycji minus koszt zakupu, z odsetkami i zyskiem ze sprzedanych);
+- **pozostałe** – korekty sald (także na kontach inwestycyjnych, np. wolna gotówka poprawiona według brokera) i zmiany kursów walut na kontach walutowych.
 
 Spłata kapitału kredytu nie zmienia majątku (ubywa gotówki i długu jednocześnie); odsetki są w wydatkach.
 
@@ -241,7 +250,7 @@ Jeśli masz kredyt, a w aplikacji nie ma tego, co za niego kupiłeś (mieszkania
 
 O początku dziennika decydują wpisane i zaimportowane przychody i wydatki. Raty kredytów i odsetki z obligacji, które aplikacja zapisuje sama według harmonogramu (także wstecz), nie przesuwają go.
 
-**6. Dokąd zmierzam? – prognoza.** Wykres pokazuje dotychczasowy majątek (linia ciągła), **wariant bazowy** (linia przerywana) i przedział od **ostrożnego** do **optymistycznego** (pasmo). Horyzont: 1 rok, 5, 10, 20 albo 30 lat. Pod wykresem tabela wariantów, kamienie milowe (spłata kredytów, wyjście na plus, kolejne okrągłe kwoty, niezależność finansowa) i podpowiedź, ile daje każde dodatkowe 100 zł odkładane co miesiąc.
+**6. Dokąd zmierzam? – prognoza.** Wykres pokazuje dotychczasowy majątek (linia ciągła), **wariant bazowy** (linia przerywana) i przedział od **ostrożnego** do **optymistycznego** (pasmo). Horyzont: 1 rok, 5, 10, 20 albo 30 lat. Nad wykresem: ile z prognozowanej kwoty to zyski z inwestycji, które dopiero przyjdą. Pod wykresem tabela wariantów, kamienie milowe (spłata kredytów, wyjście na plus, kolejne okrągłe kwoty, niezależność finansowa) i podpowiedź, ile daje każde dodatkowe 100 zł odkładane co miesiąc.
 
 Prognoza opiera się na Twojej historii i nawykach:
 - **Co miesiąc odkładasz** – średnia z ostatnich [pełnych miesięcy](#pełne-miesiące) (przychody minus wydatki). Przy krótszej historii niż 3 pełne miesiące aplikacja korzysta ze stałych pozycji (np. wynagrodzenie i rachunki) i planów inwestycyjnych.

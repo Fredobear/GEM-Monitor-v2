@@ -211,7 +211,8 @@ const ui = {
   setTab: 'kategorie',
   worthRange: 12,
   worthMode: 'netto',
-  invRange: 0,
+  dayRange: 0,
+  dayMode: 'majatek',
   fcYears: 10,
   txMode: 'lista',
   detOpen: new Set(),
@@ -618,6 +619,7 @@ function alerts() {
     const key = `${d.accountId}|${d.planId}`;
     out.push(`<div class="banner info">📋 Wpłata do planu <b>${esc(d.plan.name)}</b> (${esc(d.account.name)}) z ${esc(shortDate(d.date, true))}: ${esc(money(d.plan.recurring.amount, d.account.currency))}${planBlocked.includes(key) ? ' – brakuje ceny któregoś instrumentu, wpisz ją' : ''}. <button class="link" data-plan-pay="${esc(`${key}|${d.date}`)}">Zapisz wpłatę</button> · <button class="link" data-plan-skip="${esc(key)}">Pomiń</button></div>`);
   }
+  out.push(planRepairBanners());
   const bal = balances(fin);
   for (const a of activeAccounts()) {
     // Kredyt bez automatycznego zapisu rat: przypomnienie o racie na 3 dni przed terminem.
@@ -633,6 +635,45 @@ function alerts() {
     }
   }
   return out.join('');
+}
+
+// Naprawa wpłat do planów: pieniądze pobrane drugi raz (przelew był już zapisany osobno) i wpłaty wpisane dwa razy.
+const planOf = (accountId, planId) => acc(accountId)?.plans?.find((p) => p.id === planId);
+function planRepairBanners() {
+  const out = [];
+  const doubles = planDoubleCharges(fin);
+  if (doubles.length) {
+    const back = new Map();
+    for (const d of doubles) back.set(d.fromId, (back.get(d.fromId) ?? 0) + d.back);
+    const backText = [...back].map(([id, v]) => `${money(v, acc(id)?.currency)} na konto ${accName(id)}`).join(' i ');
+    const plans = [...new Set(doubles.map((d) => `„${planOf(d.accountId, d.planId)?.name ?? ''}” (${accName(d.accountId)})`))].join(', ');
+    const dates = doubles.map((d) => `${shortDate(d.date, true)} – ${money(d.amount, acc(d.accountId)?.currency)}`).join('; ');
+    out.push(`<div class="banner warn">⚠️ <b>${doubles.length} ${plural(doubles.length, 'wpłata do planu pobrała', 'wpłaty do planu pobrały', 'wpłat do planu pobrało')} pieniądze drugi raz.</b> Plan ${esc(plans)}: ${esc(dates)}. W tych dniach był już osobny przelew na to konto, a wpłata zapisała kolejny. Naprawa kupi te jednostki z wolnej gotówki i zwróci ${esc(backText)}. <button class="link" data-plan-fix="1">Napraw</button> · <button class="link" data-plan-fix-ok="1">To nie błąd</button></div>`);
+  }
+  for (const { accountId, planId, a: x, b: y } of planDuplicates(fin)) {
+    const p = planOf(accountId, planId);
+    const cur = acc(accountId)?.currency;
+    const lx = x.date === y.date ? 'pierwszą' : `z ${shortDate(x.date, true)}`;
+    const ly = x.date === y.date ? 'drugą' : `z ${shortDate(y.date, true)}`;
+    const k = (e) => esc(`${accountId}|${planId}|${e.id}`);
+    out.push(`<div class="banner warn">⚠️ Wpłaty do planu „${esc(p?.name ?? '')}” ${esc(x.date === y.date ? `z ${shortDate(x.date, true)}` : `z ${shortDate(x.date, true)} i z ${shortDate(y.date, true)}`)} mają identyczne zakupy (${esc(money(x.amount, cur))}, te same jednostki i ceny) – jedna jest pewnie wpisana dwa razy. <button class="link" data-plan-del="${k(x)}">Usuń wpłatę ${esc(lx)}</button> · <button class="link" data-plan-del="${k(y)}">Usuń wpłatę ${esc(ly)}</button> · <button class="link" data-plan-dup-ok="${esc(`${accountId}|${planId}|${x.id}|${y.id}`)}">To nie duplikat</button></div>`);
+  }
+  return out.join('');
+}
+
+async function deletePlanEntryFlow(key) {
+  const [accountId, planId, entryId] = key.split('|');
+  const a = acc(accountId);
+  const p = planOf(accountId, planId);
+  const e = p?.log?.find((x) => x.id === entryId);
+  if (!e) return;
+  const buys = (e.buys ?? []).map((b) => `${b.asset.startsWith(FUND_PREFIX) || b.asset.startsWith(CRYPTO_PREFIX) ? planItemLabel(p.items.find((i) => i.asset === b.asset) ?? b) : b.asset} ${fmtQty(Math.round(b.qty * 1e4) / 1e4)}`).join(', ');
+  const tr = liveTx(fin).find((t) => (e.txIds ?? []).includes(t.id) && t.type === 'przelew');
+  const body = `<p><b>${esc(shortDate(e.date, true))} · ${esc(money(e.amount, a.currency))}</b> · ${esc(planSourceText(a, e))}</p><p class="small muted">Znikną kupione w niej jednostki (${esc(buys)})${tr ? ` i przelew ${esc(money(tr.accountAmount ?? tr.amount, acc(tr.accountId)?.currency))} z konta ${esc(accName(tr.accountId))}` : ''}.</p>`;
+  if (!(await confirmAction({ title: 'Usunąć wpłatę do planu?', body, ok: 'Usuń wpłatę' }))) return;
+  undoable('Usunięto wpłatę do planu.', () => {
+    fin = removePlanEntry(fin, accountId, planId, entryId);
+  });
 }
 
 function categoryRows(list, from, to) {
@@ -984,6 +1025,18 @@ function gemInfo(a, b) {
   return out.join('');
 }
 
+// Skąd były pieniądze na wpłatę do planu.
+const planSourceText = (a, e) => (e.fromId === a.id ? 'z wolnej gotówki' : !e.fromId || e.fromId === PLAN_EXTERNAL ? 'spoza aplikacji' : `przelew z konta ${accName(e.fromId)}`);
+// Historia wpłat planu (od najnowszej): zmiana źródła na wolną gotówkę i usunięcie wpłaty wpisanej przez pomyłkę.
+function planLogList(a, p) {
+  const log = [...(p.log ?? [])].reverse();
+  if (!log.length) return '';
+  const det = `planlog-${p.id}`;
+  const key = (e) => esc(`${a.id}|${p.id}|${e.id}`);
+  const rows = log.map((e) => `<li><span>${esc(shortDate(e.date, true))} · <b>${esc(money(e.amount, a.currency))}</b> · ${esc(planSourceText(a, e))}</span><span class="plan-log-act">${e.fromId && e.fromId !== a.id && e.fromId !== PLAN_EXTERNAL ? `<button class="link small" data-plan-cash="${key(e)}">kup z wolnej gotówki</button> · ` : ''}<button class="link small danger-text" data-plan-del="${key(e)}">usuń</button></span></li>`).join('');
+  return `<details class="acc-det plan-log" data-det="${esc(det)}" ${ui.detOpen.has(det) ? 'open' : ''}><summary>Historia wpłat (${log.length})</summary><ul>${rows}</ul><p class="small muted">„Kup z wolnej gotówki” usuwa przelew zapisany przez wpłatę – zakup zmniejsza wtedy wolną gotówkę na koncie. Przydaje się, gdy przelew na to konto był już zapisany osobno.</p></details>`;
+}
+
 // Plany inwestycyjne konta: udziały, wpłata cykliczna, przyciski wpłaty i edycji.
 const planItemLabel = (i) => (String(i.asset).startsWith(FUND_PREFIX) ? `${i.name || 'fundusz'} (${fundCategoryOf(i.asset)})` : String(i.asset).startsWith(CRYPTO_PREFIX) ? i.name || cryptoIdOf(i.asset) : i.asset);
 function plansInfo(a) {
@@ -993,7 +1046,7 @@ function plansInfo(a) {
       const r = p.recurring;
       const rec = r ? ` · co miesiąc ${money(r.amount, cur)} (${r.day}. dnia, najbliższa ${shortDate(r.nextDate)})${r.auto ? '' : ' – z potwierdzeniem'}` : '';
       const total = (p.log ?? []).reduce((s, e) => s + (e.amount || 0), 0);
-      return `<div class="plan-line"><div class="small"><b>📋 ${esc(p.name)}</b>: ${esc(p.items.map((i) => `${planItemLabel(i)} ${pctNum(i.pct)}%`).join(' · '))}${esc(rec)}${total ? `<br><span class="muted">Wpłacono w planie: ${esc(money(total, cur))} (${(p.log ?? []).length} ${plural((p.log ?? []).length, 'wpłata', 'wpłaty', 'wpłat')})</span>` : ''}</div><div class="acc-actions"><button class="btn small primary" data-plan-pay="${esc(`${a.id}|${p.id}`)}">Wpłać do planu</button><button class="btn small ghost" data-plan-edit="${esc(`${a.id}|${p.id}`)}">Edytuj plan</button></div></div>`;
+      return `<div class="plan-line"><div class="small"><b>📋 ${esc(p.name)}</b>: ${esc(p.items.map((i) => `${planItemLabel(i)} ${pctNum(i.pct)}%`).join(' · '))}${esc(rec)}${total ? `<br><span class="muted">Wpłacono w planie: ${esc(money(total, cur))} (${(p.log ?? []).length} ${plural((p.log ?? []).length, 'wpłata', 'wpłaty', 'wpłat')})</span>` : ''}</div>${planLogList(a, p)}<div class="acc-actions"><button class="btn small primary" data-plan-pay="${esc(`${a.id}|${p.id}`)}">Wpłać do planu</button><button class="btn small ghost" data-plan-edit="${esc(`${a.id}|${p.id}`)}">Edytuj plan</button></div></div>`;
     })
     .join('');
 }
@@ -1219,40 +1272,105 @@ function forecastChart(hist, fc, months, value) {
   return `${chartBox(svg, tips, P.W)}${legendRow([['s-net', 'Dotychczas', true], ['s-net cx-dash-key', 'Prognoza (wariant bazowy)', true], ['s-band', 'Od ostrożnego do optymistycznego']])}`;
 }
 
-// Inwestycje: ile są warte i ile pieniędzy w nie włożono (jak w aplikacjach do śledzenia portfela). Wartość to linia
-// z polem pod spodem, wpłacone pieniądze – druga linia; odstęp między nimi to zysk z inwestowania.
-const INV_RANGES = [[12, '1 rok'], [36, '3 lata'], [60, '5 lat'], [0, 'Wszystko']];
+// ---------- Majątek dzień po dniu: całkowity i zarobiony, inwestycje, dzienna analiza ----------
+// Dwa widoki jednego wykresu: „Cały majątek” – majątek całkowity i zarobiony (bez zysków z inwestycji), „Inwestycje” –
+// wartość inwestycji i wpłacone w nie pieniądze. Odstęp między liniami to zysk z inwestowania. Punkt na każdy dzień
+// (przy długiej historii – co tydzień), ostatni to dziś; liczby przeliczają się przy każdej aktualizacji cen.
+const DAY_RANGES = [[31, '1 mies.'], [92, '3 mies.'], [366, '1 rok'], [0, 'Wszystko']];
 const signed0 = (x) => `${x < -0.5 ? '−' : '+'}${zl0(Math.abs(x))}`;
-function investChart(points) {
-  const n = points.length;
-  const P = plotArea(Math.min(0, ...points.map((p) => Math.min(p.value, p.invested))), Math.max(1, ...points.map((p) => Math.max(p.value, p.invested))), { H: 220 });
+const dayShort = (iso) => `${Number(iso.slice(8, 10))} ${MONTHS_SHORT[Number(iso.slice(5, 7)) - 1]}`;
+const DAY_MODES = {
+  majatek: { top: 'worth', base: 'earned', topLabel: 'Majątek całkowity', baseLabel: 'Majątek zarobiony', tipTop: 'Całkowity', tipBase: 'Zarobiony', aria: 'Majątek całkowity i zarobiony dzień po dniu' },
+  inwestycje: { top: 'value', base: 'invested', topLabel: 'Wartość inwestycji', baseLabel: 'Wpłacone pieniądze', tipTop: 'Wartość', tipBase: 'Wpłacono', aria: 'Wartość inwestycji i wpłacone pieniądze dzień po dniu' },
+};
+
+// Seria dzienna jest liczona raz na zmianę danych (zapis, nowe ceny, nowy dzień).
+let dayCache = { key: '', days: [] };
+function dailyCached(t) {
+  const key = `${fin.updatedAt}|${t}|${MARKET.asOf}|${Object.keys(MARKET.assets ?? {}).length}|${JSON.stringify(MARKET.gemValues ?? {}).length}`;
+  if (dayCache.key !== key) dayCache = { key, days: dailyWealth(fin, MARKET, { today: t }) };
+  return dayCache.days;
+}
+
+function dayChart(points, m) {
+  const k = Math.ceil(points.length / 400);
+  const pts = k > 1 ? points.filter((p, i) => (points.length - 1 - i) % k === 0) : points;
+  const n = pts.length;
+  const long = daysBetween(pts[0].date, pts[n - 1].date) > 150;
+  // Oś od najniższej do najwyższej wartości (nie od zera), żeby było widać zmiany z dnia na dzień.
+  const vals = pts.flatMap((p) => [p[m.top], p[m.base]]);
+  const P = plotArea(Math.min(...vals), Math.max(...vals), { H: 220 });
   const x = (i) => (n === 1 ? (P.x0 + P.x1) / 2 : P.x0 + ((P.x1 - P.x0) * i) / (n - 1));
-  const path = (k) => points.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${P.y(p[k]).toFixed(1)}`).join('');
-  const value = path('value');
-  const show = pickLabels(n);
-  const labels = points.map((p, i) => (show(i) ? xLabel(x(i), monthShort(p.month), P.H) : '')).join('');
-  const last = points[n - 1];
+  const path = (key) => pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${P.y(p[key]).toFixed(1)}`).join('');
+  const top = path(m.top);
+  const show = pickLabels(n, 5);
+  const labels = pts.map((p, i) => (show(i) ? xLabel(x(i), long ? monthShort(p.date.slice(0, 7)) : dayShort(p.date), P.H) : '')).join('');
+  const last = pts[n - 1];
   const xe = x(n - 1).toFixed(1);
-  const svg = `<svg viewBox="0 0 ${P.W} ${P.H}" role="img" aria-label="Wartość inwestycji i wpłacone pieniądze miesiąc po miesiącu">${P.grid}${labels}<path d="${value}L${xe},${P.base.toFixed(1)}L${x(0).toFixed(1)},${P.base.toFixed(1)}Z" class="cx-area s-inv"/><path d="${path('invested')}" class="cx-line s-paid"/><path d="${value}" class="cx-line s-inv"/><circle cx="${xe}" cy="${P.y(last.invested).toFixed(1)}" r="4" class="cx-dot s-paid"/><circle cx="${xe}" cy="${P.y(last.value).toFixed(1)}" r="4" class="cx-dot s-inv"/>${cross(P)}</svg>`;
-  const tips = points.map((p, i) => [Math.round(x(i) * 10) / 10, i === n - 1 ? 'Dziś' : `Koniec: ${monthLabel(p.month)}`, [['Wartość', zl0(p.value), 'inv'], ['Wpłacono', zl0(p.invested), 'paid'], ['Zysk', signed0(p.gain), '']]]);
+  const floor = P.floor.toFixed(1);
+  const svg = `<svg viewBox="0 0 ${P.W} ${P.H}" role="img" aria-label="${esc(m.aria)}">${P.grid}${labels}<path d="${top}L${xe},${floor}L${x(0).toFixed(1)},${floor}Z" class="cx-area s-inv"/><path d="${path(m.base)}" class="cx-line s-paid"/><path d="${top}" class="cx-line s-inv"/><circle cx="${xe}" cy="${P.y(last[m.base]).toFixed(1)}" r="4" class="cx-dot s-paid"/><circle cx="${xe}" cy="${P.y(last[m.top]).toFixed(1)}" r="4" class="cx-dot s-inv"/>${cross(P)}</svg>`;
+  const tips = pts.map((p, i) => [Math.round(x(i) * 10) / 10, i === n - 1 ? 'Dziś' : shortDate(p.date, true), [[m.tipTop, zl0(p[m.top]), 'inv'], [m.tipBase, zl0(p[m.base]), 'paid'], ['Zysk z inwestycji', signed0(p[m.top] - p[m.base]), '']]]);
   return chartBox(svg, tips, P.W);
 }
 
-function investChartCard(inv) {
-  const all = inv.points;
-  if (all.length < 2 || !all.some((p) => p.value > 0.5 || p.invested > 0.5)) return '';
-  const ranges = INV_RANGES.filter(([m]) => !m || all.length > m + 1);
-  const sel = ranges.some(([m]) => m === ui.invRange) ? ui.invRange : 0;
-  const points = sel ? all.slice(-(sel + 1)) : all;
-  const last = all[all.length - 1];
-  const rows = [...points].reverse().map((p, i) => `<tr><td>${i ? esc(cap(monthShort(p.month))) : 'dziś'}</td><td class="num">${esc(zl0(p.value))}</td><td class="num">${esc(zl0(p.invested))}</td><td class="num ${gainClass(p.gain)}">${esc(signed0(p.gain))}</td></tr>`).join('');
-  const approx = inv.approxUntil && inv.approxUntil > points[0].date ? ` Do ${Number(inv.approxUntil.slice(8, 10))} ${MONTHS_GEN[Number(inv.approxUntil.slice(5, 7)) - 1]} ${inv.approxUntil.slice(0, 4)} brakuje notowań części pozycji – do tego dnia ich wartość jest liczona po cenie zakupu.` : '';
-  const manual = fin.accounts.some((a) => !a.archived && (a.lots ?? []).some((l) => l.asset === 'manual')) ? ' Aktywa z wyceną ręczną (np. mieszkanie) nie są tu liczone.' : '';
-  return `<section class="card"><div class="card-head"><h2>Jak rosną inwestycje</h2>${ranges.length > 1 ? `<div class="seg small">${ranges.map(([m, l]) => `<button data-inv-range="${m}" class="${sel === m ? 'on' : ''}">${l}</button>`).join('')}</div>` : ''}</div>
-  <ul class="inv-legend"><li><i class="cx-key-line s-inv"></i><span>Wartość inwestycji</span><b>${esc(zl(last.value))}</b></li><li><i class="cx-key-line s-paid"></i><span>Wpłacone pieniądze</span><b>${esc(zl(last.invested))}</b></li><li><i class="cx-key-none"></i><span>Zysk</span><b class="${gainClass(last.gain)}">${esc(gainText(last.gain, last.invested > 0.5 ? last.gain / last.invested : null))}</b></li></ul>
-  ${investChart(points)}
-  <details class="cx-table"><summary>Pokaż liczby w tabeli</summary><div class="tbl-wrap"><table><thead><tr><th>Koniec miesiąca</th><th class="num">Wartość</th><th class="num">Wpłacono</th><th class="num">Zysk</th></tr></thead><tbody>${rows}</tbody></table></div></details>
-  <p class="small muted">„Wartość inwestycji” to wycena Twoich pozycji na koniec każdego miesiąca (akcje, ETF-y, fundusze, obligacje, złoto, kryptowaluty i portfel GEM), a „Wpłacone pieniądze” – ile w nie włożono: koszt zakupu pozycji, które były wtedy w portfelu (sprzedane znikają z obu linii), minus wypłacone odsetki. Odstęp między liniami to zysk z inwestowania.${approx}${manual} Dotknij wykresu, aby zobaczyć wartości z danego miesiąca.</p></section>`;
+// Dzienna analiza: o ile zmienił się majątek dziś, w tym miesiącu i w tym roku – i ile z tego dały inwestycje.
+function dayAnalysis(days) {
+  const last = days[days.length - 1];
+  const first = days[0];
+  const at = (date) => (date < first.date ? first : days[daysBetween(first.date, date)] ?? first);
+  const t = last.date;
+  const mBase = isoDays(`${t.slice(0, 7)}-01`, -1);
+  const yBase = `${Number(t.slice(0, 4)) - 1}-12-31`;
+  const cols = [
+    ['Dziś', days.length > 1 ? days[days.length - 2] : first],
+    ['Ten miesiąc', at(mBase)],
+    ['Ten rok', at(yBase)],
+  ];
+  const rows = [
+    ['Majątek', 'worth'],
+    ['z inwestycji', 'gain'],
+    ['zarobione', 'earned'],
+  ];
+  const cell = (b, k) => {
+    const v = last[k] - b[k];
+    return `<td class="num ${k === 'worth' ? '' : gainClass(v)}">${k === 'worth' ? '<b>' : ''}${esc(signed0(v))}${k === 'worth' ? '</b>' : ''}</td>`;
+  };
+  const fromStart = [mBase < first.date && '„Ten miesiąc”', yBase < first.date && '„Ten rok”'].filter(Boolean);
+  const since = fromStart.length ? `<p class="small muted">${fromStart.join(' i ')} – od ${esc(shortDate(first.date, true))}, czyli od początku dziennika.</p>` : '';
+  return `<div class="tbl-wrap"><table class="fc-table day-table"><thead><tr><th>Zmiana</th>${cols.map(([l]) => `<th class="num">${l}</th>`).join('')}</tr></thead><tbody>${rows.map(([l, k]) => `<tr><td>${l}</td>${cols.map(([, b]) => cell(b, k)).join('')}</tr>`).join('')}</tbody></table></div>${since}`;
+}
+
+function dayCard(days, fc, approxUntil) {
+  if (days.length < 2) return '';
+  const hasInv = days.some((d) => d.value > 0.5 || d.invested > 0.5);
+  const mode = ui.dayMode === 'inwestycje' && hasInv ? 'inwestycje' : 'majatek';
+  const m = DAY_MODES[mode];
+  // W widoku inwestycji wykres zaczyna się dzień przed pierwszym zakupem.
+  const k = mode === 'inwestycje' ? days.findIndex((d) => d.value > 0.5 || d.invested > 0.5) : 0;
+  const series = days.slice(Math.max(0, k - 1));
+  const ranges = DAY_RANGES.filter(([r]) => !r || series.length > r + 1);
+  const sel = ranges.some(([r]) => r === ui.dayRange) ? ui.dayRange : 0;
+  const points = sel ? series.slice(-(sel + 1)) : series;
+  const last = days[days.length - 1];
+  const gain = last[m.top] - last[m.base];
+  const gainNote = mode === 'majatek' ? (last.worth > 0.5 ? ` (${pct1(gain / last.worth)} majątku)` : '') : last.invested > 0.5 ? ` (${gain < -0.004 ? '−' : '+'}${pct1(gain / last.invested)})` : '';
+  const legend = `<ul class="inv-legend"><li><i class="cx-key-line s-inv"></i><span>${m.topLabel}</span><b>${esc(zl(last[m.top]))}</b></li><li><i class="cx-key-line s-paid"></i><span>${m.baseLabel}</span><b>${esc(zl(last[m.base]))}</b></li><li><i class="cx-key-none"></i><span>Zysk z inwestycji</span><b class="${gainClass(gain)}">${esc(signed(gain))}${esc(gainNote)}</b></li></ul>`;
+  // Prognoza z karty „Prognoza” (wariant bazowy): koniec roku i za rok, z tego przyszłe zyski z inwestycji.
+  const real = (fin.forecast ?? {}).real !== false;
+  const val = (v, mm) => (real ? v / (1 + fc.params.inflationPct / 100) ** (mm / 12) : v);
+  const mEnd = monthDiff(last.date.slice(0, 7), `${last.date.slice(0, 4)}-12`);
+  const fcText = fc.defaults.basis === 'brak' && !Number.isFinite(Number(fin.forecast?.saved)) ? '' : `<p class="small"><b>Prognoza</b> (wariant bazowy${real ? ', w dzisiejszych pieniądzach' : ''}): ${mEnd > 0 ? `na koniec roku ok. <b>${esc(zl0(val(fc.base[mEnd].worth, mEnd)))}</b>, ` : ''}za rok ok. <b>${esc(zl0(val(fc.base[12].worth, 12)))}</b> – z tego ok. ${esc(zl0(val(fc.base[12].gain, 12)))} to przyszłe zyski z inwestycji. Założenia i dłuższy horyzont – w karcie „Prognoza”.</p>`;
+  const approx = mode === 'inwestycje' && approxUntil && approxUntil > points[0].date ? ` Do ${esc(shortDate(approxUntil, true))} brakuje notowań części pozycji – do tego dnia ich wartość jest liczona po cenie zakupu.` : '';
+  const explain = mode === 'majatek'
+    ? '„Majątek zarobiony” to majątek bez zysków z inwestycji – to, co pochodzi z pracy, oszczędności i wpłat. Odstęp między liniami pokazuje, ile dało inwestowanie.'
+    : '„Wartość inwestycji” to wycena Twoich pozycji (akcje, ETF-y, fundusze, obligacje, złoto, kryptowaluty i portfel GEM), a „Wpłacone pieniądze” – koszt zakupu pozycji, które są w portfelu (sprzedane znikają z obu linii), minus wypłacone odsetki. Odstęp między liniami to zysk.';
+  return `<section class="card"><div class="card-head"><h2>Majątek dzień po dniu</h2>${ranges.length > 1 ? `<div class="seg small">${ranges.map(([r, l]) => `<button data-day-range="${r}" class="${sel === r ? 'on' : ''}">${l}</button>`).join('')}</div>` : ''}</div>
+  ${hasInv ? `<div class="seg small mode-seg"><button data-day-mode="majatek" class="${mode === 'majatek' ? 'on' : ''}">Cały majątek</button><button data-day-mode="inwestycje" class="${mode === 'inwestycje' ? 'on' : ''}">Inwestycje</button></div>` : ''}
+  ${legend}
+  ${dayChart(points, m)}
+  ${dayAnalysis(days)}
+  ${fcText}
+  <p class="small muted">${explain}${approx} Zysk z inwestycji to wartość pozycji minus ich koszt zakupu (z odsetkami i zyskiem ze sprzedanych pozycji). Wykres i tabela liczą się z Twoich operacji i cen z każdego dnia – przeliczają się przy każdej aktualizacji cen (w dni robocze rano). Dotknij wykresu, aby zobaczyć wartości z danego dnia.</p></section>`;
 }
 
 // Wiersz z paskiem: nazwa, kwota i pasek proporcjonalny do największej pozycji.
@@ -1284,13 +1402,16 @@ function wealthHistoryCard(all) {
 
 function wealthChangeCard(all) {
   const points = ui.worthRange ? all.slice(-ui.worthRange) : all;
-  const ch = wealthChange(points);
+  // Wynik inwestycji z tej samej serii co wykres „Majątek dzień po dniu” (zysk z pozycji), korekty sald – w „Pozostałych”.
+  const days = dailyCached(today());
+  const gainAt = days.length ? (date) => (date < days[0].date ? days[0] : days[daysBetween(days[0].date, date)] ?? days[days.length - 1]).gain : null;
+  const ch = wealthChange(points, { gainAt });
   if (!ch) return '';
   const items = [
     ['Odłożone z dochodów', ch.saved, `przychody ${zl0(ch.income)} − wydatki ${zl0(ch.expense)}`],
     ['Wpłaty spoza budżetu', ch.external, 'np. składki pracodawcy do PPE i aktywa dopisane do dziennika'],
-    ['Wynik inwestycji', ch.invGain, 'zmiana wartości kont inwestycyjnych poza wpłatami'],
-    ['Pozostałe', ch.other, 'korekty sald i zmiany kursów walut na kontach'],
+    ['Wynik inwestycji', ch.invGain, 'zmiana zysku z pozycji: ich wartość minus koszt zakupu, z odsetkami i zyskiem ze sprzedanych'],
+    ['Pozostałe', ch.other, 'korekty sald (także na kontach inwestycyjnych) i zmiany kursów walut na kontach'],
   ].filter(([, v], i) => i === 0 || Math.abs(v) >= 1);
   const max = Math.max(1, ...items.map(([, v]) => Math.abs(v)));
   return `<section class="card"><h2>Skąd ta zmiana</h2>
@@ -1343,9 +1464,8 @@ const afterYears = (y) => (y === 1 ? 'roku' : `${y} latach`);
 const pc1 = (x) => String(Math.round(x * 10) / 10).replace('.', ',');
 const fcDate = (iso) => `${MONTHS[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}`;
 
-function forecastCard(all, stats) {
+function forecastCard(all, stats, fc) {
   const o = fin.forecast ?? {};
-  const fc = wealthForecast(fin, MARKET, { today: today(), months: 480, overrides: o });
   const d = fc.defaults;
   const real = o.real !== false;
   const years = FC_YEARS.includes(ui.fcYears) ? ui.fcYears : 10;
@@ -1385,7 +1505,7 @@ function forecastCard(all, stats) {
   const end = at(fc.base, months);
   const cashShare = fc.base[months].worth + fc.base[months].debt > 1 ? Math.max(0, fc.base[months].cash) / (Math.max(0, fc.base[months].cash) + fc.base[months].investments) : 0;
   return `<section class="card" id="forecast-card"><div class="card-head"><h2>Prognoza</h2><div class="seg small">${FC_YEARS.map((y) => `<button data-fc-years="${y}" class="${y === years ? 'on' : ''}">${y === 1 ? '1 rok' : `${y} lat`}</button>`).join('')}</div></div>
-  <p class="lead">Za ${esc(yearsLabel(years))} (${esc(fcDate(fc.dates[months]))}) Twój majątek netto może wynosić około <b>${esc(zl0(end))}</b> – prawdopodobnie między ${esc(zl0(at(fc.low, months)))} a ${esc(zl0(at(fc.high, months)))}${real ? ', w dzisiejszych pieniądzach' : ''}.</p>
+  <p class="lead">Za ${esc(yearsLabel(years))} (${esc(fcDate(fc.dates[months]))}) Twój majątek netto może wynosić około <b>${esc(zl0(end))}</b> – prawdopodobnie między ${esc(zl0(at(fc.low, months)))} a ${esc(zl0(at(fc.high, months)))}${real ? ', w dzisiejszych pieniądzach' : ''}.${fc.base[months].gain > 0.5 ? ` Z tej kwoty ok. <b>${esc(zl0(value(fc.base[months].gain, months)))}</b> to zyski z inwestycji, które dopiero przyjdą – reszta to dzisiejszy majątek i pieniądze odłożone z dochodów.` : ''}</p>
   ${forecastChart(hist, fc, months, value)}
   <label class="check small"><input type="checkbox" data-fc-real ${real ? 'checked' : ''}> <span>Pokaż w dzisiejszych pieniądzach (po odjęciu inflacji ${esc(pc1(infl))}% rocznie)</span></label>
   <div class="tbl-wrap"><table class="fc-table"><thead><tr><th></th><th class="num">Ostrożnie</th><th class="num">Bazowo</th><th class="num">Optymistycznie</th></tr></thead><tbody>${rows}</tbody></table></div>
@@ -1426,7 +1546,8 @@ function viewWealth() {
   const stats = savingsStats(fin, MARKET, { today: t, months: 12 });
   // Kredyt bez wpisanej wartości tego, co za niego kupiono, zaniża majątek netto.
   const hint = now.loanDebt > 0.5 && !st.assets.some((i) => i.key === 'reczne') ? '<div class="banner info small">Masz kredyt, ale w aplikacji nie ma tego, co za niego kupiłeś (np. mieszkania albo samochodu), dlatego majątek netto jest zaniżony. Możesz dopisać jego wartość: Konta → konto inwestycyjne (np. „Nieruchomości”) → Aktywa → „Inne aktywo (wycena ręczna)”.</div>' : '';
-  return `${wealthHero(now, all)}${hint}${investChartCard(investSeries(fin, MARKET, { today: t }))}<div class="wealth-grid">${wealthHistoryCard(all)}${wealthChangeCard(all)}${savingsCard(stats, st.liquid)}${structureCard(st)}</div>${forecastCard(all, stats)}`;
+  const fc = wealthForecast(fin, MARKET, { today: t, months: 480, overrides: fin.forecast ?? {} });
+  return `${wealthHero(now, all)}${hint}${dayCard(dailyCached(t), fc, investSeries(fin, MARKET, { today: t }).approxUntil)}<div class="wealth-grid">${wealthHistoryCard(all)}${wealthChangeCard(all)}${savingsCard(stats, st.liquid)}${structureCard(st)}</div>${forecastCard(all, stats, fc)}`;
 }
 
 // Dymek wykresu: najbliższy punkt do palca albo kursora, pionowa linia i wartości wszystkich serii.
@@ -1942,8 +2063,12 @@ $('#fin-root').addEventListener('click', async (ev) => {
     ui.worthMode = d.worthMode;
     return render();
   }
-  if (d.invRange !== undefined) {
-    ui.invRange = Number(d.invRange);
+  if (d.dayRange !== undefined) {
+    ui.dayRange = Number(d.dayRange);
+    return render();
+  }
+  if (d.dayMode) {
+    ui.dayMode = d.dayMode;
     return render();
   }
   if (d.fcYears) {
@@ -2022,6 +2147,33 @@ $('#fin-root').addEventListener('click', async (ev) => {
     const [accId, planId] = d.planSkip.split('|');
     return undoable('Pominięto wpłatę do planu (termin przesunięty na kolejny miesiąc).', () => {
       fin = advancePlan(fin, accId, planId);
+    });
+  }
+  // Naprawa wpłat do planów: zakup z wolnej gotówki zamiast drugiego przelewu, usunięcie duplikatu.
+  if (d.planFix) {
+    const list = planDoubleCharges(fin);
+    if (!list.length) return render();
+    const back = list.reduce((s, x) => s + x.back, 0);
+    return undoable(`Naprawiono ${list.length} ${plural(list.length, 'wpłatę', 'wpłaty', 'wpłat')}: kupione z wolnej gotówki, zwrot ${money(back, acc(list[0].fromId)?.currency)}.`, () => {
+      for (const x of list) fin = planEntryToCash(fin, x.accountId, x.planId, x.entryId, { market: MARKET, newId });
+    });
+  }
+  if (d.planFixOk) {
+    return undoable('Oznaczono wpłaty jako poprawne.', () => {
+      for (const x of planDoubleCharges(fin)) fin = markPlanEntryOk(fin, x.accountId, x.planId, x.entryId, 'double');
+    });
+  }
+  if (d.planCash) {
+    const [accId, planId, entryId] = d.planCash.split('|');
+    return undoable('Wpłata kupiona z wolnej gotówki – jej przelew usunięty.', () => {
+      fin = planEntryToCash(fin, accId, planId, entryId, { market: MARKET, newId });
+    });
+  }
+  if (d.planDel) return deletePlanEntryFlow(d.planDel);
+  if (d.planDupOk) {
+    const [accId, planId, xId, yId] = d.planDupOk.split('|');
+    return undoable('Oznaczono jako dwie różne wpłaty.', () => {
+      fin = markPlanEntryOk(fin, accId, planId, xId, 'dup', yId);
     });
   }
   if (d.loanSync) return syncLoanBalance(d.loanSync);
@@ -3489,12 +3641,15 @@ async function ensurePlanAssets(items) {
   for (const i of items) if (!MARKET.assets?.[i.asset]) addLibraryAsset(i.asset, i.name, i.currency);
 }
 
+// Wolna gotówka na koncie (w walucie konta).
+const freeCash = (a) => balances(fin)[a.id] ?? 0;
 function planFromOptions(a, selected) {
   const others = fin.accounts.filter((x) => x.id !== a.id && !x.archived && !isLoan(x) && !isCard(x));
   const opt = (v, l) => `<option value="${esc(v)}" ${v === selected ? 'selected' : ''}>${esc(l)}</option>`;
-  return `${others.map((x) => opt(x.id, `Przelew z konta: ${x.name}`)).join('')}${opt(a.id, 'Z wolnej gotówki na tym koncie')}${opt(PLAN_EXTERNAL, 'Spoza aplikacji (np. składka pracodawcy do PPE)')}`;
+  return `${opt(a.id, `Z wolnej gotówki na tym koncie (${money(freeCash(a), a.currency)})`)}${others.map((x) => opt(x.id, `Nowy przelew z konta: ${x.name}`)).join('')}${opt(PLAN_EXTERNAL, 'Spoza aplikacji (np. składka pracodawcy do PPE)')}`;
 }
-const defaultPlanFrom = (a) => (/ppe|ppk/i.test(a.name) ? PLAN_EXTERNAL : defaultAccount('przelew') || a.id);
+// Domyślnie zakup z wolnej gotówki, gdy na koncie jakaś jest (pieniądze przelane wcześniej) – inaczej przelew z konta.
+const defaultPlanFrom = (a) => (/ppe|ppk/i.test(a.name) ? PLAN_EXTERNAL : freeCash(a) >= 1 ? a.id : defaultAccount('przelew') || a.id);
 
 function addPlanItem(item) {
   const d = planState?.draft;
@@ -3592,7 +3747,9 @@ async function openPlanPay(accountId, planId, due = null) {
   if (!p) return;
   await ensurePlanAssets(p.items);
   const date = due || today();
-  planState = { mode: 'pay', accountId, planId, due, date, amount: p.recurring?.amount ?? 0, fromId: p.recurring?.fromId ?? defaultPlanFrom(a), prices: {}, edited: {} };
+  // Wpłata cykliczna ma swoje źródło; ręczna – zakup z wolnej gotówki, jeśli jest (np. po przelewie na to konto).
+  const recFrom = due ? p.recurring?.fromId : null;
+  planState = { mode: 'pay', accountId, planId, due, date, amount: p.recurring?.amount ?? 0, fromId: recFrom ?? defaultPlanFrom(a), prices: {}, edited: {} };
   for (const i of p.items) planState.prices[i.asset] = marketPriceAt(MARKET, a, i.asset, date);
   $('#pl-title').textContent = `Wpłata do planu „${p.name}”`;
   $('#pl-delete').hidden = true;
@@ -3611,6 +3768,7 @@ function renderPlanPay() {
   $('#pl-body').innerHTML = `<p class="small">${esc(p.items.map((i) => `${planItemLabel(i)} ${pctNum(i.pct)}%`).join(' · '))}</p>
   <div class="two"><label class="field">Kwota wpłaty (${esc(curLabel(cur))})<input id="pp-amount" inputmode="decimal" value="${esc(fmtInput(s.amount))}" placeholder="np. 1000"></label><label class="field">Data<input type="date" id="pp-date" value="${esc(s.date)}"></label></div>
   <label class="field">Skąd pieniądze<select id="pp-from">${planFromOptions(a, s.fromId)}</select></label>
+  <p id="pp-hint" class="small" hidden></p>
   <div class="sched-wrap"><table class="sched pp-tbl"><thead><tr><th>Instrument</th><th>Kwota</th><th>Cena</th><th>Jednostki</th></tr></thead><tbody>${p.items.map((i) => `<tr><td>${esc(planItemLabel(i))}<br><span class="muted">${esc(pctNum(i.pct))}%</span></td><td data-pp-amt="${esc(i.asset)}"></td><td><input data-pp-price="${esc(i.asset)}" inputmode="decimal" value="${esc(fmtInput(s.prices[i.asset]))}" placeholder="cena"><br><span class="muted">${esc(curLabel(i.currency))}</span></td><td data-pp-qty="${esc(i.asset)}"></td></tr>`).join('')}</tbody></table></div>
   <p class="small muted">Ceny z dnia wpłaty: dla funduszy ING TFI i akcji z GPW – z notowań, dla ETF-ów z Xetry czy Londynu – szacunek według indeksu od ostatniego kursu, który wpisałeś. Popraw je według potwierdzenia z XTB albo ING, jeśli się różnią.</p>`;
   updatePlanPay();
@@ -3629,6 +3787,17 @@ function updatePlanPay() {
     if (amtEl) amtEl.textContent = money(part.amount, cur);
     if (qtyEl) qtyEl.textContent = price > 0 && amtAsset !== null ? fmtQty(Math.round((amtAsset / price) * 1e4) / 1e4) || '0' : '–';
   }
+  // Podpowiedź o źródle pieniędzy: przelew z banku przy wolnej gotówce na koncie zapisze przelew drugi raz.
+  const hint = $('#pp-hint', PLAN);
+  if (!hint) return;
+  const cash = freeCash(a);
+  const from = acc(s.fromId);
+  let text = '';
+  if (s.fromId === a.id && s.amount > cash + 0.005) text = `Wolnej gotówki na koncie jest ${money(cash, cur)} – mniej niż kwota wpłaty. Jeśli pieniądze dopiero przelewasz, zapisz najpierw przelew na to konto albo wybierz konto, z którego idzie przelew.`;
+  else if (from && s.fromId !== a.id && cash >= 1) text = `Na koncie jest ${money(cash, cur)} wolnej gotówki. Jeśli przelew z konta ${from.name} jest już zapisany, wybierz „Z wolnej gotówki” – inaczej pieniądze zejdą z konta ${from.name} drugi raz.`;
+  hint.textContent = text;
+  hint.className = `small ${text ? 'warn' : ''}`;
+  hint.hidden = !text;
 }
 
 PLAN.addEventListener('input', (ev) => {
@@ -3678,7 +3847,10 @@ PLAN.addEventListener('change', async (ev) => {
       if (inp) inp.value = fmtInput(planState.prices[i.asset]);
     }
     updatePlanPay();
-  } else if (el.id === 'pp-from') planState.fromId = el.value;
+  } else if (el.id === 'pp-from') {
+    planState.fromId = el.value;
+    updatePlanPay();
+  }
 });
 
 PLAN.addEventListener('click', async (ev) => {

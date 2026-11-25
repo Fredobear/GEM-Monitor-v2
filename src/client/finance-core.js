@@ -700,6 +700,128 @@ export function planDeposit(fin, accountId, planId, { date, amount, prices, from
   return { fin: { ...fin, accounts, txs: [...fin.txs, ...txs], updatedAt: now }, buys, entry };
 }
 
+// Zmiana jednej wpłaty w historii planu (pomocnicze).
+function withPlanEntry(fin, accountId, planId, entryId, change) {
+  const account = fin.accounts.find((a) => a.id === accountId);
+  const plan = account?.plans?.find((p) => p.id === planId);
+  const entry = plan?.log?.find((e) => e.id === entryId);
+  return entry ? change(account, plan, entry) : fin;
+}
+const setPlanLog = (fin, accountId, planId, log, extra = {}) => ({
+  ...fin,
+  accounts: fin.accounts.map((a) => (a.id !== accountId ? a : { ...a, ...extra, plans: a.plans.map((p) => (p.id !== planId ? p : { ...p, log })) })),
+});
+
+/**
+ * Wpłata do planu kupiona z wolnej gotówki na koncie zamiast nowym przelewem: przelew zapisany przez wpłatę zostaje
+ * usunięty, a kupno zmniejsza wolną gotówkę. Naprawia podwójne pobranie pieniędzy, gdy przelew na konto inwestycyjne
+ * był już zapisany osobno (np. 1000 zł z banku na konto w euro, a potem wpłata do planu „z banku”).
+ */
+export function planEntryToCash(fin, accountId, planId, entryId, { market = null, newId, now = Date.now() } = {}) {
+  return withPlanEntry(fin, accountId, planId, entryId, (account, plan, entry) => {
+    if (entry.fromId === accountId) return fin;
+    const own = new Set(entry.txIds ?? []);
+    const drop = new Set(fin.txs.filter((t) => own.has(t.id) && t.type === 'przelew').map((t) => t.id));
+    const txs = fin.txs.map((t) => (drop.has(t.id) ? { ...t, deleted: true, updatedAt: now } : t));
+    const txIds = [...own].filter((id) => !drop.has(id));
+    // Wpłata „spoza aplikacji” nie miała kupna w gotówce konta – dopisujemy je, żeby wolna gotówka zmalała.
+    if (!fin.txs.some((t) => own.has(t.id) && t.type === 'korekta' && !t.deleted)) {
+      const cur = account.currency || 'PLN';
+      const pln = convert(market, entry.amount, cur, 'PLN', entry.date);
+      if (pln === null) return fin;
+      const k = { id: newId(), type: 'korekta', amount: -pln, date: entry.date, accountId, merchant: `Kupno w planie „${plan.name}”`, source: 'plan', planId: plan.id, createdAt: now, updatedAt: now };
+      if (cur !== 'PLN') k.accountAmount = -entry.amount;
+      txs.push(k);
+      txIds.push(k.id);
+    }
+    const log = plan.log.map((e) => (e.id === entryId ? { ...e, fromId: accountId, txIds } : e));
+    return { ...setPlanLog(fin, accountId, planId, log), txs, updatedAt: now };
+  });
+}
+
+/** Usunięcie wpłaty do planu: jej pozycje, operacje (przelew i kupno) i wpis w historii planu. */
+export function removePlanEntry(fin, accountId, planId, entryId, now = Date.now()) {
+  return withPlanEntry(fin, accountId, planId, entryId, (account, plan, entry) => {
+    const lotIds = new Set(entry.lotIds ?? []);
+    const txIds = new Set(entry.txIds ?? []);
+    const txs = fin.txs.map((t) => (txIds.has(t.id) && !t.deleted ? { ...t, deleted: true, updatedAt: now } : t));
+    const lots = (account.lots ?? []).filter((l) => !lotIds.has(l.id));
+    return { ...setPlanLog(fin, accountId, planId, plan.log.filter((e) => e.id !== entryId), { lots }), txs, updatedAt: now };
+  });
+}
+
+/**
+ * Wpłaty do planu, które pobrały pieniądze z innego konta, chociaż przelew z tego konta na konto inwestycyjne był już
+ * zapisany osobno (w dniu wpłaty albo do 7 dni wcześniej) – pieniądze zeszły wtedy z konta dwa razy, a wolna gotówka
+ * na koncie inwestycyjnym się nie zmieniła. Osobny przelew pokrywa zakupy do swojej kwoty (w walucie konta
+ * inwestycyjnego) – najpierw te kupione z wolnej gotówki, które po nim nastąpiły. Zwraca [{ accountId, planId, entryId,
+ * date, amount, fromId, back – ile wróci na konto, z którego poszedł przelew (w jego walucie), transferId }].
+ * Wpłaty oznaczone jako poprawne (okDouble) są pomijane.
+ */
+export function planDoubleCharges(fin) {
+  const live = liveTx(fin);
+  const out = [];
+  for (const a of fin.accounts) {
+    if (a.archived || !a.plans?.length) continue;
+    const pool = live
+      .filter((t) => t.type === 'przelew' && t.toAccountId === a.id && t.source !== 'plan')
+      .map((t) => ({ t, left: t.toAmount ?? t.amount }))
+      .sort((x, y) => (x.t.date < y.t.date ? 1 : x.t.date > y.t.date ? -1 : (y.t.createdAt ?? 0) - (x.t.createdAt ?? 0)));
+    // Wszystkie wpłaty po kolei: kupione z wolnej gotówki zużywają przelew, z banku – są podwójne, gdy przelew jeszcze został.
+    const entries = [];
+    for (const p of a.plans) {
+      for (const e of p.log ?? []) {
+        if (!e.fromId || e.fromId === PLAN_EXTERNAL) continue;
+        const txs = live.filter((t) => (e.txIds ?? []).includes(t.id));
+        const own = txs.find((t) => t.type === 'przelew');
+        if (e.fromId !== a.id && !own) continue;
+        entries.push({ p, e, own, cash: e.fromId === a.id, at: Math.min(...txs.map((t) => t.createdAt ?? 0), Infinity) });
+      }
+    }
+    entries.sort((x, y) => (x.e.date < y.e.date ? -1 : x.e.date > y.e.date ? 1 : x.at - y.at));
+    for (const { p, e, own, cash } of entries) {
+      const m = pool.find((x) => (cash || x.t.accountId === e.fromId) && x.t.date <= e.date && daysBetween(x.t.date, e.date) <= 7 && x.left >= e.amount * 0.98 - 0.005);
+      if (!m) continue;
+      m.left -= e.amount;
+      if (cash || e.okDouble) continue;
+      out.push({ accountId: a.id, planId: p.id, entryId: e.id, date: e.date, amount: e.amount, fromId: e.fromId, back: own.accountAmount ?? own.amount, transferId: m.t.id });
+    }
+  }
+  return out;
+}
+
+/**
+ * Wpłaty do planu wpisane prawdopodobnie dwa razy: te same instrumenty, ilości i ceny. Zwraca pary
+ * [{ accountId, planId, a: wpis, b: wpis }] (a – wcześniejszy w historii); pary oznaczone jako poprawne są pomijane.
+ */
+export function planDuplicates(fin) {
+  const out = [];
+  const same = (x, y) => Math.abs(x - y) <= 1e-6 * Math.max(1, Math.abs(x));
+  const key = (e) => (e.buys ?? []).map((b) => b.asset).join('|');
+  for (const acc of fin.accounts) {
+    if (acc.archived) continue;
+    for (const p of acc.plans ?? []) {
+      const log = p.log ?? [];
+      for (let i = 0; i < log.length; i++) {
+        for (let j = i + 1; j < log.length; j++) {
+          const [x, y] = [log[i], log[j]];
+          if (x.okDup === y.id || y.okDup === x.id || !x.buys?.length || key(x) !== key(y) || !same(x.amount, y.amount)) continue;
+          if (x.buys.every((b, k) => same(b.qty, y.buys[k].qty) && same(b.price, y.buys[k].price))) out.push({ accountId: acc.id, planId: p.id, a: x, b: y });
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/** Oznaczenie wpłaty jako poprawnej: kind 'double' (to nie podwójny przelew) albo 'dup' (to nie duplikat wpłaty twinId). */
+export function markPlanEntryOk(fin, accountId, planId, entryId, kind, twinId = null) {
+  return withPlanEntry(fin, accountId, planId, entryId, (account, plan) => {
+    const log = plan.log.map((e) => (e.id !== entryId ? e : kind === 'dup' ? { ...e, okDup: twinId } : { ...e, okDouble: true }));
+    return { ...setPlanLog(fin, accountId, planId, log), updatedAt: Date.now() };
+  });
+}
+
 /** Wpłaty cykliczne do planów, których termin minął: [{ accountId, planId, date, plan, account }]. */
 export function duePlanDeposits(fin, today) {
   const out = [];
@@ -1641,7 +1763,7 @@ export function worthSeries(fin, market, { today, months = 0 } = {}) {
  * Skąd wzięła się zmiana majątku między pierwszym a ostatnim punktem: odłożone z dochodów (przychody − wydatki),
  * wpłaty spoza budżetu (np. pracodawca do PPE), wynik inwestycji i pozostałe (korekty sald, kursy walut).
  */
-export function wealthChange(points) {
+export function wealthChange(points, { gainAt = null } = {}) {
   if (!points || points.length < 2) return null;
   const first = points[0];
   const last = points[points.length - 1];
@@ -1650,8 +1772,93 @@ export function wealthChange(points) {
   const change = last.worth - first.worth;
   const saved = sum('saved');
   const external = sum('external');
-  const invGain = last.invTotal - first.invTotal - sum('invIn');
+  // gainAt(data) – zysk z pozycji w dniu (z dailyWealth): wynik inwestycji to jego zmiana, a korekty sald na kontach
+  // inwestycyjnych trafiają do „pozostałych”. Bez niego: zmiana wartości kont inwestycyjnych poza wpłatami.
+  const invGain = gainAt ? gainAt(last.date) - gainAt(first.date) : last.invTotal - first.invTotal - sum('invIn');
   return { from: first.date, to: last.date, months: later.length, change, saved, external, invGain, other: change - saved - external - invGain, income: sum('income'), expense: sum('expense') };
+}
+
+// Wartość i wpłaty portfela GEM w dniu: bieżąca wycena (ostatni tydzień) albo historia z końca miesięcy; null przed historią.
+function gemPointAt(g, date) {
+  if (date >= isoDays(g.date, -7)) return [date, g.value, g.invested];
+  return g.history?.length && date >= g.history[0][0] ? pairAt(g.history, date) : null;
+}
+
+/**
+ * Majątek dzień po dniu – do wykresu „majątek całkowity i zarobiony” i dziennej analizy. Dla każdego dnia:
+ * worth – majątek netto; gain – zysk z inwestycji: wartość pozycji minus koszt zakupu plus wypłacone odsetki (także
+ * z pozycji już sprzedanych – zysk zrealizowany), portfel GEM: wartość minus wpłaty; earned – majątek zarobiony, czyli
+ * bez zysku z inwestycji (z pracy, oszczędności i wpłat); value i invested – wartość inwestycji i włożone w nie pieniądze
+ * (jak w investSeries: pozycje od daty zakupu, sprzedane znikają z obu). W zysku pozycje liczą się tak jak w majątku:
+ * od zakupu albo od dnia dopisania z rozliczeniem gotówki. Aktywa z wyceną ręczną (np. mieszkanie) nie są inwestycjami.
+ */
+export function dailyWealth(fin, market, { today }) {
+  const live = liveTx(fin)
+    .filter((t) => t.date && t.date <= today)
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  const lots = [];
+  const gems = [];
+  for (const a of fin.accounts) {
+    if (!inWorth(a) || isLoan(a)) continue;
+    const g = a.gemValuation && a.gemAccount ? market?.gemValues?.[a.gemAccount] : null;
+    if (g && Number.isFinite(g.value)) gems.push({ a, g });
+    else for (const l of a.lots ?? []) if (l.asset && l.asset !== 'manual' && l.qty > 0 && l.date && l.date <= today) lots.push(l);
+  }
+  const starts = [live[0]?.date, ...lots.map((l) => l.date), ...gems.map(({ g }) => g.history?.[0]?.[0] ?? g.date)].filter((d) => d && d <= today);
+  if (!starts.length) return [];
+  const start = starts.reduce((m, d) => (d < m ? d : m));
+  // Salda liczone przyrostowo (tak jak balances): saldo początkowe i operacje od daty salda początkowego.
+  const bal = Object.fromEntries(fin.accounts.map((a) => [a.id, Number(a.openingBalance) || 0]));
+  const open = Object.fromEntries(fin.accounts.map((a) => [a.id, a.openingDate ?? '0000-00-00']));
+  const apply = (t) => {
+    if (t.accountId in bal && t.date >= open[t.accountId]) bal[t.accountId] += (t.type === 'przychod' || t.type === 'korekta' ? 1 : -1) * (t.accountAmount ?? t.amount);
+    if (t.type === 'przelew' && t.toAccountId in bal && t.date >= open[t.toAccountId]) bal[t.toAccountId] += t.toAmount ?? t.amount;
+  };
+  const cost = new Map(lots.map((l) => [l.id, lotCost(market, l).costPLN]));
+  // Pozycja dopisana z rozliczeniem gotówki (since): wcześniej jej wartość – razem z zyskiem – była w saldzie konta.
+  // Ten zysk (z dnia dopisania) liczy się od początku, żeby majątek zarobiony nie spadał w dniu dopisania pozycji.
+  const hidden = new Map();
+  for (const l of lots) {
+    const c = cost.get(l.id);
+    const r = l.since ? rateOn(market, lotCurrency(market, l), l.since) : null;
+    if (c !== null && r !== null) hidden.set(l.id, l.qty * lotPrice(market, l, l.since) * r + lotIncome(market, l, l.since) - c);
+  }
+  const out = [];
+  let i = 0;
+  for (let d = start; d <= today; d = isoDays(d, 1)) {
+    while (i < live.length && live[i].date <= d) apply(live[i++]);
+    const w = wealthAt(fin, market, d, bal);
+    let gain = 0;
+    let value = 0;
+    let invested = 0;
+    for (const l of lots) {
+      const c = cost.get(l.id);
+      const rate = rateOn(market, lotCurrency(market, l), d);
+      if (c === null || rate === null) continue;
+      const close = lotEnd(l);
+      const closed = close && d >= close;
+      if (l.date <= d && !closed) {
+        value += l.qty * lotPrice(market, l, d) * rate;
+        invested += c - lotIncome(market, l, d);
+      }
+      if ((l.since && l.since > l.date ? l.since : l.date) > d) {
+        gain += hidden.get(l.id) ?? 0;
+        continue;
+      }
+      if (closed) gain += l.qty * lotExitPrice(market, l, close) * (rateOn(market, lotCurrency(market, l), close) ?? rate) + lotIncome(market, l, close) - c;
+      else gain += l.qty * lotPrice(market, l, d) * rate + lotIncome(market, l, d) - c;
+    }
+    for (const { a, g } of gems) {
+      const p = gemPointAt(g, d);
+      if (!p) continue;
+      const inv = Number.isFinite(p[2]) ? p[2] : bal[a.id];
+      value += p[1];
+      invested += inv;
+      gain += p[1] - inv;
+    }
+    out.push({ date: d, worth: w.worth, gain, earned: w.worth - gain, value, invested });
+  }
+  return out;
 }
 
 /**
@@ -1704,9 +1911,7 @@ export function investSeries(fin, market, { today }) {
     // Portfel GEM: wartość i wpłaty netto z historii zakładki GEM (starsza historia bez wpłat – suma przelewów na konto).
     let bal = null;
     for (const { a, g } of gems) {
-      let p = null;
-      if (date >= isoDays(g.date, -7)) p = [date, g.value, g.invested];
-      else if (g.history?.length && date >= g.history[0][0]) p = pairAt(g.history, date);
+      const p = gemPointAt(g, date);
       if (!p) continue;
       value += p[1];
       invested += Number.isFinite(p[2]) ? p[2] : (bal ??= balances(fin, date))[a.id];
@@ -1923,6 +2128,8 @@ export function simulateWealth({ cash, investments, debt, months, saved, investe
   let c = cash;
   let i = investments;
   let d = debt;
+  // gain – suma przyszłych zysków z inwestycji od dziś (reszta przyrostu majątku to odłożone pieniądze).
+  let gain = 0;
   // Jeden krok: wpływ do gotówki (bez kosztu kredytu), kapitał raty, wpłata na inwestycje i wpłata spoza budżetu.
   const step = (m, cashIn, loan, toInvest, fromOutside) => {
     const principal = Math.min(d, loan?.principal ?? 0);
@@ -1938,13 +2145,15 @@ export function simulateWealth({ cash, investments, debt, months, saved, investe
       i += put;
       c -= put;
     }
-    out.push({ m, cash: c, investments: i, debt: d, worth: c + i - d });
+    out.push({ m, cash: c, investments: i, debt: d, worth: c + i - d, gain });
   };
   // Krok 0: do końca bieżącego miesiąca – to, co zwykle jeszcze wpływa i wypływa po tym dniu miesiąca.
   step(0, month0?.cashIn ?? 0, loans[0], month0?.invested ?? 0, month0?.external ?? 0);
   for (let m = 1; m <= months; m++) {
     const f = indexed ? (1 + inflationPct / 100) ** (m / 12) : 1;
-    i *= 1 + rm;
+    const g = i * rm;
+    i += g;
+    gain += g;
     step(m, (saved + loanCost) * f, loans[m], invested * f, external * f);
   }
   return out;

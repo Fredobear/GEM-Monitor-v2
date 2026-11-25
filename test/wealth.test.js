@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   accountWorth,
   compareMonth,
+  dailyWealth,
   emptyFinance,
   flowStart,
   forecastDefaults,
@@ -93,6 +94,15 @@ test('skąd przyrost: odłożone z dochodów, wpłaty spoza budżetu i wynik inw
   near(ch.other, 0);
   near(ch.change, ch.saved + ch.external + ch.invGain);
   assert.equal(wealthChange([{ worth: 1 }]), null);
+  // Z zyskiem z pozycji (dailyWealth) wynik jest ten sam, a korekta salda na koncie inwestycyjnym to „pozostałe”.
+  const fin2 = sample();
+  fin2.txs.push(tx('korekta', -400, '2026-07-05', 'xtb'));
+  const days = dailyWealth(fin2, MARKET, { today: '2026-07-10' });
+  const gainAt = (d) => days.find((x) => x.date === d).gain;
+  const ch2 = wealthChange(worthSeries(fin2, MARKET, { today: '2026-07-10' }), { gainAt });
+  near(ch2.invGain, 1000);
+  near(ch2.other, -400);
+  near(ch2.change, ch2.saved + ch2.external + ch2.invGain + ch2.other);
 });
 
 test('struktura majątku: rodzaje aktywów i długów, suma równa majątkowi netto', () => {
@@ -236,6 +246,33 @@ test('inwestycje: wartość pozycji i wpłacone pieniądze miesiąc po miesiącu
   near(bp.find((p) => p.month === '2026-03').invested, 1000 - 48.6);
 });
 
+test('majątek dzień po dniu: całkowity = zarobiony + zysk z inwestycji, także po sprzedaży pozycji', () => {
+  const fin = sample();
+  const days = dailyWealth(fin, MARKET, { today: '2026-07-10' });
+  // Dziennik od 1 lutego (pierwsza operacja), punkt na każdy dzień do dziś.
+  assert.equal(days[0].date, '2026-02-01');
+  assert.equal(days.at(-1).date, '2026-07-10');
+  assert.equal(days.length, 160);
+  const last = days.at(-1);
+  near(last.worth, wealthAt(fin, MARKET, '2026-07-10').worth);
+  near(last.gain, 50 * 20); // 50 j. ETF po 120 zamiast 100 zł; fundusz bez zmiany
+  near(last.earned, last.worth - 1000);
+  near(last.value, 7500);
+  near(last.invested, 6500);
+  // Przed pierwszym zakupem zysk i inwestycje są zerowe, a majątek zarobiony równa się całkowitemu.
+  near(days[10].gain, 0);
+  near(days[10].earned, days[10].worth);
+  // Sprzedaż: zysk zrealizowany zostaje w zysku z inwestycji (gotówka ze sprzedaży nie jest „zarobiona”).
+  const sold = sample();
+  const lot = sold.accounts[1].lots[0]; // 10 szt. z 26 lutego
+  lot.until = '2026-07-10';
+  sold.txs.push({ id: 'sell', type: 'korekta', amount: 1200, date: '2026-07-10', accountId: 'xtb', createdAt: 1, updatedAt: 1 });
+  const after = dailyWealth(sold, MARKET, { today: '2026-07-10' }).at(-1);
+  near(after.worth, last.worth);
+  near(after.gain, last.gain);
+  near(after.value, 6300); // sprzedane jednostki znikają z inwestycji
+});
+
 test('symulacja: odkładanie, procent składany, kredyt z harmonogramu, brak gotówki i deficyt', () => {
   // Sama gotówka: co miesiąc +1000 zł.
   const a = simulateWealth({ cash: 5000, investments: 0, debt: 0, months: 12, saved: 1000, indexed: false });
@@ -257,6 +294,9 @@ test('symulacja: odkładanie, procent składany, kredyt z harmonogramu, brak got
   near(d[1].debt, 400);
   near(d[2].worth, d[1].worth + 1000 - 60); // spłata kapitału nie zmienia majątku, odsetki tak
   near(d[3].cash, d[2].cash + 1000); // po spłacie kredytu zostaje więcej
+  // Przyszłe zyski z inwestycji liczone osobno: wartość inwestycji = start + wpłaty + zyski.
+  near(b[120].gain, b[120].investments - 10000 - 500 * 120, 0.5);
+  near(a[12].gain, 0);
   // Nie da się zainwestować więcej, niż jest gotówki; przy deficycie różnica idzie z inwestycji.
   const e = simulateWealth({ cash: 100, investments: 0, debt: 0, months: 1, saved: 200, invested: 5000, indexed: false });
   near(e[1].investments, 300);
