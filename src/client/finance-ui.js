@@ -1392,6 +1392,129 @@ function dayCard(days, fc, approxUntil) {
   <p class="small muted">${explain}${approx} Zysk z inwestycji to wartość pozycji minus ich koszt zakupu (z odsetkami i zyskiem ze sprzedanych pozycji). Wykres i tabela liczą się z Twoich operacji i cen z każdego dnia – przeliczają się przy każdej aktualizacji cen (w dni robocze rano). Dotknij wykresu, aby zobaczyć wartości z danego dnia.</p></section>`;
 }
 
+// ---------- Cele finansowe: ile odkładać, gdzie trzymać pieniądze i ile dalej inwestować ----------
+// Sugestie z goalPlan (finance-core): podział średniej miesięcznej nadwyżki (poduszka, cele, inwestycje) i plan
+// dla każdego celu z uzasadnieniem. Tylko podpowiedzi – nic nie zmienia się samo.
+const monthsText = (n) => {
+  const y = Math.floor(n / 12);
+  const m = n % 12;
+  return [y ? `${y} ${plural(y, 'rok', 'lata', 'lat')}` : '', m ? `${m} mies.` : ''].filter(Boolean).join(' i ') || 'mniej niż miesiąc';
+};
+const monthGen = (month) => `${MONTHS_GEN[Number(month.slice(5, 7)) - 1]} ${month.slice(0, 4)}`;
+
+function goalSplit(plan) {
+  if (!(plan.surplus > 0.5)) return `<div class="banner warn small">Z Twoich ostatnich miesięcy nic nie zostaje z dochodów (wydatki są równe przychodom albo wyższe). Żeby odkładać na cele, potrzebna jest nadwyżka – zacznij od przejrzenia największych kategorii wydatków w Przeglądzie.</div>`;
+  const goals = Math.min(plan.goalsNeed, Math.max(0, plan.surplus - plan.emergency.monthly));
+  const parts = [
+    ['s-cash', 'Na cele', goals, ''],
+    ['s-cushion', 'Na poduszkę finansową', plan.emergency.monthly, plan.emergency.monthly > 0.5 ? `do 3 miesięcy wydatków (${zl0(plan.emergency.min)}), teraz masz ${NF1.format(plan.emergency.months ?? 0)} mies.` : ''],
+    ['s-inv', 'Na inwestycje', plan.investAfter, plan.investingNow > 0.5 ? `teraz średnio ${zl0(plan.investingNow)} miesięcznie` : ''],
+  ].filter(([, , v], i) => i !== 1 || v > 0.5);
+  const basis = plan.basis === 'stale' ? 'ze stałych pozycji (za mało historii)' : plan.n ? `średnio z ${plan.n} ${plural(plan.n, 'pełnego miesiąca', 'pełnych miesięcy', 'pełnych miesięcy')}` : 'z Twoich założeń';
+  const bar = parts.filter(([, , v]) => v > 0.5).map(([cls, , v]) => `<span class="${cls}" style="width:${((v / plan.surplus) * 100).toFixed(1)}%"></span>`).join('');
+  return `<p class="small">Co miesiąc zostaje Ci <b>${esc(zl0(plan.surplus))}</b> (${esc(basis)}). Proponowany podział:</p>
+  <div class="goal-split" role="img" aria-label="Podział miesięcznej nadwyżki">${bar}</div>
+  <ul class="inv-legend">${parts.map(([cls, label, v, note]) => `<li><i class="cx-key-line ${cls}"></i><span>${esc(label)}${note ? `<br><small class="muted">${esc(note)}</small>` : ''}</span><b>${esc(zl0(v))}</b></li>`).join('')}</ul>
+  ${plan.shortfall > 0.5 ? `<p class="small warn">Na wszystko nie starcza: brakuje ok. <b>${esc(zl0(plan.shortfall))}</b> miesięcznie – propozycje są przy celach poniżej.</p>` : plan.investingNow > plan.investAfter + 50 ? `<p class="small">Do czasu zakupów inwestuj mniej niż teraz: ok. ${esc(zl0(plan.investAfter))} zamiast ${esc(zl0(plan.investingNow))} miesięcznie – resztę odkładaj na cele.</p>` : plan.investAfter > 0.5 ? `<p class="small">Po odłożeniu na cele możesz dalej inwestować ok. <b>${esc(zl0(plan.investAfter))}</b> miesięcznie – długoterminowo, bez ruszania pieniędzy na cele.</p>` : ''}`;
+}
+
+function goalItem(x, plan) {
+  const g = x.goal;
+  const cur = today().slice(0, 7);
+  const left = Math.max(0, x.target - x.saved);
+  const status = x.done ? '<span class="goal-badge ok">✓ Uzbierane</span>' : x.short > 0.5 ? '<span class="goal-badge warn">Za mało nadwyżki</span>' : '<span class="goal-badge ok">W zasięgu</span>';
+  const tip = x.done
+    ? 'Masz już całą kwotę – trzymaj ją bezpiecznie do dnia zakupu.'
+    : `Odkładaj <b>${esc(zl0(x.need))}</b> miesięcznie${x.short > 0.5 ? `, a z Twojej nadwyżki zostaje na ten cel ok. ${esc(zl0(x.funded))}` : ''}.`;
+  const lines = [];
+  if (g.inflate !== false && Math.abs(x.target - g.amount) >= 1) lines.push(`Cena w dniu zakupu: ok. <b>${esc(zl0(x.target))}</b> (dziś ${esc(zl0(g.amount))} + wzrost cen o inflację).`);
+  if (!x.done) {
+    lines.push(`Gdzie trzymać: ${esc(x.vehicle.where)}. Zakładany zysk po podatku: ok. ${esc(pc1(x.vehicle.ratePct))}% rocznie${x.need0 - x.need >= 1 ? ` – dzięki temu wystarczy ${esc(zl0(x.need))} zamiast ${esc(zl0(x.need0))} miesięcznie` : ''}.`);
+    if (x.vehicle.eqShare === 0) lines.push('Przy takim terminie nie trzymaj tych pieniędzy w akcjach – spadek tuż przed zakupem trudno byłoby odrobić.');
+    if (x.lump > 0.5) lines.push(`Masz ${esc(zl0(plan.excess))} gotówki ponad 6 miesięcy wydatków. Jeśli przeznaczysz od razu ${esc(zl0(x.lump))} na ten cel, wystarczy ${esc(zl0(x.needLump))} miesięcznie.`);
+    if (x.short > 0.5) {
+      const opts = [];
+      if (x.extendTo) opts.push(`przesunąć termin – odkładając ${zl0(x.funded)} miesięcznie, uzbierasz do ${monthGen(shiftMonth(cur, x.extendTo))}`);
+      if (plan.investingNow > 0.5) opts.push(`do czasu zakupu wstrzymać albo zmniejszyć dokładanie do inwestycji (teraz średnio ${zl0(plan.investingNow)} miesięcznie)`);
+      opts.push(`pokryć brakujące ok. ${zl0(x.short * x.months)} z inwestycji tuż przed zakupem – pamiętaj o podatku 19% od zysku i o tym, że kurs może być wtedy niższy`);
+      lines.push(`Na ten cel brakuje ok. ${esc(zl0(x.short))} miesięcznie. Możesz ${esc(opts.join('; '))}.`);
+    }
+    if (plan.emergency.monthly > 0.5 && plan.goals[0] === x) lines.push(`Najpierw poduszka finansowa: masz ${esc(NF1.format(plan.emergency.months ?? 0))} mies. wydatków, bezpieczne minimum to 3 miesiące (${esc(zl0(plan.emergency.min))}). Do tego czasu odkładaj na nią ok. ${esc(zl0(plan.emergency.monthly))} miesięcznie.`);
+  }
+  const det = `goal-${g.id}`;
+  return `<div class="goal"><div class="goal-head"><span class="goal-ico" aria-hidden="true">${esc(g.icon || '🎯')}</span><div><b>${esc(g.name)}</b>${status}<small>${esc(zl0(x.target))} · do ${esc(monthGen(g.date.slice(0, 7)))}${x.overdue ? ' (termin minął)' : ` (za ${esc(monthsText(x.months))})`}</small></div><button class="link small" data-goal-edit="${esc(g.id)}">Edytuj</button></div>
+  <div class="br-track"><span class="s-cash" style="width:${Math.max(1.5, x.progress * 100).toFixed(1)}%"></span></div>
+  <div class="small muted">Masz ${esc(zl0(x.saved))} (${esc(pct(x.progress))})${left > 0.5 ? ` · brakuje ${esc(zl0(left))}` : ''}${g.accountId ? ` · konto ${esc(accName(g.accountId))}` : ''}</div>
+  <p class="goal-tip">${tip}</p>
+  ${lines.length ? `<details class="acc-det goal-det" data-det="${esc(det)}" ${ui.detOpen.has(det) ? 'open' : ''}><summary>Plan i uzasadnienie</summary><ul class="goal-plan">${lines.map((l) => `<li>${l}</li>`).join('')}</ul></details>` : ''}</div>`;
+}
+
+function goalsCard() {
+  const head = `<div class="card-head"><h2>Cele finansowe</h2><button class="btn small primary" data-goal-new="1">+ Dodaj cel</button></div>`;
+  if (!(fin.goals ?? []).length) return `<section class="card" id="goals-card">${head}<p class="small muted">Dodaj cel – np. samochód, wkład własny albo wakacje. Aplikacja policzy, ile odkładać co miesiąc, gdzie trzymać te pieniądze i ile możesz dalej inwestować – na podstawie Twoich dochodów, wydatków i poduszki finansowej.</p></section>`;
+  const plan = goalPlan(fin, MARKET, { today: today(), inflationPct: Number(fin.forecast?.inflationPct) || DEFAULT_INFLATION });
+  return `<section class="card" id="goals-card">${head}${goalSplit(plan)}${plan.goals.map((x) => goalItem(x, plan)).join('')}
+  <p class="small muted">To sugestie liczone z Twoich średnich z pełnych miesięcy, poduszki finansowej i bieżącej oferty obligacji skarbowych (zysk po podatku 19%). Kolejność: najpierw poduszka do 3 miesięcy wydatków, potem cele od najbliższego, a reszta na inwestycje. To nie porada inwestycyjna – decyzja należy do Ciebie.</p></section>`;
+}
+
+// Okno celu: dodawanie, edycja i usuwanie.
+const GOAL_DLG = $('#goal-dialog');
+const goalForm = $('form', GOAL_DLG);
+function openGoal(id) {
+  const g = id ? (fin.goals ?? []).find((x) => x.id === id) : null;
+  const e = goalForm.elements;
+  goalForm.dataset.id = g?.id ?? '';
+  $('#gd-title').textContent = g ? 'Edytuj cel' : 'Nowy cel';
+  e.name.value = g?.name ?? '';
+  const icon = g?.icon ?? '🎯';
+  for (const r of goalForm.querySelectorAll('input[name="icon"]')) r.checked = r.value === icon;
+  e.amount.value = g ? fmtInput(g.amount) : '';
+  e.date.value = g?.date ?? '';
+  e.inflate.checked = g ? g.inflate !== false : true;
+  e.accountId.innerHTML = `<option value="">Bez osobnego konta – wpiszę, ile mam</option>${accountOptions(g?.accountId ?? '', { none: false, filter: (x) => !isLoan(x) && !isCard(x) && !isLent(x) })}`;
+  e.saved.value = g?.saved ? fmtInput(g.saved) : '';
+  $('#gd-saved-wrap').hidden = Boolean(g?.accountId);
+  $('#gd-delete').hidden = !g;
+  $('#gd-errors').textContent = '';
+  openDialog(GOAL_DLG);
+}
+goalForm.addEventListener('change', (ev) => {
+  if (ev.target.name === 'accountId') $('#gd-saved-wrap').hidden = Boolean(ev.target.value);
+});
+goalForm.addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const e = goalForm.elements;
+  const name = e.name.value.trim();
+  const amount = Math.abs(parseAmount(e.amount.value));
+  const date = e.date.value;
+  const errors = [];
+  if (!name) errors.push('Podaj, na co oszczędzasz.');
+  if (!(amount > 0)) errors.push('Podaj kwotę celu.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date <= today()) errors.push('Podaj termin zakupu w przyszłości.');
+  if (errors.length) {
+    $('#gd-errors').textContent = errors.join(' ');
+    return;
+  }
+  const id = goalForm.dataset.id || newId();
+  const prev = (fin.goals ?? []).find((x) => x.id === id);
+  const accountId = e.accountId.value || undefined;
+  const g = { ...(prev ?? { createdAt: Date.now() }), id, name, icon: goalForm.querySelector('input[name="icon"]:checked')?.value ?? '🎯', amount: round2(amount), date, inflate: e.inflate.checked, accountId, saved: accountId ? undefined : round2(Math.abs(parseAmount(e.saved.value)) || 0) };
+  closeDialog(GOAL_DLG);
+  undoable(prev ? 'Zapisano cel.' : `Dodano cel „${name}”. Plan znajdziesz w zakładce Majątek.`, () => {
+    fin.goals = prev ? fin.goals.map((x) => (x.id === id ? g : x)) : [...(fin.goals ?? []), g];
+  });
+});
+$('#gd-delete').addEventListener('click', async () => {
+  const id = goalForm.dataset.id;
+  const g = (fin.goals ?? []).find((x) => x.id === id);
+  if (!g) return;
+  closeDialog(GOAL_DLG);
+  if (!(await confirmAction({ title: 'Usunąć cel?', body: `<p><b>${esc(g.icon || '🎯')} ${esc(g.name)}</b> · ${esc(zl0(g.amount))}</p><p class="small muted">Usuwa się tylko cel – konta i operacje zostają.</p>`, ok: 'Usuń cel' }))) return;
+  undoable('Usunięto cel.', () => {
+    fin.goals = fin.goals.filter((x) => x.id !== id);
+  });
+});
+
 // Wiersz z paskiem: nazwa, kwota i pasek proporcjonalny do największej pozycji.
 const barRow = (label, value, share, cls, note = '') => `<li class="bar-row"><div class="br-top"><span>${label}</span><b>${esc(value)}</b></div><div class="br-track"><span class="${cls}" style="width:${Math.max(1.5, Math.min(100, share * 100)).toFixed(1)}%"></span></div>${note ? `<small>${note}</small>` : ''}</li>`;
 const kpiTile = (label, value, note = '', cls = '') => `<div class="kpi"><span>${esc(label)}</span><b class="${cls}">${esc(value)}</b>${note ? `<small>${note}</small>` : ''}</div>`;
@@ -1483,6 +1606,15 @@ const afterYears = (y) => (y === 1 ? 'roku' : `${y} latach`);
 const pc1 = (x) => String(Math.round(x * 10) / 10).replace('.', ',');
 const fcDate = (iso) => `${MONTHS[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}`;
 
+// Cele w prognozie: zakupy w terminach celów (po cenie z inflacją) – z przełącznikiem.
+function goalsNote(fc, o) {
+  const goals = (fin.goals ?? []).filter((g) => g.amount > 0 && g.date >= today());
+  if (!goals.length) return '';
+  const on = o.goals !== false;
+  const list = goals.map((g) => `${g.name} – ${monthLabel(g.date.slice(0, 7))}`).join(', ');
+  return `<label class="check small"><input type="checkbox" data-fc-goals ${on ? 'checked' : ''}> <span>Uwzględnij cele finansowe – zakupy w ich terminach (${esc(list)})</span></label>`;
+}
+
 function forecastCard(all, stats, fc) {
   const o = fin.forecast ?? {};
   const d = fc.defaults;
@@ -1527,6 +1659,7 @@ function forecastCard(all, stats, fc) {
   <p class="lead">Za ${esc(yearsLabel(years))} (${esc(fcDate(fc.dates[months]))}) Twój majątek netto może wynosić około <b>${esc(zl0(end))}</b> – prawdopodobnie między ${esc(zl0(at(fc.low, months)))} a ${esc(zl0(at(fc.high, months)))}${real ? ', w dzisiejszych pieniądzach' : ''}.${fc.base[months].gain > 0.5 ? ` Z tej kwoty ok. <b>${esc(zl0(value(fc.base[months].gain, months)))}</b> to zyski z inwestycji, które dopiero przyjdą – reszta to dzisiejszy majątek i pieniądze odłożone z dochodów.` : ''}</p>
   ${forecastChart(hist, fc, months, value)}
   <label class="check small"><input type="checkbox" data-fc-real ${real ? 'checked' : ''}> <span>Pokaż w dzisiejszych pieniądzach (po odjęciu inflacji ${esc(pc1(infl))}% rocznie)</span></label>
+  ${goalsNote(fc, o)}
   <div class="tbl-wrap"><table class="fc-table"><thead><tr><th></th><th class="num">Ostrożnie</th><th class="num">Bazowo</th><th class="num">Optymistycznie</th></tr></thead><tbody>${rows}</tbody></table></div>
   ${miles.length ? `<ul class="miles">${miles.map(([ico, label, when]) => `<li><span>${ico}</span><span>${esc(label)}</span><b>${esc(when)}</b></li>`).join('')}</ul>` : ''}
   <div class="banner info small">Każde dodatkowe <b>100 zł</b> odkładane co miesiąc to po ${esc(afterYears(years))} około <b>${esc(zl0(extra(true)))}</b> więcej, jeśli je inwestujesz, albo ${esc(zl0(extra(false)))}, jeśli zostają w gotówce.${cashShare > 0.4 && years >= 10 ? ` Przy obecnych nawykach ${esc(pct(cashShare))} aktywów będzie wtedy w gotówce, która nie zarabia.` : ''}</div>
@@ -1566,7 +1699,7 @@ function viewWealth() {
   // Kredyt bez wpisanej wartości tego, co za niego kupiono, zaniża majątek netto.
   const hint = now.loanDebt > 0.5 && !st.assets.some((i) => i.key === 'reczne') ? '<div class="banner info small">Masz kredyt, ale w aplikacji nie ma tego, co za niego kupiłeś (np. mieszkania albo samochodu), dlatego majątek netto jest zaniżony. Możesz dopisać jego wartość: Konta → konto inwestycyjne (np. „Nieruchomości”) → Aktywa → „Inne aktywo (wycena ręczna)”.</div>' : '';
   const fc = wealthForecast(fin, MARKET, { today: t, months: 480, overrides: fin.forecast ?? {} });
-  return `${wealthHero(now, all)}${hint}${dayCard(dailyCached(t), fc, investSeries(fin, MARKET, { today: t }).approxUntil)}<div class="wealth-grid">${wealthHistoryCard(all)}${wealthChangeCard(all)}${savingsCard(stats, st.liquid)}${structureCard(st)}</div>${forecastCard(all, stats, fc)}`;
+  return `${wealthHero(now, all)}${hint}${dayCard(dailyCached(t), fc, investSeries(fin, MARKET, { today: t }).approxUntil)}${goalsCard()}<div class="wealth-grid">${wealthHistoryCard(all)}${wealthChangeCard(all)}${savingsCard(stats, st.liquid)}${structureCard(st)}</div>${forecastCard(all, stats, fc)}`;
 }
 
 // Dymek wykresu: najbliższy punkt do palca albo kursora, pionowa linia i wartości wszystkich serii.
@@ -2195,6 +2328,8 @@ $('#fin-root').addEventListener('click', async (ev) => {
       fin = markPlanEntryOk(fin, accId, planId, xId, 'dup', yId);
     });
   }
+  if (d.goalNew) return openGoal(null);
+  if (d.goalEdit) return openGoal(d.goalEdit);
   if (d.lendBack) {
     const a = acc(d.lendBack);
     const owed = Math.max(0, balances(fin)[a.id] ?? 0);
@@ -2380,6 +2515,11 @@ $('#fin-root').addEventListener('change', async (ev) => {
     if (!limits || el.value.trim() === '' || !Number.isFinite(v)) delete next[el.dataset.fc];
     else next[el.dataset.fc] = Math.min(limits[1], Math.max(limits[0], v));
     fin.forecast = next;
+    save();
+    return render();
+  }
+  if (el.dataset.fcGoals !== undefined) {
+    fin.forecast = { ...(fin.forecast ?? {}), goals: el.checked };
     save();
     return render();
   }

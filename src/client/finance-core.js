@@ -31,7 +31,7 @@ export const DEFAULT_CATEGORIES = [
   ['inne_przychody', '💰', 'Inne przychody', 'przychod'],
 ].map(([id, emoji, name, kind], i) => ({ id, emoji, name, kind, color: PALETTE[i % PALETTE.length], budget: null }));
 
-export const emptyFinance = () => ({ version: 1, accounts: [], categories: DEFAULT_CATEGORIES.map((c) => ({ ...c })), txs: [], rules: [], recurring: [], updatedAt: 0 });
+export const emptyFinance = () => ({ version: 1, accounts: [], categories: DEFAULT_CATEGORIES.map((c) => ({ ...c })), txs: [], rules: [], recurring: [], goals: [], updatedAt: 0 });
 export const ACCOUNT_ICONS = { bank: '🏦', karta: '💳', gotowka: '💵', oszczednosci: '🐷', inwestycje: '📈', kredyt: '🏠', pozyczka: '🤝', inne: '👛' };
 export const isCard = (a) => a?.type === 'karta';
 // Pieniądze pożyczone komuś: saldo dodatnie to kwota, którą ta osoba jest winna (należność, część majątku).
@@ -2100,7 +2100,10 @@ export function forecastDefaults(fin, market, { today, inflationPct = DEFAULT_IN
   let loanCost = s.avgLoanCost;
   if (s.n < 3) {
     const rec = recurringMonthly(fin, market, today);
-    if (rec.przychod > 0 || rec.wydatek > 0) {
+    // Stałe pozycje zamiast krótkiej historii tylko wtedy, gdy obejmują większość dochodów (np. wynagrodzenie) –
+    // bez pensji wśród stałych pozycji wychodziłoby, że nic nie zostaje, choć z historii widać nadwyżkę.
+    const complete = s.n ? rec.przychod > 0 && rec.przychod >= 0.5 * s.avgIncome : rec.przychod > 0 || rec.wydatek > 0;
+    if (complete) {
       const next = loanOutlook(fin, market, today, 1)[1] ?? { cost: 0 };
       basis = 'stale';
       loanCost = next.cost;
@@ -2129,7 +2132,7 @@ export function forecastDefaults(fin, market, { today, inflationPct = DEFAULT_IN
  * nigdy więcej, niż jest gotówki. Gdy pieniędzy brakuje, różnica jest pokrywana z inwestycji. Odkładane kwoty rosną
  * z inflacją (realnie się nie zmieniają). Dług maleje zgodnie z harmonogramami kredytów.
  */
-export function simulateWealth({ cash, investments, debt, months, saved, invested = 0, external = 0, loanCost = 0, loans = [], returnPct = 0, inflationPct = 0, indexed = true, month0 = null }) {
+export function simulateWealth({ cash, investments, debt, months, saved, invested = 0, external = 0, loanCost = 0, loans = [], returnPct = 0, inflationPct = 0, indexed = true, month0 = null, spends = [] }) {
   const rm = (1 + returnPct / 100) ** (1 / 12) - 1;
   const out = [];
   let c = cash;
@@ -2141,7 +2144,7 @@ export function simulateWealth({ cash, investments, debt, months, saved, investe
   const step = (m, cashIn, loan, toInvest, fromOutside) => {
     const principal = Math.min(d, loan?.principal ?? 0);
     i += fromOutside;
-    c += cashIn - (d > 0.005 ? loan?.cost ?? 0 : 0) - principal;
+    c += cashIn - (d > 0.005 ? loan?.cost ?? 0 : 0) - principal - (spends[m] ?? 0);
     d = Math.max(0, d - principal);
     if (c < 0) {
       const take = Math.min(i, -c);
@@ -2218,6 +2221,7 @@ export function wealthForecast(fin, market, { today, months = 120, overrides = {
   // Reszta bieżącego miesiąca: typowy wpływ po tym dniu miesiąca; zmiana założenia o odkładanej kwocie przesuwa go
   // proporcjonalnie do tego, ile miesiąca zostało.
   const rest = defaults.basis === 'historia' || defaults.basis === 'krotka' ? monthRemainder(fin, market, today) : null;
+  const spends = overrides.goals === false ? [] : goalSpends(fin, today, months, inflationPct);
   const left = 1 - Number(today.slice(8, 10)) / Number(monthBounds(cur).to.slice(8, 10));
   const run = (k) => {
     const saved = params.saved + k * Math.abs(params.saved) * defaults.savedSpread;
@@ -2232,9 +2236,165 @@ export function wealthForecast(fin, market, { today, months = 120, overrides = {
       saved,
       returnPct: params.returnPct + k * defaults.spread,
       month0: rest?.n ? { cashIn: rest.cashIn + (saved - defaults.saved) * left, invested: Math.min(rest.invested, params.invested), external: rest.external } : null,
+      spends,
     });
   };
   // Pozycja 0 – koniec bieżącego miesiąca, potem koniec każdego kolejnego (pozycja 12 to „za rok”).
   const dates = Array.from({ length: months + 1 }, (_, i) => monthBounds(shiftMonth(cur, i)).to);
-  return { today, now, start, params, defaults, rest, dates, base: run(0), low: run(-1), high: run(1) };
+  return { today, now, start, params, defaults, rest, dates, spends, base: run(0), low: run(-1), high: run(1) };
+}
+
+// ---------- Cele finansowe: ile odkładać, gdzie trzymać pieniądze i ile dalej inwestować ----------
+// Cel: { id, name, icon, amount – dzisiejsza cena (zł), date – termin zakupu, accountId – osobne konto na cel albo
+// saved – już odłożona kwota, inflate – cena rośnie z inflacją (domyślnie tak) }. Plan liczy się z Twoich średnich
+// z pełnych miesięcy (forecastDefaults), poduszki finansowej i bieżącej oferty obligacji skarbowych. To sugestie –
+// prosty, jawny model, a nie porada inwestycyjna.
+export const GOAL_ICONS = ['🚗', '🏠', '✈️', '💍', '🎓', '🛋️', '💻', '👶', '🎯'];
+const GOAL_TAX = 0.19; // podatek od odsetek i zysków kapitałowych
+
+/** Cena celu w miesiącu zakupu: dzisiejsza kwota powiększona o inflację (gdy cel ją uwzględnia). */
+export function goalTarget(goal, months, inflationPct = DEFAULT_INFLATION) {
+  return goal.inflate === false ? goal.amount : goal.amount * (1 + inflationPct / 100) ** (Math.max(0, months) / 12);
+}
+
+/** Ile odkładać co miesiąc przez n miesięcy (przy rocznym zysku ratePct po podatku), żeby z `saved` dojść do `target`. */
+export function goalMonthly(target, saved, n, ratePct = 0) {
+  const months = Math.max(1, n);
+  const r = (1 + ratePct / 100) ** (1 / 12) - 1;
+  const gap = target - saved * (1 + r) ** months;
+  if (gap <= 0) return 0;
+  return r > 1e-9 ? (gap * r) / ((1 + r) ** months - 1) : gap / months;
+}
+
+/** Po ilu miesiącach uzbiera się na cel przy wpłacie `monthly` (cena rośnie z inflacją); null, gdy dłużej niż 30 lat. */
+export function goalMonthsNeeded(goal, saved, monthly, ratePct, inflationPct = DEFAULT_INFLATION) {
+  for (let m = 1; m <= 360; m++) if (goalMonthly(goalTarget(goal, m, inflationPct), saved, m, ratePct) <= monthly + 0.005) return m;
+  return null;
+}
+
+/**
+ * Gdzie trzymać pieniądze na cel – według czasu do zakupu. Im bliżej terminu, tym ważniejsze bezpieczeństwo niż zysk:
+ * do roku konto oszczędnościowe i obligacje roczne, do 2–3 lat obligacje 2- i 3-letnie, dłużej obligacje indeksowane
+ * inflacją i część w akcjach (ETF), którą 2–3 lata przed zakupem przenosisz do bezpiecznych aktywów. Oprocentowanie
+ * obligacji z bieżącej oferty (market.bonds), akcje 7% rocznie; ratePct – zakładany zysk roczny po podatku 19%.
+ */
+export function goalVehicle(months, market, inflationPct = DEFAULT_INFLATION) {
+  const bonds = market?.bonds;
+  const offer = (type) => {
+    const id = (bonds?.offer ?? []).find((x) => x.startsWith(type));
+    return id && bonds.series?.[id] ? { id, ...bonds.series[id] } : null;
+  };
+  const ref = bonds?.ref?.at(-1)?.[1] ?? inflationPct;
+  const pc = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
+  let eqShare = 0;
+  let key;
+  let safe; // zysk brutto bezpiecznej części (% rocznie)
+  let where;
+  if (months <= 3) {
+    key = 'konto';
+    safe = Math.max(1, ref - 1);
+    where = 'konto oszczędnościowe albo lokata – pieniądze dostępne od ręki';
+  } else if (months <= 12) {
+    const b = offer('ROR');
+    key = 'ror';
+    safe = b?.rate1 ?? Math.max(1, ref - 0.5);
+    where = `${b ? `obligacje roczne ROR (${pc(safe)}%, ${b.id}; stopa NBP + marża, odsetki co miesiąc)` : 'obligacje roczne ROR'} albo konto oszczędnościowe`;
+  } else if (months <= 24) {
+    const b = offer('DOR');
+    key = 'dor';
+    safe = b?.rate1 ?? ref;
+    where = `obligacje 2-letnie DOR${b ? ` (${pc(safe)}%, ${b.id})` : ''}, a w ostatnim roku przed zakupem – ROR albo konto oszczędnościowe`;
+  } else if (months <= 36) {
+    const b = offer('TOS');
+    key = 'tos';
+    safe = b?.rate1 ?? ref;
+    where = `obligacje 3-letnie TOS ze stałym oprocentowaniem${b ? ` (${pc(safe)}%, ${b.id})` : ''}, a bliżej terminu krótsze: DOR, ROR albo konto oszczędnościowe`;
+  } else {
+    const b = offer(months <= 60 ? 'COI' : 'EDO');
+    key = months <= 60 ? 'coi' : 'edo';
+    safe = inflationPct + (b?.margin ?? 1.5);
+    eqShare = months <= 60 ? 0.2 : months <= 96 ? 0.4 : 0.6;
+    where = `${months <= 60 ? 'obligacje 4-letnie COI' : 'obligacje 10-letnie EDO'} (inflacja + ${pc(b?.margin ?? 1.5)} pkt proc.${b ? `, ${b.id}` : ''}) i do ${Math.round(eqShare * 100)}% w funduszach akcji (ETF); na 2–3 lata przed zakupem przenieś część akcyjną do obligacji albo na konto oszczędnościowe`;
+  }
+  const ratePct = (eqShare * RETURN_ASSUMPTIONS.akcje[0] + (1 - eqShare) * safe) * (1 - GOAL_TAX);
+  return { key, eqShare, safePct: safe, ratePct: Math.round(ratePct * 100) / 100, where };
+}
+
+/**
+ * Plan dla wszystkich celów (od najbliższego): dla każdego – cena w dniu zakupu, ile już jest, ile odkładać co miesiąc
+ * (z zyskiem lokat albo obligacji i bez niego), jednorazowa wpłata z gotówki ponad 6 miesięcy wydatków, gdzie trzymać
+ * pieniądze, a gdy nie starcza – kiedy uzbiera się przy możliwej kwocie. Do tego podział miesięcznej nadwyżki:
+ * najpierw poduszka finansowa do 3 miesięcy wydatków, potem cele, a reszta na inwestycje.
+ */
+export function goalPlan(fin, market, { today, inflationPct = DEFAULT_INFLATION } = {}) {
+  const goals = (fin.goals ?? []).filter((g) => g && g.amount > 0 && /^\d{4}-\d{2}-\d{2}$/.test(g.date ?? '')).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  const d = forecastDefaults(fin, market, { today, inflationPct });
+  const s = d.stats;
+  const surplus = Math.max(0, d.saved);
+  const monthlyExpense = s.n ? s.avgExpense : recurringMonthly(fin, market, today).wydatek;
+  const bal = balances(fin, today);
+  const st = wealthStructure(fin, market, today, bal);
+  const liquidTypes = ['bank', 'oszczednosci', 'gotowka'];
+  const savedOf = (g) => {
+    if (!g.accountId) return Math.max(0, Number(g.saved) || 0);
+    const a = fin.accounts.find((x) => x.id === g.accountId);
+    const w = a ? accountWorth(fin, a, market, today, bal[a.id]) : null;
+    return w ? Math.max(0, w.total) : 0;
+  };
+  // Pieniądze odłożone na cele nie są poduszką finansową (wpisana kwota leży zwykle na zwykłych kontach).
+  let earmarked = 0;
+  for (const g of goals) if (!g.accountId || liquidTypes.includes(fin.accounts.find((x) => x.id === g.accountId)?.type)) earmarked += savedOf(g);
+  const free = Math.max(0, st.liquid - earmarked);
+  const emergency = { min: 3 * monthlyExpense, max: 6 * monthlyExpense, have: free };
+  emergency.gap = Math.max(0, emergency.min - free);
+  emergency.monthly = emergency.gap > 0.5 ? Math.min(emergency.gap / 6, surplus * 0.5) : 0;
+  emergency.months = monthlyExpense > 1 ? free / monthlyExpense : null;
+  let excess = Math.max(0, free - emergency.max);
+  const excessTotal = excess;
+  let left = surplus - emergency.monthly;
+  const cur = today.slice(0, 7);
+  const out = goals.map((g) => {
+    const n = Math.max(1, monthDiff(cur, g.date.slice(0, 7)));
+    const target = goalTarget(g, n, inflationPct);
+    const saved = savedOf(g);
+    const vehicle = goalVehicle(n, market, inflationPct);
+    const need = goalMonthly(target, saved, n, vehicle.ratePct);
+    const need0 = goalMonthly(target, saved, n, 0);
+    const lump = Math.min(excess, Math.max(0, target - saved));
+    excess -= lump;
+    const needLump = lump > 0.5 ? goalMonthly(target, saved + lump, n, vehicle.ratePct) : need;
+    const funded = Math.max(0, Math.min(left, need));
+    left -= need;
+    const short = need - funded;
+    const extendTo = short > 0.5 && funded > 0.5 ? goalMonthsNeeded(g, saved, funded, vehicle.ratePct, inflationPct) : null;
+    return { goal: g, months: n, target, saved, progress: target > 0 ? Math.min(1, saved / target) : 0, vehicle, need, need0, lump, needLump, funded, short, extendTo, done: saved >= target - 0.5, overdue: g.date < today };
+  });
+  const goalsNeed = out.reduce((sum, x) => sum + x.need, 0);
+  return {
+    basis: d.basis,
+    n: s.n,
+    surplus,
+    rawSaved: d.saved,
+    investingNow: Math.max(0, d.invested),
+    monthlyExpense,
+    emergency,
+    excess: excessTotal,
+    goals: out,
+    goalsNeed,
+    investAfter: Math.max(0, surplus - emergency.monthly - goalsNeed),
+    shortfall: Math.max(0, emergency.monthly + goalsNeed - surplus),
+  };
+}
+
+/** Zakupy z celów w prognozie: kwota (cena z inflacją) w miesiącu celu – pozycja 0 to bieżący miesiąc. */
+export function goalSpends(fin, today, months, inflationPct = DEFAULT_INFLATION) {
+  const out = [];
+  const cur = today.slice(0, 7);
+  for (const g of fin.goals ?? []) {
+    if (!(g?.amount > 0) || !/^\d{4}-\d{2}-\d{2}$/.test(g.date ?? '') || g.date < today) continue;
+    const m = monthDiff(cur, g.date.slice(0, 7));
+    if (m > months) continue;
+    out[m] = (out[m] ?? 0) + goalTarget(g, m, inflationPct);
+  }
+  return out;
 }

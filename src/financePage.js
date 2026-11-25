@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CSS, HEAD_COMMON, navHtml } from './dashboard.js';
-import { ACCOUNT_ICONS, ACCOUNT_TYPES, CURRENCIES, FREQS, GEM_ACCOUNTS, LOAN_KINDS, LOAN_RATE_TYPES } from './client/finance-core.js';
+import { ACCOUNT_ICONS, ACCOUNT_TYPES, CURRENCIES, FREQS, GEM_ACCOUNTS, GOAL_ICONS, LOAN_KINDS, LOAN_RATE_TYPES } from './client/finance-core.js';
 import { addDays } from './lib/dates.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -265,6 +265,14 @@ form[data-type=wydatek] .amount-input{color:var(--neg)}form[data-type=przychod] 
 .inv-legend li{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;font-size:14px}.inv-legend li+li{border-top:1px solid var(--line)}
 .inv-legend b{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
 .day-table{margin-top:10px}.day-table td:first-child{color:var(--muted)}.day-table tbody tr:first-child td:first-child{color:var(--ink);font-weight:600}
+.goal{padding:12px 0 4px;border-top:1px solid var(--line)}.goal:first-of-type{border-top:0}
+.goal-head{display:flex;align-items:center;gap:10px}.goal-head>div{flex:1;min-width:0}.goal-head small{display:block;color:var(--muted);font-size:12.5px}.goal-ico{font-size:26px;line-height:1}
+.goal .br-track{margin:9px 0 4px}.goal-tip{margin:8px 0 4px;font-size:14.5px}.goal-badge{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:1px 8px;margin-left:4px;vertical-align:1px}
+.goal-badge.ok{background:var(--pos-soft);color:var(--pos)}.goal-badge.warn{background:var(--warn-soft);color:var(--warn)}
+.goal-plan{margin:6px 0 2px;padding-left:18px;font-size:13.5px;line-height:1.5}.goal-plan li{margin:6px 0}
+.goal-split{display:flex;height:10px;border-radius:99px;overflow:hidden;gap:2px;margin:10px 0 4px;background:var(--surface-2)}.goal-split span{display:block;height:100%}
+.goal-split .s-cash{background:var(--s-cash)}.goal-split .s-inv{background:var(--s-inv)}.goal-split .s-cushion{background:var(--muted)}.cx-key-line.s-cushion{border-color:var(--muted)}
+.goal-icons span{font-size:20px;padding:4px 10px}
 .plan-log{margin:6px 0 2px}.plan-log ul{list-style:none;margin:6px 0;padding:0}
 .plan-log li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
 .plan-log li b{font-variant-numeric:tabular-nums}.plan-log-act{white-space:nowrap}
@@ -320,6 +328,19 @@ const TABS = [['przeglad', 'Przegląd'], ['operacje', 'Operacje'], ['majatek', '
 const typeRadios = () => `<div class="type3" role="radiogroup" aria-label="Typ">${[['wydatek', 'Wydatek'], ['przychod', 'Przychód'], ['przelew', 'Przelew']].map(([v, l]) => `<label><input type="radio" name="type" value="${v}"><span>${l}</span></label>`).join('')}</div>`;
 const actions = (del = '', extra = '', submit = 'Zapisz') =>
   `<div class="dlg-actions">${del}${extra}<span style="flex:1"></span><button type="button" class="btn ghost" data-close>Anuluj</button><button type="submit" class="btn primary">${submit}</button></div>`;
+
+// Cel finansowy: na co, ile kosztuje dziś, termin, czy cena rośnie z inflacją i gdzie są już odłożone pieniądze.
+const GOAL_DIALOG = `<dialog id="goal-dialog"><form method="dialog" novalidate>
+<h3 id="gd-title">Nowy cel</h3>
+<label class="field">Na co oszczędzasz<input name="name" maxlength="60" placeholder="np. Samochód" autocomplete="off"></label>
+<div class="field"><span>Ikona</span><div class="typesel goal-icons" role="radiogroup" aria-label="Ikona celu">${GOAL_ICONS.map((ic) => `<label><input type="radio" name="icon" value="${ic}"><span>${ic}</span></label>`).join('')}</div></div>
+<div class="two"><label class="field">Ile kosztuje dziś (zł)<input name="amount" inputmode="decimal" placeholder="np. 60 000" autocomplete="off"></label><label class="field">Kiedy chcesz kupić<input type="date" name="date"></label></div>
+<label class="check small"><input type="checkbox" name="inflate"> <span>Ceny rosną – licz kwotę na dzień zakupu z inflacją (jak w prognozie)</span></label>
+<label class="field">Gdzie odkładasz<select name="accountId"></select><small>Osobne konto na ten cel (np. oszczędnościowe) – postęp liczy się wtedy z jego salda. Bez osobnego konta wpisz, ile już masz.</small></label>
+<label class="field" id="gd-saved-wrap">Już odłożone (zł)<input name="saved" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+<div class="errors" id="gd-errors" role="alert"></div>
+${actions('<button type="button" class="btn danger" id="gd-delete" hidden>Usuń cel</button>')}
+</form></dialog>`;
 
 const currencyOptions = () => CURRENCIES.map((c) => `<option value="${c}">${c === 'PLN' ? 'PLN – złoty' : c}</option>`).join('');
 
@@ -498,7 +519,7 @@ ${navHtml('finanse')}
 <footer><p><b>Prywatność:</b> dziennik działa bez internetu. Dane i dokumenty są zapisane wyłącznie w pamięci tej przeglądarki na tym urządzeniu. Strona ma zablokowane wszystkie połączenia sieciowe (Content-Security-Policy: connect-src 'none'), więc nie może wysłać danych nigdzie, także na GitHub. Kursy NBP i ceny ETF-ów strategii są dołączane do strony przy każdej aktualizacji aplikacji, a ceny pozostałych akcji i ETF-ów z oferty XTB, wyceny funduszy ING TFI, cenę złota, kursy kryptowalut i dane do wyceny obligacji skarbowych strona wczytuje z plików aplikacji (data/notowania.js, data/fundusze.js, data/zloto.js, data/krypto.js, data/obligacje.js) – to tylko pobranie gotowego pliku, bez wysyłania jakichkolwiek danych. Kopię zapasową tworzysz ręcznie w zakładce Więcej.</p></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
-${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}${LOTS_DIALOG}${PLAN_DIALOG}${LOAN_DIALOG}${CONFIRM_DIALOG}${DOC_DIALOG}
+${TX_DIALOG}${ACC_DIALOG}${REC_DIALOG}${REPAY_DIALOG}${LOTS_DIALOG}${PLAN_DIALOG}${LOAN_DIALOG}${GOAL_DIALOG}${CONFIRM_DIALOG}${DOC_DIALOG}
 <noscript><p>Dziennik wymaga włączonej obsługi JavaScript.</p></noscript>
 <script type="application/json" id="fin-market">${market}</script>
 <script type="module">${read('assets.js')}\n${read('finance-core.js')}\n${read('instruments.js')}\n${read('mmbackup.js')}\n${read('finance-ui.js')}</script>

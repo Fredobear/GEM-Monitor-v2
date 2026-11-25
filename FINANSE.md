@@ -219,7 +219,7 @@ Ceny instrumentów spoza strategii strona wczytuje z plików aplikacji (`data/no
 
 ## Majątek: wykres, struktura i prognoza
 
-Zakładka **Majątek** odpowiada na sześć pytań.
+Zakładka **Majątek** odpowiada na siedem pytań.
 
 **1. Ile mam?** Na górze **majątek netto** (aktywa minus długi), zmiana w tym miesiącu i przez 12 miesięcy oraz gotówka, inwestycje i długi – pełne kwoty z groszami. Ten sam kafel jest na Przeglądzie i w Kontach – dotknięcie otwiera zakładkę Majątek.
 
@@ -265,7 +265,8 @@ O początku dziennika decydują wpisane i zaimportowane przychody i wydatki. Rat
 **6. Dokąd zmierzam? – prognoza.** Wykres pokazuje dotychczasowy majątek (linia ciągła), **wariant bazowy** (linia przerywana) i przedział od **ostrożnego** do **optymistycznego** (pasmo). Horyzont: 1 rok, 5, 10, 20 albo 30 lat. Nad wykresem: ile z prognozowanej kwoty to zyski z inwestycji, które dopiero przyjdą. Pod wykresem tabela wariantów, kamienie milowe (spłata kredytów, wyjście na plus, kolejne okrągłe kwoty, niezależność finansowa) i podpowiedź, ile daje każde dodatkowe 100 zł odkładane co miesiąc.
 
 Prognoza opiera się na Twojej historii i nawykach:
-- **Co miesiąc odkładasz** – średnia z ostatnich [pełnych miesięcy](#pełne-miesiące) (przychody minus wydatki). Przy krótszej historii niż 3 pełne miesiące aplikacja korzysta ze stałych pozycji (np. wynagrodzenie i rachunki) i planów inwestycyjnych.
+- **Co miesiąc odkładasz** – średnia z ostatnich [pełnych miesięcy](#pełne-miesiące) (przychody minus wydatki). Przy krótszej historii niż 3 pełne miesiące aplikacja korzysta ze stałych pozycji (np. wynagrodzenie i rachunki) i planów inwestycyjnych – ale tylko wtedy, gdy stałe pozycje obejmują większość Twoich dochodów; bez pensji wśród stałych pozycji liczy się krótka historia.
+- **Cele finansowe** – zakupy z celów (np. samochód) zmniejszają majątek w miesiącu celu, po cenie z inflacją. Przełącznik „Uwzględnij cele finansowe” pod wykresem pokazuje prognozę bez nich.
 - **Z tego inwestujesz** – ile średnio co miesiąc przenosisz na konta inwestycyjne (przelewy, wpłaty do planów). Reszta zostaje w gotówce.
 - **Zysk z inwestycji** – wynika ze składu portfela: akcje, ETF-y i portfel GEM ok. 7% rocznie, fundusze 6%, obligacje indeksowane: inflacja + marża, obligacje zmiennoprocentowe: stopa NBP + marża, złoto: inflacja + 1,5 pkt proc., kryptowaluty 7% (z bardzo szerokim przedziałem). To założenia długoterminowe, a nie wynik z ostatnich miesięcy – krótka historia własnego portfela niczego nie przesądza.
 - **Kredyty** spłacają się według harmonogramów: dług maleje, odsetki z każdą ratą są mniejsze, a po spłacie co miesiąc zostaje więcej.
@@ -277,6 +278,21 @@ Prognoza opiera się na Twojej historii i nawykach:
 Każde założenie możesz zmienić w polach pod wykresem („Co miesiąc odkładasz”, „Z tego inwestujesz”, „Zysk z inwestycji”, „Inflacja”) i od razu zobaczyć wynik – np. co da odkładanie 500 zł więcej. „Przywróć założenia wyliczone z historii” wraca do wartości domyślnych. Uproszczenia: gotówka nie jest oprocentowana, podatki od przyszłych zysków nie są odliczane, a „niezależność finansowa” to popularna reguła 25-krotności rocznych wydatków.
 
 Prognoza to szacunek przy dzisiejszych nawykach, a nie obietnica ani porada inwestycyjna: zmiana pracy, duży wydatek albo bessa mogą ją znacząco zmienić.
+
+**7. Na co oszczędzam? – cele finansowe.** Karta **Cele finansowe** (*Majątek → + Dodaj cel*): na co oszczędzasz (np. samochód), ile kosztuje dziś, kiedy chcesz kupić, czy cena ma rosnąć z inflacją i gdzie odkładasz – osobne konto na cel (postęp z jego salda) albo kwota, którą już masz. Aplikacja tylko sugeruje – nic nie przelewa i nie zmienia sama.
+
+Na górze karty – **podział miesięcznej nadwyżki** (przychody minus wydatki z [pełnych miesięcy](#pełne-miesiące)) w rozsądnej kolejności:
+1. **poduszka finansowa** – jeśli pieniędzy na kontach, oszczędnościach i w gotówce (bez odłożonych na cele) jest mniej niż na 3 miesiące wydatków, część nadwyżki idzie najpierw na nią (brakująca kwota w 6 miesięcy, najwyżej połowa nadwyżki);
+2. **cele** od najbliższego terminu;
+3. **inwestycje** – reszta; aplikacja porównuje ją z tym, ile inwestujesz teraz, i podpowiada, czy do czasu zakupu inwestować mniej.
+
+Przy każdym celu: cena w dniu zakupu, ile masz i ile brakuje, **ile odkładać co miesiąc** i **Plan i uzasadnienie**:
+- **gdzie trzymać pieniądze** – im bliżej zakupu, tym bezpieczniej: do 3 miesięcy konto oszczędnościowe albo lokata, do roku obligacje roczne ROR, do 2 lat DOR, do 3 lat TOS (stałe oprocentowanie), dłużej obligacje indeksowane inflacją (COI, EDO) i część w funduszach akcji (do 20% przy 3–5 latach, 40% przy 5–8, 60% powyżej), którą na 2–3 lata przed zakupem przenosisz do bezpiecznych aktywów. Oprocentowanie obligacji jest z bieżącej oferty (aktualizowanej w dni robocze), a zysk liczony po podatku 19%;
+- ile dzięki temu mniej trzeba odkładać niż bez żadnego zysku;
+- **wpłata jednorazowa** – jeśli masz gotówkę ponad 6 miesięcy wydatków, ile z niej przeznaczyć od razu i ile wtedy odkładać co miesiąc;
+- gdy nadwyżki nie starcza – propozycje: kiedy uzbierasz przy kwocie, na którą Cię stać (przesunięcie terminu), wstrzymanie albo zmniejszenie dokładania do inwestycji do czasu zakupu, albo pokrycie brakującej kwoty z inwestycji tuż przed zakupem (z podatkiem 19% od zysku i ryzykiem spadku kursu).
+
+To prosty, jawny model liczony z Twoich średnich – nie porada inwestycyjna.
 
 ## Korekta salda
 
