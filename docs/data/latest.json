@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-25T19:08:01.406Z",
+  "generatedAt": "2026-11-25T22:10:24.554Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -50,14 +50,14 @@
    "changed": false
   },
   "preview": {
-   "asOf": "2026-11-24",
+   "asOf": "2026-11-25",
    "returns": {
-    "US": 0.0864212098316528,
-    "EXUS": 0.09688814867060302,
-    "TBILLS": 0.03680714809751251,
-    "BONDS": -0.004876355822053813,
-    "DEVX": 0.10280295983469512,
-    "EM": 0.06906660856544788
+    "US": 0.07318309174912252,
+    "EXUS": 0.08795962164245519,
+    "TBILLS": 0.03692042305274268,
+    "BONDS": -0.002633799147982563,
+    "DEVX": 0.09306460117718074,
+    "EM": 0.06121413516375518
    },
    "decision": {
     "asset": "EXUS",
@@ -68,8 +68,8 @@
      "US"
     ],
     "absAsset": "US",
-    "excess": 0.04961406173414029,
-    "relativeMargin": 0.010466938838950224,
+    "excess": 0.03626266869637984,
+    "relativeMargin": 0.014776529893332668,
     "safeMargin": null,
     "nearTie": false,
     "bufferApplied": false
@@ -692,7 +692,7 @@
   ],
   "switchesInHistory": 6,
   "nextDecisionDate": "2026-11-30",
-  "lastDataDate": "2026-11-24",
+  "lastDataDate": "2026-11-25",
   "warnings": []
  },
  "explanation": {
@@ -716,7 +716,7 @@
    "level": "słaby"
   },
   "stabilityText": "Stabilność sygnału: słaby (do zmiany sygnału brakuje 1,7 pp).",
-  "previewNote": "Wstępny sygnał na dziś (dane do 24 listopada 2026) potwierdza EXUS.DE.",
+  "previewNote": "Wstępny sygnał na dziś (dane do 25 listopada 2026) potwierdza EXUS.DE.",
   "currency": [
    {
     "key": "IKE",
@@ -778,8 +778,8 @@
    {
     "id": "T10Y3M",
     "name": "Krzywa rentowności USA (10L − 3M)",
-    "date": "2026-11-24",
-    "value": "0,55 pp",
+    "date": "2026-11-25",
+    "value": "0,51 pp",
     "tier": 0,
     "comment": "normalna"
    },
@@ -818,7 +818,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 471,
+  "fetched": 491,
   "items": [
    {
     "title": "Even the price of toys is on the rise. How Americans are scaling back holiday plans",
@@ -834,24 +834,6 @@
      "Konflikty i wojny",
      "Energia i surowce",
      "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 11
-   },
-   {
-    "title": "US court convicts Huawei of theft: A history of Chinese firm’s global woes",
-    "link": "https://www.aljazeera.com/news/2026/11/25/us-court-convicts-huawei-of-theft-a-history-of-chinese-firms-global-woes?traffic_source=rss",
-    "date": "2026-11-25T13:37:51.000Z",
-    "summary": "Chinese tech giant has faced legal problems from Europe to Asia, and its products have been banned in trade war with US.",
-    "source": "Al Jazeera",
-    "regions": [
-     "USA",
-     "Europa",
-     "Azja"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Sankcje i cła"
     ],
     "relevant": true,
     "score": 11
@@ -874,28 +856,10 @@
     "score": 10
    },
    {
-    "title": "Podwyżki stóp w Polsce są przesądzone, prawdopodobnie trzy",
-    "link": "https://www.parkiet.com/inwestycje/art45512751-podwyzki-stop-w-polsce-sa-przesadzone-prawdopodobnie-trzy",
-    "date": "2026-11-25T05:00:00.000Z",
-    "summary": "Fundusze dłużne mogą być dobrym rozwiązaniem na kolejny rok, ale jest też sporo niewiadomych. Dwa główne źródła ryzyka dla obligacji to rozwój konfliktu na Bliskim Wschodzie oraz sytuacja wokół Rosji i Ukrainy - mówi Tomasz Rabęda, dyrektor zespołu zarządzania instrumentami dłużnymi, ING TFI.",
-    "source": "Parkiet",
-    "regions": [
-     "Polska",
-     "Bliski Wschód",
-     "Rosja/Ukraina"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Banki centralne i stopy"
-    ],
-    "relevant": true,
-    "score": 10
-   },
-   {
-    "title": "Bitcoin Falls Further as Inflation, Trump Tariffs and AI Selloff Rattle Markets - Decrypt",
-    "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTFBjWWJWUlo0aHRXWld1MHBLUnNjR1hQQVRkTVdlOEV4bDlGRmYxb296ODJlZ2szRmJiWnpCRU9pdm92djJtVzg5LXVReUVxZXNjYUV5Nk04azAyOEVOc0JsUEZkZ0hNYkVkdEg3NVd0aFRrWEphS0ZZWkx2RGhMbFk?oc=5",
-    "date": "2026-11-25T16:52:50.000Z",
-    "summary": "Bitcoin Falls Further as Inflation, Trump Tariffs and AI Selloff Rattle Markets Decrypt",
+    "title": "US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street - Dimsum Daily",
+    "link": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxOYURKOW1qVndfbVVpWXhHTDh0Zzg1UVVqNkUzcVRpOHBBNzRJdzBwQk5lTEQ0M05vM3BWbVBiNm00YmR2U2RQSnVidWVLZmhWbm1kX1A0QTlNaDBuSGdUV2MyYnJQS0FzWVEwMXZFUzRkMm9WOGd5WnpEWjRJdGNBSnBVTE5xXzVTV0dIQnhSMUlleUhQTmtxNEdkQmt2U0NDZktxSjVGMUJTRENESnJmemdNa1hNN2lkTEd6LVFWQkNaenlpZm1OSUpqX2JTdnJyR2kzYTIySm0?oc=5",
+    "date": "2026-11-25T20:49:15.000Z",
+    "summary": "US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street Dimsum Daily",
     "source": "Google News",
     "regions": [
      "USA"
@@ -909,10 +873,27 @@
     "score": 9
    },
    {
-    "title": "US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street - Dimsum Daily",
-    "link": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxOYURKOW1qVndfbVVpWXhHTDh0Zzg1UVVqNkUzcVRpOHBBNzRJdzBwQk5lTEQ0M05vM3BWbVBiNm00YmR2U2RQSnVidWVLZmhWbm1kX1A0QTlNaDBuSGdUV2MyYnJQS0FzWVEwMXZFUzRkMm9WOGd5WnpEWjRJdGNBSnBVTE5xXzVTV0dIQnhSMUlleUhQTmtxNEdkQmt2U0NDZktxSjVGMUJTRENESnJmemdNa1hNN2lkTEd6LVFWQkNaenlpZm1OSUpqX2JTdnJyR2kzYTIySm0?oc=5",
-    "date": "2026-11-25T15:04:21.000Z",
-    "summary": "US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street Dimsum Daily",
+    "title": "The Fed says inflation hasn’t gotten any better ahead of its key December vote to raise rates",
+    "link": "https://www.marketwatch.com/story/the-fed-says-inflation-hasnt-gotten-any-better-ahead-of-its-key-december-vote-to-raise-rates-65024d33?mod=mw_rss_topstories",
+    "date": "2026-11-25T19:39:00.000Z",
+    "summary": "Just ahead of pivotal December vote to raise U.S. interest rates, the Federal Reserve on Wednesday said stubborn inflation remains a thorn in the side of an expanding economy.",
+    "source": "MarketWatch",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Banki centralne i stopy",
+     "Wybory i polityka",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
+    "title": "Bitcoin Falls Further as Inflation, Trump Tariffs and AI Selloff Rattle Markets - Yahoo Finance",
+    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPOFhEUmQxaFBsZmszQkxnaVE4M3hUcHQtNFpmbDVieHdiRW50SVZCTnFRUkRkUHFxR0FCQVpDTUk2S0hXTGh3YXI1cWNVVTVxRFNHVjdlZ2x1MHFrd3ZfX1BQdGRabXRwakVGV2VKcHk3VFJPRzhoSzFWcWxHOHlXbVRMTm9RamFmZVNWNzFRbVB3Yjg2bkZRRkViVUxLMDRqZHlVXw?oc=5",
+    "date": "2026-11-25T16:52:50.000Z",
+    "summary": "Bitcoin Falls Further as Inflation, Trump Tariffs and AI Selloff Rattle Markets Yahoo Finance",
     "source": "Google News",
     "regions": [
      "USA"
@@ -977,23 +958,6 @@
     "score": 9
    },
    {
-    "title": "Are Global Oil Stocks Big Enough to Weather Another Six Months of US-Iran War? - EnergyNow",
-    "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNa0NtZjhQaTA0TGg5dWdlN3JyeDJ0aVllSUNfc1VVT1Q3M1VnbHZWVkZvYkp3SzE0UFgzRHFVWTZMZjlqeXdIR0gwZ3IxOF80S3hNTnd5dnNPWktYSWxnWGxTbTBaeFRET3Eta0F2emRJYktGc2ZxcnJoSmI0elpYRDJpc2lnU09LZHhFaEFHSDVOM29HVlphMjdySmxQQlZEY0gxNldXTmhRYkE?oc=5",
-    "date": "2026-11-24T20:56:41.000Z",
-    "summary": "Are Global Oil Stocks Big Enough to Weather Another Six Months of US-Iran War? EnergyNow",
-    "source": "Google News",
-    "regions": [
-     "USA",
-     "Bliski Wschód"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
     "title": "Trump Says Markets and Iran Attacks Confirmed His Election Warning - Jordan News",
     "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPZWlXT0ViZ3MteWRuelBvTFByelpTQnRPOTR2eFdaN19CdV8xX1h3bEhHUEgtUEgwbGlhOU01ODV0dzBpLUNZa3ZQS3MxazlIMkRmSG5IWkViQW55X0d5bVBydXotRWdaLVpQRENIMl9SbTBzNjRBZGU5RjNuRi1hZEZ3emxrTlFOY1JCS3ZhMndFMF9teFZld2pCVHNSMlp5UnVRN1dJbU5WeGtWT3hqMm11Q3U?oc=5",
     "date": "2026-11-23T04:57:55.000Z",
@@ -1009,6 +973,101 @@
     ],
     "relevant": true,
     "score": 9
+   },
+   {
+    "title": "US Equity Markets Mixed Amid US Plans for New Tariffs on China, Europe - marketscreener.com",
+    "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPXy0zRHFpTkR6SlRhU0NjbXVkS2dyYlZ5V1R3RDZncGVDVlR1ZE02NlkyUEFSOVhnYWtnd2FLWlBBODkyN1kzUFZBZEdkWkpTZWlTRlhKTjVxMmJfQ0xrUk5CMTJvb0VheFJMZFozZk5pRms0U29XSWd2UW5ELURCZFBleHFwSWNmQTR3Ynlnel9KREl2Q1dUUlRJY3lDX3ZOS3pheVJjd1Y0TEhiMmlsb1M0cUxYZ0F5T3dDNlROcw?oc=5",
+    "date": "2026-11-25T21:34:14.000Z",
+    "summary": "US Equity Markets Mixed Amid US Plans for New Tariffs on China, Europe marketscreener.com",
+    "source": "Google News",
+    "regions": [
+     "USA",
+     "Europa",
+     "Azja"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Rosyjskie rafinerie przerabiają najmniej ropy od dekad. To skutek ukraińskich ataków",
+    "link": "https://www.pb.pl/rosyjskie-rafinerie-przerabiaja-najmniej-ropy-od-dekad-to-skutek-ukrainskich-atakow-1271076",
+    "date": "2026-11-25T21:15:17.000Z",
+    "summary": "Rystad Energy, niezależna norweska firma analityczna i doradcza zajmująca się światowym rynkiem energii twierdzi, że ilość ropy przerabianej w Rosji spadła do najniższego poziomu od ponad dwóch dekad. To skutek prowadzonej przez Ukrainę kampanii intensywnych ataków na rosyjskie rafinerie, informuje ",
+    "source": "Puls Biznesu",
+    "regions": [
+     "Rosja/Ukraina"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Stocks tumble on new tariffs, inflation worries, leading to an AI sell-off - Fast Company",
+    "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNQlhBUmJReUNxVFNtWlBEUGFnd3JUY2VvU2lRajVYdi1LZnhNTVpSdXN0SG13cjA2RGRzam5fZjRsQTc5cl9UdU41cC0wN3gwTWNPODdBQ0Z3bWhXTjlrbmFTUTRXa2lMZm1FbU05OGd2QUxRcTdObUVHb003eUc1akNUcXc?oc=5",
+    "date": "2026-11-25T21:09:36.000Z",
+    "summary": "Stocks tumble on new tariffs, inflation worries, leading to an AI sell-off Fast Company",
+    "source": "Google News",
+    "regions": [],
+    "themes": [
+     "Sankcje i cła",
+     "Inflacja i recesja",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "US Stocks Pare Losses as Tariffs and Inflation Pressure Markets - SuaraGarut.ID",
+    "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE1jWVdqVVdROHdTTWl4VmFhSnU2VWgybkdRWllDOFhval9OMXJhekdIZDB5WmdpamlSN1BYS19Rd0Y4MFZ4ZnJ6a2hOTS03T2J6eExrWTQ2a0psalBuY2toV3lMMDRtMHJzblZ3WVZn?oc=5",
+    "date": "2026-11-25T19:23:00.000Z",
+    "summary": "US Stocks Pare Losses as Tariffs and Inflation Pressure Markets SuaraGarut.ID",
+    "source": "Google News",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Market sell-off eases up, but AI doubts, tariffs and inflation still weigh down stocks - NBC News",
+    "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxOdlpRc1pWbUlBRjhqREZ5aFk5SDJUMjEzOWtOeEZCd19aRnhneEJKaHRFSnQ1TGhTVzEtRmdySjZfdV9MUjVOZmxiN016Qkc5aXNUcEktOHUxUElnX2p6RDk5ZG95Z3hvb3B0bmR3THpRaUJ4bDVOalFaaXV1c2J1RXlnT2o1bXZ1WEI5XzBSQU5pLVBhbTlZNUlXX0hhY2UteDYzbnNB?oc=5",
+    "date": "2026-11-25T18:36:31.000Z",
+    "summary": "Market sell-off eases up, but AI doubts, tariffs and inflation still weigh down stocks NBC News",
+    "source": "Google News",
+    "regions": [],
+    "themes": [
+     "Sankcje i cła",
+     "Inflacja i recesja",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Fresh US tariffs weigh on markets ahead of Fed decision - BBC",
+    "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTFBNLUJmVTF1eXhwY1dUMUlXZ3ItZi1Ub2RXVGpQMlI3MzZUd1Y2dnVsemdRX04tRjBqRDkweXlvV0NEQ3piTVNPNHRvZm5XVUlIdkhwQV9WdmY?oc=5",
+    "date": "2026-11-25T18:00:00.000Z",
+    "summary": "Fresh US tariffs weigh on markets ahead of Fed decision BBC",
+    "source": "Google News",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Banki centralne i stopy"
+    ],
+    "relevant": true,
+    "score": 8
    },
    {
     "title": "Martin Lewis' tips on staying warm this winter",
@@ -1091,89 +1150,25 @@
     ],
     "relevant": true,
     "score": 8
-   },
-   {
-    "title": "Trump wraca do gry z cłami. Szykuje 15 proc. taryfę dla Europy i 20 proc. dla Chin",
-    "link": "https://www.bankier.pl/wiadomosc/Trump-wraca-do-gry-z-clami-Szykuje-15-proc-taryfe-dla-Europy-i-20-proc-dla-Chin-9235012.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-25T15:10:00.000Z",
-    "summary": "Administracja Donalda Trumpa zaproponowała w środę nałożenie nowych ceł na towary z 14 gospodarek, w tym Chin i Unii Europejskiej, tłumacząc to nadwyżkami mocy produkcyjnych. Nowe taryfy mogą najwcześniej wejść w życie w styczniu. Towary z Chin mogą być objęte stawką 20-procentową, z UE - 15 proc.",
-    "source": "Bankier.pl",
-    "regions": [
-     "USA",
-     "Europa",
-     "Azja"
-    ],
-    "themes": [
-     "Sankcje i cła"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Stock Sell-Off Continues as Investors Fret About A.I., Tariffs and Inflation - The New York Times",
-    "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTE02aG9MTzVQV1FPaHZkWUlkbUctTTNOWWxwTHplcDc2akxGWU4xRy1MQndiMUxhU0tEN2Y5WkdRTlIxRU80aUxmbGNJOWVVdE12VjZ1YnM2NU8xN0VoX0ZmNVNrbDlGOEdLV0kzV19fcEJrNDVjUk1KZnhVMA?oc=5",
-    "date": "2026-11-25T14:47:47.000Z",
-    "summary": "Stock Sell-Off Continues as Investors Fret About A.I., Tariffs and Inflation The New York Times",
-    "source": "Google News",
-    "regions": [],
-    "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja",
-     "Nastroje na giełdach"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "US Stocks Tumble On Hot Inflation, Trump Tariffs - BusinessToday Malaysia",
-    "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPSUdFbHZFcFRUTUpCcklybWR0ZmdoRUxxTVJ6UlBWeFF5bWhuaXZqbUtxemxyWHpsVnc1dVYtQjBFX0t3WkZjSV9CQl9qRzFZMEFQR3lieEZyWE1SNTF1WUdhSU9KclFVNFdSMDk4dVl2ckJaeEZjdV9Jb3FOdXlmenNvOHI0M00ycW9yU1pxUVRBM1JGa1RF?oc=5",
-    "date": "2026-11-25T14:36:28.000Z",
-    "summary": "US Stocks Tumble On Hot Inflation, Trump Tariffs BusinessToday Malaysia",
-    "source": "Google News",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Europa wygrywa z Azją wojnę o LNG. Przepłaca to jednak wysokimi cenami gazu",
-    "link": "https://www.pb.pl/europa-wygrywa-z-azja-wojne-o-lng-przeplaca-to-jednak-wysokimi-cenami-gazu-1271022",
-    "date": "2026-11-25T12:18:14.000Z",
-    "summary": "Europejscy odbiorcy LNG wygrywają obecnie rywalizację o dostawy z krajami Azji, korzystając z wysokich cen i słabszego popytu na tamtejszych rynkach. Sytuację komplikuje jednak niski poziom zapasów gazu przed zimą. Rosnące koszty importu coraz mocniej obciążają europejski przemysł i gospodarstwa dom",
-    "source": "Puls Biznesu",
-    "regions": [
-     "Europa"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 19,
-   "Sankcje i cła": 59,
-   "Banki centralne i stopy": 13,
-   "Wybory i polityka": 30,
+   "Konflikty i wojny": 17,
+   "Sankcje i cła": 77,
+   "Banki centralne i stopy": 14,
+   "Wybory i polityka": 32,
    "Energia i surowce": 22,
-   "Inflacja i recesja": 20,
+   "Inflacja i recesja": 25,
    "Nastroje na giełdach": 22,
    "Spółki i wyniki": 15
   },
   "regionCounts": {
-   "USA": 70,
-   "Europa": 21,
-   "Azja": 20,
-   "Rynki wschodzące": 3,
-   "Polska": 15,
-   "Bliski Wschód": 12,
+   "USA": 82,
+   "Europa": 24,
+   "Azja": 23,
+   "Rynki wschodzące": 6,
+   "Polska": 14,
+   "Bliski Wschód": 10,
    "Rosja/Ukraina": 4
   },
   "errors": []
@@ -1443,7 +1438,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-25T19:08:01.406Z",
+  "generatedAt": "2026-11-25T22:10:24.554Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -1711,13 +1706,13 @@
     "kind": "yield",
     "src": "fred",
     "bond": false,
-    "date": "2026-11-23",
-    "last": 4.92,
-    "d1": 0,
-    "w1": -0.2,
-    "m1": -0.08,
-    "ytd": 0.74,
-    "y1": 0.86,
+    "date": "2026-11-24",
+    "last": 4.91,
+    "d1": -0.01,
+    "w1": -0.19,
+    "m1": -0.09,
+    "ytd": 0.73,
+    "y1": 0.87,
     "high52": 5.31,
     "low52": 3.97,
     "fromHigh": null,
@@ -1732,13 +1727,13 @@
     "kind": "yield",
     "src": "fred",
     "bond": false,
-    "date": "2026-11-23",
+    "date": "2026-11-24",
     "last": 4.63,
     "d1": 0,
-    "w1": -0.2,
+    "w1": -0.17,
     "m1": -0.06,
     "ytd": 1.16,
-    "y1": 1.12,
+    "y1": 1.17,
     "high52": 4.92,
     "low52": 3.38,
     "fromHigh": null,
@@ -1941,8 +1936,8 @@
    "key": "down|high",
    "trend": "down",
    "vol": "high",
-   "volValue": 0.3096,
-   "date": "2026-11-24"
+   "volValue": 0.3086,
+   "date": "2026-11-25"
   },
   "stats": {
    "since": "1993-01-29",
@@ -2047,16 +2042,16 @@
    },
    "summary": [
     "Akcje w ostatnim tygodniu: S&P 500 −1,9%, Europa −2,5%, rynki wschodzące −2,7%, WIG20 −4,6% (S&P 500 od początku roku +5,2%).",
-    "Rentowność 10-letnich obligacji USA 4,92% (−0,20 pp w tydzień), złoto −7,7%, ropa Brent 91,8 USD (−1,2%).",
+    "Rentowność 10-letnich obligacji USA 4,91% (−0,19 pp w tydzień), złoto −7,7%, ropa Brent 91,8 USD (−1,2%).",
     "Złoty: EUR/PLN 4,4809 (+1,6% w tydzień), USD/PLN 4,0966 (+2,0% w tydzień)."
    ],
    "sections": [
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Sankcje i cła (59 wiadomości): cła i sankcje uderzają w handel i marże firm; najbardziej wrażliwe są spółki eksportowe, rynki wschodzące i branże z długimi łańcuchami dostaw (technologie, motoryzacja). Przykład: „US court convicts Huawei of theft: A history of Chinese firm’s global woes” (Al Jazeera).",
-      "Wybory i polityka (30 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Trump Says Markets and Iran Attacks Confirmed His Election Warning - Jordan News” (Google News).",
-      "Energia i surowce (22 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Even the price of toys is on the rise. How Americans are scaling back holiday plans” (CNBC)."
+      "Sankcje i cła (77 wiadomości): cła i sankcje uderzają w handel i marże firm; najbardziej wrażliwe są spółki eksportowe, rynki wschodzące i branże z długimi łańcuchami dostaw (technologie, motoryzacja). Przykład: „Wojna handlowa wraca, giełdy reagują. USA publikują nową listę ceł, do 45% na Chiny - BitHub.pl” (Google News PL).",
+      "Wybory i polityka (32 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „The Fed says inflation hasn’t gotten any better ahead of its key December vote to raise rates” (MarketWatch).",
+      "Inflacja i recesja (25 wiadomości): wyższa inflacja oddala obniżki stóp, a słabsze dane o wzroście zwiększają ryzyko spadku zysków firm, choć mogą przyspieszyć obniżki stóp. Przykład: „Even the price of toys is on the rise. How Americans are scaling back holiday plans” (CNBC)."
      ]
     },
     {
