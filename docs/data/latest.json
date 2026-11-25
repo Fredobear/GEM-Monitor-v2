@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-25T22:10:24.554Z",
+  "generatedAt": "2026-11-25T22:29:34.500Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -818,7 +818,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 491,
+  "fetched": 533,
   "items": [
    {
     "title": "Even the price of toys is on the rise. How Americans are scaling back holiday plans",
@@ -907,6 +907,23 @@
     "score": 9
    },
    {
+    "title": "Prezydent USA proponuje nowe cła, wyprzedaż akcji. - Vietnam.vn",
+    "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNZ29SWFBPUjhmRjRfdmpnMHkwclFmTnRWMEpoLUYxVnZjVElzYlZDdHFSUmluX0owUGhYazdhb0R1VzFuWng2ZlR6dlJENXdUUVBvV2ZhcUFheFJEU0dBVkdYWVlvMGFHc1Z1SDR5U1RSUW8tWVhHbWg4cHNFSTdpVGtlc0hpSHE5R1dB?oc=5",
+    "date": "2026-11-25T15:54:16.000Z",
+    "summary": "Prezydent USA proponuje nowe cła, wyprzedaż akcji. Vietnam.vn",
+    "source": "Google News PL",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Wybory i polityka",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
     "title": "Przed sesją na Wall Street: szykuje się bolesna wyprzedaż. Inflacja i nowe cła budzą dodatkowy niepokój inwestorów",
     "link": "https://www.pb.pl/przed-sesja-na-wall-street-szykuje-sie-bolesna-wyprzedaz-inflacja-i-nowe-cla-budza-dodatkowy-niepokoj-inwestorow-1271027",
     "date": "2026-11-25T13:33:49.000Z",
@@ -975,6 +992,22 @@
     "score": 9
    },
    {
+    "title": "US stocks close mixed amid hotter-than-expected inflation, fresh tariffs - TRT World",
+    "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE1BNjZIUWNqOTBTTjZPVkRvam5RY3R5b0VlZWxJZ2dKMHVZczVRWWZJRDFNRG80RzFnektoYlhBaXkzbEtLRk52VkltM0dMTnMzcC10ZW51bkc?oc=5",
+    "date": "2026-11-25T22:22:04.000Z",
+    "summary": "US stocks close mixed amid hotter-than-expected inflation, fresh tariffs TRT World",
+    "source": "Google News",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
     "title": "US Equity Markets Mixed Amid US Plans for New Tariffs on China, Europe - marketscreener.com",
     "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPXy0zRHFpTkR6SlRhU0NjbXVkS2dyYlZ5V1R3RDZncGVDVlR1ZE02NlkyUEFSOVhnYWtnd2FLWlBBODkyN1kzUFZBZEdkWkpTZWlTRlhKTjVxMmJfQ0xrUk5CMTJvb0VheFJMZFozZk5pRms0U29XSWd2UW5ELURCZFBleHFwSWNmQTR3Ynlnel9KREl2Q1dUUlRJY3lDX3ZOS3pheVJjd1Y0TEhiMmlsb1M0cUxYZ0F5T3dDNlROcw?oc=5",
     "date": "2026-11-25T21:34:14.000Z",
@@ -1018,6 +1051,22 @@
      "Sankcje i cła",
      "Inflacja i recesja",
      "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 8
+   },
+   {
+    "title": "Wall Street tempers early slide as pullback in AI stocks eases despite hotter inflation, new tariffs - Greater Milwaukee Today",
+    "link": "https://news.google.com/rss/articles/CBMimwJBVV95cUxOWXJCdnMxckFnUktiT1o0cGJkUUtmQzlZZW0zZGVmbXVPQmZFT2JrSjltbTlHSnYwUmFLajMtVk5fZVBmeFZ6dlFPWTNmbnBHN0NPOGNxdjJ0Q2tyeXF4STllQ0lSaGtFeTd0SUJqTDUyNU9GYnJISVg2SEJVb2VTT3IySnJMNWFqMGlkdklId0txUDg1aTFuZlhHUGhwMlg4ZjZVWC1VcWZsV0dCZDc1eXJ0RnJYVXpPWnUwUW9EZU0zTjJHcU5WeUIxWkZyT25aS2J2RmEybFFWamoyd1NRV1lLR1ZLLUZacGkwYmVHSDg0UzVxQWJJdG9IUVMtVE9vdUQ4NXVGTndPcVBzRVBaYjdEaVkzaWxWOFlJ?oc=5",
+    "date": "2026-11-25T20:12:05.000Z",
+    "summary": "Wall Street tempers early slide as pullback in AI stocks eases despite hotter inflation, new tariffs Greater Milwaukee Today",
+    "source": "Google News",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Inflacja i recesja"
     ],
     "relevant": true,
     "score": 8
@@ -1100,72 +1149,22 @@
     ],
     "relevant": true,
     "score": 8
-   },
-   {
-    "title": "U.S. proposes new tariffs on 14 trading partners, including China and the EU",
-    "link": "https://www.cnbc.com/2026/11/25/us-tariffs-trump-section-301.html",
-    "date": "2026-11-25T16:02:52.000Z",
-    "summary": "The new levies seek to counter foreign trade practices deemed unfair, discriminatory or burdensome to U.S. commerce.",
-    "source": "CNBC",
-    "regions": [
-     "USA",
-     "Europa",
-     "Azja"
-    ],
-    "themes": [
-     "Sankcje i cła"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "US stocks crater again on Wednesday on hot inflation, new Trump tariffs - FXStreet",
-    "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxON0FJOWFCR2NXVzY1dF90TXczbjdJbkRzUG4wTFJ2WENhQ0dkTDR2cWVYMnpHc1RjYThaR2Z6bmFmZURmdHFaVkpZd1lFWEFmcTNSdGU5cjNsLThtUXc3UmZUTmJtU0pBNlhSTGtsTVh5UW1oYzl6a2NWWEpQODBSYzREZm5RMjJ5Zkx3ek5JZFpDWW9OaVJCOGtTdjNpV0h3SWx4amtIR2FpNzg4ZURUbHNPOA?oc=5",
-    "date": "2026-11-25T15:43:17.000Z",
-    "summary": "US stocks crater again on Wednesday on hot inflation, new Trump tariffs FXStreet",
-    "source": "Google News",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "USA proponują nowe cła wobec 14 partnerów handlowych, w tym Unii Europejskiej",
-    "link": "https://www.pb.pl/usa-proponuja-nowe-cla-wobec-14-partnerow-handlowych-w-tym-unii-europejskiej-1271046",
-    "date": "2026-11-25T15:20:30.000Z",
-    "summary": "Administracja Donalda Trumpa szykuje nowe cła, uzasadniając ich wprowadzenie nadwyżkami mocy produkcyjnych w przemysłach głównych partnerów handlowych. To wynik dochodzenia obejmującego 16 gospodarek, w tym Unię Europejską. ​​Meksyk i Norwegia mogą uniknąć ceł, informuje CNBC.",
-    "source": "Puls Biznesu",
-    "regions": [
-     "USA",
-     "Europa",
-     "Rynki wschodzące"
-    ],
-    "themes": [
-     "Sankcje i cła"
-    ],
-    "relevant": true,
-    "score": 8
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 17,
-   "Sankcje i cła": 77,
-   "Banki centralne i stopy": 14,
-   "Wybory i polityka": 32,
-   "Energia i surowce": 22,
-   "Inflacja i recesja": 25,
-   "Nastroje na giełdach": 22,
+   "Konflikty i wojny": 18,
+   "Sankcje i cła": 80,
+   "Banki centralne i stopy": 15,
+   "Wybory i polityka": 33,
+   "Energia i surowce": 23,
+   "Inflacja i recesja": 26,
+   "Nastroje na giełdach": 25,
    "Spółki i wyniki": 15
   },
   "regionCounts": {
-   "USA": 82,
+   "USA": 86,
    "Europa": 24,
-   "Azja": 23,
+   "Azja": 24,
    "Rynki wschodzące": 6,
    "Polska": 14,
    "Bliski Wschód": 10,
@@ -1438,7 +1437,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-25T22:10:24.554Z",
+  "generatedAt": "2026-11-25T22:29:34.500Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -2049,9 +2048,9 @@
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Sankcje i cła (77 wiadomości): cła i sankcje uderzają w handel i marże firm; najbardziej wrażliwe są spółki eksportowe, rynki wschodzące i branże z długimi łańcuchami dostaw (technologie, motoryzacja). Przykład: „Wojna handlowa wraca, giełdy reagują. USA publikują nową listę ceł, do 45% na Chiny - BitHub.pl” (Google News PL).",
-      "Wybory i polityka (32 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „The Fed says inflation hasn’t gotten any better ahead of its key December vote to raise rates” (MarketWatch).",
-      "Inflacja i recesja (25 wiadomości): wyższa inflacja oddala obniżki stóp, a słabsze dane o wzroście zwiększają ryzyko spadku zysków firm, choć mogą przyspieszyć obniżki stóp. Przykład: „Even the price of toys is on the rise. How Americans are scaling back holiday plans” (CNBC)."
+      "Sankcje i cła (80 wiadomości): cła i sankcje uderzają w handel i marże firm; najbardziej wrażliwe są spółki eksportowe, rynki wschodzące i branże z długimi łańcuchami dostaw (technologie, motoryzacja). Przykład: „Wojna handlowa wraca, giełdy reagują. USA publikują nową listę ceł, do 45% na Chiny - BitHub.pl” (Google News PL).",
+      "Wybory i polityka (33 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „The Fed says inflation hasn’t gotten any better ahead of its key December vote to raise rates” (MarketWatch).",
+      "Inflacja i recesja (26 wiadomości): wyższa inflacja oddala obniżki stóp, a słabsze dane o wzroście zwiększają ryzyko spadku zysków firm, choć mogą przyspieszyć obniżki stóp. Przykład: „Even the price of toys is on the rise. How Americans are scaling back holiday plans” (CNBC)."
      ]
     },
     {
