@@ -7,7 +7,7 @@ Zakładka **Finanse** to osobna strona aplikacji (`finanse.html`) do śledzenia 
 | **Przegląd** | majątek netto, wydatki i przychody za dzień, tydzień, miesiąc, rok albo dowolny okres, wykres kategorii, duże przyciski **− Wydatek** i **+ Przychód**, raporty |
 | **Operacje** | lista wszystkich operacji z wyszukiwaniem i filtrami albo **kalendarz** (przełącznik Lista / Kalendarz), eksport do CSV |
 | **Majątek** | jak zmienia się majątek, skąd bierze się przyrost, ile odkładasz, z czego majątek się składa i **prognoza** na przyszłość |
-| **Konta** | konta pogrupowane według rodzaju (konta i gotówka, inwestycje, karty, kredyty) z sumami, karty kredytowe, konta inwestycyjne z aktywami |
+| **Konta** | konta pogrupowane według rodzaju (konta i gotówka, pożyczone innym, inwestycje, karty, kredyty) z sumami, karty kredytowe, konta inwestycyjne z aktywami |
 | **Stałe** | stałe dochody, płatności i przelewy (pensja, czynsz, rachunki, subskrypcje) |
 | **Więcej** | kategorie i reguły, import (Money Manager, wyciąg CSV), dokumenty (paski płacowe, paragony), Apple Pay, kopia zapasowa |
 
@@ -94,6 +94,18 @@ Wpłatę na IKE, IKZE albo OKI zapisujesz raz, a trafia w dwa miejsca: do dzienn
 
 Prywatność: Finanse i portfel GEM działają w tej samej przeglądarce na Twoim urządzeniu. Dziennik czyta i dopisuje wpłaty w portfelu GEM lokalnie – nic nie jest wysyłane. Jeśli masz włączoną synchronizację portfela GEM z prywatnym repozytorium, wpłata trafi tam przy następnym otwarciu zakładki GEM (jak każda inna wpłata w portfelu). Dane dziennika nadal nie są synchronizowane.
 
+## Pożyczone komuś
+
+Rodzaj konta **Pożyczone komuś** śledzi pieniądze, które ktoś jest Ci winien. Saldo jest dodatnie – to kwota do zwrotu – i liczy się do majątku (osobno jako „Pożyczone innym” w podsumowaniu i strukturze majątku, ale nie do poduszki finansowej, bo tych pieniędzy nie masz pod ręką).
+
+1. *Konta → + Dodaj konto → Pożyczone komuś*: nazwa (np. „Pożyczka – Kuba”), kwota, **skąd pieniądze** i opcjonalnie **termin zwrotu**.
+   - **przelew z konta** (np. mBank) – zapisze się przelew na konto pożyczki z datą pożyczki; majątek się nie zmienia, pieniądze zmieniają tylko miejsce;
+   - **pożyczone wcześniej** – aplikacja tylko zapisze kwotę (np. pożyczka sprzed założenia dziennika), więc majątek rośnie o tę należność.
+2. **Zwrot** przy koncie otwiera przelew z pożyczki na Twoje konto z kwotą do oddania (zmień ją przy zwrocie części). **Pożycz więcej** – przelew w drugą stronę.
+3. Przy koncie widać, ile zostało do zwrotu, ile oddano i termin. Na 3 dni przed terminem i po nim na Przeglądzie pojawia się przypomnienie z przyciskiem „Zapisz zwrot”. Spłaconą pożyczkę możesz ukryć (Edytuj → Ukryj).
+
+Pożyczki i zwroty to przelewy, więc nie są przychodami ani wydatkami. Jeśli część pieniędzy przepadnie, popraw kwotę w *Edytuj* – zapisze się korekta salda.
+
 ## Kredyty i pożyczki
 
 Rodzaj konta **Kredyt / pożyczka** śledzi kredyt hipoteczny, gotówkowy, samochodowy, zakup na raty (także 0%), kredyt konsolidacyjny albo pożyczkę. Saldo jest ujemne: to kapitał, który został do spłaty (zadłużenie liczy się w majątku jak karta kredytowa).
@@ -137,7 +149,7 @@ Rodzaj konta **Konto inwestycyjne** (np. XTB, IKE, IKZE, PPE). Jego wartość to
 
 1. *Konta → przy koncie inwestycyjnym → **Aktywa***.
 2. **+ Instrument z XTB**: wyszukaj dowolną akcję albo ETF z oferty XTB – po nazwie (np. „all world”), symbolu (np. „CDR”, „VWCE”) albo ISIN. Zanim cokolwiek wpiszesz, lista podpowiada ETF-y strategii GEM. Wpisz ilość i cenę zakupu za sztukę (albo od razu kwotę **Zainwestowano** – cenę aplikacja wyliczy) oraz datę zakupu. Każdy zakup możesz dodać jako osobną pozycję albo jedną pozycję ze średnią ceną. Przy instrumencie widać, skąd pochodzi jego cena.
-3. **+ Fundusz ING TFI (PPE)**: wybierz fundusz i **kategorię jednostek** (w PPE zwykle E, F, S, T albo W – sprawdzisz ją w serwisie ING TFI24 przy nazwie funduszu albo w umowie PPE pracodawcy; każda kategoria ma inną cenę jednostki). Wpisz **liczbę jednostek** i **sumę wpłat** – obie liczby pokazuje ING TFI24. Aplikacja zapamięta kategorię dla tego konta i przy kolejnym funduszu podpowie ją sama. Wycena jednostek przychodzi z ING TFI w każdy dzień roboczy.
+3. **+ Fundusz ING TFI (PPE)**: wybierz fundusz i **kategorię jednostek** (w PPE zwykle E, F, S, T albo W – sprawdzisz ją w serwisie ING TFI24 przy nazwie funduszu albo w umowie PPE pracodawcy; każda kategoria ma inną cenę jednostki). Wpisz **liczbę jednostek** i **sumę wpłat** (zainwestowane środki) – średnia cena jednostki wyliczy się sama, bo ING jej nie podaje. Gdy w PPE masz kilka funduszy, a ING pokazuje tylko **łączną sumę wpłat**, wpisz liczbę jednostek przy każdym funduszu, a łączną sumę w polu **Łączna suma wpłat na fundusze** pod listą → **Rozdziel sumę na fundusze**: aplikacja podzieli ją według dzisiejszej wartości funduszy (każdy dostanie tę samą stopę zysku). Aplikacja zapamięta kategorię dla tego konta i przy kolejnym funduszu podpowie ją sama. Wycena jednostek przychodzi z ING TFI w każdy dzień roboczy.
 4. **+ Obligacje skarbowe**, **+ Złoto**, **+ Kryptowaluta** – zob. [niżej](#obligacje-skarbowe-złoto-i-kryptowaluty).
 5. **+ Inne aktywo (wycena ręczna)**: np. lokata, mieszkanie, kryptowaluta spoza listy. Wpisujesz wartość, a gdy się zmieni – nową wartość (aplikacja zapamięta historię wycen do wykresu). Instrument z XTB bez darmowych notowań (np. akcja z Frankfurtu) aplikacja sama doda w tym trybie, z nazwą i walutą z katalogu.
 6. Opcja **Rozlicz zmianę z wolną gotówką na koncie** (domyślnie włączona):

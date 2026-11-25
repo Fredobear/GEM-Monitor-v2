@@ -602,7 +602,7 @@ function heroBalance() {
   const delta = older ? now.worth - wealthAt(fin, MARKET, prevEnd).worth : null;
   const stat = (label, value, cls = '', note = '') => `<span><i>${esc(label)}</i><b class="${cls}">${esc(value)}</b>${note}</span>`;
   return `<button class="card hero-bal" data-view="majatek" aria-label="Majątek netto – otwórz zakładkę Majątek"><span class="hb-main"><span class="hb-top"><span class="muted small">Majątek netto</span><span class="hb-chev" aria-hidden="true">›</span></span><span class="hb-val ${now.worth < -0.004 ? 'neg' : ''}">${esc(zl(now.worth))}</span>${delta === null ? '' : `<span class="small"><b class="${gainClass(delta)}">${esc(signed(delta))}</b> <span class="muted">w tym miesiącu</span></span>`}
-  <span class="hb-stats">${stat('Gotówka i konta', zl(now.cash))}${stat('Inwestycje', zl(now.investments), '', inv.positions ? `<small class="${gainClass(inv.gain)}">${esc(gainText(inv.gain, inv.gainPct))}</small>` : '')}${stat('Długi', now.debt > 0.004 ? `−${zl(now.debt)}` : zl(0), now.debt > 0.004 ? 'neg' : '')}</span>${now.missing.length ? `<span class="small warn">Bez kursu waluty: ${esc(now.missing.join(', '))}</span>` : ''}</span></button>`;
+  <span class="hb-stats">${stat('Gotówka i konta', zl(now.cash - now.lent))}${now.lent > 0.004 ? stat('Pożyczone innym', zl(now.lent)) : ''}${stat('Inwestycje', zl(now.investments), '', inv.positions ? `<small class="${gainClass(inv.gain)}">${esc(gainText(inv.gain, inv.gainPct))}</small>` : '')}${stat('Długi', now.debt > 0.004 ? `−${zl(now.debt)}` : zl(0), now.debt > 0.004 ? 'neg' : '')}</span>${now.missing.length ? `<span class="small warn">Bez kursu waluty: ${esc(now.missing.join(', '))}</span>` : ''}</span></button>`;
 }
 
 function alerts() {
@@ -627,6 +627,11 @@ function alerts() {
       const next = loanSchedule(a.loan).find((r) => r.kind === 'rata' && r.date >= today());
       const days = next ? daysBetween(today(), next.date) : 99;
       if (days <= 3) out.push(`<div class="banner info">🏠 <b>${esc(a.name)}</b>: rata ${days === 0 ? 'dziś' : days === 1 ? 'jutro' : `za ${days} dni (${esc(shortDate(next.date))})`} – ${esc(money(next.payment + (Number(a.loan.insurance) || 0), a.currency))}. <button class="link" data-loan="${esc(a.id)}">Szczegóły</button></div>`);
+    }
+    if (isLent(a) && a.dueDate && bal[a.id] > 0.5) {
+      const days = daysBetween(today(), a.dueDate);
+      const when = days < 0 ? `termin zwrotu minął ${-days} ${plural(-days, 'dzień', 'dni', 'dni')} temu` : days === 0 ? 'termin zwrotu dziś' : days === 1 ? 'termin zwrotu jutro' : `termin zwrotu za ${days} dni`;
+      if (days <= 3) out.push(`<div class="banner ${days < 0 ? 'warn' : 'info'}">🤝 <b>${esc(a.name)}</b>: ${esc(when)} (${esc(shortDate(a.dueDate, true))}) – do oddania ${esc(money(bal[a.id], a.currency))}. <button class="link" data-lend-back="${esc(a.id)}">Zapisz zwrot</button></div>`);
     }
     const d = cardDue(a, bal[a.id], today());
     if (d && d.days <= 5) {
@@ -1070,11 +1075,14 @@ function accountItem(a, b) {
     ? `${st.limit ? `<div class="meter" title="Wykorzystany limit"><span style="width:${(st.usedShare * 100).toFixed(1)}%;background:${st.usedShare > 0.8 ? 'var(--neg)' : 'var(--accent)'}"></span></div>` : ''}<div class="small muted">${st.debt > 0.004 ? `Do spłaty <b class="neg">${esc(zl(st.debt))}</b>` : 'Karta spłacona ✓'}${st.limit ? ` · limit ${esc(zl0(st.limit))} · dostępne ${esc(zl(st.available))}` : ''}${due ? ` · termin ${esc(shortDate(due.due))}` : ''}</div>${cardCostLine(a, st.debt)}`
     : '';
   const cards = a.cards?.length ? `<div class="small muted">Apple Pay: ${esc(a.cards.join(', '))}</div>` : '';
-  const details = `${inv && !gemVal ? investmentLines(a, b) : ''}${inv && !gemVal ? plansInfo(a) : ''}${a.gemAccount ? gemInfo(a, b) : ''}${loan ? loanInfo(a, b) : ''}${cardInfo}${cards}`;
+  const lent = isLent(a);
+  const details = `${lent ? lentInfo(a, b) : ''}${inv && !gemVal ? investmentLines(a, b) : ''}${inv && !gemVal ? plansInfo(a) : ''}${a.gemAccount ? gemInfo(a, b) : ''}${loan ? loanInfo(a, b) : ''}${cardInfo}${cards}`;
   const buttons = [
     inv && !gemVal ? `<button class="btn small" data-plan-new="${esc(a.id)}">+ Plan inwestycyjny</button>` : '',
     card && st.debt > 0.004 ? `<button class="btn small primary" data-repay="${esc(a.id)}">Spłać kartę</button>` : '',
     loan ? `<button class="btn small primary" data-loan="${esc(a.id)}">Szczegóły kredytu</button>` : '',
+    lent && b > 0.004 ? `<button class="btn small primary" data-lend-back="${esc(a.id)}">Zwrot</button>` : '',
+    lent ? `<button class="btn small" data-lend-more="${esc(a.id)}">Pożycz więcej</button>` : '',
     a.gemAccount ? `<button class="btn small primary" data-gem-pay="${esc(a.id)}">Wpłać na ${esc(a.gemAccount === 'ZWYKLE' ? 'konto' : a.gemAccount)}</button>` : '',
     inv && !gemVal ? `<button class="btn small ${a.gemAccount ? '' : 'primary'}" data-lots="${esc(a.id)}">Aktywa</button>` : '',
     `<button class="btn small" data-history="${esc(a.id)}">Historia</button>`,
@@ -1085,9 +1093,20 @@ function accountItem(a, b) {
   <div class="acc-more">${details}<div class="acc-actions">${buttons}</div></div></li>`;
 }
 
+// Pożyczka udzielona: ile zostało do zwrotu, ile już oddano i termin zwrotu.
+function lentInfo(a, b) {
+  const cur = a.currency || 'PLN';
+  const back = liveTx(fin).filter((t) => t.type === 'przelew' && t.accountId === a.id).reduce((s, t) => s + (t.accountAmount ?? t.amount), 0);
+  const days = a.dueDate ? daysBetween(today(), a.dueDate) : null;
+  const owed = b > 0.004;
+  const when = a.dueDate && owed ? ` · termin zwrotu ${shortDate(a.dueDate, true)}${days < 0 ? ` – ${-days} ${plural(-days, 'dzień', 'dni', 'dni')} po terminie` : days === 0 ? ' – dziś' : ''}` : '';
+  return `<div class="small ${owed && days !== null && days < 0 ? 'warn' : 'muted'}">${owed ? `Do zwrotu <b>${esc(money(b, cur))}</b>` : 'Pożyczka oddana ✓ – konto możesz ukryć (Edytuj → Ukryj)'}${back > 0.004 ? ` · oddano dotąd ${esc(money(back, cur))}` : ''}${esc(when)}</div>`;
+}
+
 // Konta pogrupowane według rodzaju, z sumą każdej grupy (w złotych, bez kont wyłączonych z majątku).
 const ACCOUNT_GROUPS = [
-  ['pieniadze', 'Konta i gotówka', (a) => !isLoan(a) && !isCard(a) && !isInvAccount(a) && !a.gemAccount],
+  ['pieniadze', 'Konta i gotówka', (a) => !isLoan(a) && !isCard(a) && !isLent(a) && !isInvAccount(a) && !a.gemAccount],
+  ['pozyczki', 'Pożyczone innym', (a) => isLent(a)],
   ['inwestycje', 'Inwestycje', (a) => !isLoan(a) && !isCard(a) && (isInvAccount(a) || Boolean(a.gemAccount))],
   ['karty', 'Karty kredytowe', (a) => isCard(a)],
   ['kredyty', 'Kredyty i pożyczki', (a) => isLoan(a)],
@@ -1384,7 +1403,7 @@ function wealthHero(now, all) {
   const delta = (p, label) => (p ? `<span class="hero-delta"><b class="${gainClass(now.worth - p.worth)}">${esc(signed(now.worth - p.worth))}</b> ${esc(label)}</span>` : '');
   return `<section class="card wealth-hero"><span class="muted small">Majątek netto</span><div class="hero-fig ${now.worth < -0.5 ? 'neg' : ''}">${esc(zl(now.worth))}</div>
   <div class="hero-deltas">${delta(prev, 'w tym miesiącu')}${delta(year, 'przez 12 miesięcy')}</div>
-  <div class="kpis">${kpiTile('Gotówka', zl(now.cash))}${kpiTile('Inwestycje', zl(now.investments))}${kpiTile('Długi', now.debt > 0.004 ? `−${zl(now.debt)}` : zl(0), '', now.debt > 0.004 ? 'neg' : '')}</div>
+  <div class="kpis">${kpiTile('Gotówka', zl(now.cash - now.lent))}${now.lent > 0.004 ? kpiTile('Pożyczone innym', zl(now.lent)) : ''}${kpiTile('Inwestycje', zl(now.investments))}${kpiTile('Długi', now.debt > 0.004 ? `−${zl(now.debt)}` : zl(0), '', now.debt > 0.004 ? 'neg' : '')}</div>
   ${now.missing.length ? `<p class="small warn">Bez kursu waluty (poza majątkiem): ${esc(now.missing.join(', '))}.</p>` : ''}</section>`;
 }
 
@@ -2176,6 +2195,17 @@ $('#fin-root').addEventListener('click', async (ev) => {
       fin = markPlanEntryOk(fin, accId, planId, xId, 'dup', yId);
     });
   }
+  if (d.lendBack) {
+    const a = acc(d.lendBack);
+    const owed = Math.max(0, balances(fin)[a.id] ?? 0);
+    const to = fin.accounts.find((x) => x.id === defaultAccount('przelew') && x.id !== a.id)?.id;
+    return openTx(null, { type: 'przelew', accountId: a.id, toAccountId: to, merchant: `Zwrot pożyczki – ${lentWho(a.name)}`, amount: owed > 0.004 ? round2(owed) : undefined });
+  }
+  if (d.lendMore) {
+    const a = acc(d.lendMore);
+    const from = fin.accounts.find((x) => x.id === defaultAccount('przelew') && x.id !== a.id)?.id;
+    return openTx(null, { type: 'przelew', accountId: from, toAccountId: a.id, merchant: `Pożyczka – ${lentWho(a.name)}` });
+  }
   if (d.loanSync) return syncLoanBalance(d.loanSync);
   if (d.gemPay) {
     const a = acc(d.gemPay);
@@ -2792,6 +2822,10 @@ function openAccount(id) {
   f.elements.gemAccount.value = a?.gemAccount ?? '';
   f.elements.gemValuation.checked = a?.gemAccount ? Boolean(a.gemValuation) : true;
   fillLoanForm(a?.loan ?? null);
+  f.elements.lentFrom.innerHTML = `<option value="">— wybierz —</option><option value="wczesniej">Pożyczone wcześniej – tylko zapisz kwotę</option>${accountOptions('', { none: false, filter: (x) => !isLoan(x) && !isLent(x) && !isCard(x) })}`;
+  f.elements.lentFrom.value = '';
+  f.elements.lentDate.value = today();
+  f.elements.lentDue.value = a?.dueDate ?? '';
   $('#ad-delete').hidden = !a;
   $('#ad-archive').hidden = !a;
   $('#ad-archive').textContent = a?.archived ? 'Przywróć' : 'Ukryj';
@@ -2799,6 +2833,18 @@ function openAccount(id) {
   f.dataset.type = f.elements.type.value;
   syncAccForm();
   openDialog(ACC);
+}
+
+// Komu pożyczono – nazwa konta bez słowa „Pożyczka” na początku (np. „Pożyczka – Kuba” → „Kuba”), do opisów przelewów.
+const lentWho = (name) => String(name).replace(/^pożyczk[aię]\s*(?:dla\s+|[–—:-]\s*)?/i, '').trim() || String(name);
+// Przelew między kontem a pożyczką udzieloną (amount w zł, accountAmount i toAmount w walutach kont).
+function lendTx(fromId, toId, amountTo, date, merchant) {
+  const toCur = accountCurrency(fin, toId);
+  const fromCur = accountCurrency(fin, fromId);
+  const t = { id: newId(), type: 'przelew', amount: convert(MARKET, amountTo, toCur, 'PLN', date) ?? amountTo, date, accountId: fromId, toAccountId: toId, merchant, source: 'reczne', createdAt: Date.now(), updatedAt: Date.now() };
+  if (fromCur !== 'PLN') t.accountAmount = convert(MARKET, amountTo, toCur, fromCur, date) ?? amountTo;
+  if (toCur !== fromCur) t.toAmount = amountTo;
+  return t;
 }
 
 // ---------- Formularz kredytu (rodzaj konta „Kredyt / pożyczka”) ----------
@@ -2931,6 +2977,10 @@ function syncAccForm() {
   const loanType = type === 'kredyt';
   $('#ad-loan').hidden = !loanType;
   $('#ad-gem').hidden = type !== 'inwestycje';
+  const lent = type === 'pozyczka';
+  $('#ad-lent').hidden = !lent;
+  $('#ad-lent-new').hidden = !lent || Boolean(f.dataset.id);
+  f.elements.name.placeholder = lent ? 'np. Pożyczka – Kuba' : 'np. mBank – konto osobiste';
   if (loanType) syncLoanForm();
   const wasCard = f.dataset.type === 'karta';
   // Przy zmianie rodzaju przenosimy kwotę: saldo ujemne ↔ zadłużenie.
@@ -2945,9 +2995,11 @@ function syncAccForm() {
   const cur = curLabel(f.elements.currency.value);
   $('#ad-plain').hidden = card || loanType;
   $('#ad-card').hidden = !card;
-  $('#ad-balance-label').textContent = type === 'inwestycje' ? `Wolna gotówka na rachunku (${cur})` : `Saldo obecne (${cur})`;
+  $('#ad-balance-label').textContent = type === 'inwestycje' ? `Wolna gotówka na rachunku (${cur})` : lent ? `Ile ta osoba jest Ci winna (${cur})` : `Saldo obecne (${cur})`;
   $('#ad-balance-hint').textContent =
-    type === 'inwestycje'
+    lent && !f.dataset.id
+      ? 'Kwota pożyczki. Jeśli pieniądze wychodzą teraz z Twojego konta, wybierz je niżej – zapisze się przelew (majątek się nie zmienia, pieniądze zmieniają tylko miejsce). Zwroty zapiszesz przyciskiem „Zwrot” przy tym koncie.'
+      : type === 'inwestycje'
       ? 'Same pieniądze, bez ETF-ów. Aktywa dodasz przyciskiem „Aktywa” na liście kont – ich wartość liczy się osobno, po bieżących cenach.'
       : f.dataset.id
         ? 'Zmiana salda zapisze się w historii jako korekta salda z dzisiejszą datą (nie jako wydatek ani przychód).'
@@ -2974,6 +3026,11 @@ accForm.addEventListener('submit', (ev) => {
   if (!loanType && !Number.isFinite(target)) errors.push(card ? 'Nie rozpoznano kwoty zadłużenia.' : 'Nie rozpoznano salda.');
   const dueDay = f.elements.dueDay.value.trim() ? Math.round(Number(f.elements.dueDay.value)) : null;
   if (card && dueDay !== null && !(dueDay >= 1 && dueDay <= 31)) errors.push('Dzień spłaty to liczba od 1 do 31.');
+  // Nowa pożyczka: skąd pieniądze (przelew z konta albo pożyczone wcześniej) i kwota większa od zera.
+  const lentType = type === 'pozyczka';
+  const lentFrom = lentType && !prev ? f.elements.lentFrom.value : '';
+  if (lentType && !prev && !lentFrom) errors.push('Wybierz, skąd były pieniądze na pożyczkę.');
+  if (lentType && !prev && !(target > 0)) errors.push('Podaj kwotę pożyczki.');
   if (errors.length) {
     $('#ad-errors').textContent = errors.join(' ');
     return;
@@ -2993,13 +3050,18 @@ accForm.addEventListener('submit', (ev) => {
   a.gemAccount = gemAccount;
   a.gemValuation = gemAccount ? f.elements.gemValuation.checked || undefined : undefined;
   a.loan = loanType ? loan : undefined;
+  a.dueDate = lentType ? f.elements.lentDue.value || undefined : undefined;
   fin.accounts = prev ? fin.accounts.map((x) => (x.id === id ? a : x)) : [...fin.accounts, a];
-  if (!prev || (loanType && !isLoan(prev))) setBalance(fin, id, target);
+  if (!prev && lentType && lentFrom !== 'wczesniej') {
+    // Pieniądze wychodzą teraz z konta: przelew na konto pożyczki (majątek bez zmian).
+    setBalance(fin, id, 0);
+    fin.txs.push(lendTx(lentFrom, id, target, f.elements.lentDate.value || today(), `Pożyczka – ${lentWho(name)}`));
+  } else if (!prev || (loanType && !isLoan(prev))) setBalance(fin, id, target);
   else if (!loanType && Math.abs(balances(fin)[id] - target) >= 0.005) adjustBalance(fin, id, target, { date: today(), newId, market: MARKET });
   if (loanType) runRecurring();
   save();
   closeDialog(ACC);
-  toast(prev ? 'Zapisano konto.' : card ? 'Dodano kartę kredytową.' : loanType ? 'Dodano kredyt. Szczegóły, harmonogram i nadpłaty znajdziesz pod przyciskiem „Szczegóły kredytu”.' : type === 'inwestycje' ? (gemAccount ? `Dodano konto powiązane z portfelem GEM (${gemAccount}). Przelewy na nie zapiszą się też jako wpłaty w portfelu.` : 'Dodano konto inwestycyjne. Aktywa dodasz przyciskiem „Aktywa”.') : 'Dodano konto.', 6000);
+  toast(prev ? 'Zapisano konto.' : lentType ? 'Dodano pożyczkę – liczy się do majątku. Zwrot zapiszesz przyciskiem „Zwrot” przy koncie.' : card ? 'Dodano kartę kredytową.' : loanType ? 'Dodano kredyt. Szczegóły, harmonogram i nadpłaty znajdziesz pod przyciskiem „Szczegóły kredytu”.' : type === 'inwestycje' ? (gemAccount ? `Dodano konto powiązane z portfelem GEM (${gemAccount}). Przelewy na nie zapiszą się też jako wpłaty w portfelu.` : 'Dodano konto inwestycyjne. Aktywa dodasz przyciskiem „Aktywa”.') : 'Dodano konto.', 6000);
   render();
 });
 $('#ad-archive').addEventListener('click', () => {
@@ -3193,6 +3255,46 @@ function bondRowBody(l) {
     <label class="check small full"><input type="checkbox" data-lf="ike" ${b.ike ? 'checked' : ''}> <span>Obligacje na koncie IKE/IKZE (bez podatku od odsetek i bez opłaty przy wypłacie z IKE)</span></label>`;
 }
 
+// Ilość, cena i kwota zakupu. Fundusz (np. w PPE): liczba jednostek i suma wpłat, a średnia cena wylicza się sama –
+// ING nie podaje średniej ceny jednostki. Inne aktywa: ilość, cena zakupu i kwota (powiązane: kwota = ilość × cena).
+function lotQtyCostFields(l, fund, coin, cur) {
+  const c = esc(curLabel(cur));
+  const qty = `<label class="field">${fund ? 'Liczba jednostek' : coin ? 'Ilość (np. 0,0525)' : 'Ilość (szt.)'}<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty, coin ? 8 : 6))}"></label>`;
+  const price = `<label class="field">${fund ? 'Średnia cena jednostki' : coin ? 'Średnia cena zakupu za 1' : 'Cena zakupu za szt.'} (${c})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}">${fund ? '<small>wylicza się z sumy wpłat</small>' : ''}</label>`;
+  const cost = `<label class="field">${fund ? 'Suma wpłat' : 'Zainwestowano'} (${c})<input data-lf="cost" inputmode="decimal" value="${esc(fmtInput(l.qty * l.price))}" placeholder="${fund ? 'zainwestowane środki' : 'ilość × cena'}">${fund ? '<small>ile w sumie wpłacono na ten fundusz</small>' : ''}</label>`;
+  const date = `<label class="field">${fund ? 'Data pierwszej wpłaty' : 'Data zakupu'}<input type="date" data-lf="date" value="${esc(l.date)}"></label>`;
+  return fund ? `${qty}${cost}${price}${date}` : `${qty}${price}${cost}${date}`;
+}
+
+// Kilka funduszy, a znana tylko łączna suma wpłat (tak pokazuje ją ING w PPE): podział według dzisiejszej wartości funduszy.
+function fundSplitBlock() {
+  const funds = lotsState.lots.filter((l) => isFundLot(l));
+  if (funds.length < 2) return '';
+  return `<div class="lot-row ld-fundsum"><label class="field full">Łączna suma wpłat na fundusze (zł)<input id="ld-fundsum" inputmode="decimal" placeholder="np. 23 450,00" autocomplete="off"><small>ING w PPE pokazuje zwykle tylko łączną sumę wpłat i liczbę jednostek każdego funduszu. Wpisz liczbę jednostek przy funduszach i tu łączną sumę – rozdzielę ją według dzisiejszej wartości funduszy (każdy dostanie tę samą stopę zysku).</small></label><div class="full"><button type="button" class="btn small" data-fund-split="1">Rozdziel sumę na fundusze</button></div></div>`;
+}
+
+function splitFundTotal() {
+  const total = Math.abs(parseAmount($('#ld-fundsum')?.value ?? '')) || 0;
+  const at = valuationDate();
+  const funds = lotsState.lots.filter((l) => isFundLot(l) && l.qty > 0);
+  // Do proporcji wystarczy ostatnia znana wycena jednostki (także sprzed kilku dni).
+  const unit = (l) => MARKET.assets?.[l.asset]?.quotes?.at(-1)?.[1] || lotPrice(MARKET, { ...l, price: 0, mark: null }, at) || 0;
+  const vals = funds.map((l) => l.qty * unit(l));
+  const sum = vals.reduce((a, v) => a + v, 0);
+  const err = (text) => ($('#ld-errors').textContent = text);
+  if (!(total > 0)) return err('Wpisz łączną sumę wpłat.');
+  if (funds.length < 2) return err('Wpisz najpierw liczbę jednostek przy funduszach.');
+  if (vals.some((v) => !(v > 0))) return err('Brakuje dzisiejszej wyceny któregoś funduszu – wpisz sumę wpłat przy każdym funduszu osobno.');
+  let left = round2(total);
+  funds.forEach((l, k) => {
+    const part = k === funds.length - 1 ? left : round2((total * vals[k]) / sum);
+    left = round2(left - part);
+    Object.assign(l, { cost: part, costMode: true, price: part / l.qty });
+  });
+  err('');
+  renderLots();
+}
+
 function renderLots() {
   $('#ld-rows').innerHTML = lotsState.lots.length
     ? lotsState.lots
@@ -3215,14 +3317,11 @@ function renderLots() {
                  <label class="field">Wartość za sztukę dziś (${esc(curLabel(cur))})<input data-lf="value" inputmode="decimal" value="${esc(fmtInput(l.value))}"></label>
                  <label class="field">Od kiedy<input type="date" data-lf="date" value="${esc(l.date)}"></label>`
               : `<div class="full lot-inst">${head}<div class="small muted">${esc(lotSource(l))}</div>${l.hint ? `<div class="small muted">${esc(l.hint)}</div>` : ''}${pence ? `<div class="small warn">${esc(pence)}</div>` : ''}</div>
-                 <label class="field">${fund ? 'Liczba jednostek' : coin ? 'Ilość (np. 0,0525)' : 'Ilość (szt.)'}<input data-lf="qty" inputmode="decimal" value="${esc(fmtQty(l.qty, coin ? 8 : 6))}"></label>
-                 <label class="field">${fund ? 'Średnia cena jednostki' : coin ? 'Średnia cena zakupu za 1' : 'Cena zakupu za szt.'} (${esc(curLabel(cur))})<input data-lf="price" inputmode="decimal" value="${esc(fmtInput(l.price))}"></label>
-                 <label class="field">${fund ? 'Suma wpłat' : 'Zainwestowano'} (${esc(curLabel(cur))})<input data-lf="cost" inputmode="decimal" value="${esc(fmtInput(l.qty * l.price))}" placeholder="ilość × cena"></label>
-                 <label class="field">${fund ? 'Data pierwszej wpłaty' : 'Data zakupu'}<input type="date" data-lf="date" value="${esc(l.date)}"></label>
+                 ${lotQtyCostFields(l, fund, coin, cur)}
                  ${needsMark(l) ? `<label class="field full">Kurs teraz z XTB (${esc(curLabel(cur))}) – do wyceny i zysku<input data-lf="mark" inputmode="decimal" value="${esc(fmtInput(l.markNew))}" placeholder="${l.price > 0 ? `teraz ok. ${esc(fmtInput(lotPrice(MARKET, l, valuationDate())))}` : 'np. 143,22'}"><small>${l.mark ? `Ostatnio wpisany: ${esc(fmtInput(l.mark[1]))} (${esc(shortDate(l.mark[0], true))}); od tego dnia kurs zmienia się razem z indeksem. ` : ''}Przepisz cenę z XTB (pozycja → aktualna cena). Wystarczy raz – dalej aplikacja śledzi zmiany indeksu, a kurs możesz poprawić w każdej chwili.</small></label>` : ''}`;
           return `<div class="lot-row" data-lot="${i}">${body}<div class="lot-foot full"><span class="small muted" data-lot-val="${i}">${esc(lotSummary(l))}</span><button type="button" class="link small danger-text" data-lot-del="${i}">Usuń</button></div></div>`;
         })
-        .join('')
+        .join('') + fundSplitBlock()
     : '<p class="muted small">Brak aktywów. Dodaj instrument z oferty XTB (wyszukaj po nazwie, symbolu albo ISIN), fundusz ING TFI (np. z PPE), obligacje skarbowe, złoto, kryptowalutę albo inne aktywo z wyceną ręczną.</p>';
   updateLotsSum();
 }
@@ -3396,7 +3495,14 @@ lotsForm.addEventListener('input', (ev) => {
   updateLotsSum();
 });
 lotsForm.addEventListener('change', (ev) => ev.target.dataset.lf === 'asset' && renderLots());
+// Enter w polu łącznej sumy wpłat rozdziela ją na fundusze (zamiast zapisywać całe okno).
+$('#ld-rows').addEventListener('keydown', (ev) => {
+  if (ev.target.id !== 'ld-fundsum' || ev.key !== 'Enter') return;
+  ev.preventDefault();
+  splitFundTotal();
+});
 $('#ld-rows').addEventListener('click', (ev) => {
+  if (ev.target.closest('[data-fund-split]')) return splitFundTotal();
   const b = ev.target.closest('[data-lot-del]');
   if (!b) return;
   lotsState.lots.splice(Number(b.dataset.lotDel), 1);

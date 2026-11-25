@@ -6,7 +6,7 @@ import { BOND_PREFIX, BOND_TAX, BOND_TYPES, bondEvents, bondLotPrice, bondMaturi
 // Korekta salda: zmiana salda konta (saldo początkowe, wycena konta inwestycyjnego, wyrównanie do banku).
 // Kwota korekty ma znak (+/−) i nie liczy się do wydatków ani przychodów.
 export const FIN_TYPES = { wydatek: 'Wydatek', przychod: 'Przychód', przelew: 'Przelew', korekta: 'Korekta salda' };
-export const ACCOUNT_TYPES = { bank: 'Konto bankowe', karta: 'Karta kredytowa', gotowka: 'Gotówka', oszczednosci: 'Oszczędności', inwestycje: 'Konto inwestycyjne', kredyt: 'Kredyt / pożyczka', inne: 'Inne' };
+export const ACCOUNT_TYPES = { bank: 'Konto bankowe', karta: 'Karta kredytowa', gotowka: 'Gotówka', oszczednosci: 'Oszczędności', inwestycje: 'Konto inwestycyjne', kredyt: 'Kredyt / pożyczka', pozyczka: 'Pożyczone komuś', inne: 'Inne' };
 export const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF'];
 export const isFlow = (t) => t.type === 'wydatek' || t.type === 'przychod';
 export const SKIP_CATEGORY = 'pomiń';
@@ -32,8 +32,10 @@ export const DEFAULT_CATEGORIES = [
 ].map(([id, emoji, name, kind], i) => ({ id, emoji, name, kind, color: PALETTE[i % PALETTE.length], budget: null }));
 
 export const emptyFinance = () => ({ version: 1, accounts: [], categories: DEFAULT_CATEGORIES.map((c) => ({ ...c })), txs: [], rules: [], recurring: [], updatedAt: 0 });
-export const ACCOUNT_ICONS = { bank: '🏦', karta: '💳', gotowka: '💵', oszczednosci: '🐷', inwestycje: '📈', kredyt: '🏠', inne: '👛' };
+export const ACCOUNT_ICONS = { bank: '🏦', karta: '💳', gotowka: '💵', oszczednosci: '🐷', inwestycje: '📈', kredyt: '🏠', pozyczka: '🤝', inne: '👛' };
 export const isCard = (a) => a?.type === 'karta';
+// Pieniądze pożyczone komuś: saldo dodatnie to kwota, którą ta osoba jest winna (należność, część majątku).
+export const isLent = (a) => a?.type === 'pozyczka';
 export const nextColor = (n) => PALETTE[n % PALETTE.length];
 export const liveTx = (fin) => fin.txs.filter((t) => !t.deleted);
 const pad = (n) => String(n).padStart(2, '0');
@@ -1650,9 +1652,12 @@ const FUND_ASSET_PREFIX = 'INGTFI:';
 export const isInvAccount = (a) => !isLoan(a) && (a?.type === 'inwestycje' || (a?.lots?.length ?? 0) > 0);
 const inWorth = (a) => !a.archived && !a.excludeFromTotal;
 
-/** Majątek w dniu `date` z podziałem: gotówka (dodatnie salda), inwestycje i długi (kredyty, karty, debety). */
+/**
+ * Majątek w dniu `date` z podziałem: gotówka (dodatnie salda), inwestycje i długi (kredyty, karty, debety).
+ * lent – pieniądze pożyczone komuś (należności); są częścią gotówki `cash`, tu podane osobno do pokazania.
+ */
 export function wealthAt(fin, market, date, bal = balances(fin, date)) {
-  const out = { date, worth: 0, cash: 0, investments: 0, debt: 0, loanDebt: 0, cardDebt: 0, invTotal: 0, missing: [] };
+  const out = { date, worth: 0, cash: 0, investments: 0, debt: 0, loanDebt: 0, cardDebt: 0, invTotal: 0, lent: 0, missing: [] };
   for (const a of fin.accounts) {
     if (!inWorth(a)) continue;
     const w = accountWorth(fin, a, market, date, bal[a.id]);
@@ -1662,6 +1667,7 @@ export function wealthAt(fin, market, date, bal = balances(fin, date)) {
     }
     const owed = Math.max(0, -w.cashPLN);
     out.cash += Math.max(0, w.cashPLN);
+    if (isLent(a)) out.lent += Math.max(0, w.cashPLN);
     out.investments += w.investments;
     out.debt += owed;
     if (isLoan(a)) out.loanDebt += owed;
@@ -1935,6 +1941,7 @@ export const ASSET_CLASSES = {
   oszczednosci: 'Oszczędności',
   gotowka: 'Gotówka',
   broker: 'Gotówka na kontach inwestycyjnych',
+  pozyczki: 'Pożyczone innym',
   inne: 'Inne konta',
   akcje: 'Akcje i ETF-y',
   gem: 'Portfel GEM',
@@ -1947,7 +1954,7 @@ export const ASSET_CLASSES = {
   kredyty: 'Kredyty i pożyczki',
   debet: 'Debet na kontach',
 };
-const CASH_CLASS = { bank: 'konta', oszczednosci: 'oszczednosci', gotowka: 'gotowka', inwestycje: 'broker' };
+const CASH_CLASS = { bank: 'konta', oszczednosci: 'oszczednosci', gotowka: 'gotowka', inwestycje: 'broker', pozyczka: 'pozyczki' };
 
 /**
  * Z czego składa się majątek w dniu `date`: aktywa i długi według rodzaju (posortowane malejąco), suma aktywów,

@@ -97,11 +97,11 @@ dialog{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .hero-bal{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;font:inherit;color:var(--ink);cursor:pointer;background:linear-gradient(135deg,var(--accent-soft),var(--surface) 75%)}
 .hb-main{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .hb-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.hb-top .hb-chev{font-size:22px}
-.hb-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.hb-stats{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .hb-stats>span{display:flex;flex-direction:column;min-width:0}
 .hb-stats i{font-style:normal;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hb-stats b{font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}.hb-stats small{font-size:11.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
-@media (max-width:560px){.hb-stats{grid-template-columns:1fr;gap:7px}.hb-stats>span{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-items:baseline}.hb-stats i{font-size:13.5px}.hb-stats b{font-size:15.5px;text-align:right}.hb-stats small{grid-column:1/-1;justify-self:end;font-size:12px;margin-top:-2px}}
+@media (max-width:560px){.hb-stats{grid-auto-flow:row;grid-template-columns:1fr;gap:7px}.hb-stats>span{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-items:baseline}.hb-stats i{font-size:13.5px}.hb-stats b{font-size:15.5px;text-align:right}.hb-stats small{grid-column:1/-1;justify-self:end;font-size:12px;margin-top:-2px}}
 .hb-val{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
 .hb-chev{font-size:30px;line-height:1;color:var(--muted)}
 .period{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
@@ -246,10 +246,10 @@ form[data-type=wydatek] .amount-input{color:var(--neg)}form[data-type=przychod] 
 .hero-delta b{font-variant-numeric:tabular-nums}
 .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 4px}
 .kpi{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;min-width:0}
-.wealth-hero .kpi{background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.wealth-hero .kpi{background:color-mix(in srgb,var(--surface) 70%,transparent)}.wealth-hero .kpis{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}
 .kpi span{font-size:12px;color:var(--muted);line-height:1.3}.kpi b{font-size:17px;white-space:nowrap;line-height:1.35}.kpi small{font-size:11.5px;color:var(--muted);line-height:1.3}
 @media (max-width:400px){.kpi{padding:7px 8px}.kpi b{font-size:15px}}
-@media (max-width:560px){.wealth-hero .kpis{grid-template-columns:1fr;gap:0;padding:2px 12px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 70%,transparent)}.wealth-hero .kpi{flex-direction:row;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border:0;border-radius:0;background:none}.wealth-hero .kpi+.kpi{border-top:1px solid var(--line)}.wealth-hero .kpi span{font-size:13.5px}.wealth-hero .kpi b{font-size:16px;font-variant-numeric:tabular-nums}}
+@media (max-width:560px){.wealth-hero .kpis{grid-template-columns:1fr;grid-auto-flow:row;gap:0;padding:2px 12px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 70%,transparent)}.wealth-hero .kpi{flex-direction:row;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border:0;border-radius:0;background:none}.wealth-hero .kpi+.kpi{border-top:1px solid var(--line)}.wealth-hero .kpi span{font-size:13.5px}.wealth-hero .kpi b{font-size:16px;font-variant-numeric:tabular-nums}}
 .lead{font-size:15px;line-height:1.5;margin:0 0 10px}
 .sub-h{font-size:14px;margin:18px 0 8px}.sub-h .muted{font-weight:500}
 .mode-seg{display:flex;width:100%;margin:2px 0 10px}.seg.mode-seg button{flex:1}
@@ -350,6 +350,10 @@ const ACC_DIALOG = `<dialog id="acc-dialog"><form method="dialog" novalidate>
 <div class="field"><span>Rodzaj</span><div class="typesel" role="radiogroup" aria-label="Rodzaj konta">${Object.entries(ACCOUNT_TYPES).map(([k, l]) => `<label><input type="radio" name="type" value="${k}"><span>${ACCOUNT_ICONS[k]} ${l}</span></label>`).join('')}</div></div>
 <label class="field">Waluta<select name="currency">${currencyOptions()}</select><small id="ad-currency-hint">Konto w innej walucie liczy się do majątku po bieżącym kursie średnim NBP.</small></label>
 <label class="field" id="ad-plain"><span id="ad-balance-label">Saldo obecne (zł)</span><input name="balance" inputmode="decimal" placeholder="0,00" autocomplete="off"><small id="ad-balance-hint">Ile jest teraz na koncie. Każda zapisana operacja zmieni to saldo.</small></label>
+<div id="ad-lent" hidden>
+<div class="two" id="ad-lent-new"><label class="field">Skąd pieniądze<select name="lentFrom"></select></label><label class="field">Data pożyczki<input type="date" name="lentDate"></label></div>
+<label class="field">Termin zwrotu (opcjonalnie)<input type="date" name="lentDue"><small>Przypomnę o nim na Przeglądzie na 3 dni przed terminem.</small></label>
+</div>
 <div id="ad-card" hidden>
 <label class="field">Zadłużenie na karcie (zł)<input name="debt" inputmode="decimal" placeholder="0,00" autocomplete="off"><small>Kwota do spłaty, np. 1250. Saldo karty będzie ujemne, a każdy wydatek tą kartą je powiększy.</small></label>
 <div class="two"><label class="field">Limit karty (zł)<input name="limit" inputmode="decimal" placeholder="np. 5000" autocomplete="off"></label><label class="field">Dzień spłaty<input name="dueDay" inputmode="numeric" placeholder="np. 25" maxlength="2" autocomplete="off"></label></div>

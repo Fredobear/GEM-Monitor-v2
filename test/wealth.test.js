@@ -12,6 +12,7 @@ import {
   investmentMix,
   investSeries,
   investSummary,
+  isLent,
   loanOutlook,
   loanSchedule,
   localToday,
@@ -103,6 +104,31 @@ test('skąd przyrost: odłożone z dochodów, wpłaty spoza budżetu i wynik inw
   near(ch2.invGain, 1000);
   near(ch2.other, -400);
   near(ch2.change, ch2.saved + ch2.external + ch2.invGain + ch2.other);
+});
+
+test('pożyczone komuś: należność w majątku, osobno w strukturze i poza poduszką finansową', () => {
+  const fin = emptyFinance();
+  fin.accounts = [
+    { id: 'bank', name: 'Bank', type: 'bank', openingBalance: 5000 },
+    { id: 'kuba', name: 'Pożyczka – Kuba', type: 'pozyczka', openingBalance: 0, dueDate: '2026-12-31' },
+  ];
+  fin.txs.push(tx('przelew', 1000, '2026-07-01', 'bank', { toAccountId: 'kuba' })); // pożyczka z konta
+  fin.txs.push(tx('przelew', 300, '2026-07-05', 'kuba', { toAccountId: 'bank' })); // częściowy zwrot
+  assert.ok(isLent(fin.accounts[1]) && !isLent(fin.accounts[0]));
+  const w = wealthAt(fin, MARKET, '2026-07-10');
+  near(w.worth, 5000); // pieniądze zmieniły tylko miejsce
+  near(w.lent, 700);
+  near(w.cash, 5000); // gotówka razem z należnością (pokazywaną osobno)
+  const st = wealthStructure(fin, MARKET, '2026-07-10');
+  const lent = st.assets.find((i) => i.key === 'pozyczki');
+  near(lent.value, 700);
+  assert.equal(lent.label, 'Pożyczone innym');
+  near(st.liquid, 4300); // poduszka finansowa bez pożyczonych pieniędzy
+  // Pożyczka sprzed założenia dziennika (tylko kwota) zwiększa majątek.
+  fin.accounts.push({ id: 'ola', name: 'Pożyczka – Ola', type: 'pozyczka', openingBalance: 2000 });
+  near(wealthAt(fin, MARKET, '2026-07-10').worth, 7000);
+  // Przelewy na pożyczkę i zwroty to nie przychody ani wydatki.
+  assert.equal(savingsStats(fin, MARKET, { today: '2026-08-10' }).n, 0);
 });
 
 test('struktura majątku: rodzaje aktywów i długów, suma równa majątkowi netto', () => {

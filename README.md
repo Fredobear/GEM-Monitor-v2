@@ -53,6 +53,7 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
   - przy każdym koncie inwestycyjnym i każdej pozycji: **ile zainwestowano, ile to jest warte i jaki jest zysk** (w złotych i procentach, z efektem kursu walut), a w podsumowaniu majątku – łączny zysk z inwestycji; pozycje można wpisać ze średnią ceną i kursem z XTB (zysk od razu, bez całej historii transakcji);
   - **plany inwestycyjne**: wpłata dzielona procentowo na kilka ETF-ów, funduszy albo kryptowalut (jak plany w XTB i alokacja w PPE), także cyklicznie i automatycznie; zakup z wolnej gotówki na koncie (np. po przelewie z banku na konto w euro), historia wpłat i naprawa wpłat, które pobrały pieniądze drugi raz albo są wpisane dwa razy;
   - tabela porównania kategorii z poprzednim miesiącem: dotknięcie kwoty pokazuje dymek z wydatkami, z których się składa;
+  - **pożyczone komuś**: konto z kwotą do zwrotu, terminem i przypomnieniem, liczone do majątku (przelew z konta przy pożyczce, przycisk „Zwrot”);
   - zakładka **Majątek**: majątek dzień po dniu – całkowity i zarobiony (bez zysków z inwestycji; odstęp pokazuje, ile dało inwestowanie) albo wartość inwestycji i wpłacone pieniądze, z dzienną analizą (dziś, miesiąc, rok) i krótką prognozą; majątek netto miesiąc po miesiącu (gotówka, inwestycje, długi), skąd bierze się przyrost (odłożone z dochodów, wynik inwestycji, wpłaty pracodawcy), stopa oszczędności i poduszka finansowa, struktura majątku oraz **prognoza** na 1–30 lat z wariantem ostrożnym i optymistycznym, liczona z Twojej historii i nawyków (założenia można zmienić);
   - dokumenty offline (paski płacowe, paragony, umowy) przy operacjach i w osobnej zakładce;
   - usuwanie i zmiany zawsze z potwierdzeniem i przyciskiem „Cofnij”;
@@ -61,7 +62,7 @@ Aplikacja ma trzy części (menu na dole ekranu): **GEM** – strategia i jej po
 - **Bezpieczniki:**
   - bez kompletnych i aktualnych danych sygnał nie powstaje, a Ty dostajesz komunikat o problemie;
   - dwa niezależne źródła danych są ze sobą porównywane;
-  - 142 testy automatyczne.
+  - 143 testy automatyczne.
 
 | Rola | ETF w XTB | Waluta |
 |---|---|---|
@@ -258,7 +259,7 @@ node src/cli.js demo
 node scripts/serve.js
 ```
 
-- `npm test` uruchamia 142 testy.
+- `npm test` uruchamia 143 testy.
 - `node src/cli.js demo` buduje aplikację demonstracyjną bez kluczy API. Sygnał pochodzi z danych historycznych, a w zakładce GEM → Mój portfel GEM możesz wczytać przykładowe transakcje.
 - `node scripts/serve.js` udostępnia panel pod adresem http://localhost:8080.
 
