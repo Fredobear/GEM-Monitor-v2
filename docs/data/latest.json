@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-25T22:29:34.500Z",
+  "generatedAt": "2026-11-26T07:28:09.810Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -818,7 +818,7 @@
   "errors": []
  },
  "news": {
-  "fetched": 533,
+  "fetched": 486,
   "items": [
    {
     "title": "Even the price of toys is on the rise. How Americans are scaling back holiday plans",
@@ -856,9 +856,27 @@
     "score": 10
    },
    {
+    "title": "Kogo stać na wolne? Polska walczy o pieniądze z UE. Trump ostrzega Rosję. PB BRIEF",
+    "link": "https://www.pb.pl/kogo-stac-na-wolne-polska-walczy-o-pieniadze-z-ue-trump-ostrzega-rosje-pb-brief-1271088",
+    "date": "2026-11-26T07:53:39.000Z",
+    "summary": "Ile kosztuje gospodarkę dzień wolny od pracy i dlaczego Niemcy pracują krócej od Polaków? Unia Europejska negocjuje budżet na lata 2028–2034, ministrowie szukają rozwiązania kryzysu mieszkaniowego, a Donald Trump i Mark Rutte ostrzegają Rosję przed rozszerzeniem wojny.",
+    "source": "Puls Biznesu",
+    "regions": [
+     "USA",
+     "Europa",
+     "Polska",
+     "Rosja/Ukraina"
+    ],
+    "themes": [
+     "Konflikty i wojny"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
     "title": "US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street - Dimsum Daily",
     "link": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxOYURKOW1qVndfbVVpWXhHTDh0Zzg1UVVqNkUzcVRpOHBBNzRJdzBwQk5lTEQ0M05vM3BWbVBiNm00YmR2U2RQSnVidWVLZmhWbm1kX1A0QTlNaDBuSGdUV2MyYnJQS0FzWVEwMXZFUzRkMm9WOGd5WnpEWjRJdGNBSnBVTE5xXzVTV0dIQnhSMUlleUhQTmtxNEdkQmt2U0NDZktxSjVGMUJTRENESnJmemdNa1hNN2lkTEd6LVFWQkNaenlpZm1OSUpqX2JTdnJyR2kzYTIySm0?oc=5",
-    "date": "2026-11-25T20:49:15.000Z",
+    "date": "2026-11-25T22:44:43.000Z",
     "summary": "US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street Dimsum Daily",
     "source": "Google News",
     "regions": [
@@ -873,27 +891,10 @@
     "score": 9
    },
    {
-    "title": "The Fed says inflation hasn’t gotten any better ahead of its key December vote to raise rates",
-    "link": "https://www.marketwatch.com/story/the-fed-says-inflation-hasnt-gotten-any-better-ahead-of-its-key-december-vote-to-raise-rates-65024d33?mod=mw_rss_topstories",
-    "date": "2026-11-25T19:39:00.000Z",
-    "summary": "Just ahead of pivotal December vote to raise U.S. interest rates, the Federal Reserve on Wednesday said stubborn inflation remains a thorn in the side of an expanding economy.",
-    "source": "MarketWatch",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Banki centralne i stopy",
-     "Wybory i polityka",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
-    "title": "Bitcoin Falls Further as Inflation, Trump Tariffs and AI Selloff Rattle Markets - Yahoo Finance",
-    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPOFhEUmQxaFBsZmszQkxnaVE4M3hUcHQtNFpmbDVieHdiRW50SVZCTnFRUkRkUHFxR0FCQVpDTUk2S0hXTGh3YXI1cWNVVTVxRFNHVjdlZ2x1MHFrd3ZfX1BQdGRabXRwakVGV2VKcHk3VFJPRzhoSzFWcWxHOHlXbVRMTm9RamFmZVNWNzFRbVB3Yjg2bkZRRkViVUxLMDRqZHlVXw?oc=5",
+    "title": "Bitcoin Falls Further as Inflation, Trump Tariffs and AI Selloff Rattle Markets - Decrypt",
+    "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTFBjWWJWUlo0aHRXWld1MHBLUnNjR1hQQVRkTVdlOEV4bDlGRmYxb296ODJlZ2szRmJiWnpCRU9pdm92djJtVzg5LXVReUVxZXNjYUV5Nk04azAyOEVOc0JsUEZkZ0hNYkVkdEg3NVd0aFRrWEphS0ZZWkx2RGhMbFk?oc=5",
     "date": "2026-11-25T16:52:50.000Z",
-    "summary": "Bitcoin Falls Further as Inflation, Trump Tariffs and AI Selloff Rattle Markets Yahoo Finance",
+    "summary": "Bitcoin Falls Further as Inflation, Trump Tariffs and AI Selloff Rattle Markets Decrypt",
     "source": "Google News",
     "regions": [
      "USA"
@@ -901,23 +902,6 @@
     "themes": [
      "Sankcje i cła",
      "Inflacja i recesja",
-     "Nastroje na giełdach"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
-    "title": "Prezydent USA proponuje nowe cła, wyprzedaż akcji. - Vietnam.vn",
-    "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNZ29SWFBPUjhmRjRfdmpnMHkwclFmTnRWMEpoLUYxVnZjVElzYlZDdHFSUmluX0owUGhYazdhb0R1VzFuWng2ZlR6dlJENXdUUVBvV2ZhcUFheFJEU0dBVkdYWVlvMGFHc1Z1SDR5U1RSUW8tWVhHbWg4cHNFSTdpVGtlc0hpSHE5R1dB?oc=5",
-    "date": "2026-11-25T15:54:16.000Z",
-    "summary": "Prezydent USA proponuje nowe cła, wyprzedaż akcji. Vietnam.vn",
-    "source": "Google News PL",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Sankcje i cła",
-     "Wybory i polityka",
      "Nastroje na giełdach"
     ],
     "relevant": true,
@@ -941,6 +925,23 @@
     "score": 9
    },
    {
+    "title": "European shares rise on consumer boost; markets await US tariffs, inflation - Fort Worth Star-Telegram",
+    "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPVDFoR29tME44dUlqOGJmcTJFenFlU2ktcF9WMjljZjdTcThYSkcxVlQwOURqMUZzWjZCb2JLSWx6M1FDVXpJMjNQTElsM19WdkZ3OWkxTm96VjlxdHpoa1BMZ3RxUUVWQWhpRDNQcHAyN3Qwa0NhRE9Ba0pGSEdhUjJZT0Y?oc=5",
+    "date": "2026-11-25T08:43:06.000Z",
+    "summary": "European shares rise on consumer boost; markets await US tariffs, inflation Fort Worth Star-Telegram",
+    "source": "Google News",
+    "regions": [
+     "USA",
+     "Europa"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 9
+   },
+   {
     "title": "European shares rise as consumer stocks gain, markets await U.S. tariffs and inflation data - Traders Union",
     "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPcmNwU042SThVd0NleHZIYzY3Q0dWRGRlTkQ1dFpuN3BQLTJrSlVfWmtWMHhFaE5qeWtjQ3pjOTY1R0dwYUQyang2QTJFSVFTeE5fbG4xM0t4eEZSQkE5QjVLYXZHT1JvWUdmNlluVFgyQzhkaWJjT0lVNlBrNENsb2NfWFg5RWtoSFcyc0NQVWE0ZXV4Ym9z?oc=5",
     "date": "2026-11-25T08:39:30.000Z",
@@ -958,38 +959,52 @@
     "score": 9
    },
    {
-    "title": "European shares rise on consumer boost; markets await US tariffs, inflation - Reuters",
-    "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNNjI0Y0NKdzRvSEFNNVk4Sk5pOEtGbnRiNmNoaW04dGF4RVVrRDRBcjRmT0JnZ3gxcDdEMFJDMW85aUY4RmZMZWthTTJPTjNxZEF0bmFVN2ZSQ3E4TmhnUFhFcy1LYktmeC1jRWtVb3prNUxQcEJHNEZxLW1YQU92a0pnbnFQcFZtVE5FVDdoSWkzclJTc0ZEX0g1ZlM1YVlGV2ktM2pTbHEwbTBSWGdlM1ZLUmJoYnlDUUlhWktB?oc=5",
-    "date": "2026-11-25T08:27:46.000Z",
-    "summary": "European shares rise on consumer boost; markets await US tariffs, inflation Reuters",
-    "source": "Google News",
+    "title": "Spory o miliard. Sankcja kredytu darmowego znowu na fali",
+    "link": "https://www.bankier.pl/wiadomosc/Spory-o-miliard-Sankcja-kredytu-darmowego-znowu-na-fali-9234991.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-26T05:00:00.000Z",
+    "summary": "Banki notowane na warszawskiej giełdzie uczestniczą już w ponad 30 tys. sporów o sankcję kredytu darmowego. Po lekkim spowolnieniu wzrostów z połowy roku nie ma śladu. Dynamika kwartał do kwartału sięgnęła 20 proc.",
+    "source": "Bankier.pl",
     "regions": [
-     "USA",
-     "Europa"
+     "Polska"
     ],
     "themes": [
      "Sankcje i cła",
      "Inflacja i recesja"
     ],
     "relevant": true,
-    "score": 9
+    "score": 8
    },
    {
-    "title": "Trump Says Markets and Iran Attacks Confirmed His Election Warning - Jordan News",
-    "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPZWlXT0ViZ3MteWRuelBvTFByelpTQnRPOTR2eFdaN19CdV8xX1h3bEhHUEgtUEgwbGlhOU01ODV0dzBpLUNZa3ZQS3MxazlIMkRmSG5IWkViQW55X0d5bVBydXotRWdaLVpQRENIMl9SbTBzNjRBZGU5RjNuRi1hZEZ3emxrTlFOY1JCS3ZhMndFMF9teFZld2pCVHNSMlp5UnVRN1dJbU5WeGtWT3hqMm11Q3U?oc=5",
-    "date": "2026-11-23T04:57:55.000Z",
-    "summary": "Trump Says Markets and Iran Attacks Confirmed His Election Warning Jordan News",
+    "title": "Trump tariffs 2027: a new threat to inflation and US stocks - Forex Factory",
+    "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOS0dSMWpGcEQ3SjRqa2ZaLU1sWTVLX3BIWFU1cnc0Z3RCRXNjQXdETS05NGRUd3ZKcGdNRHBUZHYwTmJPTmpodk1NY2lDZ0tMblFldUt6UkR2clZocEZJcnN0QmVId1RUYmluRjFWTmlVNVpGTVE4amlCRExsMzFzM0tQNlBzNUhCQ0xkTmJIONIBlAFBVV95cUxQUk5nbV9QQ1hLWV9wUVgzVlczX3BsUVBJRnMxT0F1NS1DOTJ5UWMtd2JjaUM2c29ZMnFGX1ktdXhFcGlmdEVEUXlTZTluclpvVGsxVjlXeko3bHlxX21YT1dmcnpvdjhYUUNvQ1VVWWVZRkJWRlN3eG92N0wyd19vMVhZdi1kel94QnpWSGdPaGdrTjRU?oc=5",
+    "date": "2026-11-26T02:27:00.000Z",
+    "summary": "Trump tariffs 2027: a new threat to inflation and US stocks Forex Factory",
     "source": "Google News",
     "regions": [
-     "USA",
-     "Bliski Wschód"
+     "USA"
     ],
     "themes": [
-     "Konflikty i wojny",
-     "Wybory i polityka"
+     "Sankcje i cła",
+     "Inflacja i recesja"
     ],
     "relevant": true,
-    "score": 9
+    "score": 8
+   },
+   {
+    "title": "High US PCE, Trump tariffs and hawkish Fed outlook weigh on stocks - www.equiti.com",
+    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOQ3Z2VURBaDlWOFd1TlRWVDh0dmVzM09POUpJLUY4djhwUDFpUDAzc3pISmc1RGpsRks1bEl0a3BEc01QSG9JUF9jQXlxT3NsLWZyV1MySXU0b1ZZbk9XM2JfQ3pkSGNYRWFCa2JWR2R4eWlCRWt5cDRXMG02RHJ0MFY3YjR4LUxYclItWUxtVDVnQ0k4emdsMGJ5RWxTb09sZFZCRlNVRU14a2VVcUFOTGJn?oc=5",
+    "date": "2026-11-26T01:51:15.000Z",
+    "summary": "High US PCE, Trump tariffs and hawkish Fed outlook weigh on stocks www.equiti.com",
+    "source": "Google News",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Banki centralne i stopy"
+    ],
+    "relevant": true,
+    "score": 8
    },
    {
     "title": "US stocks close mixed amid hotter-than-expected inflation, fresh tariffs - TRT World",
@@ -1041,26 +1056,11 @@
     "score": 8
    },
    {
-    "title": "Stocks tumble on new tariffs, inflation worries, leading to an AI sell-off - Fast Company",
-    "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNQlhBUmJReUNxVFNtWlBEUGFnd3JUY2VvU2lRajVYdi1LZnhNTVpSdXN0SG13cjA2RGRzam5fZjRsQTc5cl9UdU41cC0wN3gwTWNPODdBQ0Z3bWhXTjlrbmFTUTRXa2lMZm1FbU05OGd2QUxRcTdObUVHb003eUc1akNUcXc?oc=5",
-    "date": "2026-11-25T21:09:36.000Z",
-    "summary": "Stocks tumble on new tariffs, inflation worries, leading to an AI sell-off Fast Company",
-    "source": "Google News",
-    "regions": [],
-    "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja",
-     "Nastroje na giełdach"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Wall Street tempers early slide as pullback in AI stocks eases despite hotter inflation, new tariffs - Greater Milwaukee Today",
-    "link": "https://news.google.com/rss/articles/CBMimwJBVV95cUxOWXJCdnMxckFnUktiT1o0cGJkUUtmQzlZZW0zZGVmbXVPQmZFT2JrSjltbTlHSnYwUmFLajMtVk5fZVBmeFZ6dlFPWTNmbnBHN0NPOGNxdjJ0Q2tyeXF4STllQ0lSaGtFeTd0SUJqTDUyNU9GYnJISVg2SEJVb2VTT3IySnJMNWFqMGlkdklId0txUDg1aTFuZlhHUGhwMlg4ZjZVWC1VcWZsV0dCZDc1eXJ0RnJYVXpPWnUwUW9EZU0zTjJHcU5WeUIxWkZyT25aS2J2RmEybFFWamoyd1NRV1lLR1ZLLUZacGkwYmVHSDg0UzVxQWJJdG9IUVMtVE9vdUQ4NXVGTndPcVBzRVBaYjdEaVkzaWxWOFlJ?oc=5",
-    "date": "2026-11-25T20:12:05.000Z",
-    "summary": "Wall Street tempers early slide as pullback in AI stocks eases despite hotter inflation, new tariffs Greater Milwaukee Today",
-    "source": "Google News",
+    "title": "Wieczorne podsumowanie: inflacja w USA rośnie, Trump proponuje nowe cła wobec 14 gospodarek - Invezz",
+    "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPQzBOUmVONHdiSThSWmhYRUVfdEF3X3EzYm5WajAzaHhPRTN0Nk5EaUd2S2xNbXhLcmRGSkExd0k5Mm5qVVlxRWVjanpqT1dDb2d0SHhJcS1hZ3lsNng4Wk03Rk5HSG5zYXBPX3dKNjBlRkxBSGs3b1pwMmFWT0V4LVA1c2gwTEZCWUp5bHBCY1lpT19rTzVPeXUzZUJpRDdaY1NuT2pyM1JXejQ4VnpKYXBjNVE1MkUyMU5obmRZYnpiRVhaYWpqYy1FRnJ6YnM?oc=5",
+    "date": "2026-11-25T20:15:00.000Z",
+    "summary": "Wieczorne podsumowanie: inflacja w USA rośnie, Trump proponuje nowe cła wobec 14 gospodarek Invezz",
+    "source": "Google News PL",
     "regions": [
      "USA"
     ],
@@ -1088,10 +1088,10 @@
     "score": 8
    },
    {
-    "title": "Market sell-off eases up, but AI doubts, tariffs and inflation still weigh down stocks - NBC News",
+    "title": "Markets sell-off eases up, but AI doubts, tariffs and inflation still weigh down stocks - NBC News",
     "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxOdlpRc1pWbUlBRjhqREZ5aFk5SDJUMjEzOWtOeEZCd19aRnhneEJKaHRFSnQ1TGhTVzEtRmdySjZfdV9MUjVOZmxiN016Qkc5aXNUcEktOHUxUElnX2p6RDk5ZG95Z3hvb3B0bmR3THpRaUJ4bDVOalFaaXV1c2J1RXlnT2o1bXZ1WEI5XzBSQU5pLVBhbTlZNUlXX0hhY2UteDYzbnNB?oc=5",
     "date": "2026-11-25T18:36:31.000Z",
-    "summary": "Market sell-off eases up, but AI doubts, tariffs and inflation still weigh down stocks NBC News",
+    "summary": "Markets sell-off eases up, but AI doubts, tariffs and inflation still weigh down stocks NBC News",
     "source": "Google News",
     "regions": [],
     "themes": [
@@ -1135,10 +1135,10 @@
     "score": 8
    },
    {
-    "title": "Wall Street in turmoil: AI stocks crash, inflation bites and Trump tariffs spook investors - The Financial Express",
-    "link": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxNVU0yblpybVdObVY4Y244VEo0dE13MTYzLURPNC1jaWJwZ2x2LTdkaU1HZUZMWDNQY240Y0k5eEhCZElmbmIwU2xnWm9qWWs5VHRVcE1qaFhVUlJKc2RQTVFCRGVURzFzZmc2S3JkYk1JWGlsU3NLQmNlekNzM05vRXJBX3Flc1FqeGlaWUR4MzNsT3pyX3BlYTl4dG5KdThpekktZlRkTm1zNmFCWlg5YWtDa3dFSXhPel9tYnFrek5IRkxKZWQxWDQtSXo5emlrVWQzaWJ6dFRyZnB2bTlzR2V5OGZoeGvSAe4BQVVfeXFMUERpVE1ReTRHc1pHUUd1OTRSUW1Qc1FnU3RfSFpkeEFveHg0aEZ1aVRKVGdDMWNYcDBSWTR4WHdRSmZsdXNqdTNONGJqQmFvME5NdGFfYTRPN3Z1RXJmYXdqZVEwUmV2RDlDVWkxZEszWi1iblBzVk16ejRiS3ZVNUJBVVhVdG1HbjJvOUJYUks1NTFQSHFqMHdiQ1M1WDVqODBFLVhUcEtKaXV0Y193eGM5U1YzMzdWTWg3NkZBZ2NvRlpQQ2JvbGRDaXNSVjVUOUJJUWNEdEE2WktmZTU3VDJKNXBzMmxXYWFLZTUzQQ?oc=5",
-    "date": "2026-11-25T16:23:58.000Z",
-    "summary": "Wall Street in turmoil: AI stocks crash, inflation bites and Trump tariffs spook investors The Financial Express",
+    "title": "Bitcoin Falls to $57,470 as Hot Inflation and Trump Tariffs Hit Markets - Cryptonews.net",
+    "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9LNWxmenVGakdvc0pLU09YaWpveXJhV1VqMGlNSEl4SFUtdVdtZnN2dmtHaVB2Z3J4OGM3WXM0VXlaUV9wSDViRXNkdWZ6Y1lMWVhaMHl4VHA?oc=5",
+    "date": "2026-11-25T17:00:00.000Z",
+    "summary": "Bitcoin Falls to $57,470 as Hot Inflation and Trump Tariffs Hit Markets Cryptonews.net",
     "source": "Google News",
     "regions": [
      "USA"
@@ -1152,22 +1152,22 @@
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 18,
-   "Sankcje i cła": 80,
-   "Banki centralne i stopy": 15,
-   "Wybory i polityka": 33,
-   "Energia i surowce": 23,
-   "Inflacja i recesja": 26,
+   "Konflikty i wojny": 14,
+   "Sankcje i cła": 93,
+   "Banki centralne i stopy": 16,
+   "Wybory i polityka": 14,
+   "Energia i surowce": 20,
+   "Inflacja i recesja": 24,
    "Nastroje na giełdach": 25,
    "Spółki i wyniki": 15
   },
   "regionCounts": {
-   "USA": 86,
-   "Europa": 24,
-   "Azja": 24,
-   "Rynki wschodzące": 6,
-   "Polska": 14,
-   "Bliski Wschód": 10,
+   "USA": 94,
+   "Europa": 26,
+   "Azja": 28,
+   "Rynki wschodzące": 5,
+   "Polska": 18,
+   "Bliski Wschód": 5,
    "Rosja/Ukraina": 4
   },
   "errors": []
@@ -1311,7 +1311,7 @@
     {
      "title": "Osobiste Konto Inwestycyjne – limity i rozliczanie podatku 2027 - Poradnik Przedsiębiorcy",
      "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPWXE2Z3M1bWp0RVBnNjFaWjZGRFJRSVg2bzRLc3RMN3pJc1lublpDeTdQSXZvUE1Ub1JQSHljYlZFWjBuQnRlRXppRXRoRlNTRWdzMzZGd1VvRjZoRU1oQVZkbkJPVWszUnZmbmVPbzczYXUxb2x2NmNhcjk4NEx6NzBqenZUNTJfc0l6SXhmZ0UzMnR5dlE?oc=5",
-     "date": "2026-11-17T12:30:15.000Z",
+     "date": "2026-11-17T08:00:00.000Z",
      "summary": "Osobiste Konto Inwestycyjne – limity i rozliczanie podatku 2027 Poradnik Przedsiębiorcy",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1437,7 +1437,7 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-25T22:29:34.500Z",
+  "generatedAt": "2026-11-26T07:28:09.810Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
@@ -1474,16 +1474,16 @@
     "kind": "index",
     "src": "fred",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 23733.54,
-    "d1": -0.014779,
-    "w1": -0.02445,
-    "m1": -0.085601,
-    "ytd": 0.021149,
-    "y1": 0.037667,
+    "date": "2026-11-25",
+    "last": 23585.8,
+    "d1": -0.006225,
+    "w1": -0.034551,
+    "m1": -0.098725,
+    "ytd": 0.014793,
+    "y1": 0.02433,
     "high52": 27599.89,
     "low52": 20794.64,
-    "fromHigh": -0.140086,
+    "fromHigh": -0.145439,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1495,16 +1495,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 267.14,
-    "d1": 0.005268,
-    "w1": -0.007099,
-    "m1": -0.031224,
-    "ytd": 0.09258,
-    "y1": 0.12487,
+    "date": "2026-11-25",
+    "last": 268.87,
+    "d1": 0.006476,
+    "w1": -0.004628,
+    "m1": -0.029315,
+    "ytd": 0.099656,
+    "y1": 0.107999,
     "high52": 304.2892,
     "low52": 238.4186,
-    "fromHigh": -0.122085,
+    "fromHigh": -0.1164,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1516,16 +1516,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 147.56,
-    "d1": -0.004386,
-    "w1": -0.020511,
-    "m1": -0.053496,
-    "ytd": 0.055044,
-    "y1": 0.088576,
+    "date": "2026-11-25",
+    "last": 147.54,
+    "d1": -0.000136,
+    "w1": -0.015941,
+    "m1": -0.058095,
+    "ytd": 0.054901,
+    "y1": 0.078411,
     "high52": 161.9728,
     "low52": 133.3692,
-    "fromHigh": -0.088983,
+    "fromHigh": -0.089106,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1537,16 +1537,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 71.96,
-    "d1": 0.002927,
-    "w1": -0.024932,
-    "m1": -0.018281,
-    "ytd": 0.034632,
-    "y1": 0.104475,
+    "date": "2026-11-25",
+    "last": 72.09,
+    "d1": 0.001807,
+    "w1": -0.011382,
+    "m1": -0.01905,
+    "ytd": 0.036501,
+    "y1": 0.087722,
     "high52": 78.77,
     "low52": 66.1511,
-    "fromHigh": -0.086454,
+    "fromHigh": -0.084804,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1558,16 +1558,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 86.64,
-    "d1": -0.002992,
-    "w1": -0.023114,
-    "m1": -0.079277,
-    "ytd": 0.078789,
-    "y1": 0.10594,
+    "date": "2026-11-25",
+    "last": 87.25,
+    "d1": 0.007041,
+    "w1": -0.008973,
+    "m1": -0.074565,
+    "ytd": 0.086385,
+    "y1": 0.111279,
     "high52": 99.32,
-    "low52": 78.5131,
-    "fromHigh": -0.127668,
+    "low52": 79.0402,
+    "fromHigh": -0.121526,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1579,16 +1579,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 56.69,
-    "d1": -0.019713,
-    "w1": -0.027115,
-    "m1": -0.085793,
-    "ytd": 0.041402,
-    "y1": 0.077077,
+    "date": "2026-11-25",
+    "last": 56.4,
+    "d1": -0.005116,
+    "w1": -0.02557,
+    "m1": -0.087674,
+    "ytd": 0.036075,
+    "y1": 0.067786,
     "high52": 71.21,
     "low52": 52.3368,
-    "fromHigh": -0.203904,
+    "fromHigh": -0.207976,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1600,12 +1600,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 4056.67,
-    "d1": -0.027392,
-    "w1": -0.046001,
+    "date": "2026-11-25",
+    "last": 3980.69,
+    "d1": -0.01873,
+    "w1": -0.05811,
     "m1": null,
-    "ytd": 0.274072,
+    "ytd": 0.250209,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1621,12 +1621,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 152740.12,
-    "d1": -0.024082,
-    "w1": -0.042766,
+    "date": "2026-11-25",
+    "last": 150363.09,
+    "d1": -0.015563,
+    "w1": -0.052869,
     "m1": null,
-    "ytd": 0.302796,
+    "ytd": 0.282521,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1642,12 +1642,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 10247.86,
-    "d1": -0.016289,
-    "w1": -0.036041,
+    "date": "2026-11-25",
+    "last": 10172.46,
+    "d1": -0.007358,
+    "w1": -0.041956,
     "m1": null,
-    "ytd": 0.252479,
+    "ytd": 0.243264,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1663,12 +1663,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 27885.54,
-    "d1": -0.013236,
-    "w1": -0.037917,
+    "date": "2026-11-25",
+    "last": 27602.08,
+    "d1": -0.010165,
+    "w1": -0.042232,
     "m1": null,
-    "ytd": -0.057607,
+    "ytd": -0.067187,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1684,12 +1684,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": true,
-    "date": "2026-11-24",
-    "last": 2251.18,
-    "d1": -0.000959,
-    "w1": 0.005853,
+    "date": "2026-11-25",
+    "last": 2256.67,
+    "d1": 0.002439,
+    "w1": 0.00715,
     "m1": null,
-    "ytd": 0.011671,
+    "ytd": 0.014138,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1747,16 +1747,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": true,
-    "date": "2026-11-24",
-    "last": 81.49,
-    "d1": -0.002448,
-    "w1": 0.024387,
-    "m1": 0.006051,
-    "ytd": -0.02834,
-    "y1": -0.052014,
+    "date": "2026-11-25",
+    "last": 82.24,
+    "d1": 0.009204,
+    "w1": 0.025181,
+    "m1": 0.011084,
+    "ytd": -0.019397,
+    "y1": -0.045728,
     "high52": 87.7236,
     "low52": 76.7876,
-    "fromHigh": -0.07106,
+    "fromHigh": -0.06251,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1768,16 +1768,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 325.45,
-    "d1": -0.022731,
-    "w1": -0.076685,
-    "m1": -0.112272,
-    "ytd": -0.178799,
-    "y1": -0.144003,
+    "date": "2026-11-25",
+    "last": 327.45,
+    "d1": 0.006145,
+    "w1": -0.040271,
+    "m1": -0.109755,
+    "ytd": -0.173753,
+    "y1": -0.138471,
     "high52": 495.9,
     "low52": 322.87,
-    "fromHigh": -0.343718,
+    "fromHigh": -0.339685,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -1810,16 +1810,16 @@
     "kind": "etf",
     "src": "proxy",
     "bond": false,
-    "date": "2026-11-24",
-    "last": 33.76,
-    "d1": -0.024841,
-    "w1": -0.065855,
-    "m1": -0.265448,
-    "ytd": -0.32004,
-    "y1": -0.332411,
+    "date": "2026-11-25",
+    "last": 34.07,
+    "d1": 0.009182,
+    "w1": -0.036482,
+    "m1": -0.246572,
+    "ytd": -0.313797,
+    "y1": -0.31255,
     "high52": 55.44,
     "low52": 33.02,
-    "fromHigh": -0.391053,
+    "fromHigh": -0.385462,
     "trend": "down",
     "trendBasis": "średnia 200 sesji"
    },
@@ -2030,34 +2030,41 @@
     "kind": "bank",
     "note": "Ogłoszenie ok. 14:15, konferencja prezes EBC ok. 14:45.",
     "approx": false
+   },
+   {
+    "date": "2026-12-31",
+    "title": "Szybki szacunek inflacji w Polsce (GUS)",
+    "kind": "dane",
+    "note": "Zwykle ostatni dzień roboczy miesiąca o 10:00 – termin orientacyjny.",
+    "approx": true
    }
   ],
   "note": {
-   "date": "2026-11-25",
+   "date": "2026-11-26",
    "stance": {
     "id": "ostrozne",
     "label": "ostrożne",
     "tone": "warn"
    },
    "summary": [
-    "Akcje w ostatnim tygodniu: S&P 500 −1,9%, Europa −2,5%, rynki wschodzące −2,7%, WIG20 −4,6% (S&P 500 od początku roku +5,2%).",
-    "Rentowność 10-letnich obligacji USA 4,91% (−0,19 pp w tydzień), złoto −7,7%, ropa Brent 91,8 USD (−1,2%).",
+    "Akcje w ostatnim tygodniu: S&P 500 −1,9%, Europa −1,1%, rynki wschodzące −2,6%, WIG20 −5,8% (S&P 500 od początku roku +5,2%).",
+    "Rentowność 10-letnich obligacji USA 4,91% (−0,19 pp w tydzień), złoto −4,0%, ropa Brent 91,8 USD (−1,2%).",
     "Złoty: EUR/PLN 4,4809 (+1,6% w tydzień), USD/PLN 4,0966 (+2,0% w tydzień)."
    ],
    "sections": [
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Sankcje i cła (80 wiadomości): cła i sankcje uderzają w handel i marże firm; najbardziej wrażliwe są spółki eksportowe, rynki wschodzące i branże z długimi łańcuchami dostaw (technologie, motoryzacja). Przykład: „Wojna handlowa wraca, giełdy reagują. USA publikują nową listę ceł, do 45% na Chiny - BitHub.pl” (Google News PL).",
-      "Wybory i polityka (33 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „The Fed says inflation hasn’t gotten any better ahead of its key December vote to raise rates” (MarketWatch).",
-      "Inflacja i recesja (26 wiadomości): wyższa inflacja oddala obniżki stóp, a słabsze dane o wzroście zwiększają ryzyko spadku zysków firm, choć mogą przyspieszyć obniżki stóp. Przykład: „Even the price of toys is on the rise. How Americans are scaling back holiday plans” (CNBC)."
+      "Sankcje i cła (93 wiadomości): cła i sankcje uderzają w handel i marże firm; najbardziej wrażliwe są spółki eksportowe, rynki wschodzące i branże z długimi łańcuchami dostaw (technologie, motoryzacja). Przykład: „Wojna handlowa wraca, giełdy reagują. USA publikują nową listę ceł, do 45% na Chiny - BitHub.pl” (Google News PL).",
+      "Nastroje na giełdach (25 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street - Dimsum Daily” (Google News).",
+      "Inflacja i recesja (24 wiadomości): wyższa inflacja oddala obniżki stóp, a słabsze dane o wzroście zwiększają ryzyko spadku zysków firm, choć mogą przyspieszyć obniżki stóp. Przykład: „Even the price of toys is on the rise. How Americans are scaling back holiday plans” (CNBC)."
      ]
     },
     {
      "title": "Największe zmiany w tygodniu",
      "items": [
-      "Najmocniej: długie obligacje USA +2,4%, polskie obligacje +0,6%.",
-      "Najsłabiej: złoto −7,7%, bitcoin −6,6%."
+      "Najmocniej: długie obligacje USA +2,5%, polskie obligacje +0,7%.",
+      "Najsłabiej: WIG20 −5,8%, WIG −5,3%."
      ]
     },
     {
