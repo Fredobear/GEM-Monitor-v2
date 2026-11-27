@@ -1,6 +1,6 @@
 {
  "signals": {
-  "generatedAt": "2026-11-26T07:28:09.810Z",
+  "generatedAt": "2026-11-27T07:27:55.880Z",
   "rules": {
    "variant": "klasyczny",
    "equities": [
@@ -786,7 +786,7 @@
    {
     "id": "USEPUINDXD",
     "name": "Niepewność polityki gospodarczej USA (EPU)",
-    "date": "2026-11-24",
+    "date": "2026-11-25",
     "value": "289",
     "tier": 1,
     "comment": "podwyższona (percentyl 74 z 5 lat, średnia 30 dni)"
@@ -809,16 +809,16 @@
    }
   ],
   "usdpln": {
-   "date": "2026-11-25",
-   "rate": 4.0966,
-   "change12m": 0.11115330367798615
+   "date": "2026-11-26",
+   "rate": 4.0835,
+   "change12m": 0.1118825899907423
   },
   "stress": 2,
   "summary": "2 wskaźniki ryzyka podwyższone – rynek w trybie podwyższonej nerwowości.",
   "errors": []
  },
  "news": {
-  "fetched": 486,
+  "fetched": 449,
   "items": [
    {
     "title": "Even the price of toys is on the rise. How Americans are scaling back holiday plans",
@@ -839,27 +839,27 @@
     "score": 11
    },
    {
-    "title": "Wojna handlowa wraca, giełdy reagują. USA publikują nową listę ceł, do 45% na Chiny - BitHub.pl",
-    "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPMzVVbkxXelBtSl9vS29kNEtoZEhnSUttVmV5MDMtc0JGQllrQjE1eTU4dERlX0QtUVh0XzJXdjJRWE5RY28yTjNqeUZ6VGtWcU9VcFp6OUxPN0xOeml1Y3I4OTEybFNyMlh6R25yNW1vOUR6S2JuYjdQWDkyMS1nZlg5cFdJcWVFdWlzeTN3WV9lVzBzOGE2Q3dQYllZN05lcUhva3pjcDQ?oc=5",
-    "date": "2026-11-25T13:44:25.000Z",
-    "summary": "Wojna handlowa wraca, giełdy reagują. USA publikują nową listę ceł, do 45% na Chiny BitHub.pl",
-    "source": "Google News PL",
+    "title": "Trump Tariffs 2027: Inflation, Fed Rates & Stock Risks - www.equiti.com",
+    "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOZ3RQTHA1azE5Uk1LWmJtYnpmRlQ0eEJEWnBsS1lYazl2THRsSFdtTVJtT2tGWER6VElya1JFRVhtc0JfZUZhY2VhMUNYaXllTDFEd1gtdkFLWU93X2pqTVM1Wi1BWEltdlY4N1M0ZEoxYzBuTmgtaWp5c3FVZEhnRGM1dEJiNmdLcU9lYjYwRVR2TWpLTFUwQWpZRUp0elJD?oc=5",
+    "date": "2026-11-26T01:49:01.000Z",
+    "summary": "Trump Tariffs 2027: Inflation, Fed Rates & Stock Risks www.equiti.com",
+    "source": "Google News",
     "regions": [
-     "USA",
-     "Azja"
+     "USA"
     ],
     "themes": [
-     "Konflikty i wojny",
-     "Sankcje i cła"
+     "Sankcje i cła",
+     "Banki centralne i stopy",
+     "Inflacja i recesja"
     ],
     "relevant": true,
     "score": 10
    },
    {
-    "title": "Kogo stać na wolne? Polska walczy o pieniądze z UE. Trump ostrzega Rosję. PB BRIEF",
-    "link": "https://www.pb.pl/kogo-stac-na-wolne-polska-walczy-o-pieniadze-z-ue-trump-ostrzega-rosje-pb-brief-1271088",
-    "date": "2026-11-26T07:53:39.000Z",
-    "summary": "Ile kosztuje gospodarkę dzień wolny od pracy i dlaczego Niemcy pracują krócej od Polaków? Unia Europejska negocjuje budżet na lata 2028–2034, ministrowie szukają rozwiązania kryzysu mieszkaniowego, a Donald Trump i Mark Rutte ostrzegają Rosję przed rozszerzeniem wojny.",
+    "title": "Szczyt UE bez porozumienia budżetowego. Palantir dla polskiego wojska i Black Friday w PB BRIEF",
+    "link": "https://www.pb.pl/szczyt-ue-bez-porozumienia-budzetowego-palantir-dla-polskiego-wojska-i-black-friday-w-pb-brief-1271155",
+    "date": "2026-11-27T06:50:56.000Z",
+    "summary": "Europejscy przywódcy nie osiągnęli porozumienia w sprawie budżetu UE na lata 2028–2034 ani dodatkowego finansowania Ukrainy. Polskie wojsko podpisuje umowę z amerykańskim Palantirem, Europejski Bank Centralny szykuje się do zmiany kierownictwa, a handel detaliczny liczy na rekordowe obroty podczas B",
     "source": "Puls Biznesu",
     "regions": [
      "USA",
@@ -868,24 +868,8 @@
      "Rosja/Ukraina"
     ],
     "themes": [
-     "Konflikty i wojny"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
-    "title": "US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street - Dimsum Daily",
-    "link": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxOYURKOW1qVndfbVVpWXhHTDh0Zzg1UVVqNkUzcVRpOHBBNzRJdzBwQk5lTEQ0M05vM3BWbVBiNm00YmR2U2RQSnVidWVLZmhWbm1kX1A0QTlNaDBuSGdUV2MyYnJQS0FzWVEwMXZFUzRkMm9WOGd5WnpEWjRJdGNBSnBVTE5xXzVTV0dIQnhSMUlleUhQTmtxNEdkQmt2U0NDZktxSjVGMUJTRENESnJmemdNa1hNN2lkTEd6LVFWQkNaenlpZm1OSUpqX2JTdnJyR2kzYTIySm0?oc=5",
-    "date": "2026-11-25T22:44:43.000Z",
-    "summary": "US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street Dimsum Daily",
-    "source": "Google News",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja",
-     "Nastroje na giełdach"
+     "Konflikty i wojny",
+     "Banki centralne i stopy"
     ],
     "relevant": true,
     "score": 9
@@ -908,27 +892,10 @@
     "score": 9
    },
    {
-    "title": "Przed sesją na Wall Street: szykuje się bolesna wyprzedaż. Inflacja i nowe cła budzą dodatkowy niepokój inwestorów",
-    "link": "https://www.pb.pl/przed-sesja-na-wall-street-szykuje-sie-bolesna-wyprzedaz-inflacja-i-nowe-cla-budza-dodatkowy-niepokoj-inwestorow-1271027",
-    "date": "2026-11-25T13:33:49.000Z",
-    "summary": "Kontrakty terminowe na amerykańskie indeksy wskazują na prawdopodobne tąpnięcie podczas środowej sesji na Wall Street. Największa presja ponownie koncentruje się na spółkach technologicznych i producentach półprzewodników, a inwestorzy przygotowują się na publikację danych o inflacji PCE i dynamice ",
-    "source": "Puls Biznesu",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja",
-     "Nastroje na giełdach"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
-    "title": "European shares rise on consumer boost; markets await US tariffs, inflation - Fort Worth Star-Telegram",
-    "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPVDFoR29tME44dUlqOGJmcTJFenFlU2ktcF9WMjljZjdTcThYSkcxVlQwOURqMUZzWjZCb2JLSWx6M1FDVXpJMjNQTElsM19WdkZ3OWkxTm96VjlxdHpoa1BMZ3RxUUVWQWhpRDNQcHAyN3Qwa0NhRE9Ba0pGSEdhUjJZT0Y?oc=5",
-    "date": "2026-11-25T08:43:06.000Z",
-    "summary": "European shares rise on consumer boost; markets await US tariffs, inflation Fort Worth Star-Telegram",
+    "title": "European Shares Rise on Consumer Boost; Markets Await US Tariffs, Inflation - US News Money",
+    "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPSGYxUzFxdndScTVLdkMtdDZ4YUNwLUJNYWlLVTQ1dUgwSmhBMGJ0cGt6U3hzbGRKSTd2VVhhWml0Q3EzLWZUbnY5dkQ3MzlOTGdFSU8tVU96aFU5SlVlRDVyelMtZTdFcHpHWWlrdmszaV92Y041Q0g4X0NGSmstMDZoNUg0ZWlfYm14VVQ4X0d1MENtaGVEaXpUMEl6VzlTME1BRkIzcFdJYkV0NXItblQydDB6Qm5TTzR2Rkp3dEFXNmM1czNGbkJLWjdEQQ?oc=5",
+    "date": "2026-11-25T09:20:24.000Z",
+    "summary": "European Shares Rise on Consumer Boost; Markets Await US Tariffs, Inflation US News Money",
     "source": "Google News",
     "regions": [
      "USA",
@@ -942,50 +909,34 @@
     "score": 9
    },
    {
-    "title": "European shares rise as consumer stocks gain, markets await U.S. tariffs and inflation data - Traders Union",
-    "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPcmNwU042SThVd0NleHZIYzY3Q0dWRGRlTkQ1dFpuN3BQLTJrSlVfWmtWMHhFaE5qeWtjQ3pjOTY1R0dwYUQyang2QTJFSVFTeE5fbG4xM0t4eEZSQkE5QjVLYXZHT1JvWUdmNlluVFgyQzhkaWJjT0lVNlBrNENsb2NfWFg5RWtoSFcyc0NQVWE0ZXV4Ym9z?oc=5",
-    "date": "2026-11-25T08:39:30.000Z",
-    "summary": "European shares rise as consumer stocks gain, markets await U.S. tariffs and inflation data Traders Union",
+    "title": "Stock Market Today: Gift Nifty, Oil Prices To Iran War; Five Key Factors That May Drive Sensex, Nifty 50 On Nov 27 - NDTV Profit",
+    "link": "https://news.google.com/rss/articles/CBMi8AFBVV95cUxNS0JYc0tkclVBeDdsNC1ackZLNGh1LW0tV296ZUFwSWJQbGJ6NlhDUnNuS2FuZjVJakRrLXlpbHM2NmRGemZ1S1VpRWRGVU5mYnc4SDNCM3V3OWJHaXRCTU9ma0xXZXozWDRGU3lBenhTTms1TW9xVXRHci00ekpCZWxRVXR0VGZmY1lqV0JZWjJYWDRhQm82eWppTjB2Q01ZMXFzWmJXeDVyN1VpRUtVZ1hvOG1UdGVfZU5VdU9IeGlIWjQ0clhLeTNiZ0RVLTVwVUx0NWszOFVBSWpBbjQ4Z1VtRk1RMUZlbVJKV3NoTjjSAfgBQVVfeXFMUFkwT3pDRHQ1eXR2MlB2UHAzQVBQOENSZVF1ODNxcXROeFd6MVdYZFN3N04zdHY2NlFBVFJ3SnVfZEg0b1hGWUt4ZDNKS0h3N0ZJZzQ4YThRQmRVbG1KNTRzR3p6dWtRNjZWd2FlRTBSNjFaUW1ZbHRBTXRfd3UzTDM4aFpHenVhVUF4X1hDQ0h4NWtlQ3J4cHhqTUpQX2ZsVmszMjROTm9JWlRJUWJPaVpKczlXOWhZTUZxVEczTlBES2lVUmJ2ZEx3TldLVzVIT3Z1QVU3WjFabWZEM09GdDZpVGIwS2M2U2JQaGpGUXhaWFFpWDJ0X3g?oc=5",
+    "date": "2026-11-27T01:28:15.000Z",
+    "summary": "Stock Market Today: Gift Nifty, Oil Prices To Iran War; Five Key Factors That May Drive Sensex, Nifty 50 On Nov 27 NDTV Profit",
     "source": "Google News",
     "regions": [
-     "USA",
-     "Europa"
+     "Bliski Wschód"
     ],
     "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 9
-   },
-   {
-    "title": "Spory o miliard. Sankcja kredytu darmowego znowu na fali",
-    "link": "https://www.bankier.pl/wiadomosc/Spory-o-miliard-Sankcja-kredytu-darmowego-znowu-na-fali-9234991.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
-    "date": "2026-11-26T05:00:00.000Z",
-    "summary": "Banki notowane na warszawskiej giełdzie uczestniczą już w ponad 30 tys. sporów o sankcję kredytu darmowego. Po lekkim spowolnieniu wzrostów z połowy roku nie ma śladu. Dynamika kwartał do kwartału sięgnęła 20 proc.",
-    "source": "Bankier.pl",
-    "regions": [
-     "Polska"
-    ],
-    "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja"
+     "Konflikty i wojny",
+     "Energia i surowce"
     ],
     "relevant": true,
     "score": 8
    },
    {
-    "title": "Trump tariffs 2027: a new threat to inflation and US stocks - Forex Factory",
-    "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOS0dSMWpGcEQ3SjRqa2ZaLU1sWTVLX3BIWFU1cnc0Z3RCRXNjQXdETS05NGRUd3ZKcGdNRHBUZHYwTmJPTmpodk1NY2lDZ0tMblFldUt6UkR2clZocEZJcnN0QmVId1RUYmluRjFWTmlVNVpGTVE4amlCRExsMzFzM0tQNlBzNUhCQ0xkTmJIONIBlAFBVV95cUxQUk5nbV9QQ1hLWV9wUVgzVlczX3BsUVBJRnMxT0F1NS1DOTJ5UWMtd2JjaUM2c29ZMnFGX1ktdXhFcGlmdEVEUXlTZTluclpvVGsxVjlXeko3bHlxX21YT1dmcnpvdjhYUUNvQ1VVWWVZRkJWRlN3eG92N0wyd19vMVhZdi1kel94QnpWSGdPaGdrTjRU?oc=5",
-    "date": "2026-11-26T02:27:00.000Z",
-    "summary": "Trump tariffs 2027: a new threat to inflation and US stocks Forex Factory",
-    "source": "Google News",
+    "title": "Iran zaciska pasa po miesiącach wojny. Rząd wycofuje popularne dopłaty",
+    "link": "https://www.bankier.pl/wiadomosc/Iran-zaciska-pasa-po-miesiacach-wojny-Rzad-wycofuje-popularne-doplaty-9235922.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-26T18:03:00.000Z",
+    "summary": "Iran, poddawany rosnącej presji ekonomicznej, wprowadza po dziewięciu miesiącach wojny politykę zaciskania pasa, wycofuje popularne subwencje na chleb, czy benzynę i zapowiada racjonowanie energii elektrycznej - podaje w czwartek „Washington Post”.",
+    "source": "Bankier.pl",
     "regions": [
-     "USA"
+     "Bliski Wschód"
     ],
     "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja"
+     "Konflikty i wojny",
+     "Wybory i polityka",
+     "Energia i surowce"
     ],
     "relevant": true,
     "score": 8
@@ -1040,22 +991,6 @@
     "score": 8
    },
    {
-    "title": "Rosyjskie rafinerie przerabiają najmniej ropy od dekad. To skutek ukraińskich ataków",
-    "link": "https://www.pb.pl/rosyjskie-rafinerie-przerabiaja-najmniej-ropy-od-dekad-to-skutek-ukrainskich-atakow-1271076",
-    "date": "2026-11-25T21:15:17.000Z",
-    "summary": "Rystad Energy, niezależna norweska firma analityczna i doradcza zajmująca się światowym rynkiem energii twierdzi, że ilość ropy przerabianej w Rosji spadła do najniższego poziomu od ponad dwóch dekad. To skutek prowadzonej przez Ukrainę kampanii intensywnych ataków na rosyjskie rafinerie, informuje ",
-    "source": "Puls Biznesu",
-    "regions": [
-     "Rosja/Ukraina"
-    ],
-    "themes": [
-     "Konflikty i wojny",
-     "Energia i surowce"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
     "title": "Wieczorne podsumowanie: inflacja w USA rośnie, Trump proponuje nowe cła wobec 14 gospodarek - Invezz",
     "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPQzBOUmVONHdiSThSWmhYRUVfdEF3X3EzYm5WajAzaHhPRTN0Nk5EaUd2S2xNbXhLcmRGSkExd0k5Mm5qVVlxRWVjanpqT1dDb2d0SHhJcS1hZ3lsNng4Wk03Rk5HSG5zYXBPX3dKNjBlRkxBSGs3b1pwMmFWT0V4LVA1c2gwTEZCWUp5bHBCY1lpT19rTzVPeXUzZUJpRDdaY1NuT2pyM1JXejQ4VnpKYXBjNVE1MkUyMU5obmRZYnpiRVhaYWpqYy1FRnJ6YnM?oc=5",
     "date": "2026-11-25T20:15:00.000Z",
@@ -1067,37 +1002,6 @@
     "themes": [
      "Sankcje i cła",
      "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "US Stocks Pare Losses as Tariffs and Inflation Pressure Markets - SuaraGarut.ID",
-    "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE1jWVdqVVdROHdTTWl4VmFhSnU2VWgybkdRWllDOFhval9OMXJhekdIZDB5WmdpamlSN1BYS19Rd0Y4MFZ4ZnJ6a2hOTS03T2J6eExrWTQ2a0psalBuY2toV3lMMDRtMHJzblZ3WVZn?oc=5",
-    "date": "2026-11-25T19:23:00.000Z",
-    "summary": "US Stocks Pare Losses as Tariffs and Inflation Pressure Markets SuaraGarut.ID",
-    "source": "Google News",
-    "regions": [
-     "USA"
-    ],
-    "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja"
-    ],
-    "relevant": true,
-    "score": 8
-   },
-   {
-    "title": "Markets sell-off eases up, but AI doubts, tariffs and inflation still weigh down stocks - NBC News",
-    "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxOdlpRc1pWbUlBRjhqREZ5aFk5SDJUMjEzOWtOeEZCd19aRnhneEJKaHRFSnQ1TGhTVzEtRmdySjZfdV9MUjVOZmxiN016Qkc5aXNUcEktOHUxUElnX2p6RDk5ZG95Z3hvb3B0bmR3THpRaUJ4bDVOalFaaXV1c2J1RXlnT2o1bXZ1WEI5XzBSQU5pLVBhbTlZNUlXX0hhY2UteDYzbnNB?oc=5",
-    "date": "2026-11-25T18:36:31.000Z",
-    "summary": "Markets sell-off eases up, but AI doubts, tariffs and inflation still weigh down stocks NBC News",
-    "source": "Google News",
-    "regions": [],
-    "themes": [
-     "Sankcje i cła",
-     "Inflacja i recesja",
-     "Nastroje na giełdach"
     ],
     "relevant": true,
     "score": 8
@@ -1119,11 +1023,11 @@
     "score": 8
    },
    {
-    "title": "Martin Lewis' tips on staying warm this winter",
-    "link": "https://www.bbc.co.uk/news/videos/cjr4gw12k2lwo?at_medium=RSS&at_campaign=rss",
-    "date": "2026-11-25T17:59:14.000Z",
-    "summary": "Energy bills will soar by 26% for millions of households in January after a surge in gas prices sparked by the Iran war.",
-    "source": "BBC Business",
+    "title": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso - EnergyNow",
+    "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQSUM3X1VmZFpNZTZuYlpmTElibk1aVG1wdEt5N3RvU0IySkZ6Tllkc1hudDB4ZVJOc2VmWmZZSUxXZnI4RHdUQlcyMGNSSUNGX3NzLWVIZWhQTmc4djJZdzFFT0M1a0dMNUp2SzVRZTNacThTOEczZDNkUXJtV1otU2lkdTVRUnNCYXJYWDJhb1VLdjFLQ1JKTGFsNTZYeE9TNUxCZUJZWm5zTUtoVExzSg?oc=5",
+    "date": "2026-11-24T12:58:44.000Z",
+    "summary": "COMMENTARY: Oil Markets Survived the Iran War Sprint. Now Comes the Marathon: Bousso EnergyNow",
+    "source": "Google News",
     "regions": [
      "Bliski Wschód"
     ],
@@ -1135,40 +1039,137 @@
     "score": 8
    },
    {
-    "title": "Bitcoin Falls to $57,470 as Hot Inflation and Trump Tariffs Hit Markets - Cryptonews.net",
-    "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9LNWxmenVGakdvc0pLU09YaWpveXJhV1VqMGlNSEl4SFUtdVdtZnN2dmtHaVB2Z3J4OGM3WXM0VXlaUV9wSDViRXNkdWZ6Y1lMWVhaMHl4VHA?oc=5",
-    "date": "2026-11-25T17:00:00.000Z",
-    "summary": "Bitcoin Falls to $57,470 as Hot Inflation and Trump Tariffs Hit Markets Cryptonews.net",
+    "title": "Unia Europejska gra va banque za Atlantykiem. Stawka: 132 miliony konsumentów",
+    "link": "https://www.bankier.pl/wiadomosc/Unia-Europejska-gra-va-banque-za-Atlantykiem-Stawka-132-miliony-konsumentow-9235580.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-27T05:00:00.000Z",
+    "summary": "132 miliony konsumentów, cła spadające do zera i potężna szansa dla europejskiego nabiału, alkoholi oraz jabłek. Zmodernizowana umowa handlowa UE–Meksyk może wejść w życie już na początku 2027 roku. Czy to ratunek dla europejskiego eksportu, czy – jak obawiają się niektórzy rolnicy – nowy \"mini-Merc",
+    "source": "Bankier.pl",
+    "regions": [
+     "Europa",
+     "Rynki wschodzące"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "US Section 301 tariffs spare key chip markets, but Vietnam clouds Taiwan's 2027 outlook - digitimes",
+    "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPRDdNc3UzbnBlQm1URVJLR2VEeGluZHhkQm9BZGl3b3NfRWlVQi0zS2NURjVrVlR5TWZlVEVoMWttSl9tWHFsQjZWLVZSdldEaHZWY0ZQb2xMZzdKZm80RDJiTWZLREtVbjUzYUhDQ0ZseFd4djh3Z2ZYU1pKUTFXWFl6UkVCTEExWTh0bnFVMHZFUWR6SWNZd0FESXY?oc=5",
+    "date": "2026-11-27T01:21:23.000Z",
+    "summary": "US Section 301 tariffs spare key chip markets, but Vietnam clouds Taiwan's 2027 outlook digitimes",
+    "source": "Google News",
+    "regions": [
+     "USA",
+     "Azja"
+    ],
+    "themes": [
+     "Sankcje i cła"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Trump kwestionuje dane o wzroście PKB. „Poważny i celowy błąd”",
+    "link": "https://www.bankier.pl/wiadomosc/Trump-kwestionuje-dane-o-wzroscie-PKB-Powazny-i-celowy-blad-9235902.html?utm_source=RSS&utm_medium=RSS&utm_campaign=Wiadomosci",
+    "date": "2026-11-26T17:38:00.000Z",
+    "summary": "Prezydent USA Donald Trump w czwartek zażądał zbadania danych gospodarczych opublikowanych przed wyborami połówkowymi do Kongresu 3 listopada. Uznał, że informacje dotyczące wzrostu gospodarczego były celowo zaniżone. Szacunki dotyczące PKB są rutynowo korygowane w miarę napływu danych.",
+    "source": "Bankier.pl",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Wybory i polityka",
+     "Inflacja i recesja"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Trump tariffs bad timing for markets hit by tech selloff - Kuwait Times",
+    "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNTFFvQmZEeUs2QmJJQ3NTTTI0b2NHNVZZSnJzQ3ktMlZlX1RaTVJVSzBWbXFKcjJzcng4cnQwS1JvMkZiVi1oQnhwYWlyWnFwd0NGQnpKcnI1SjNGYk5MVGQ4eXg3T1RVQ2hfdVhDUkJvd01YZzNRVTAwall3MXhueDhWV2Z2Z2dzWldBX0ZSeWk4b2szY3lVQ2tyWXVhcVNVY2hXaUlKZ9IBqwFBVV95cUxQVC1FaWNHZzRpUkc2bi0tcWdKc21fSGp2ZEJ1WW9nSmM1VXJIald2U094RHA2c2dkRU9yTGZYZV9UQjdPNy1CUmI2bEw0SFUxbVM0d3B0dlFDZ3hONmF4QVFxZTJOY2t6dk40TEViTG05WEZ5d3NIWGt3N3ROczY4dk8tWUV0MTdFWjZwUENCYjgwVWh4UWVMMzQ2VmtfZy1RbzlKcFZ4VHE0a3c?oc=5",
+    "date": "2026-11-26T16:31:08.000Z",
+    "summary": "Trump tariffs bad timing for markets hit by tech selloff Kuwait Times",
     "source": "Google News",
     "regions": [
      "USA"
     ],
     "themes": [
      "Sankcje i cła",
-     "Inflacja i recesja"
+     "Nastroje na giełdach"
     ],
     "relevant": true,
-    "score": 8
+    "score": 7
+   },
+   {
+    "title": "Trump, NATO chief caution Russia as attacks on Ukraine’s energy infrastructure intensify",
+    "link": "https://www.cnbc.com/2026/11/26/trump-nato-rutte-russia-ukraine-war.html",
+    "date": "2026-11-26T16:12:47.000Z",
+    "summary": "Trump and NATO chief Mark Rutte urged Russia to avoid actions that could expand the war and called for a rapid peaceful resolution.",
+    "source": "CNBC",
+    "regions": [
+     "USA",
+     "Rosja/Ukraina"
+    ],
+    "themes": [
+     "Konflikty i wojny",
+     "Energia i surowce"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Stocks rally in Asia, unrocked by US tariffs - شبكة تواصل الإخبارية",
+    "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE55YnZOQ0tpb1NjV0JuUHpKT0liOXdhUUhLeFVHeXM5VTRtbG01dlgxekdIVlNYcXpEdmd4YmJPTVgweWQ5WTFSUW5mUVlZaW5fNkRj?oc=5",
+    "date": "2026-11-26T07:01:55.000Z",
+    "summary": "Stocks rally in Asia, unrocked by US tariffs شبكة تواصل الإخبارية",
+    "source": "Google News",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 7
+   },
+   {
+    "title": "Stocks rally in Asia, US tariffs not as dire as feared - Yahoo Finance",
+    "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPa09oWTlvekdOUXlkVXcxUGNFcHY3cDdKdWtLMlNpYzJpdHpaQUVKbkxBckJCUGt5RWYtVHM5VkZhQkZacTFRNHMzdG8xSmRIclRoYUhOZDgtbThXYWFrTHdLdncwWjItTUMxRFZ3RkV4czRqc2hUd2RRUFJXWXBaWlhJdlBHTkFoMEV1OTFXWEczS2Fja3FVZUcySlVpSnV2SmFN?oc=5",
+    "date": "2026-11-26T05:02:00.000Z",
+    "summary": "Stocks rally in Asia, US tariffs not as dire as feared Yahoo Finance",
+    "source": "Google News",
+    "regions": [
+     "USA"
+    ],
+    "themes": [
+     "Sankcje i cła",
+     "Nastroje na giełdach"
+    ],
+    "relevant": true,
+    "score": 7
    }
   ],
   "themeCounts": {
-   "Konflikty i wojny": 14,
-   "Sankcje i cła": 93,
-   "Banki centralne i stopy": 16,
-   "Wybory i polityka": 14,
-   "Energia i surowce": 20,
-   "Inflacja i recesja": 24,
-   "Nastroje na giełdach": 25,
-   "Spółki i wyniki": 15
+   "Konflikty i wojny": 7,
+   "Sankcje i cła": 47,
+   "Banki centralne i stopy": 15,
+   "Wybory i polityka": 22,
+   "Energia i surowce": 17,
+   "Inflacja i recesja": 13,
+   "Nastroje na giełdach": 16,
+   "Spółki i wyniki": 11
   },
   "regionCounts": {
-   "USA": 94,
-   "Europa": 26,
-   "Azja": 28,
-   "Rynki wschodzące": 5,
-   "Polska": 18,
-   "Bliski Wschód": 5,
-   "Rosja/Ukraina": 4
+   "USA": 50,
+   "Europa": 21,
+   "Azja": 12,
+   "Rynki wschodzące": 2,
+   "Polska": 13,
+   "Bliski Wschód": 6,
+   "Rosja/Ukraina": 3
   },
   "errors": []
  },
@@ -1179,7 +1180,7 @@
     {
      "title": "Limity IKE, IKZE, OIPE, OKI, OFE, PPK i PPE na 2027 r. Razem to około 220 tys. zł - Parkiet.com",
      "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQNElOckVsenZtdV9haTZJdDJlU1BWZXdnSllnZ0gxbnVjazYxdk1naEFKZld0WGJlRkhSa2l0QWNNZWE4WlNKMmRvQkZjNGstLWg0YVFhaTFHdUR5T0dvSkhXQjBYZWNSWnNaaVB0R3A3VlBNY192c0ZIdnFNV3dLakpkYlAxTVNJTVU1YWpXSVRDMnVpZThNZFNFNnRnbWlUcXJXekFJLVhvUDJ1UjNiRDlwUXJjR0wydGc?oc=5",
-     "date": "2026-11-18T16:01:06.000Z",
+     "date": "2026-11-18T08:00:00.000Z",
      "summary": "Limity IKE, IKZE, OIPE, OKI, OFE, PPK i PPE na 2027 r. Razem to około 220 tys. zł Parkiet.com",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1206,32 +1207,6 @@
      "score": 10
     },
     {
-     "title": "Limit IKZE w 2026 i 2027 roku – jakie kwoty obowiązują? - XTB.com",
-     "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFBKQTRGMjRqXzlKU3dQQzhlZkxGYkFYMDRWX0tLWkxIOF9XWTNvNmIxazVYYk51Yl9weUxId1NhcVFDbllaNkJFMk5lV0lrcHVOQ1V0aQ?oc=5",
-     "date": "2026-11-12T08:00:00.000Z",
-     "summary": "Limit IKZE w 2026 i 2027 roku – jakie kwoty obowiązują? XTB.com",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "Brokerzy i opłaty"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
-     "title": "Limit IKE w 2026 i 2027 roku - ile wynosi? - XTB.com",
-     "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTFBxci1YQ0RsSHBkTTZYT0FGSE9OZ0pIR19TMWVwOWdYcm9yUmRXa2c5clNuZ0xrVTUxUnhsVzZJTTVucTBfNWM1T3N6eFFhOXBKa2pR?oc=5",
-     "date": "2026-11-12T08:00:00.000Z",
-     "summary": "Limit IKE w 2026 i 2027 roku - ile wynosi? XTB.com",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "Brokerzy i opłaty"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
      "title": "Długoterminowe oszczędzanie Polaków: czy OFE wciąż ma sens? PPK - najtańszy i najbardziej korzystny sposób. OKI już od 2027 r. [Wywiad] - Gazeta Prawna",
      "link": "https://news.google.com/rss/articles/CBMiswJBVV95cUxPSlM5MVptdUVCRUptc0E4OWJabUd3QmhaUHNkT2J6QWFiRE9DUlhncVlnemRncTQ3NmFzWkZURmI3Y2VSaGNDYXBkaktubjd1VWdRTzl6NFVYaW1DRXJ5aERoVzhOVFc2UUxtbXlTbHpIc1QzdUJPVnRxa05iZERTS2VkaWUzb2FpSnd3ZS1odjlDV2NJbUo2My16Rk9qc2lsTDBOS2ktTG1fMzdXbDhBc1VEMTVFc1Q2ckh0S1JaNU9Dc3RRVnNIYlppSGVKd1g1VWhYMXNRUlBHOERtUUlGbGpudHQ2b09JMkRmMUt6QjFOQWstX3RwUXRrc3pjS3lQT0Rtdzc1T3FaYTV0TV8xT04tYS0xejBuOVlLLUtNRUhMaExEdGF5RllRb05xV1lWcTRJ?oc=5",
      "date": "2026-11-23T13:24:23.000Z",
@@ -1243,19 +1218,6 @@
      ],
      "important": true,
      "score": 7
-    },
-    {
-     "title": "OKI bez podatku Belki? Jak działa podatek od aktywów i kiedy się opłaca | Debata ekspertów - StockWatch.pl",
-     "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNZ3FPZzJMbU42a19UUEZUVnFWRzlXUHJUeXJ0UlA5WFZtQTE3M3RPSnRDUUlJakxXRTh4SmRMOGFfQlVJZHpxaWNvYV91UHBrcURvNFhMcnl0ZlZqSlNFMHhXVUJoTktvVk9yTUxXbjhwanJBOV9QekEtMm9kUXBva1pLNkdTRVVwSEVjeTQ2R1YxbTdBRkE5V0t1SVJyZEt3QkRTRElmZFpYM0ZTS0pZTzFGcEkzcHVQWXRTeDFTOA?oc=5",
-     "date": "2026-11-25T17:00:08.000Z",
-     "summary": "OKI bez podatku Belki? Jak działa podatek od aktywów i kiedy się opłaca | Debata ekspertów StockWatch.pl",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "OKI",
-      "Podatek Belki"
-     ],
-     "important": false,
-     "score": 6
     },
     {
      "title": "Webinar \"Osobiste Konto Inwestycyjne (OKI) – przyszłość inwestowania w Polsce. Poznaj projekt od kulis!\" - Uniwersytet Ekonomiczny w Katowicach",
@@ -1323,7 +1285,7 @@
     {
      "title": "Nowe progi PIT mogą zmniejszyć podatkową atrakcyjność IKZE - Analizy.pl",
      "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNQ2hHQlRXWjNWSGlXTHpFWEpFamlpSFJqckRrSkItTm1vMTFWTWg1aTY0ck9HQWVCSmJCV2Jab3JmRGVSR0Q2MDJNWVY4T2g4cVdTM1lIWERvRGdDWUxZOURXamc1bVRuMEkycmJlOVhoMTdiaUdoamVFVFlGNWlLNFNQSWJUcFR6R3RNWE5ueHEyYmFMcmkxVGdXZERPVVE?oc=5",
-     "date": "2026-11-23T14:25:08.000Z",
+     "date": "2026-11-25T14:01:15.000Z",
      "summary": "Nowe progi PIT mogą zmniejszyć podatkową atrakcyjność IKZE Analizy.pl",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1332,13 +1294,52 @@
      ],
      "important": false,
      "score": 5
+    },
+    {
+     "title": "IKZE przed końcem roku. Jedna wpłata może obniżyć PIT nawet o 5,4 tys. zł. Liczy się data - Pit.pl",
+     "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOcFh3Z2dhVjVRdkRNb0J1Wm94TFBlLVJjalpwQ040M245dFVWMEpjTW15UlhVMTFIX0hsYk5HZmNZUVQ5a3l2Q1hKUWI0X21ZdVVJNzNqR0k1ckxLR2tlRmU0c1lwNHpjTUNwSE5SeGpzTzBlLUs3WVp0ZjNxWm5PbUprVzlfOHE5cVlpRGtkQVFTRC0td0dWZzRGUkM4eFhqeHhvdmJIcnMtbFVlMUJzdXM0OWZOYlE?oc=5",
+     "date": "2026-11-23T06:28:00.000Z",
+     "summary": "IKZE przed końcem roku. Jedna wpłata może obniżyć PIT nawet o 5,4 tys. zł. Liczy się data Pit.pl",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "PIT i rozliczenia"
+     ],
+     "important": false,
+     "score": 5
+    },
+    {
+     "title": "Alior wprowadza 0% prowizji na rachunkach IKE i IKZE - Analizy.pl",
+     "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNdWpZTFR2Z0gwNlVOcTBpRGw2dm5mQ2hwcG1ic2dMVURCR1NyX3ByNnFQYUVEY3JYZ09veWhwTmotTktEVXdNSWpVSkxSUkJ4X3VIQ3haZUl0S2JrWnJNczE1alFrY1lWUVNDZlZ6TURpMWNGeDJybVRTY3dsY1ppeV84YnI2R3hXSFkzOFp4ZlRYYkNUYmc?oc=5",
+     "date": "2026-11-18T15:33:05.000Z",
+     "summary": "Alior wprowadza 0% prowizji na rachunkach IKE i IKZE Analizy.pl",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "Brokerzy i opłaty"
+     ],
+     "important": false,
+     "score": 5
+    },
+    {
+     "title": "Obligacje skarbowe w grudniu 2026 r. - jakie oprocentowanie nowych emisji. Ostatni dzwonek na podatkowe korzyści z wpłat na IKE-Obligacje i IKZE-Obligacje - INFOR.PL",
+     "link": "https://news.google.com/rss/articles/CBMitgJBVV95cUxNODNLMWZqQXBnclR5MnRzS1pnZmk1VEhmQ1RKUzcwRU9VMWk3ejM4Wi1WYjBmYUpsczczU3dXdUxKazFsUDNMY0tTV2o0TVFLSUxhQ2RJZFk1NjJ3OUhuT2IxRTlpZ1ZuY3l2RlhlZTdJemExWnBxZmhiWHBnVDZ0ZlRUQVozZzZhY0VOQnBKT2NzNmY0ZGlWWllmd0NRclVOaUdfQ1Nfd2JmRDFINzFkN18zY1lFeXh1Vm1Kak1Ba2lYeXV1d3VGR1lIRFlwMk1BZE8wZWhSS2hXMFMtdWdTWXBpTTBPS1RaUWJsZ0tqNmktVnItMVZGMk03bHF2RXhXQlF5UUlPNkNxWE1FbVduNDh4ckRFTFlGTEduRW9uSXdZcF9FSG12Q2JRc3ItYzNLcldNeWVB?oc=5",
+     "date": "2026-11-25T11:40:00.000Z",
+     "summary": "Obligacje skarbowe w grudniu 2026 r. - jakie oprocentowanie nowych emisji. Ostatni dzwonek na podatkowe korzyści z wpłat na IKE-Obligacje i IKZE-Obligacje INFOR.PL",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE",
+      "Obligacje skarbowe"
+     ],
+     "important": false,
+     "score": 4
     }
    ],
    "important": [
     {
      "title": "Limity IKE, IKZE, OIPE, OKI, OFE, PPK i PPE na 2027 r. Razem to około 220 tys. zł - Parkiet.com",
      "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQNElOckVsenZtdV9haTZJdDJlU1BWZXdnSllnZ0gxbnVjazYxdk1naEFKZld0WGJlRkhSa2l0QWNNZWE4WlNKMmRvQkZjNGstLWg0YVFhaTFHdUR5T0dvSkhXQjBYZWNSWnNaaVB0R3A3VlBNY192c0ZIdnFNV3dLakpkYlAxTVNJTVU1YWpXSVRDMnVpZThNZFNFNnRnbWlUcXJXekFJLVhvUDJ1UjNiRDlwUXJjR0wydGc?oc=5",
-     "date": "2026-11-18T16:01:06.000Z",
+     "date": "2026-11-18T08:00:00.000Z",
      "summary": "Limity IKE, IKZE, OIPE, OKI, OFE, PPK i PPE na 2027 r. Razem to około 220 tys. zł Parkiet.com",
      "source": "Google News – podatki inwestora",
      "topics": [
@@ -1348,32 +1349,6 @@
      ],
      "important": true,
      "score": 10
-    },
-    {
-     "title": "Limit IKZE w 2026 i 2027 roku – jakie kwoty obowiązują? - XTB.com",
-     "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFBKQTRGMjRqXzlKU3dQQzhlZkxGYkFYMDRWX0tLWkxIOF9XWTNvNmIxazVYYk51Yl9weUxId1NhcVFDbllaNkJFMk5lV0lrcHVOQ1V0aQ?oc=5",
-     "date": "2026-11-12T08:00:00.000Z",
-     "summary": "Limit IKZE w 2026 i 2027 roku – jakie kwoty obowiązują? XTB.com",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "Brokerzy i opłaty"
-     ],
-     "important": true,
-     "score": 8
-    },
-    {
-     "title": "Limit IKE w 2026 i 2027 roku - ile wynosi? - XTB.com",
-     "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTFBxci1YQ0RsSHBkTTZYT0FGSE9OZ0pIR19TMWVwOWdYcm9yUmRXa2c5clNuZ0xrVTUxUnhsVzZJTTVucTBfNWM1T3N6eFFhOXBKa2pR?oc=5",
-     "date": "2026-11-12T08:00:00.000Z",
-     "summary": "Limit IKE w 2026 i 2027 roku - ile wynosi? XTB.com",
-     "source": "Google News – podatki inwestora",
-     "topics": [
-      "IKE/IKZE",
-      "Brokerzy i opłaty"
-     ],
-     "important": true,
-     "score": 8
     },
     {
      "title": "Długoterminowe oszczędzanie Polaków: czy OFE wciąż ma sens? PPK - najtańszy i najbardziej korzystny sposób. OKI już od 2027 r. [Wywiad] - Gazeta Prawna",
@@ -1393,6 +1368,30 @@
      "link": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxQT1NwOXhYZTlSX2VYVnFUeHQ2d3Rwd2NDVW1vT2F0akRHTi1uOU00UUM1MmZtMFdsUFBFVDQxNnU4dWxOcVRIR1hybVVTYUF4QmRHQVlyVTRZZzdEcTI2ZUVzWG9PT0RWcE01TmRlN0hhdjFPRlF1UlY1bVpzaVBHUXNmcmgzbFBVZ1FUNldNY2ZXS0wyWl9IX2dzSjM5ZWI4ZDM1OC05WWN0OEhLZ2liU1dzM3NEazZabHNFVHpTZlV2Q3JrYzEtRU1UQzcwc2VTZHRCVjRZUE85UDM4RXpHZlhMRTBrRjBLa2IwNDJn?oc=5",
      "date": "2026-11-24T07:11:00.000Z",
      "summary": "Webinar \"Osobiste Konto Inwestycyjne (OKI) – przyszłość inwestowania w Polsce. Poznaj projekt od kulis!\" Uniwersytet Ekonomiczny w Katowicach",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "OKI"
+     ],
+     "important": true,
+     "score": 6
+    },
+    {
+     "title": "IKE i IKZE: limity 2026 i 2027 i odliczenie od podatku - Devstock Academy",
+     "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNckdtV3BoMjVyX2g5RWpOcTNEbHBoaWtEeEhHLWpVVEw0emUxaEE5bWpEbVVhU0tRWW1MaFZaVzJHcTk3Z3hacWJXdk1LSGdrb2gyZmxacVh6WlFfSkRRZVhaQ2YwWVVXT3g2U2trcGN5UUxLMU0yeklCUnZlWFBfY2E3dXJfRWx5VTV1WDRKems2NzFoUjlDSDBKMA?oc=5",
+     "date": "2026-11-21T10:19:00.000Z",
+     "summary": "IKE i IKZE: limity 2026 i 2027 i odliczenie od podatku Devstock Academy",
+     "source": "Google News – podatki inwestora",
+     "topics": [
+      "IKE/IKZE"
+     ],
+     "important": true,
+     "score": 6
+    },
+    {
+     "title": "Osobiste Konto Inwestycyjne – limity i rozliczanie podatku 2027 - Poradnik Przedsiębiorcy",
+     "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPWXE2Z3M1bWp0RVBnNjFaWjZGRFJRSVg2bzRLc3RMN3pJc1lublpDeTdQSXZvUE1Ub1JQSHljYlZFWjBuQnRlRXppRXRoRlNTRWdzMzZGd1VvRjZoRU1oQVZkbkJPVWszUnZmbmVPbzczYXUxb2x2NmNhcjk4NEx6NzBqenZUNTJfc0l6SXhmZ0UzMnR5dlE?oc=5",
+     "date": "2026-11-17T08:00:00.000Z",
+     "summary": "Osobiste Konto Inwestycyjne – limity i rozliczanie podatku 2027 Poradnik Przedsiębiorcy",
      "source": "Google News – podatki inwestora",
      "topics": [
       "OKI"
@@ -1437,13 +1436,13 @@
   "discrepancies": []
  },
  "meta": {
-  "generatedAt": "2026-11-26T07:28:09.810Z",
+  "generatedAt": "2026-11-27T07:27:55.880Z",
   "dataSource": "tiingo",
   "warnings": [],
   "crossCheck": null
  },
  "rynek": {
-  "asOf": "2026-11-25",
+  "asOf": "2026-11-26",
   "world": [
    {
     "key": "SPX",
@@ -1600,12 +1599,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": false,
-    "date": "2026-11-25",
-    "last": 3980.69,
-    "d1": -0.01873,
-    "w1": -0.05811,
+    "date": "2026-11-26",
+    "last": 4043.87,
+    "d1": 0.015872,
+    "w1": -0.03825,
     "m1": null,
-    "ytd": 0.250209,
+    "ytd": 0.270052,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1621,12 +1620,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": false,
-    "date": "2026-11-25",
-    "last": 150363.09,
-    "d1": -0.015563,
-    "w1": -0.052869,
+    "date": "2026-11-26",
+    "last": 152971.1,
+    "d1": 0.017345,
+    "w1": -0.031024,
     "m1": null,
-    "ytd": 0.282521,
+    "ytd": 0.304766,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1642,12 +1641,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": false,
-    "date": "2026-11-25",
-    "last": 10172.46,
-    "d1": -0.007358,
-    "w1": -0.041956,
+    "date": "2026-11-26",
+    "last": 10409.19,
+    "d1": 0.023272,
+    "w1": -0.011211,
     "m1": null,
-    "ytd": 0.243264,
+    "ytd": 0.272197,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1663,12 +1662,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": false,
-    "date": "2026-11-25",
-    "last": 27602.08,
-    "d1": -0.010165,
-    "w1": -0.042232,
+    "date": "2026-11-26",
+    "last": 28121.38,
+    "d1": 0.018814,
+    "w1": -0.020852,
     "m1": null,
-    "ytd": -0.067187,
+    "ytd": -0.049637,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1684,12 +1683,12 @@
     "kind": "index",
     "src": "gpw",
     "bond": true,
-    "date": "2026-11-25",
-    "last": 2256.67,
-    "d1": 0.002439,
-    "w1": 0.00715,
+    "date": "2026-11-26",
+    "last": 2257.86,
+    "d1": 0.000527,
+    "w1": 0.005101,
     "m1": null,
-    "ytd": 0.014138,
+    "ytd": 0.014673,
     "y1": null,
     "high52": null,
     "low52": null,
@@ -1831,13 +1830,13 @@
     "kind": "fx",
     "src": "nbp",
     "bond": false,
-    "date": "2026-11-25",
-    "last": 4.4809,
-    "d1": 0.003943,
-    "w1": 0.016331,
-    "m1": 0.017785,
-    "ytd": 0.060141,
-    "y1": 0.059289,
+    "date": "2026-11-26",
+    "last": 4.4802,
+    "d1": -0.000156,
+    "w1": 0.014423,
+    "m1": 0.016933,
+    "ytd": 0.059976,
+    "y1": 0.058398,
     "high52": 4.4809,
     "low52": 4.2009,
     "fromHigh": null,
@@ -1852,13 +1851,13 @@
     "kind": "fx",
     "src": "nbp",
     "bond": false,
-    "date": "2026-11-25",
-    "last": 4.0966,
-    "d1": 0.003601,
-    "w1": 0.019816,
-    "m1": 0.042578,
-    "ytd": 0.137439,
-    "y1": 0.117001,
+    "date": "2026-11-26",
+    "last": 4.0835,
+    "d1": -0.003198,
+    "w1": 0.016403,
+    "m1": 0.032699,
+    "ytd": 0.133802,
+    "y1": 0.116381,
     "high52": 4.0966,
     "low52": 3.5045,
     "fromHigh": null,
@@ -2037,34 +2036,41 @@
     "kind": "dane",
     "note": "Zwykle ostatni dzień roboczy miesiąca o 10:00 – termin orientacyjny.",
     "approx": true
+   },
+   {
+    "date": "2027-01-01",
+    "title": "Nowy sygnał GEM (po zamknięciu miesiąca)",
+    "kind": "gem",
+    "note": "Aplikacja sprawdzi sygnał i powiadomi, jeśli trzeba zmienić ETF.",
+    "approx": false
    }
   ],
   "note": {
-   "date": "2026-11-26",
+   "date": "2026-11-27",
    "stance": {
     "id": "ostrozne",
     "label": "ostrożne",
     "tone": "warn"
    },
    "summary": [
-    "Akcje w ostatnim tygodniu: S&P 500 −1,9%, Europa −1,1%, rynki wschodzące −2,6%, WIG20 −5,8% (S&P 500 od początku roku +5,2%).",
+    "Akcje w ostatnim tygodniu: S&P 500 −1,9%, Europa −1,1%, rynki wschodzące −2,6%, WIG20 −3,8% (S&P 500 od początku roku +5,2%).",
     "Rentowność 10-letnich obligacji USA 4,91% (−0,19 pp w tydzień), złoto −4,0%, ropa Brent 91,8 USD (−1,2%).",
-    "Złoty: EUR/PLN 4,4809 (+1,6% w tydzień), USD/PLN 4,0966 (+2,0% w tydzień)."
+    "Złoty: EUR/PLN 4,4802 (+1,4% w tydzień), USD/PLN 4,0835 (+1,6% w tydzień)."
    ],
    "sections": [
     {
      "title": "Co się dzieje na świecie",
      "items": [
-      "Sankcje i cła (93 wiadomości): cła i sankcje uderzają w handel i marże firm; najbardziej wrażliwe są spółki eksportowe, rynki wschodzące i branże z długimi łańcuchami dostaw (technologie, motoryzacja). Przykład: „Wojna handlowa wraca, giełdy reagują. USA publikują nową listę ceł, do 45% na Chiny - BitHub.pl” (Google News PL).",
-      "Nastroje na giełdach (25 wiadomości): gwałtowne wzrosty i wyprzedaże pokazują nastroje inwestorów; same w sobie rzadko zmieniają długoterminowy trend, ale podnoszą zmienność. Przykład: „US stocks tumble as artificial intelligence sell-off, sticky inflation, and new tariffs rattle Wall Street - Dimsum Daily” (Google News).",
-      "Inflacja i recesja (24 wiadomości): wyższa inflacja oddala obniżki stóp, a słabsze dane o wzroście zwiększają ryzyko spadku zysków firm, choć mogą przyspieszyć obniżki stóp. Przykład: „Even the price of toys is on the rise. How Americans are scaling back holiday plans” (CNBC)."
+      "Sankcje i cła (47 wiadomości): cła i sankcje uderzają w handel i marże firm; najbardziej wrażliwe są spółki eksportowe, rynki wschodzące i branże z długimi łańcuchami dostaw (technologie, motoryzacja). Przykład: „Trump Tariffs 2027: Inflation, Fed Rates & Stock Risks - www.equiti.com” (Google News).",
+      "Wybory i polityka (22 wiadomości): niepewność polityczna podnosi zmienność do czasu rozstrzygnięcia; potem rynki zwykle wracają do fundamentów: zysków firm i stóp procentowych. Przykład: „Iran zaciska pasa po miesiącach wojny. Rząd wycofuje popularne dopłaty” (Bankier.pl).",
+      "Energia i surowce (17 wiadomości): droższa energia podbija inflację i koszty firm (szkodzi importerom, w tym Europie i Polsce), a wspiera spółki surowcowe. Przykład: „Even the price of toys is on the rise. How Americans are scaling back holiday plans” (CNBC)."
      ]
     },
     {
      "title": "Największe zmiany w tygodniu",
      "items": [
-      "Najmocniej: długie obligacje USA +2,5%, polskie obligacje +0,7%.",
-      "Najsłabiej: WIG20 −5,8%, WIG −5,3%."
+      "Najmocniej: długie obligacje USA +2,5%, polskie obligacje +0,5%.",
+      "Najsłabiej: złoto −4,0%, WIG20 −3,8%."
      ]
     },
     {
